@@ -1,0 +1,96 @@
+regions:
+  # World:
+  #   initial capital:
+  #     value: 190
+  #     unit: trillion US$2005/yr
+  R5.2OECD:
+    initial capital:
+      value: 80
+      unit: trillion US$2005/yr
+  R5.2ASIA:
+    initial capital:
+      value: 45
+      unit: trillion US$2005/yr
+  R5.2LAM:
+    initial capital:
+      value: 20
+      unit: trillion US$2005/yr
+  R5.2MAF:
+    initial capital:
+      value: 20
+      unit: trillion US$2005/yr
+  R5.2REF:
+    initial capital:
+      value: 10
+      unit: trillion US$2005/yr
+
+
+input:
+  db_filename: ../../Databases/SSP_IAM_V2_201811.csv
+  baselines:
+    SSP1:
+      scenario: SSP1-Baseline
+      model: IMAGE
+    SSP2:
+      scenario: SSP2-Baseline
+      model: MESSAGE-GLOBIOM
+    SSP3:
+      scenario: SSP3-Baseline
+      model: AIM/CGE
+    SSP4:
+      scenario: SSP4-Baseline
+      model: GCAM4
+    SSP5:
+      scenario: SSP5-Baseline
+      model: REMIND-MAGPIE
+
+  variables:
+    GDP:
+      name: GDP|PPP
+      conversionfactor: 0.001
+    emissions:
+      name: Emissions|CO2
+      conversionfactor: 0.001
+    population: 
+      name: Population
+      conversionfactor: 0.001
+
+time:
+  start: 2015
+  end: 2125
+  dt: 2.5
+
+SSP: 'SSP2'
+
+economics:
+  PRTP: 0.015
+  elasmu: 1.45
+  GDP:
+    alpha: 0.3
+    depreciation of capital: 0.1
+    savings rate: 0.21
+  MAC:
+    beta: 2
+    rho: 0.82
+    gamma: 3.926
+  damages:
+    coeff: 0.010038
+
+emissions:
+  carbonbudget: 600
+  min level: -20     # False or a number
+  inertia:
+    global: False     # False or a number < 0, % of initial emissions
+    regional: -0.05     # False or a number < 0, % of initial emissions
+
+temperature:
+  initial: 1.09
+  TCRE: 0.00062
+
+GEKKO:
+  remote: False
+  verbose: False
+  imode: 6
+  max_iter: 600
+  upperbounds:
+    relative_abatement: 1.5
