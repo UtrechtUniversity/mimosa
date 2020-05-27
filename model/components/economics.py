@@ -21,7 +21,7 @@ def get_TFP(time, region):
     K0_data = params['regions'][region]['initial capital']
     K = K0_data['value']
 
-    GDP_data = data.get_data(time, region, params['SSP'], 'GDP')
+    GDP_data = data.get_data(time, region, params['SSP'], 'GDP', 'currency_unit')
 
     # Check units:
     if K0_data['unit'] != GDP_data['unit']:
@@ -29,7 +29,7 @@ def get_TFP(time, region):
             K0_data['unit'], GDP_data['unit']
         ))
 
-    population_data = data.get_data(time, region, params['SSP'], 'population')
+    population_data = data.get_data(time, region, params['SSP'], 'population', 'population_unit')
 
     for t, GDP, L in zip(time, GDP_data['values'], population_data['values']):
         TFP.append(GDP / calc_GDP(1, L, K, alpha))

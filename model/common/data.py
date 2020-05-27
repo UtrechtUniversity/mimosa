@@ -1,6 +1,8 @@
 import numpy as np
 import pandas as pd
+
 from model.common.config import params
+from model.common import units
 
 ### Load SSP database
 database = pd.read_csv(params['input']['db_filename'])
@@ -10,7 +12,7 @@ def get_data_from_database(region, SSP, variable):
     
     model = params['input']['baselines'][SSP]['model']
     scenario = params['input']['baselines'][SSP]['scenario']
-    variablename = params['input']['variables'][variable]['name']
+    variablename = params['input']['variables'][variable]
     
     selection = database.loc[
         (database['MODEL'] == model)
@@ -26,17 +28,11 @@ def get_data_from_database(region, SSP, variable):
             )
         )
     
-    conversionfactor = params['input']['variables'][variable]['conversionfactor']
-
+    years = selection.loc[:,'2010':].columns.values.astype(float)
+    values = selection.loc[:,'2010':].values[0]
     unit = selection.iloc[0]['UNIT']
-    if conversionfactor != 1:
-        unit = '{} (x{})'.format(unit, conversionfactor)
     
-    return {
-        'years': selection.loc[:,'2010':].columns.values.astype(float),
-        'values': selection.loc[:,'2010':].values[0] * conversionfactor,
-        'unit': unit
-    }
+    return years, values, unit
 
 
 
@@ -66,20 +62,24 @@ def extrapolate(input, years, extra_years, stabilising_years=50):
 
 
 
-def get_data(year, region, SSP, variable):
+def get_data(year, region, SSP, variable, to_unit=None):
     # 1. Get data from database
-    database_values = get_data_from_database(region, SSP, variable)
-    SSP_years = database_values['years']
+    years, values, unit = get_data_from_database(region, SSP, variable)
+    if to_unit is not None:
+        quantity = units.to_default_units(values, unit, to_unit)
+        values = quantity.magnitude
+        unit = quantity.units
+
 
     # 2. Extrapolate this data to beyond 2100
     extra_years = np.arange(2110, 2260, 10)
-    extended_data = extrapolate(database_values['values'], SSP_years, extra_years)
-    extended_years = np.concatenate([SSP_years, extra_years])
+    extended_data = extrapolate(values, years, extra_years)
+    extended_years = np.concatenate([years, extra_years])
 
     # 3. Interpolate the combined data
     return {
         'values': np.interp(year, extended_years, extended_data),
-        'unit': database_values['unit']
+        'unit': unit
     }
 
 

@@ -5,7 +5,7 @@ import time as timer
 from gekko import GEKKO
 
 from model.common.config import params
-from model.common import utils, data
+from model.common import utils, data, units
 from model.components import economics, emissions, time, variable_factory
 from model.visualisation import plot
 

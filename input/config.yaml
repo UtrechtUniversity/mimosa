@@ -45,15 +45,9 @@ input:
       model: REMIND-MAGPIE
 
   variables:
-    GDP:
-      name: GDP|PPP
-      conversionfactor: 0.001
-    emissions:
-      name: Emissions|CO2
-      conversionfactor: 0.001
-    population: 
-      name: Population
-      conversionfactor: 0.001
+    GDP: GDP|PPP
+    emissions: Emissions|CO2
+    population: Population
 
 time:
   start: 2015
@@ -72,20 +66,26 @@ economics:
   MAC:
     beta: 2
     rho: 0.82
-    gamma: 3.926
+    gamma: 3.926 # unit
   damages:
     coeff: 0.010038
 
 emissions:
-  carbonbudget: 600
-  min level: -20     # False or a number
+  carbonbudget: 600 # unit
+  min level: -20     # False or a number # unit
   inertia:
-    global: False     # False or a number < 0, % of initial emissions
-    regional: -0.05     # False or a number < 0, % of initial emissions
+    global: False     # False or a number < 0, % of initial emissions # unit
+    regional: -0.05     # False or a number < 0, % of initial emissions # unit
 
 temperature:
-  initial: 1.09
-  TCRE: 0.00062
+  initial: 1.09 # unit
+  TCRE: 0.00062 # unit
+
+default units:
+  currency_unit: trillion USD2005/yr
+  emissions_unit: Gt CO2/yr
+  temperature_unit: degC
+  population_unit: billion
 
 GEKKO:
   remote: False
