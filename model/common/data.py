@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 
 from model.common.config import params
-from model.common import units
+from model.common.units import Quant
 
 ### Load SSP database
 database = pd.read_csv(params['input']['db_filename'])
@@ -66,7 +66,7 @@ def get_data(year, region, SSP, variable, to_unit=None):
     # 1. Get data from database
     years, values, unit = get_data_from_database(region, SSP, variable)
     if to_unit is not None:
-        quantity = units.to_default_units(values, unit, to_unit)
+        quantity = Quant(values, unit, to_unit, only_magnitude=False)
         values = quantity.magnitude
         unit = quantity.units
 

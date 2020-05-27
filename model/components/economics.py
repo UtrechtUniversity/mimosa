@@ -1,6 +1,7 @@
 import numpy as np
 import warnings
 from model.common.config import params
+from model.common.units import Quant
 from model.common import data
 
 
@@ -18,15 +19,15 @@ def get_TFP(time, region):
     sr = params['economics']['GDP']['savings rate']
 
     # Initialise capital
-    K0_data = params['regions'][region]['initial capital']
-    K = K0_data['value']
+    K0_data = Quant(params['regions'][region]['initial capital'], 'currency_unit', only_magnitude=False)
+    K = K0_data.magnitude
 
     GDP_data = data.get_data(time, region, params['SSP'], 'GDP', 'currency_unit')
 
     # Check units:
-    if K0_data['unit'] != GDP_data['unit']:
+    if K0_data.units != GDP_data['unit']:
         warnings.warn("Capital stock unit {} not equal to GDP unit {}.".format(
-            K0_data['unit'], GDP_data['unit']
+            K0_data.units, GDP_data['unit']
         ))
 
     population_data = data.get_data(time, region, params['SSP'], 'population', 'population_unit')

@@ -1,28 +1,16 @@
 regions:
   # World:
-  #   initial capital:
-  #     value: 190
-  #     unit: trillion US$2005/yr
+  #   initial capital: 190 trillion US$2005/yr
   R5.2OECD:
-    initial capital:
-      value: 80
-      unit: trillion US$2005/yr
+    initial capital: 80000 billion US$2005/yr
   R5.2ASIA:
-    initial capital:
-      value: 45
-      unit: trillion US$2005/yr
+    initial capital: 45 trillion US$2005/yr
   R5.2LAM:
-    initial capital:
-      value: 20
-      unit: trillion US$2005/yr
+    initial capital: 20 trillion US$2005/yr
   R5.2MAF:
-    initial capital:
-      value: 20
-      unit: trillion US$2005/yr
+    initial capital: 20 trillion US$2005/yr
   R5.2REF:
-    initial capital:
-      value: 10
-      unit: trillion US$2005/yr
+    initial capital: 10 trillion US$2005/yr
 
 
 input:
@@ -71,11 +59,11 @@ economics:
     coeff: 0.010038
 
 emissions:
-  carbonbudget: 600 # unit
-  min level: -20     # False or a number # unit
+  carbonbudget: 600 GtCO2     # False or a quantity
+  min level: -20 GtCO2/yr     # False or a quantity
   inertia:
-    global: False     # False or a number < 0, % of initial emissions # unit
-    regional: -0.05     # False or a number < 0, % of initial emissions # unit
+    global: False     # False or a number < 0, % of initial emissions
+    regional: -0.05     # False or a number < 0, % of initial emissions
 
 temperature:
   initial: 1.09 # unit
@@ -83,7 +71,8 @@ temperature:
 
 default units:
   currency_unit: trillion USD2005/yr
-  emissions_unit: Gt CO2/yr
+  emissionsrate_unit: emissions_unit/yr
+  emissions_unit: Gt CO2
   temperature_unit: degC
   population_unit: billion
 

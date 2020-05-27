@@ -2,6 +2,7 @@ import numpy as np
 
 from model.common import data, utils, units
 from model.common.config import params
+from model.common.units import Quant
 from model.components import economics, emissions
 
 
@@ -38,7 +39,7 @@ def create_baseline_array(m, regions, years):
     baseline_cumulative = m.Array(m.Param, len(regions))
 
     for i, region in enumerate(regions):
-        baseline_data = data.get_data(years, region, params['SSP'], 'emissions', 'emissions_unit')
+        baseline_data = data.get_data(years, region, params['SSP'], 'emissions', 'emissionsrate_unit')
         baseline_emissions[i].value = baseline_data['values']
         baseline_cumulative[i].value = [
             np.trapz(baseline_data['values'][:i+1], years[:i+1])
@@ -109,7 +110,7 @@ def create_capital_stock(m, regions, years):
     upper_bound_rel_to_GDP = 3.0
     capital_stock = m.Array(m.SV, len(regions))
     for i, region in enumerate(regions):
-        capital_stock[i].value = regions[region]['initial capital']['value']
+        capital_stock[i].value = Quant(regions[region]['initial capital'], 'currency_unit')
         capital_stock[i].lower = 0
         capital_stock[i].upper = data.get_data(years[-1], region, params['SSP'], 'GDP', 'currency_unit')['values'] * upper_bound_rel_to_GDP
     return capital_stock

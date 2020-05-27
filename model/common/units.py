@@ -3,7 +3,6 @@ from model.common.config import params
 
 ureg = UnitRegistry()
 ureg.load_definitions('input/units.txt')
-Q = ureg.Quantity
 
 def parse_default_units(units):
     for key, value in params['default units'].items():
@@ -13,9 +12,28 @@ def parse_default_units(units):
 def custom_replace(units):
     return units.replace('US$', 'USD')
 
-def to_default_units(values, unit, target_units):
+def Quant(*args, only_magnitude=True):
+    """Usage:
+    - Quant(string, to_unit):        Quant('20 GtCO2/yr', 'emissionsrate_unit')
+    - Quant(value, unit, to_unit):   Quant(20, 'GtCO2/yr', 'emissionsrate_unit')
+    """
+    
+    if len(args) not in [2, 3]: # If number of arguments is not 2 or 3
+        raise RuntimeError("Incorrect number of arguments to Q")
+
     # First parse target units with default units
-    target_units = parse_default_units(custom_replace(target_units))
-    unit = custom_replace(unit)
-    with_unit = Q(values, unit).to(target_units)
-    return with_unit
+    target_unit = parse_default_units(custom_replace(args[-1]))
+
+    if len(args) == 2:
+        string = custom_replace(str(args[0]))
+        quantity = ureg.Quantity(string)
+    elif len(args) == 3:
+        value = args[0]
+        unit = custom_replace(str(args[1]))
+        quantity = ureg.Quantity(value, unit)
+
+    if only_magnitude:
+        return quantity.to(target_unit).magnitude
+    else:
+        return quantity.to(target_unit)
+   

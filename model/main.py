@@ -5,7 +5,8 @@ import time as timer
 from gekko import GEKKO
 
 from model.common.config import params
-from model.common import utils, data, units
+from model.common.units import Quant
+from model.common import utils, data
 from model.components import economics, emissions, time, variable_factory
 from model.visualisation import plot
 
@@ -68,7 +69,7 @@ m.Equation(m.temperature == T0 + TCRE * m.cumulative_emissions)
 
 carbonbudget = params['emissions']['carbonbudget']
 if carbonbudget is not False:
-    m.Equation( masks['after_2100'] * (m.cumulative_emissions - carbonbudget) <= 0 )
+    m.Equation( masks['after_2100'] * (m.cumulative_emissions - Quant(carbonbudget, 'emissions_unit')) <= 0 )
 
 inertia_regional = params['emissions']['inertia']['regional']
 if inertia_regional is not False:
@@ -80,7 +81,7 @@ if inertia_global is not False:
 
 min_level = params['emissions']['min level']
 if min_level is not False:
-    m.Equation( m.global_emissions >= min_level )
+    m.Equation( m.global_emissions >= Quant(min_level, 'emissionsrate_unit') )
 
 
 
@@ -91,8 +92,9 @@ if min_level is not False:
 
 ### Technological learning
 m.global_cumulative_baseline = m.Intermediate(sum(m.baseline_cumulative))
+LBD_scaling = Quant('40 GtCO2', 'emissions_unit')
 m.LBD_factor = m.Intermediate(
-    ((m.global_cumulative_baseline - m.cumulative_emissions) / 40 + 1.0) ** np.log2(params['economics']['MAC']['rho'])
+    ((m.global_cumulative_baseline - m.cumulative_emissions) / LBD_scaling + 1.0) ** np.log2(params['economics']['MAC']['rho'])
 )
 
 m.damage_costs = [None]*len(regions)
