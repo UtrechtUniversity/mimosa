@@ -40,4 +40,4 @@ def full_plot(m, regions, years):
     fig.update_yaxes(title='GtCO<sub>2</sub>/yr', row=3, col=1)
     fig.update_layout(margin={'t': 50, 'l': 50, 'r': 50, 'b': 50}, legend={'yanchor': 'middle', 'y': 0.5})
 
-    fig.write_html('temp.html')
+    fig.write_html('output/temp.html')
