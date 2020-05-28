@@ -3,6 +3,15 @@ billion = 1e9
 million = 1e6
 thousand = 1e3
 
+
+# Overwrite some default units
+
+Tt = terat          # Was: 1 Tt = 1 Textile = 1e-6 kg/m
+ton = metric_ton    # Was: ton = 2000 pound = 907.18474 kg
+
+
+# Add new units
+
 USD2005 = [currency] = USD
 USD2010 = 1.11 USD2005
 

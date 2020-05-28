@@ -73,8 +73,8 @@ def create_TFP_array(m, regions, years):
 ###### Endogenous variables (parameters)
 
 def create_temperature(m, final_baseline_cumulative):
-    T0 = params['temperature']['initial']
-    TCRE = params['temperature']['TCRE']
+    T0 = Quant(params['temperature']['initial'], 'temperature_unit')
+    TCRE = Quant(params['temperature']['TCRE'], '(temperature_unit)/(emissions_unit)')
     temperature = m.SV(T0, lb=T0, ub=T0+TCRE*final_baseline_cumulative)
     return temperature
 

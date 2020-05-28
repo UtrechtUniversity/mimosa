@@ -54,7 +54,7 @@ economics:
   MAC:
     beta: 2
     rho: 0.82
-    gamma: 3.926 # unit
+    gamma: 3926 USD2005/tCO2
   damages:
     coeff: 0.010038
 
@@ -66,14 +66,14 @@ emissions:
     regional: -0.05     # False or a number < 0, % of initial emissions
 
 temperature:
-  initial: 1.09 # unit
-  TCRE: 0.00062 # unit
+  initial: 1.09 delta_degC
+  TCRE: 0.62 delta_degC/(TtCO2)
 
 default units:
   currency_unit: trillion USD2005/yr
   emissionsrate_unit: emissions_unit/yr
   emissions_unit: Gt CO2
-  temperature_unit: degC
+  temperature_unit: delta_degC
   population_unit: billion
 
 GEKKO:

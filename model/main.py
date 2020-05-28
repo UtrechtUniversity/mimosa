@@ -60,8 +60,8 @@ m.Equations([m.regional_emissions[i] == (1-m.relative_abatement[i]) * m.baseline
 m.Equation(m.global_emissions == sum(m.regional_emissions))
 m.Equation(m.cumulative_emissions.dt() == m.global_emissions)
 
-T0 = params['temperature']['initial']
-TCRE = params['temperature']['TCRE']
+T0 = Quant(params['temperature']['initial'], 'temperature_unit')
+TCRE = Quant(params['temperature']['TCRE'], '(temperature_unit)/(emissions_unit)')
 m.Equation(m.temperature == T0 + TCRE * m.cumulative_emissions)
 
 

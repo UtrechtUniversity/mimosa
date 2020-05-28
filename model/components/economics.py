@@ -41,12 +41,12 @@ def get_TFP(time, region):
 
 
 def MAC(a, factor):
-    gamma = params['economics']['MAC']['gamma']
+    gamma = Quant(params['economics']['MAC']['gamma'], 'currency_unit/emissionsrate_unit')
     beta = params['economics']['MAC']['beta']
     return gamma * factor * a**beta
 
 def AC(a, factor):
-    gamma = params['economics']['MAC']['gamma']
+    gamma = Quant(params['economics']['MAC']['gamma'], 'currency_unit/emissionsrate_unit')
     beta = params['economics']['MAC']['beta']
     return gamma * factor * a**(beta+1) / (beta+1)
 
