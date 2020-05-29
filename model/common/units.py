@@ -6,7 +6,8 @@ ureg.load_definitions('input/units.txt')
 
 def parse_default_units(units):
     for key, value in params['default units'].items():
-        units = units.replace(key, f'({value})') # Add brackets () to avoid order of operation problems with compound units
+        # Add brackets () to avoid order of operation problems with compound units
+        units = units.replace(key, f'({value})')
     return units
 
 def custom_replace(units):

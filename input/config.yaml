@@ -3,14 +3,19 @@ regions:
   #   initial capital: 190 trillion US$2005/yr
   R5.2OECD:
     initial capital: 80000 billion US$2005/yr
+    damage factor: 0.9
   R5.2ASIA:
     initial capital: 45 trillion US$2005/yr
+    damage factor: 1.2
   R5.2LAM:
     initial capital: 20 trillion US$2005/yr
+    damage factor: 1
   R5.2MAF:
     initial capital: 20 trillion US$2005/yr
+    damage factor: 3
   R5.2REF:
     initial capital: 10 trillion US$2005/yr
+    damage factor: 0.7
 
 
 input:
@@ -40,7 +45,7 @@ input:
 time:
   start: 2015
   end: 2125
-  dt: 2.5
+  dt: 1
 
 SSP: 'SSP2'
 

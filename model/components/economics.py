@@ -52,6 +52,14 @@ def AC(a, factor):
 
 
 
-def damage_fct(T):
+def damage_fct(T, T0=None):
+    """Quadratic damage function
+
+    T: temperature
+    T0 [None]: if specified, substracts damage at T0
+    """
     coeff = params['economics']['damages']['coeff']
-    return coeff * T**2
+    dmg = coeff * T**2
+    if T0 is not None:
+        dmg -= coeff * T0**2
+    return dmg

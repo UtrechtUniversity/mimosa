@@ -110,9 +110,10 @@ def create_capital_stock(m, regions, years):
     upper_bound_rel_to_GDP = 3.0
     capital_stock = m.Array(m.SV, len(regions))
     for i, region in enumerate(regions):
+        GDP_baseline = data.get_data(years, region, params['SSP'], 'GDP', 'currency_unit')['values']
         capital_stock[i].value = Quant(regions[region]['initial capital'], 'currency_unit')
-        capital_stock[i].lower = 0
-        capital_stock[i].upper = data.get_data(years[-1], region, params['SSP'], 'GDP', 'currency_unit')['values'] * upper_bound_rel_to_GDP
+        capital_stock[i].lower = GDP_baseline[0] * 0.5
+        capital_stock[i].upper = GDP_baseline[-1] * upper_bound_rel_to_GDP
     return capital_stock
 
 
