@@ -201,7 +201,7 @@ m.obj = Objective(expr=m.NPV[m.tf], sense=maximize)
 
 timer_0 = timer.time()
 discretizer = TransformationFactory('dae.finite_difference')
-discretizer.apply_to(m, nfe=m.tf, scheme='BACKWARD')
+discretizer.apply_to(m, nfe=int(m.tf/params['time']['dt']), scheme='BACKWARD')
 # discretizer = TransformationFactory('dae.collocation')
 # discretizer.apply_to(m, nfe=6, ncp=7, scheme='LAGRANGE-RADAU')
 timer_1 = timer.time()
