@@ -3,7 +3,7 @@ import numpy as np
 from model.common import data, utils, units
 from model.common.config import params
 from model.common.units import Quant
-from model.components import economics, emissions
+from model.common import economics, emissions
 
 
 ##############################################

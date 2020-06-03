@@ -6,8 +6,8 @@ from gekko import GEKKO
 
 from model.common.config import params
 from model.common.units import Quant
-from model.common import utils, data
-from model.components import economics, emissions, time
+from model.common import utils, data, economics, emissions
+from model.components import time
 from model.components import gekko_variable_factory as variable_factory
 from model.visualisation.utils import full_plot
 

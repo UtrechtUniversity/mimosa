@@ -6,8 +6,7 @@ import time as timer
 from pyomo.environ import *
 from pyomo.dae import *
 
-from model.common import data, utils
-from model.components import economics
+from model.common import data, utils, economics
 from model.common.units import Quant
 from model.common.config import params
 from model.visualisation.plot import full_plot
@@ -21,9 +20,10 @@ from model.visualisation.plot import full_plot
 regions = params['regions']
 
 data_years = np.arange(2015, 2201, 1.0)
-data_baseline   = {region: data.get_data(data_years, region, 'SSP2', 'emissions', 'emissionsrate_unit')['values'] for region in regions}
-data_GDP        = {region: data.get_data(data_years, region, 'SSP2', 'GDP', 'currency_unit')['values'] for region in regions}
-data_population = {region: data.get_data(data_years, region, 'SSP2', 'population', 'population_unit')['values'] for region in regions}
+SSP = params['SSP']
+data_baseline   = {region: data.get_data(data_years, region, SSP, 'emissions', 'emissionsrate_unit')['values'] for region in regions}
+data_GDP        = {region: data.get_data(data_years, region, SSP, 'GDP', 'currency_unit')['values'] for region in regions}
+data_population = {region: data.get_data(data_years, region, SSP, 'population', 'population_unit')['values'] for region in regions}
 data_TFP        = {region: economics.get_TFP(data_years, region) for region in regions}
 def get_data(year, region, data_param):
     return np.interp(year, data_years, data_param[region])
@@ -213,6 +213,8 @@ print('Discretisation took {} seconds'.format(timer_1-timer_0))
 
 
 print("Starting solve.")
+# solver_manager = SolverManagerFactory('neos')
+# results = solver_manager.solve(m, opt='ipopt')
 results = SolverFactory('ipopt').solve(m)
 timer_2 = timer.time()
 print('Solving took {} seconds'.format(timer_2-timer_1))

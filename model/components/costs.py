@@ -1,6 +1,6 @@
 ##############################################
 # Model equations and constraints:
-# Economics and Cobb-Douglas
+# Abatement and damage costs
 #
 ##############################################
 
