@@ -139,10 +139,11 @@ m.damage_costs = Var(m.t, m.regions)
 m.abatement_costs = Var(m.t, m.regions)
 m.carbonprice = Var(m.t, m.regions)
 
-regional_constraints.append(lambda m,t,r: m.damage_costs[t,r] == regions[r].get('damage factor', 1) * economics.damage_fct(m.temperature[t], T0))
-regional_constraints.append(lambda m,t,r:
-    m.abatement_costs[t,r] == economics.AC(m.relative_abatement[t,r], m.learning_factor[t]) * baseline(m.beginyear+t, r))
-regional_constraints.append(lambda m,t,r: m.carbonprice[t,r] == economics.MAC(m.relative_abatement[t,r], m.learning_factor[t]))
+regional_constraints.extend([
+    lambda m,t,r: m.damage_costs[t,r] == regions[r].get('damage factor', 1) * economics.damage_fct(m.temperature[t], T0),
+    lambda m,t,r: m.abatement_costs[t,r] == economics.AC(m.relative_abatement[t,r], m.learning_factor[t]) * baseline(m.beginyear+t, r),
+    lambda m,t,r: m.carbonprice[t,r] == economics.MAC(m.relative_abatement[t,r], m.learning_factor[t])
+])
 
 
 
@@ -163,12 +164,15 @@ m.consumption = Var(m.t, m.regions, initialize=(1-sr)*GDP(m.beginyear, utils.fir
 m.utility = Var(m.t, m.regions)
 L = lambda t,r: population(m.beginyear+t, r)
 
-regional_constraints.append(lambda m,t,r: m.GDP_gross[t,r] == economics.calc_GDP(TFP(m.beginyear+t, r), L(t,r), m.capital_stock[t,r], alpha))
-regional_constraints.append(lambda m,t,r: m.GDP_net[t,r] == m.GDP_gross[t,r] * (1-m.damage_costs[t,r]) - m.abatement_costs[t,r])
-regional_constraints.append(lambda m,t,r: m.investments[t,r] == sr * m.GDP_net[t,r])
-regional_constraints.append(lambda m,t,r: m.consumption[t,r] == (1-sr) * m.GDP_net[t,r])
-regional_constraints.append(lambda m,t,r: m.utility[t,r] == L(t,r) * ( (m.consumption[t,r] / L(t,r)) ** (1-elasmu) - 1 ) / (1-elasmu))
-regional_constraints.append(lambda m,t,r: m.capital_stockdot[t,r] == np.log(1-dk) * m.capital_stock[t,r] + m.investments[t,r])
+regional_constraints.extend([
+    lambda m,t,r: m.GDP_gross[t,r] == economics.calc_GDP(TFP(m.beginyear+t, r), L(t,r), m.capital_stock[t,r], alpha),
+    lambda m,t,r: m.GDP_net[t,r] == m.GDP_gross[t,r] * (1-m.damage_costs[t,r]) - m.abatement_costs[t,r],
+    lambda m,t,r: m.investments[t,r] == sr * m.GDP_net[t,r],
+    lambda m,t,r: m.consumption[t,r] == (1-sr) * m.GDP_net[t,r],
+    lambda m,t,r: m.utility[t,r] == L(t,r) * ( (m.consumption[t,r] / L(t,r)) ** (1-elasmu) - 1 ) / (1-elasmu),
+    lambda m,t,r: m.capital_stockdot[t,r] == np.log(1-dk) * m.capital_stock[t,r] + m.investments[t,r]
+])
+
 
 
 
