@@ -176,8 +176,8 @@ regional_constraints.append(lambda m,t,r: m.capital_stockdot[t,r] == np.log(1-dk
 # Optimisation
 ######################
 
-r = params['economics']['PRTP']
-global_constraints.append(lambda m,t: m.NPVdot[t] == exp(-r * t) * sum(m.utility[t,r] for r in m.regions))
+PRTP = params['economics']['PRTP']
+global_constraints.append(lambda m,t: m.NPVdot[t] == exp(-PRTP * t) * sum(m.utility[t,r] for r in m.regions))
 
 
 def _init(m):
