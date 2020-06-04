@@ -9,9 +9,7 @@ import numpy as np
 from pyomo.environ import *
 from pyomo.dae import *
 
-from model.common import data, utils, economics
-from model.common.units import Quant
-from model.common.config import params
+from model.common import utils, economics
 
 m = AbstractModel()
 
@@ -20,22 +18,10 @@ m = AbstractModel()
 # Create data (move this to other file)
 ######################
 
-regions = params['regions']
-
-data_years = np.arange(2015, 2201, 1.0)
-SSP = params['SSP']
-data_baseline   = {region: data.get_data(data_years, region, SSP, 'emissions', 'emissionsrate_unit')['values'] for region in regions}
-data_GDP        = {region: data.get_data(data_years, region, SSP, 'GDP', 'currency_unit')['values'] for region in regions}
-data_population = {region: data.get_data(data_years, region, SSP, 'population', 'population_unit')['values'] for region in regions}
-data_TFP        = {region: economics.get_TFP(data_years, region) for region in regions}
-def get_data(t, region, data_param):
-    year = params['time']['start'] + t
-    return np.interp(year, data_years, data_param[region])
-
-m.baseline    = lambda t, region: get_data(t, region, data_baseline)
-m.population  = lambda t, region: get_data(t, region, data_population)
-m.TFP         = lambda t, region: get_data(t, region, data_TFP)
-m.GDP         = lambda t, region: get_data(t, region, data_GDP)
+m.baseline    = None
+m.population  = None
+m.TFP         = None
+m.GDP         = None
 def baseline_cumulative(t_end, region):
     t_values = np.linspace(0, t_end, 100)
     return np.trapz(m.baseline(t_values, region), x=t_values)
@@ -50,14 +36,14 @@ m.baseline_cumulative = baseline_cumulative
 global_constraints = []
 regional_constraints = []
 
-m.beginyear = Param(initialize=params['time']['start'])
-m.endyear = Param(initialize=params['time']['end'])
-m.tf = Param(initialize=m.endyear - m.beginyear)      # Not sure if this should be a Param
-m.year2100 = Param(initialize=2100 - m.beginyear)     # Not sure if this should be a Param
+m.beginyear = Param()
+m.endyear = Param()
+m.tf = Param(initialize=m.endyear - m.beginyear)
+m.year2100 = Param(initialize=2100 - m.beginyear)
 m.t = ContinuousSet(bounds=(0, m.tf))
 
 
-m.regions = Set(initialize=regions.keys(), ordered=True)
+m.regions = Set(ordered=True)
 
 
 ### TODO: Maybe add initialize
@@ -72,7 +58,7 @@ m.NPV = Var(m.t)
 # Control variable:
 m.relative_abatement = Var(m.t, m.regions, initialize=0, bounds=(0, 2))
 # State variables:
-m.init_capitalstock = Param(m.regions, initialize={region: Quant(regions[region]['initial capital'], 'currency_unit') for region in regions})
+m.init_capitalstock = Param(m.regions)
 m.capital_stock = Var(m.t, m.regions, initialize=lambda m,t,r: m.init_capitalstock[r])
 m.regional_emissions = Var(m.t, m.regions)
 
@@ -93,28 +79,23 @@ regional_constraints.append(lambda m,t,r: m.regional_emissions[t, r] == (1-m.rel
 global_constraints.append(lambda m,t: m.global_emissions[t] == sum(m.regional_emissions[t, r] for r in m.regions))
 global_constraints.append(lambda m,t: m.cumulative_emissionsdot[t] == m.global_emissions[t])
 
-m.T0 = Param(initialize=Quant(params['temperature']['initial'], 'temperature_unit'))
-m.TCRE = Param(initialize=Quant(params['temperature']['TCRE'], '(temperature_unit)/(emissions_unit)'))
+m.T0 = Param()
+m.TCRE = Param()
 global_constraints.append(lambda m,t: m.temperature[t] == m.T0 + m.TCRE * m.cumulative_emissions[t])
 
 # Emission constraints
 
-carbonbudget = params['emissions']['carbonbudget']
-if carbonbudget is not False:
-    budget = Quant(carbonbudget, 'emissions_unit')
-    global_constraints.append(lambda m,t: (m.cumulative_emissions[t] - budget <= 0) if t >= m.year2100 else Constraint.Skip)
+m.budget = Param()
+global_constraints.append(lambda m,t: (m.cumulative_emissions[t] - m.budget <= 0) if (t >= m.year2100 and value(m.budget) is not False) else Constraint.Skip)
 
-inertia_regional = params['emissions']['inertia']['regional']
-if inertia_regional is not False:
-    regional_constraints.append(lambda m,t,r: m.regional_emissionsdot[t, r] >= inertia_regional * m.baseline(0, r))
+m.inertia_regional = Param()
+regional_constraints.append(lambda m,t,r: m.regional_emissionsdot[t, r] >= m.inertia_regional * m.baseline(0, r) if value(m.inertia_regional) is not False else Constraint.Skip)
 
-inertia_global = params['emissions']['inertia']['global']
-if inertia_global is not False:
-    global_constraints.append(lambda m,t: m.global_emissionsdot[t] >= inertia_global * sum(m.baseline(0, r) for r in m.regions)) # TODO global baseline
+m.inertia_global = Param()
+global_constraints.append(lambda m,t: m.global_emissionsdot[t] >= m.inertia_global * sum(m.baseline(0, r) for r in m.regions) if value(m.inertia_global) is not False else Constraint.Skip) # TODO global baseline
 
-min_level = params['emissions']['min level']
-if min_level is not False:
-    global_constraints.append(lambda m,t: m.global_emissions[t] >= Quant(min_level, 'emissionsrate_unit'))
+m.min_level = Param()
+global_constraints.append(lambda m,t: m.global_emissions[t] >= m.min_level if value(m.min_level) is not False else Constraint.Skip)
 
 
 
@@ -124,28 +105,28 @@ if min_level is not False:
 
 
 ### Technological learning
-m.LBD_rate = Param(initialize=params['economics']['MAC']['rho'])
+m.LBD_rate = Param()
 m.log_LBD_rate = Param(initialize=log(m.LBD_rate) / log(2))
 m.LBD_factor = Var(m.t)
-m.learning_factor = Var(m.t)
-LBD_scaling = Quant('40 GtCO2', 'emissions_unit')
+m.LBD_scaling = Param()
 global_constraints.append(lambda m,t:
-    m.LBD_factor[t] == ((sum(m.baseline_cumulative(t, r) for r in m.regions) - m.cumulative_emissions[t])/LBD_scaling+1.0)**m.log_LBD_rate)
+    m.LBD_factor[t] == ((sum(m.baseline_cumulative(t, r) for r in m.regions) - m.cumulative_emissions[t])/m.LBD_scaling+1.0)**m.log_LBD_rate)
 
-m.LOT_rate = Param(initialize=0)
+m.LOT_rate = Param()
 m.LOT_factor = Var(m.t)
 global_constraints.append(lambda m,t: m.LOT_factor[t] == 1 / (1+m.LOT_rate)**t)
 
+m.learning_factor = Var(m.t)
 global_constraints.append(lambda m,t: m.learning_factor[t] == (m.LBD_factor[t] * m.LOT_factor[t]))
 
 m.damage_costs = Var(m.t, m.regions)
 m.abatement_costs = Var(m.t, m.regions)
 m.carbonprice = Var(m.t, m.regions)
 
-m.damage_factor = Param(m.regions, initialize={r: regions[r].get('damage factor', 1) for r in regions})
-m.damage_coeff = Param(initialize=params['economics']['damages']['coeff'])
-m.MAC_gamma = Param(initialize=Quant(params['economics']['MAC']['gamma'], 'currency_unit/emissionsrate_unit'))
-m.MAC_beta = Param(initialize=params['economics']['MAC']['beta']) # TODO Maybe move these params to economics.MAC/AC by including "m"
+m.damage_factor = Param(m.regions)
+m.damage_coeff = Param()
+m.MAC_gamma = Param()
+m.MAC_beta = Param() # TODO Maybe move these params to economics.MAC/AC by including "m"
 
 regional_constraints.extend([
     lambda m,t,r: m.damage_costs[t,r] == m.damage_factor[r] * economics.damage_fct(m.temperature[t], m.damage_coeff, m.T0),
@@ -160,10 +141,10 @@ regional_constraints.extend([
 ######################
 
 # Parameters
-m.alpha = Param(initialize=params['economics']['GDP']['alpha'])
-m.dk = Param(initialize=params['economics']['GDP']['depreciation of capital'])
+m.alpha = Param()
+m.dk = Param()
 m.sr = Param()
-m.elasmu = Param(initialize=params['economics']['elasmu'])
+m.elasmu = Param()
 
 m.GDP_gross = Var(m.t, m.regions)
 m.GDP_net = Var(m.t, m.regions)
@@ -198,7 +179,7 @@ regional_constraints.extend([
 # Optimisation
 ######################
 
-m.PRTP = Param(initialize=params['economics']['PRTP'])
+m.PRTP = Param()
 global_constraints.append(lambda m,t: m.NPVdot[t] == exp(-m.PRTP * t) * sum(m.utility[t,r] for r in m.regions))
 
 
