@@ -40,25 +40,20 @@ def get_TFP(time, region):
 
 
 
-def MAC(a, factor):
-    gamma = Quant(params['economics']['MAC']['gamma'], 'currency_unit/emissionsrate_unit')
-    beta = params['economics']['MAC']['beta']
+def MAC(a, factor, gamma, beta):
     return gamma * factor * a**beta
 
-def AC(a, factor):
-    gamma = Quant(params['economics']['MAC']['gamma'], 'currency_unit/emissionsrate_unit')
-    beta = params['economics']['MAC']['beta']
+def AC(a, factor, gamma, beta):
     return gamma * factor * a**(beta+1) / (beta+1)
 
 
 
-def damage_fct(T, T0=None):
+def damage_fct(T, coeff, T0=None):
     """Quadratic damage function
 
     T: temperature
     T0 [None]: if specified, substracts damage at T0
     """
-    coeff = params['economics']['damages']['coeff']
     dmg = coeff * T**2
     if T0 is not None:
         dmg -= coeff * T0**2
