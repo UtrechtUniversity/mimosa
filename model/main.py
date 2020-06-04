@@ -27,16 +27,17 @@ data_baseline   = {region: data.get_data(data_years, region, SSP, 'emissions', '
 data_GDP        = {region: data.get_data(data_years, region, SSP, 'GDP', 'currency_unit')['values'] for region in regions}
 data_population = {region: data.get_data(data_years, region, SSP, 'population', 'population_unit')['values'] for region in regions}
 data_TFP        = {region: economics.get_TFP(data_years, region) for region in regions}
-def get_data(year, region, data_param):
+def get_data(t, region, data_param):
+    year = params['time']['start'] + t
     return np.interp(year, data_years, data_param[region])
 
-m.baseline    = lambda year, region: get_data(year, region, data_baseline)
-m.population  = lambda year, region: get_data(year, region, data_population)
-m.TFP         = lambda year, region: get_data(year, region, data_TFP)
-m.GDP         = lambda year, region: get_data(year, region, data_GDP)
-def baseline_cumulative(beginyear, endyear, region):
-    newyears = np.linspace(beginyear, endyear, 100)
-    return np.trapz(m.baseline(newyears, region), x=newyears)
+m.baseline    = lambda t, region: get_data(t, region, data_baseline)
+m.population  = lambda t, region: get_data(t, region, data_population)
+m.TFP         = lambda t, region: get_data(t, region, data_TFP)
+m.GDP         = lambda t, region: get_data(t, region, data_GDP)
+def baseline_cumulative(t_end, region):
+    t_values = np.linspace(0, t_end, 100)
+    return np.trapz(m.baseline(t_values, region), x=t_values)
 m.baseline_cumulative = baseline_cumulative
 
 
@@ -44,10 +45,10 @@ m.baseline_cumulative = baseline_cumulative
 # Create model
 ######################
 
-m.beginyear = params['time']['start']
-m.endyear = params['time']['end']
-m.tf = m.endyear - m.beginyear
-m.year2100 = 2100 - m.beginyear
+m.beginyear = Param(initialize=params['time']['start'])
+m.endyear = Param(initialize=params['time']['end'])
+m.tf = m.endyear - m.beginyear      # Not sure if this should be a Param
+m.year2100 = 2100 - m.beginyear     # Not sure if this should be a Param
 m.t = ContinuousSet(bounds=(0, m.tf), initialize=[m.year2100])
 
 m.regions = Set(initialize=regions.keys())
@@ -66,8 +67,6 @@ m.NPV = Var(m.t)
 m.relative_abatement = Var(m.t, m.regions, initialize=0, bounds=(0, 2))
 # State variables:
 m.init_capitalstock = Param(m.regions, initialize={region: Quant(regions[region]['initial capital'], 'currency_unit') for region in regions})
-# TODO: Bounds should be different for each region
-# m.capital_stock = Var(m.t, bounds=(0.2 * GDP(m.beginyear, 'World'), 3 * GDP(m.endyear, 'World')), initialize=init_capitalstock)
 m.capital_stock = Var(m.t, m.regions, initialize=lambda m,t,r: m.init_capitalstock[r])
 m.regional_emissions = Var(m.t, m.regions)
 
@@ -88,7 +87,7 @@ regional_constraints = []
 # Emission equations
 ######################
 
-regional_constraints.append(lambda m,t,r: m.regional_emissions[t, r] == (1-m.relative_abatement[t, r]) * m.baseline(m.beginyear+t, r))
+regional_constraints.append(lambda m,t,r: m.regional_emissions[t, r] == (1-m.relative_abatement[t, r]) * m.baseline(t, r))
 global_constraints.append(lambda m,t: m.global_emissions[t] == sum(m.regional_emissions[t, r] for r in m.regions))
 global_constraints.append(lambda m,t: m.cumulative_emissionsdot[t] == m.global_emissions[t])
 
@@ -105,11 +104,11 @@ if carbonbudget is not False:
 
 inertia_regional = params['emissions']['inertia']['regional']
 if inertia_regional is not False:
-    regional_constraints.append(lambda m,t,r: m.regional_emissionsdot[t, r] >= inertia_regional * m.baseline(m.beginyear, r))
+    regional_constraints.append(lambda m,t,r: m.regional_emissionsdot[t, r] >= inertia_regional * m.baseline(0, r))
 
 inertia_global = params['emissions']['inertia']['global']
 if inertia_global is not False:
-    global_constraints.append(lambda m,t: m.global_emissionsdot[t] >= inertia_global * sum(m.baseline(m.beginyear, r) for r in m.regions)) # TODO global baseline
+    global_constraints.append(lambda m,t: m.global_emissionsdot[t] >= inertia_global * sum(m.baseline(0, r) for r in m.regions)) # TODO global baseline
 
 min_level = params['emissions']['min level']
 if min_level is not False:
@@ -124,12 +123,12 @@ if min_level is not False:
 
 ### Technological learning
 m.LBD_rate = Param(initialize=params['economics']['MAC']['rho'])
-m.log_LBD_rate = Param(initialize=log(m.LBD_rate) / log(2))
+m.log_LBD_rate = log(m.LBD_rate) / log(2)
 m.LBD_factor = Var(m.t)
 m.learning_factor = Var(m.t)
 LBD_scaling = Quant('40 GtCO2', 'emissions_unit')
 global_constraints.append(lambda m,t:
-    m.LBD_factor[t] == ((sum(m.baseline_cumulative(m.beginyear, m.beginyear+t, r) for r in m.regions) - m.cumulative_emissions[t])/LBD_scaling+1.0)**m.log_LBD_rate)
+    m.LBD_factor[t] == ((sum(m.baseline_cumulative(t, r) for r in m.regions) - m.cumulative_emissions[t])/LBD_scaling+1.0)**m.log_LBD_rate)
 
 m.LOT_rate = Param(initialize=0)
 m.LOT_factor = Var(m.t)
@@ -148,7 +147,7 @@ m.MAC_beta = Param(initialize=params['economics']['MAC']['beta']) # TODO Maybe m
 
 regional_constraints.extend([
     lambda m,t,r: m.damage_costs[t,r] == m.damage_factor[r] * economics.damage_fct(m.temperature[t], m.damage_coeff, m.T0),
-    lambda m,t,r: m.abatement_costs[t,r] == economics.AC(m.relative_abatement[t,r], m.learning_factor[t], m.MAC_gamma, m.MAC_beta) * m.baseline(m.beginyear+t, r),
+    lambda m,t,r: m.abatement_costs[t,r] == economics.AC(m.relative_abatement[t,r], m.learning_factor[t], m.MAC_gamma, m.MAC_beta) * m.baseline(t, r),
     lambda m,t,r: m.carbonprice[t,r] == economics.MAC(m.relative_abatement[t,r], m.learning_factor[t], m.MAC_gamma, m.MAC_beta)
 ])
 
@@ -167,12 +166,12 @@ m.elasmu = Param(initialize=params['economics']['elasmu'])
 m.GDP_gross = Var(m.t, m.regions)
 m.GDP_net = Var(m.t, m.regions)
 m.investments = Var(m.t, m.regions)
-m.consumption = Var(m.t, m.regions, initialize=(1-m.sr)*m.GDP(m.beginyear, utils.firstk(regions)))
+m.consumption = Var(m.t, m.regions, initialize=(1-m.sr)*m.GDP(0, utils.firstk(regions)))
 m.utility = Var(m.t, m.regions)
-m.L = lambda t,r: m.population(m.beginyear+t, r)
+m.L = lambda t,r: m.population(t, r)
 
 regional_constraints.extend([
-    lambda m,t,r: m.GDP_gross[t,r] == economics.calc_GDP(m.TFP(m.beginyear+t, r), m.L(t,r), m.capital_stock[t,r], m.alpha),
+    lambda m,t,r: m.GDP_gross[t,r] == economics.calc_GDP(m.TFP(t, r), m.L(t,r), m.capital_stock[t,r], m.alpha),
     lambda m,t,r: m.GDP_net[t,r] == m.GDP_gross[t,r] * (1-m.damage_costs[t,r]) - m.abatement_costs[t,r],
     lambda m,t,r: m.investments[t,r] == m.sr * m.GDP_net[t,r],
     lambda m,t,r: m.consumption[t,r] == (1-m.sr) * m.GDP_net[t,r],
@@ -184,7 +183,7 @@ m.consumption_NPV = Var(m.t, m.regions)
 m.consumption_NPVdot = DerivativeVar(m.consumption_NPV, wrt=m.t)
 m.baseline_consumption_NPV = Var(m.t, m.regions)
 m.baseline_consumption_NPVdot = DerivativeVar(m.baseline_consumption_NPV, wrt=m.t)
-m.baseline_consumption = lambda t,r: (1-m.sr) * m.GDP(m.beginyear+t, r)
+m.baseline_consumption = lambda t,r: (1-m.sr) * m.GDP(t, r)
 regional_constraints.extend([
     lambda m,t,r: m.consumption_NPVdot[t,r] == exp(-0.05 * t) * m.consumption[t,r],
     lambda m,t,r: m.baseline_consumption_NPVdot[t,r] == exp(-0.05 * t) * m.baseline_consumption(t,r)
@@ -204,12 +203,12 @@ global_constraints.append(lambda m,t: m.NPVdot[t] == exp(-m.PRTP * t) * sum(m.ut
 def _init(m):
     yield m.temperature[0] == m.T0
     for r in m.regions:
-        yield m.regional_emissions[0,r] == m.baseline(m.beginyear, r)
+        yield m.regional_emissions[0,r] == m.baseline(0, r)
         yield m.capital_stock[0,r] == m.init_capitalstock[r]
         yield m.carbonprice[0,r] == 0
         yield m.consumption_NPV[0,r] == 0
         yield m.baseline_consumption_NPV[0,r] == 0
-    yield m.global_emissions[0] == sum(m.baseline(m.beginyear, r) for r in m.regions)
+    yield m.global_emissions[0] == sum(m.baseline(0, r) for r in m.regions)
     yield m.cumulative_emissions[0] == 0
     yield m.NPV[0] == 0
 m.init = ConstraintList(rule=_init)
@@ -243,7 +242,7 @@ consumption_loss = [
     (value(m.baseline_consumption_NPV[m.year2100,r]) - value(m.consumption_NPV[m.year2100, r])) / value(m.baseline_consumption_NPV[m.year2100,r])
     for r in regions
 ]
-relative_carbonbudget = [value(m.cumulative_emissions[m.year2100]) / m.baseline_cumulative(m.beginyear, 2100, r) for r in regions]
+relative_carbonbudget = [value(m.cumulative_emissions[m.year2100]) / m.baseline_cumulative(value(m.year2100), r) for r in regions]
 print('\nConsumption loss NPV:', consumption_loss)
 print('Relative carbon budget:', relative_carbonbudget)
 print(m.t[m.year2100])

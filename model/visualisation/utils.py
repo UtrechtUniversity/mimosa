@@ -11,7 +11,7 @@ class Plot:
     def __init__(self, m, numrows=3, globalrows=[3], coltitles=None, **kwargs):
         self.m = m
         self.regions = m.regions
-        self.years = m.beginyear + np.array(m.t)
+        self.years = value(m.beginyear) + np.array(m.t)
         self.t = m.t
         
         n = len(m.regions)
@@ -68,7 +68,7 @@ class Plot:
             self.add_scatter(value, name, color, row, col=1, showlegend=new, **kwargs)
         
     def set_layout(self):
-        self.fig.update_xaxes(range=[self.m.beginyear, 2100])
+        self.fig.update_xaxes(range=[self.years[0], 2100])
         self.fig.update_traces(mode='lines')
         self.fig.update_layout(
             margin={'t': 50, 'l': 50, 'r': 50, 'b': 50},
