@@ -4,6 +4,7 @@
 #
 #
 ##############################################
+import time
 
 def total_at_t(regional_array, t_i = 0):
     """Only used for GEKKO"""
@@ -27,3 +28,14 @@ def add_constraint(m, constraint):
     n = len([_ for _ in m.component_objects()])
     name = 'constraint_{}'.format(n)
     m.add_component(name, constraint)
+
+curr_tick_time = None
+curr_tick_name = None
+def tick(name=None):
+    global curr_tick_time, curr_tick_name
+    now = time.time()
+    if curr_tick_time is not None:
+        # TODO set debug logging level
+        print('{} took {} seconds.'.format(curr_tick_name, now-curr_tick_time))
+    curr_tick_time = now
+    curr_tick_name = name

@@ -92,16 +92,19 @@ global_constraints.append(lambda m,t: m.temperature[t] == m.T0 + m.TCRE * m.cumu
 # Emission constraints
 
 m.budget = Param()
-global_constraints.append(lambda m,t: (m.cumulative_emissions[t] - m.budget <= 0) if (t >= m.year2100 and value(m.budget) is not False) else Constraint.Skip)
-
-m.inertia_regional = Param()
-regional_constraints.append(lambda m,t,r: m.regional_emissionsdot[t, r] >= m.inertia_regional * m.baseline(0, r) if value(m.inertia_regional) is not False else Constraint.Skip)
-
 m.inertia_global = Param()
-global_constraints.append(lambda m,t: m.global_emissionsdot[t] >= m.inertia_global * sum(m.baseline(0, r) for r in m.regions) if value(m.inertia_global) is not False else Constraint.Skip) # TODO global baseline
-
+m.inertia_regional = Param()
 m.min_level = Param()
-global_constraints.append(lambda m,t: m.global_emissions[t] >= m.min_level if value(m.min_level) is not False else Constraint.Skip)
+global_constraints.extend([
+    lambda m,t: m.cumulative_emissions[t] - m.budget <= 0   if (t >= m.year2100 and value(m.budget) is not False) else Constraint.Skip,
+    lambda m,t: m.global_emissionsdot[t] >= m.inertia_global * sum(m.baseline(0, r) for r in m.regions) \
+                                                            if value(m.inertia_global) is not False else Constraint.Skip,
+    lambda m,t: m.global_emissions[t] >= m.min_level        if value(m.min_level) is not False else Constraint.Skip
+])
+regional_constraints.append(
+    lambda m,t,r: m.regional_emissionsdot[t, r] >= m.inertia_regional * m.baseline(0, r) \
+                                                            if value(m.inertia_regional) is not False else Constraint.Skip
+)
 
 
 

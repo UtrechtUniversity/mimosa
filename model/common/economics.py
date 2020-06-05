@@ -2,10 +2,10 @@ import numpy as np
 import warnings
 from model.common.config import params
 from model.common.units import Quant
-from model.common import data
 
 
-def get_TFP(time, region):
+def get_TFP(region, data_store):
+    time = data_store.data_years
     TFP = []
     dt = time[1] - time[0]
 
@@ -17,18 +17,12 @@ def get_TFP(time, region):
     # Initialise capital
     K0_data = Quant(params['regions'][region]['initial capital'], 'currency_unit', only_magnitude=False)
     K = K0_data.magnitude
+    
+    # Get data
+    GDP_data = data_store.data_values['GDP'][region]
+    population_data = data_store.data_values['population'][region]
 
-    GDP_data = data.get_data(time, region, params['SSP'], 'GDP', 'currency_unit')
-
-    # Check units:
-    if K0_data.units != GDP_data['unit']:
-        warnings.warn("Capital stock unit {} not equal to GDP unit {}.".format(
-            K0_data.units, GDP_data['unit']
-        ))
-
-    population_data = data.get_data(time, region, params['SSP'], 'population', 'population_unit')
-
-    for t, GDP, L in zip(time, GDP_data['values'], population_data['values']):
+    for t, GDP, L in zip(time, GDP_data, population_data):
         TFP.append(GDP / calc_GDP(1, L, K, alpha))
         K = (1-dk)**dt * K + dt * sr * GDP
 

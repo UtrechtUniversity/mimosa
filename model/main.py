@@ -1,7 +1,6 @@
 ### Import packages
 
 import numpy as np
-import time as timer
 
 from pyomo.environ import *
 from pyomo.dae import *
@@ -11,39 +10,27 @@ from model.common.units import Quant
 from model.common.config import params
 from model.visualisation.plot import full_plot
 
-from model import abstract_model
+utils.tick('Abstract model creation')
+from model.abstract_model import m as abstract_model
 
 
 
+# Obtain data from data store
+utils.tick('Concrete model creation')
+data_store = data.DataStore(params)
 
-
-### Add data functions
-# Move this first part other Data-file
 regions = params['regions']
-data_years = np.arange(2015, 2201, 1.0)
-SSP = params['SSP']
-data_values = {
-    'baseline':     {region: data.get_data(data_years, region, SSP, 'emissions', 'emissionsrate_unit')['values'] for region in regions},
-    'population':   {region: data.get_data(data_years, region, SSP, 'population', 'population_unit')['values'] for region in regions},
-    'GDP':          {region: data.get_data(data_years, region, SSP, 'GDP', 'currency_unit')['values'] for region in regions},
-    'TFP':          {region: economics.get_TFP(data_years, region) for region in regions}
-}
-def get_data(t, region, name: str):
-    year = params['time']['start'] + t
-    return np.interp(year, data_years, data_values[name][region])
 
 # The data functions need to be changed in the abstract model
 # before initialization. 
-abstract_model.m.baseline    = lambda t, region: get_data(t, region, 'baseline')
-abstract_model.m.population  = lambda t, region: get_data(t, region, 'population')
-abstract_model.m.GDP         = lambda t, region: get_data(t, region, 'GDP')
-abstract_model.m.TFP         = lambda t, region: get_data(t, region, 'TFP')
+abstract_model.baseline    = lambda t, region: data_store.interp_data(t, region, 'baseline')
+abstract_model.population  = lambda t, region: data_store.interp_data(t, region, 'population')
+abstract_model.GDP         = lambda t, region: data_store.interp_data(t, region, 'GDP')
+abstract_model.TFP         = lambda t, region: data_store.interp_data(t, region, 'TFP')
 
 
-
-
-
-# Util to create a None-indexed dictionary for un-indexed Params
+# Util to create a None-indexed dictionary for scalar components
+# (see https://pyomo.readthedocs.io/en/stable/working_abstractmodels/data/raw_dicts.html)
 v = lambda val: {None: val} 
 
 instance_data = {None: {
@@ -76,28 +63,26 @@ instance_data = {None: {
     'PRTP':             v(params['economics']['PRTP'])
 }}
 
-m = abstract_model.m.create_instance(instance_data)
+m = abstract_model.create_instance(instance_data)
 
 
 
 
-timer_0 = timer.time()
+utils.tick('Time discretisation')
 discretizer = TransformationFactory('dae.finite_difference')
 discretizer.apply_to(m, nfe=int(m.tf/params['time']['dt']), scheme='BACKWARD')
 # discretizer = TransformationFactory('dae.collocation')
 # discretizer.apply_to(m, nfe=6, ncp=7, scheme='LAGRANGE-RADAU')
-timer_1 = timer.time()
-print('Discretisation took {} seconds'.format(timer_1-timer_0))
 
 
-print("Starting solve.")
+utils.tick('Model solve')
 # solver_manager = SolverManagerFactory('neos')
 # results = solver_manager.solve(m, opt='ipopt')
 results = SolverFactory('ipopt').solve(m)
-timer_2 = timer.time()
-print('Solving took {} seconds'.format(timer_2-timer_1))
 
 print('Final NPV:', value(m.NPV[m.tf]))
+
+
 # consumption_loss = [
 #     (value(m.baseline_consumption_NPV[m.year2100,r]) - value(m.consumption_NPV[m.year2100, r])) / value(m.baseline_consumption_NPV[m.year2100,r])
 #     for r in regions
@@ -107,4 +92,6 @@ print('Final NPV:', value(m.NPV[m.tf]))
 # print('Relative carbon budget:', relative_carbonbudget)
 # print(m.t[m.year2100])
 
+utils.tick('Plotting results')
 full_plot(m)
+utils.tick()
