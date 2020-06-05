@@ -5,8 +5,7 @@ import numpy as np
 from pyomo.environ import *
 from pyomo.dae import *
 
-from model.common import data, utils, economics
-from model.common.units import Quant
+from model.common import data, utils, units, economics
 from model.common.config import params
 from model.visualisation.plot import full_plot
 
@@ -17,7 +16,8 @@ from model.abstract_model import m as abstract_model
 
 # Obtain data from data store
 utils.tick('Concrete model creation')
-data_store = data.DataStore(params)
+quant = units.Quantity(params)
+data_store = data.DataStore(params, quant)
 
 regions = params['regions']
 
@@ -38,24 +38,24 @@ instance_data = {None: {
     'endyear':          v(params['time']['end']),
     'regions':          v(params['regions'].keys()),
     
-    'budget':           v(Quant(params['emissions']['carbonbudget'], 'emissions_unit')),
+    'budget':           v(quant(params['emissions']['carbonbudget'], 'emissions_unit')),
     'inertia_regional': v(params['emissions']['inertia']['regional']),
     'inertia_global':   v(params['emissions']['inertia']['global']),
-    'min_level':        v(Quant(params['emissions']['min level'], 'emissionsrate_unit')),
+    'min_level':        v(quant(params['emissions']['min level'], 'emissionsrate_unit')),
 
-    'T0':               v(Quant(params['temperature']['initial'], 'temperature_unit')),
-    'TCRE':             v(Quant(params['temperature']['TCRE'], '(temperature_unit)/(emissions_unit)')),
+    'T0':               v(quant(params['temperature']['initial'], 'temperature_unit')),
+    'TCRE':             v(quant(params['temperature']['TCRE'], '(temperature_unit)/(emissions_unit)')),
 
     'LBD_rate':         v(params['economics']['MAC']['rho']),
-    'LBD_scaling':      v(Quant('40 GtCO2', 'emissions_unit')),
+    'LBD_scaling':      v(quant('40 GtCO2', 'emissions_unit')),
     'LOT_rate':         v(0),
 
     'damage_factor':    {r: regions[r].get('damage factor', 1) for r in regions},
     'damage_coeff':     v(params['economics']['damages']['coeff']),
-    'MAC_gamma':        v(Quant(params['economics']['MAC']['gamma'], 'currency_unit/emissionsrate_unit')),
+    'MAC_gamma':        v(quant(params['economics']['MAC']['gamma'], 'currency_unit/emissionsrate_unit')),
     'MAC_beta':         v(params['economics']['MAC']['beta']),
 
-    'init_capitalstock': {r: Quant(regions[r]['initial capital'], 'currency_unit') for r in regions},
+    'init_capitalstock': {r: quant(regions[r]['initial capital'], 'currency_unit') for r in regions},
     'alpha':            v(params['economics']['GDP']['alpha']),
     'dk':               v(params['economics']['GDP']['depreciation of capital']),
     'sr':               v(params['economics']['GDP']['savings rate']),

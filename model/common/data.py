@@ -2,8 +2,6 @@ import numpy as np
 import pandas as pd
 
 from model.common import economics
-from model.common.config import params
-from model.common.units import Quant
 
 # To extrapolate: take growth rate 2090-2100, linearly bring it down to growth rate of 0 in 2150
 # Not sure if this should rather be a method of DataStore
@@ -34,10 +32,11 @@ class DataStore:
 
     # Class property and not instance property to reduce redundancy
     databases = {}
-    cached_data ={}
+    cached_data = {}
 
-    def __init__(self, params):
+    def __init__(self, params, quant):
         self.params = params
+        self.quant = quant          # Quantity object for unit conversion
         self._select_database()
         self._create_data_years()
         self.data_values = {
@@ -74,7 +73,7 @@ class DataStore:
         }
     
 
-    def get_data_from_database(self, region, variable):
+    def _get_data_from_database(self, region, variable):
         
         database = self.database
     
@@ -114,9 +113,9 @@ class DataStore:
     
     def get_data(self, year, region, variable, to_unit=None):
         # 1. Get data from database
-        years, values, unit = self.get_data_from_database(region, variable)
+        years, values, unit = self._get_data_from_database(region, variable)
         if to_unit is not None:
-            quantity = Quant(values, unit, to_unit, only_magnitude=False)
+            quantity = self.quant(values, unit, to_unit, only_magnitude=False)
             values = quantity.magnitude
             unit = quantity.units
 

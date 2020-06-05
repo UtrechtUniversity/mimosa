@@ -1,10 +1,9 @@
 import numpy as np
-import warnings
-from model.common.config import params
-from model.common.units import Quant
 
 
 def get_TFP(region, data_store):
+    params = data_store.params
+    quant = data_store.quant
     time = data_store.data_years
     TFP = []
     dt = time[1] - time[0]
@@ -15,7 +14,7 @@ def get_TFP(region, data_store):
     sr = params['economics']['GDP']['savings rate']
 
     # Initialise capital
-    K0_data = Quant(params['regions'][region]['initial capital'], 'currency_unit', only_magnitude=False)
+    K0_data = quant(params['regions'][region]['initial capital'], 'currency_unit', only_magnitude=False)
     K = K0_data.magnitude
     
     # Get data
