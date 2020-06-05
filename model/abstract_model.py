@@ -11,11 +11,32 @@ from pyomo.dae import *
 
 from model.common import utils, economics
 
+
+######################
+# Create model
+######################
+
 m = AbstractModel()
+
+## Constraints
+# Each global / regional constraint will be put in these lists,
+# then added to the model at the end of this file.
+global_constraints = []
+regional_constraints = []
+
+
+## Time and region
+m.beginyear = Param()
+m.endyear = Param()
+m.tf = Param(initialize=m.endyear - m.beginyear)
+m.year2100 = Param(initialize=2100 - m.beginyear)
+m.t = ContinuousSet(bounds=(0, m.tf))
+
+m.regions = Set(ordered=True)
 
 
 ######################
-# Create data (move this to other file)
+# Create data functions
 ######################
 
 m.baseline    = None
@@ -29,24 +50,8 @@ m.baseline_cumulative = baseline_cumulative
 
 
 ######################
-# Create model
+# Create variables
 ######################
-
-## Constraints
-global_constraints = []
-regional_constraints = []
-
-m.beginyear = Param()
-m.endyear = Param()
-m.tf = Param(initialize=m.endyear - m.beginyear)
-m.year2100 = Param(initialize=2100 - m.beginyear)
-m.t = ContinuousSet(bounds=(0, m.tf))
-
-
-m.regions = Set(ordered=True)
-
-
-### TODO: Maybe add initialize
 
 ## Global variables
 m.temperature = Var(m.t)
@@ -82,6 +87,7 @@ global_constraints.append(lambda m,t: m.cumulative_emissionsdot[t] == m.global_e
 m.T0 = Param()
 m.TCRE = Param()
 global_constraints.append(lambda m,t: m.temperature[t] == m.T0 + m.TCRE * m.cumulative_emissions[t])
+
 
 # Emission constraints
 

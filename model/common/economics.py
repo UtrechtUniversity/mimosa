@@ -5,10 +5,6 @@ from model.common.units import Quant
 from model.common import data
 
 
-def calc_GDP(TFP, L, K, alpha):
-    return TFP * L**(1-alpha) * K**alpha
-
-
 def get_TFP(time, region):
     TFP = []
     dt = time[1] - time[0]
@@ -37,6 +33,11 @@ def get_TFP(time, region):
         K = (1-dk)**dt * K + dt * sr * GDP
 
     return np.array(TFP)
+
+
+
+def calc_GDP(TFP, L, K, alpha):
+    return TFP * L**(1-alpha) * K**alpha
 
 
 
