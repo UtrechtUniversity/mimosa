@@ -2,7 +2,7 @@
 from model.visualisation.utils import Plot
 
 
-def full_plot(m):
+def full_plot(m, filename):
 
     plot = Plot(m, horizontal_spacing=0.02, vertical_spacing=0.05)
     
@@ -20,4 +20,4 @@ def full_plot(m):
     plot.set_yaxes_titles(['GtCO<sub>2</sub>/yr','trillion US$2005/yr', 'GtCO<sub>2</sub>/yr'])
     plot.set_layout()
 
-    plot.fig.write_html('output/result.html')
+    plot.fig.write_html('output/{}.html'.format(filename))

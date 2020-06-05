@@ -56,6 +56,7 @@ class DataStore:
             
         self.database = self.databases[filename]
         self.cache = self.cached_data[filename]
+        self.filename = filename
     
     
     def _create_data_years(self):
@@ -135,6 +136,15 @@ class DataStore:
         year = self.params['time']['start'] + t
         return np.interp(year, self.data_years, self.data_values[variable][region])
     
+
+    def __repr__(self):
+        return 'DataStore with data values {} calculated on the years {}-{} from input file {} for the regions {} and {}'.format(
+            list(self.data_values.keys()),
+            self.data_years[0], self.data_years[-1],
+            self.filename,
+            list(self.params['regions'].keys()),
+            self.params['SSP']
+        )
     
 
 

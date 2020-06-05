@@ -35,6 +35,10 @@ class Quantity:
             return quantity.to(target_unit).magnitude
         else:
             return quantity.to(target_unit)
+
+    def __repr__(self):
+        units = ', '.join([f'{key}: {value}' for key, value in self.params['default units'].items()])
+        return f'Quantity with units: {units}'
     
     
     

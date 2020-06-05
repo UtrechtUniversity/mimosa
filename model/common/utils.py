@@ -34,7 +34,7 @@ curr_tick_name = None
 def tick(name=None):
     global curr_tick_time, curr_tick_name
     now = time.time()
-    if curr_tick_time is not None:
+    if curr_tick_name is not None:
         # TODO set debug logging level
         print('{} took {} seconds.'.format(curr_tick_name, now-curr_tick_time))
     curr_tick_time = now
