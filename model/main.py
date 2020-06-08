@@ -6,7 +6,8 @@ from pyomo.environ import *
 from pyomo.dae import *
 
 from model.common import data, utils, units, economics
-from model.visualisation.plot import full_plot
+from model.export.plot import full_plot
+from model.export.save import save_output
 
 utils.tick('Abstract model creation')
 from model.abstract_model import m as abstract_model
@@ -29,8 +30,8 @@ class MIMOSA:
         self.discretize()
 
 
+    @utils.timer('Concrete model creation')
     def create_instance(self):
-        utils.tick('Concrete model creation')
         
         # Create the data store
         self.data_store = data.DataStore(self.params, self.quant)
@@ -79,8 +80,8 @@ class MIMOSA:
         return m
     
 
+    @utils.timer('Time discretisation')
     def discretize(self):
-        utils.tick('Time discretisation')
 
         num_steps = int(self.m.tf/self.params['time']['dt'])
         discretizer = TransformationFactory('dae.finite_difference')
@@ -90,19 +91,20 @@ class MIMOSA:
         # discretizer.apply_to(m, nfe=6, ncp=7, scheme='LAGRANGE-RADAU')
 
 
+    @utils.timer('Model solve')
     def solve(self):
-        utils.tick('Model solve')
         # solver_manager = SolverManagerFactory('neos')
         # results = solver_manager.solve(m, opt='ipopt')
         results = SolverFactory('ipopt').solve(self.m)
 
         print('Final NPV:', value(self.m.NPV[self.m.tf]))
-        utils.tick()
 
+    @utils.timer('Plotting results')
     def plot(self, filename='result'):
-        utils.tick('Plotting results')
         full_plot(self.m, filename)
-        utils.tick()
+
+    def save(self):
+        save_output(self.params, self.m)
 
 
 

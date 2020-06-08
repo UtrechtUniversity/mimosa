@@ -39,3 +39,18 @@ def tick(name=None):
         print('{} took {} seconds.'.format(curr_tick_name, now-curr_tick_time))
     curr_tick_time = now
     curr_tick_name = name
+
+def timer(name):
+    """Decorator which times functions
+
+    Arguments:
+        name {str} -- Description of the function
+    """
+    def decorator(fct):
+        def wrapper(*args, **kwargs):
+            tick(name)
+            result = fct(*args, **kwargs)
+            tick()
+            return result
+        return wrapper
+    return decorator

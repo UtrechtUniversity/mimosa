@@ -80,11 +80,3 @@ default units:
   emissions_unit: Gt CO2
   temperature_unit: delta_degC
   population_unit: billion
-
-GEKKO:
-  remote: False
-  verbose: False
-  imode: 6
-  max_iter: 600
-  upperbounds:
-    relative_abatement: 1.5

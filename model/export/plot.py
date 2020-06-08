@@ -1,5 +1,5 @@
 
-from model.visualisation.utils import Plot
+from model.export.utils import Plot
 
 
 def full_plot(m, filename):
