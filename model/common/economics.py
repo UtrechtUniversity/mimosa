@@ -23,11 +23,15 @@ def get_TFP(region, data_store):
 
     for t, GDP, L in zip(time, GDP_data, population_data):
         TFP.append(GDP / calc_GDP(1, L, K, alpha))
-        K = (1-dk)**dt * K + dt * sr * GDP
+        dKdt = calc_dKdt(K, dk, sr * GDP, dt)
+        K = dKdt * dt + K
 
     return np.array(TFP)
 
 
+def calc_dKdt(K, dk, I, dt):
+    return np.log(1-dk) * K + I
+    # return ( (1-dk)**dt - 1)/dt * K + I
 
 def calc_GDP(TFP, L, K, alpha):
     return TFP * L**(1-alpha) * K**alpha

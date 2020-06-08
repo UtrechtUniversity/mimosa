@@ -162,13 +162,15 @@ m.consumption = Var(m.t, m.regions, initialize=lambda m: (1-m.sr)*m.GDP(0, m.reg
 m.utility = Var(m.t, m.regions)
 m.L = lambda t,r: m.population(t, r)
 
+m.dt = Param()
+
 regional_constraints.extend([
     lambda m,t,r: m.GDP_gross[t,r] == economics.calc_GDP(m.TFP(t, r), m.L(t,r), m.capital_stock[t,r], m.alpha),
     lambda m,t,r: m.GDP_net[t,r] == m.GDP_gross[t,r] * (1-m.damage_costs[t,r]) - m.abatement_costs[t,r],
     lambda m,t,r: m.investments[t,r] == m.sr * m.GDP_net[t,r],
     lambda m,t,r: m.consumption[t,r] == (1-m.sr) * m.GDP_net[t,r],
     lambda m,t,r: m.utility[t,r] == m.L(t,r) * ( (m.consumption[t,r] / m.L(t,r)) ** (1-m.elasmu) - 1 ) / (1-m.elasmu),
-    lambda m,t,r: m.capital_stockdot[t,r] == np.log(1-m.dk) * m.capital_stock[t,r] + m.investments[t,r]
+    lambda m,t,r: m.capital_stockdot[t,r] == economics.calc_dKdt(m.capital_stock[t,r], m.dk, m.investments[t,r], m.dt)
 ])
 
 # m.consumption_NPV = Var(m.t, m.regions)

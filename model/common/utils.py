@@ -36,7 +36,7 @@ def tick(name=None):
     now = time.time()
     if curr_tick_name is not None:
         # TODO set debug logging level
-        print('{} took {} seconds.'.format(curr_tick_name, now-curr_tick_time))
+        print('{} took {:.3g} seconds.'.format(curr_tick_name, now-curr_tick_time))
     curr_tick_time = now
     curr_tick_name = name
 

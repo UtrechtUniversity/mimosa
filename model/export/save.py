@@ -4,7 +4,7 @@ import random
 from pyomo.environ import value
 import hashlib
 
-def save_output(params, m, random_id=False):
+def save_output(params, m, experiment=None, random_id=False):
 
     # 1. Create a unique identifier
     if random_id:
@@ -36,12 +36,14 @@ def save_output(params, m, random_id=False):
         var_to_row(rows, m, var, True)
     df = rows_to_dataframe(rows, m)
 
-    add_param_columns(df, params, id)
+    add_param_columns(df, params, id, experiment)
 
-    df.to_csv(f'output/output_{id}.csv', float_format='%.6g')
+    filename = f'{id}' if experiment is None else f'{experiment}_{id}'
+
+    df.to_csv(f'output/output_{filename}.csv', float_format='%.6g', index=False)
 
     # 3. Save the param file
-    with open (f'output/params_{id}.json', 'w') as fp:
+    with open (f'output/params_{filename}.json', 'w') as fp:
         json.dump({id: params}, fp)
 
 
@@ -64,7 +66,7 @@ def rows_to_dataframe(rows, m):
     return df
 
 
-def add_param_columns(df, params, id):
+def add_param_columns(df, params, id, experiment):
     values = {
         'carbonbudget': params['emissions']['carbonbudget'],
         'minlevel': params['emissions']['min level'],
@@ -79,3 +81,5 @@ def add_param_columns(df, params, id):
 
     # Add ID:
     df.insert(0, 'ID', id)
+    if experiment is not None:
+        df.insert(1, 'Experiment', experiment)

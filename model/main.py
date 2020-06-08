@@ -49,6 +49,7 @@ class MIMOSA:
         instance_data = {None: {
             'beginyear':        v(params['time']['start']),
             'endyear':          v(params['time']['end']),
+            'dt':               v(params['time']['dt']),
             'regions':          v(params['regions'].keys()),
             
             'budget':           v(quant(params['emissions']['carbonbudget'], 'emissions_unit')),
@@ -103,8 +104,8 @@ class MIMOSA:
     def plot(self, filename='result'):
         full_plot(self.m, filename)
 
-    def save(self):
-        save_output(self.params, self.m)
+    def save(self, experiment=None, **kwargs):
+        save_output(self.params, self.m, experiment, **kwargs)
 
 
 
