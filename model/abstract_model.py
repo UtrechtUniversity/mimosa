@@ -26,11 +26,11 @@ regional_constraints = []
 
 
 ## Time and region
-m.beginyear = Param()
-m.endyear = Param()
-m.tf = Param(initialize=m.endyear - m.beginyear)
-m.year2100 = Param(initialize=2100 - m.beginyear)
-m.t = ContinuousSet(bounds=(0, m.tf))
+m.beginyear     = Param()
+m.endyear       = Param()
+m.tf            = Param(initialize=m.endyear - m.beginyear)
+m.year2100      = Param(initialize=2100 - m.beginyear)
+m.t             = ContinuousSet(bounds=(0, m.tf))
 
 m.regions = Set(ordered=True)
 
@@ -40,10 +40,10 @@ m.regions = Set(ordered=True)
 # Will be initialised when creating a concrete instance of the model
 ######################
 
-m.baseline    = None
-m.population  = None
-m.TFP         = None
-m.GDP         = None
+m.baseline      = None
+m.population    = None
+m.TFP           = None
+m.GDP           = None
 def baseline_cumulative(t_end, region):
     t_values = np.linspace(0, t_end, 100)
     return np.trapz(m.baseline(t_values, region), x=t_values)
@@ -55,10 +55,10 @@ m.baseline_cumulative = baseline_cumulative
 ######################
 
 ## Global variables
-m.temperature = Var(m.t)
-m.cumulative_emissions = Var(m.t, initialize=0)
+m.temperature   = Var(m.t)
+m.cumulative_emissions = Var(m.t)
 m.global_emissions = Var(m.t)
-m.NPV = Var(m.t)
+m.NPV           = Var(m.t)
 
 ## Regional variables
 # Control variable:
@@ -69,11 +69,11 @@ m.capital_stock = Var(m.t, m.regions, initialize=lambda m,t,r: m.init_capitalsto
 m.regional_emissions = Var(m.t, m.regions)
 
 ## Derivatives
-m.cumulative_emissionsdot = DerivativeVar(m.cumulative_emissions, wrt=m.t)
-m.global_emissionsdot = DerivativeVar(m.global_emissions, wrt=m.t)
-m.NPVdot = DerivativeVar(m.NPV, wrt=m.t)
-m.capital_stockdot = DerivativeVar(m.capital_stock, wrt=m.t)
-m.regional_emissionsdot = DerivativeVar(m.regional_emissions, wrt=m.t)
+m.cumulative_emissionsdot   = DerivativeVar(m.cumulative_emissions, wrt=m.t)
+m.global_emissionsdot       = DerivativeVar(m.global_emissions, wrt=m.t)
+m.NPVdot                    = DerivativeVar(m.NPV, wrt=m.t)
+m.capital_stockdot          = DerivativeVar(m.capital_stock, wrt=m.t)
+m.regional_emissionsdot     = DerivativeVar(m.regional_emissions, wrt=m.t)
 
 
 
@@ -85,17 +85,17 @@ regional_constraints.append(lambda m,t,r: m.regional_emissions[t, r] == (1-m.rel
 global_constraints.append(lambda m,t: m.global_emissions[t] == sum(m.regional_emissions[t, r] for r in m.regions))
 global_constraints.append(lambda m,t: m.cumulative_emissionsdot[t] == m.global_emissions[t])
 
-m.T0 = Param()
-m.TCRE = Param()
+m.T0            = Param()
+m.TCRE          = Param()
 global_constraints.append(lambda m,t: m.temperature[t] == m.T0 + m.TCRE * m.cumulative_emissions[t])
 
 
 # Emission constraints
 
-m.budget = Param()
+m.budget        = Param()
 m.inertia_global = Param()
 m.inertia_regional = Param()
-m.min_level = Param()
+m.min_level     = Param()
 global_constraints.extend([
     lambda m,t: m.cumulative_emissions[t] - m.budget <= 0   if (t >= m.year2100 and value(m.budget) is not False) else Constraint.Skip,
     lambda m,t: m.global_emissionsdot[t] >= m.inertia_global * sum(m.baseline(0, r) for r in m.regions) \
@@ -113,15 +113,15 @@ regional_constraints.append(
 # Damage costs
 ######################
 
-m.damage_costs = Var(m.t, m.regions)
+m.damage_costs  = Var(m.t, m.regions)
 m.gross_damages = Var(m.t, m.regions)
-m.adapt_costs = Var(m.t, m.regions)
-m.adapt_level = Var(m.t, m.regions, bounds=(0,1))
+m.adapt_costs   = Var(m.t, m.regions)
+m.adapt_level   = Var(m.t, m.regions, bounds=(0,1))
 
 m.damage_factor = Param(m.regions)
-m.damage_coeff = Param()
-m.adapt_gamma1 = Param()
-m.adapt_gamma2 = Param()
+m.damage_coeff  = Param()
+m.adapt_gamma1  = Param()
+m.adapt_gamma2  = Param()
 m.adapt_curr_level = Param()
 
 regional_constraints.extend([
@@ -138,15 +138,15 @@ regional_constraints.extend([
 
 
 ### Technological learning
-m.LBD_rate = Param()
-m.log_LBD_rate = Param(initialize=log(m.LBD_rate) / log(2))
-m.LBD_factor = Var(m.t)
-m.LBD_scaling = Param()
+m.LBD_rate      = Param()
+m.log_LBD_rate  = Param(initialize=log(m.LBD_rate) / log(2))
+m.LBD_scaling   = Param()
+m.LBD_factor    = Var(m.t)
 global_constraints.append(lambda m,t:
     m.LBD_factor[t] == ((sum(m.baseline_cumulative(t, r) for r in m.regions) - m.cumulative_emissions[t])/m.LBD_scaling+1.0)**m.log_LBD_rate)
 
-m.LOT_rate = Param()
-m.LOT_factor = Var(m.t)
+m.LOT_rate      = Param()
+m.LOT_factor    = Var(m.t)
 global_constraints.append(lambda m,t: m.LOT_factor[t] == 1 / (1+m.LOT_rate)**t)
 
 m.learning_factor = Var(m.t)
@@ -155,8 +155,8 @@ global_constraints.append(lambda m,t: m.learning_factor[t] == (m.LBD_factor[t] *
 m.abatement_costs = Var(m.t, m.regions)
 m.carbonprice = Var(m.t, m.regions)
 
-m.MAC_gamma = Param()
-m.MAC_beta = Param() # TODO Maybe move these params to economics.MAC/AC by including "m"
+m.MAC_gamma     = Param()
+m.MAC_beta      = Param() # TODO Maybe move these params to economics.MAC/AC by including "m"
 
 regional_constraints.extend([
     lambda m,t,r: m.abatement_costs[t,r] == economics.AC(m.relative_abatement[t,r], m.learning_factor[t], m.MAC_gamma, m.MAC_beta) * m.baseline(t, r),
@@ -170,16 +170,16 @@ regional_constraints.extend([
 ######################
 
 # Parameters
-m.alpha = Param()
-m.dk = Param()
-m.sr = Param()
-m.elasmu = Param()
+m.alpha         = Param()
+m.dk            = Param()
+m.sr            = Param()
+m.elasmu        = Param()
 
-m.GDP_gross = Var(m.t, m.regions)
-m.GDP_net = Var(m.t, m.regions)
-m.investments = Var(m.t, m.regions)
-m.consumption = Var(m.t, m.regions, initialize=lambda m: (1-m.sr)*m.GDP(0, m.regions.first()))
-m.utility = Var(m.t, m.regions)
+m.GDP_gross     = Var(m.t, m.regions)
+m.GDP_net       = Var(m.t, m.regions)
+m.investments   = Var(m.t, m.regions)
+m.consumption   = Var(m.t, m.regions, initialize=lambda m: (1-m.sr)*m.GDP(0, m.regions.first()))
+m.utility       = Var(m.t, m.regions)
 m.L = lambda t,r: m.population(t, r)
 
 m.dt = Param()
