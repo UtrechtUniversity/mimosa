@@ -28,6 +28,10 @@ def save_output(params, m, experiment=None, random_id=False):
         m.GDP_gross, m.GDP_net,
         m.abatement_costs,
         m.damage_costs,
+        m.resid_damages,
+        m.gross_damages,
+        m.adapt_costs,
+        m.adapt_level,
         m.consumption,
         m.utility
     ]

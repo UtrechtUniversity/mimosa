@@ -115,6 +115,7 @@ regional_constraints.append(
 
 m.damage_costs  = Var(m.t, m.regions)
 m.gross_damages = Var(m.t, m.regions)
+m.resid_damages = Var(m.t, m.regions)
 m.adapt_costs   = Var(m.t, m.regions)
 m.adapt_level   = Var(m.t, m.regions, bounds=(0,1))
 
@@ -125,9 +126,10 @@ m.adapt_gamma2  = Param()
 m.adapt_curr_level = Param()
 
 regional_constraints.extend([
-    lambda m,t,r: m.gross_damages[t,r] == m.damage_factor[r] * economics.damage_fct(m.temperature[t], m.damage_coeff, m.T0),
-    lambda m,t,r: m.adapt_costs[t,r] == economics.adaptation_costs(m.adapt_level[t,r], m.adapt_gamma1, m.adapt_gamma2),
-    lambda m,t,r: m.damage_costs[t,r] == m.gross_damages[t,r] * (1-m.adapt_level[t,r]) + m.adapt_costs[t,r]
+    lambda m,t,r: m.gross_damages[t,r]  == m.damage_factor[r] * economics.damage_fct(m.temperature[t], m.damage_coeff, m.T0),
+    lambda m,t,r: m.resid_damages[t,r]  == m.gross_damages[t,r] * (1-m.adapt_level[t,r]),
+    lambda m,t,r: m.adapt_costs[t,r]    == economics.adaptation_costs(m.adapt_level[t,r], m.adapt_gamma1, m.adapt_gamma2),
+    lambda m,t,r: m.damage_costs[t,r]   == m.resid_damages[t,r] + m.adapt_costs[t,r]
 ])
 
 
@@ -135,7 +137,6 @@ regional_constraints.extend([
 ######################
 # Abatement costs
 ######################
-
 
 ### Technological learning
 m.LBD_rate      = Param()
@@ -153,13 +154,14 @@ m.learning_factor = Var(m.t)
 global_constraints.append(lambda m,t: m.learning_factor[t] == (m.LBD_factor[t] * m.LOT_factor[t]))
 
 m.abatement_costs = Var(m.t, m.regions)
+m.rel_abatement_costs = Var(m.t, m.regions)
 m.carbonprice = Var(m.t, m.regions)
-
 m.MAC_gamma     = Param()
 m.MAC_beta      = Param() # TODO Maybe move these params to economics.MAC/AC by including "m"
 
 regional_constraints.extend([
     lambda m,t,r: m.abatement_costs[t,r] == economics.AC(m.relative_abatement[t,r], m.learning_factor[t], m.MAC_gamma, m.MAC_beta) * m.baseline(t, r),
+    lambda m,t,r: m.rel_abatement_costs[t,r] == m.abatement_costs[t,r] / m.GDP_gross[t,r], # GDP_gross is defined below
     lambda m,t,r: m.carbonprice[t,r] == economics.MAC(m.relative_abatement[t,r], m.learning_factor[t], m.MAC_gamma, m.MAC_beta)
 ])
 
@@ -175,7 +177,7 @@ m.dk            = Param()
 m.sr            = Param()
 m.elasmu        = Param()
 
-m.GDP_gross     = Var(m.t, m.regions)
+m.GDP_gross     = Var(m.t, m.regions, initialize=lambda m: m.GDP(0, m.regions.first()))
 m.GDP_net       = Var(m.t, m.regions)
 m.investments   = Var(m.t, m.regions)
 m.consumption   = Var(m.t, m.regions, initialize=lambda m: (1-m.sr)*m.GDP(0, m.regions.first()))

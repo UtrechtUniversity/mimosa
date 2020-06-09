@@ -8,7 +8,7 @@ COLORS_PBL = ['#00AEEF', '#808D1D', '#B6036C', '#FAAD1E', '#3F1464', '#7CCFF2', 
 
 class Plot:
     
-    def __init__(self, m, numrows=3, globalrows=[3], coltitles=None, **kwargs):
+    def __init__(self, m, numrows=4, globalrows=[4], coltitles=None, **kwargs):
         self.m = m
         self.regions = m.regions
         self.years = value(m.beginyear) + np.array(m.t)
@@ -21,10 +21,18 @@ class Plot:
             
         self.fig = make_subplots(
             numrows, n,
-            shared_yaxes=True, specs=specs,
+            shared_yaxes=True, shared_xaxes='rows', specs=specs,
             subplot_titles=coltitles if coltitles is not None else list(m.regions),
             **kwargs
         )
+
+        # Make sure all secondary yaxes are matched per row
+        for i in range(numrows):
+            ref = next(self.fig.select_yaxes(row=i+1, col=1, secondary_y=True))
+            ref_name = ref.plotly_name.replace('axis', '')
+            for ax in self.fig.select_yaxes(row=i+1, secondary_y=True):
+                ax.matches = ref_name
+
         self.curr_values = {}
     
     def _value(self, var, region, is_fct):
@@ -46,6 +54,7 @@ class Plot:
             line_color=color,
             row=row, col=col,
             showlegend=showlegend,
+            **({'line_dash': 'dot' if kwargs.get('secondary_y', False) else 'solid'} if 'line_dash' not in kwargs else {}),
             **kwargs
         )
     
