@@ -56,3 +56,6 @@ def damage_fct(T, coeff, T0=None):
     if T0 is not None:
         dmg -= coeff * T0**2
     return dmg
+
+def adaptation_costs(P, gamma1, gamma2):
+    return gamma1 * P**gamma2

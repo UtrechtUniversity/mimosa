@@ -62,6 +62,10 @@ economics:
     gamma: 3926 USD2005/tCO2
   damages:
     coeff: 0.010038
+  adaptation:
+    gamma1: 0.115
+    gamma2: 3.6
+    curr_level: 0.16
 
 emissions:
   carbonbudget: 600 GtCO2     # False or a quantity

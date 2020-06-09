@@ -66,6 +66,9 @@ class MIMOSA:
 
             'damage_factor':    {r: self.regions[r].get('damage factor', 1) for r in self.regions},
             'damage_coeff':     v(params['economics']['damages']['coeff']),
+            'adapt_gamma1':     v(params['economics']['adaptation']['gamma1']),
+            'adapt_gamma2':     v(params['economics']['adaptation']['gamma2']),
+            'adapt_curr_level': v(params['economics']['adaptation']['curr_level']),
             'MAC_gamma':        v(quant(params['economics']['MAC']['gamma'], 'currency_unit/emissionsrate_unit')),
             'MAC_beta':         v(params['economics']['MAC']['beta']),
 
