@@ -37,6 +37,7 @@ m.regions = Set(ordered=True)
 
 ######################
 # Create data functions
+# Will be initialised when creating a concrete instance of the model
 ######################
 
 m.baseline    = None

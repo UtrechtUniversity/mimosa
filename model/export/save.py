@@ -20,6 +20,8 @@ def save_output(params, m, experiment=None, random_id=False):
         m.learning_factor
     ]
     regional_vars = [
+        [m.baseline, 'baseline'],
+        [m.population, 'population'],
         m.regional_emissions,
         m.carbonprice,
         m.capital_stock,
@@ -51,12 +53,24 @@ def save_output(params, m, experiment=None, random_id=False):
     return
 
 def var_to_row(rows, m, var, is_regional):
-    name = var.name
+    # If var is a list, second element is the name
+    if type(var) is list:
+        name = var[1]
+        var = var[0]
+    else:
+        name = var.name
+    
+    # Check if var is a function or a pyomo variable
+    fct = var if callable(var) else (
+        (lambda t,r: value(var[t,r])) if is_regional else \
+        (lambda t:   value(var[t]))
+    )
+
     if is_regional:
         for r in m.regions:
-            rows.append([name, r]+[value(var[t,r]) for t in m.t])
+            rows.append([name, r]+[fct(t,r) for t in m.t])
     else:
-        rows.append([name, 'Global']+[value(var[t]) for t in m.t])
+        rows.append([name, 'Global']+[fct(t) for t in m.t])
 
     
 def rows_to_dataframe(rows, m):
