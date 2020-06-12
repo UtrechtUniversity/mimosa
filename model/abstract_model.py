@@ -74,6 +74,7 @@ m.global_emissionsdot       = DerivativeVar(m.global_emissions, wrt=m.t)
 m.NPVdot                    = DerivativeVar(m.NPV, wrt=m.t)
 m.capital_stockdot          = DerivativeVar(m.capital_stock, wrt=m.t)
 m.regional_emissionsdot     = DerivativeVar(m.regional_emissions, wrt=m.t)
+m.temperaturedot            = DerivativeVar(m.temperature, wrt=m.t)
 
 
 
@@ -114,6 +115,9 @@ regional_constraints.append(
 ######################
 
 m.damage_costs  = Var(m.t, m.regions)
+m.gross_global_damages = Var(m.t)
+m.gross_global_damagesdot = DerivativeVar(m.gross_global_damages, wrt=m.t)
+m.smoothed_factor = Var(m.t)
 m.gross_damages = Var(m.t, m.regions)
 m.resid_damages = Var(m.t, m.regions)
 m.adapt_costs   = Var(m.t, m.regions)
@@ -125,8 +129,24 @@ m.adapt_gamma1  = Param()
 m.adapt_gamma2  = Param()
 m.adapt_curr_level = Param()
 
+
+m.perc_reversible_damages = Param()
+
+global_constraints.extend([
+    lambda m,t: ((
+        m.smoothed_factor[t] == (tanh((m.temperaturedot[t]) / 1e-3)+1)*(1-m.perc_reversible_damages)/2 +m.perc_reversible_damages
+    ) if m.perc_reversible_damages < 1 else (m.smoothed_factor[t] == 1)),
+
+    lambda m,t: (
+        m.gross_global_damagesdot[t] == m.damage_coeff * 2 * m.temperature[t] * m.smoothed_factor[t] * m.temperaturedot[t]
+    ) if m.perc_reversible_damages < 1 else (
+        m.gross_global_damages[t]  == economics.damage_fct(m.temperature[t], m.damage_coeff, m.T0)
+    )
+])
+
 regional_constraints.extend([
-    lambda m,t,r: m.gross_damages[t,r]  == m.damage_factor[r] * economics.damage_fct(m.temperature[t], m.damage_coeff, m.T0),
+    # lambda m,t,r: m.adapt_level[t,r] == m.adapt_curr_level,
+    lambda m,t,r: m.gross_damages[t,r]  == m.damage_factor[r] * m.gross_global_damages[t],
     lambda m,t,r: m.resid_damages[t,r]  == m.gross_damages[t,r] * (1-m.adapt_level[t,r]),
     lambda m,t,r: m.adapt_costs[t,r]    == economics.adaptation_costs(m.adapt_level[t,r], m.adapt_gamma1, m.adapt_gamma2),
     lambda m,t,r: m.damage_costs[t,r]   == m.resid_damages[t,r] + m.adapt_costs[t,r]
@@ -225,6 +245,7 @@ def _init(m):
         yield m.adapt_level[0,r] == m.adapt_curr_level
         # yield m.consumption_NPV[0,r] == 0
         # yield m.baseline_consumption_NPV[0,r] == 0
+    yield m.gross_global_damages[0] == 0
     yield m.global_emissions[0] == sum(m.baseline(0, r) for r in m.regions)
     yield m.cumulative_emissions[0] == 0
     yield m.NPV[0] == 0

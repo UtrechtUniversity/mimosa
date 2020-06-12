@@ -66,6 +66,7 @@ class MIMOSA:
 
             'damage_factor':    {r: self.regions[r].get('damage factor', 1) for r in self.regions},
             'damage_coeff':     v(params['economics']['damages']['coeff']),
+            'perc_reversible_damages': v(params['economics']['damages']['percentage reversible']),
             'adapt_gamma1':     v(params['economics']['adaptation']['gamma1']),
             'adapt_gamma2':     v(params['economics']['adaptation']['gamma2']),
             'adapt_curr_level': v(params['economics']['adaptation']['curr_level']),
@@ -87,19 +88,24 @@ class MIMOSA:
     @utils.timer('Time discretisation')
     def discretize(self):
 
+
         num_steps = int(self.m.tf/self.params['time']['dt'])
         discretizer = TransformationFactory('dae.finite_difference')
         discretizer.apply_to(self.m, nfe=num_steps, scheme='BACKWARD')
 
+        # TransformationFactory('contrib.aggregate_vars').apply_to(self.m)
+        TransformationFactory('contrib.init_vars_midpoint').apply_to(self.m)
         # discretizer = TransformationFactory('dae.collocation')
         # discretizer.apply_to(m, nfe=6, ncp=7, scheme='LAGRANGE-RADAU')
 
 
     @utils.timer('Model solve')
-    def solve(self):
+    def solve(self, verbose=False):
         # solver_manager = SolverManagerFactory('neos')
-        # results = solver_manager.solve(m, opt='ipopt')
-        results = SolverFactory('ipopt').solve(self.m)
+        # solver = 'conopt' # 'ipopt'
+        # results = solver_manager.solve(self.m, opt=solver)
+        opt = SolverFactory('ipopt')
+        results = opt.solve(self.m, tee=verbose, options={'tol': 1e-2})
 
         print('Final NPV:', value(self.m.NPV[self.m.tf]))
 

@@ -21,8 +21,11 @@ def full_plot(m, filename):
     plot.add(m.abatement_costs, row=3)
     plot.add(m.global_emissions, is_regional=False, row=4)
     plot.add(m.temperature, is_regional=False, row=4, secondary_y=True)
+    plot.add(m.smoothed_factor, is_regional=False, row=4, secondary_y=True, visible='legendonly')
     plot.add(m.cumulative_emissions, is_regional=False, row=4, visible='legendonly')
     plot.set_yaxes_titles(['GtCO<sub>2</sub>/yr','% GDP', 'trillion US$2005/yr', 'GtCO<sub>2</sub>/yr'])
+    plot.fig.update_yaxes(title='Carbon price', row=1, col=len(plot.regions), secondary_y=True)
+    plot.fig.update_yaxes(title='Adaptation level', row=2, col=len(plot.regions), secondary_y=True)
     plot.set_layout()
 
     plot.fig.write_html('output/{}.html'.format(filename))

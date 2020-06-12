@@ -16,6 +16,8 @@ def save_output(params, m, experiment=None, random_id=False):
     global_vars = [
         m.global_emissions,
         m.temperature,
+        m.temperaturedot,
+        m.smoothed_factor,
         m.cumulative_emissions,
         m.learning_factor
     ]
@@ -92,6 +94,7 @@ def add_param_columns(df, params, id, experiment):
         'gamma': params['economics']['MAC']['gamma'],
         'PRTP': params['economics']['PRTP'],
         'damage_coeff': params['economics']['damages']['coeff'],
+        'perc_reversible': params['economics']['damages']['percentage reversible'],
         'TCRE': params['temperature']['TCRE']
     }
     for i, (name, value) in enumerate(values.items()):

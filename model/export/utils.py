@@ -66,7 +66,7 @@ class Plot:
 
         if new:
             self.curr_values[name] = len(self.curr_values)
-        color = COLORS_PBL[self.curr_values[name]]
+        color = COLORS_PBL[self.curr_values[name] % len(COLORS_PBL)]
         
         if is_regional:
             for i, r in enumerate(self.regions):
@@ -78,6 +78,8 @@ class Plot:
         
     def set_layout(self):
         self.fig.update_xaxes(range=[self.years[0], 2100])
+        for i in range(1, len(self.regions)):
+            self.fig.update_yaxes(secondary_y=True, showticklabels=False, col=i)
         self.fig.update_traces(mode='lines')
         self.fig.update_layout(
             margin={'t': 50, 'l': 50, 'r': 50, 'b': 50},
