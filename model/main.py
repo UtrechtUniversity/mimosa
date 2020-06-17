@@ -129,14 +129,3 @@ class MIMOSA:
 
 
 
-
-
-# consumption_loss = [
-#     (value(m.baseline_consumption_NPV[m.year2100,r]) - value(m.consumption_NPV[m.year2100, r])) / value(m.baseline_consumption_NPV[m.year2100,r])
-#     for r in regions
-# ]
-# relative_carbonbudget = [value(m.cumulative_emissions[m.year2100]) / m.baseline_cumulative(value(m.year2100), r) for r in regions]
-# print('\nConsumption loss NPV:', consumption_loss)
-# print('Relative carbon budget:', relative_carbonbudget)
-# print(m.t[m.year2100])
-

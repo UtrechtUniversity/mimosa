@@ -1,6 +1,6 @@
 ##############################################
 # Model equations and constraints:
-# Emissions and temperatures
+# Emissions and temperature
 #
 ##############################################
 
@@ -8,6 +8,18 @@ from pyomo.environ import *
 from pyomo.dae import *
 
 def constraints(m):
+    """Emissions and temperature equations and constraints
+
+    Necessary variables:
+        m.relative_abatement
+        m.cumulative_emissions
+        m.T0
+        m.temperature
+
+    Returns:
+        list: regional_constraints
+        list: global_constraints
+    """
     regional_constraints = []
     global_constraints = []
 

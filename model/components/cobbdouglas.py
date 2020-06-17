@@ -9,6 +9,15 @@ from pyomo.dae import *
 from model.common import economics
 
 def constraints(m):
+    """Economics and Cobb-Douglas equations and constraints
+
+    Necessary variables:
+        m.utility
+
+    Returns:
+        list: regional_constraints
+        list: global_constraints
+    """
     regional_constraints = []
     global_constraints = []
 

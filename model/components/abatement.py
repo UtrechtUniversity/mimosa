@@ -8,6 +8,15 @@ from pyomo.environ import *
 from pyomo.dae import *
 
 def constraints(m):
+    """Abatement cost equations and constraints
+
+    Necessary variables:
+        m.abatement_costs
+
+    Returns:
+        list: regional_constraints
+        list: global_constraints
+    """
     regional_constraints = []
     global_constraints = []
     

@@ -8,6 +8,15 @@ from pyomo.environ import *
 from pyomo.dae import *
 
 def constraints(m):
+    """Damage costs equations and constraints
+
+    Necessary variables:
+        m.damage_costs (sum of residual damages and adaptation costs, % of GDP)
+
+    Returns:
+        list: regional_constraints
+        list: global_constraints
+    """
     regional_constraints = []
     global_constraints = []
 
@@ -65,6 +74,8 @@ def constraints(m):
 #################
 
 
+# Damage function
+
 def damage_fct(T, T0, m, r):
     return _damage_fct(T, m.damage_a1[r], m.damage_a2[r], m.damage_a3[r], T0)
 
@@ -89,9 +100,11 @@ def _damage_fct_dot(T, a1, a2, a3):
     return a1 + a2 * a3 * T ** (a3 - 1)
 
 
+# Adaptation cost function
 
 def adaptation_costs(P, m, r):
     return _adaptation_costs(P, m.adapt_g1[r], m.adapt_g2[r])
+
 
 def _adaptation_costs(P, gamma1, gamma2):
     return gamma1 * P**gamma2
