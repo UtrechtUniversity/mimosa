@@ -51,7 +51,7 @@ def save_output(params, m, experiment=None, random_id=False):
     df.to_csv(f'output/output_{filename}.csv', float_format='%.6g', index=False)
 
     # 3. Save the param file
-    with open (f'output/params_{filename}.json', 'w') as fp:
+    with open (f'output/params/params_{filename}.json', 'w') as fp:
         json.dump({id: params}, fp)
 
 

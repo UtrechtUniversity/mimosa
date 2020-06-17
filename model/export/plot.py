@@ -28,4 +28,4 @@ def full_plot(m, filename):
     plot.fig.update_yaxes(title='Adaptation level', row=2, col=len(plot.regions), secondary_y=True)
     plot.set_layout()
 
-    plot.fig.write_html('output/{}.html'.format(filename))
+    plot.fig.write_html('output/plots/{}.html'.format(filename))

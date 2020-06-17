@@ -1,21 +1,33 @@
 regions:
   # World:
   #   initial capital: 190 trillion US$2005/yr
+  #   damages:
+  #     a1: 0
+  #     a2: 0.010038
+  #     a3: 2
+  #   adaptation:
+  #     g1: 0.115
+  #     g2: 3.6
   R5.2OECD:
     initial capital: 80000 billion US$2005/yr
-    damage factor: 0.9
+    damages: $regional
+    adaptation: $regional
   R5.2ASIA:
     initial capital: 45 trillion US$2005/yr
-    damage factor: 1.2
+    damages: $regional
+    adaptation: $regional
   R5.2LAM:
     initial capital: 20 trillion US$2005/yr
-    damage factor: 1
+    damages: $regional
+    adaptation: $regional
   R5.2MAF:
     initial capital: 20 trillion US$2005/yr
-    damage factor: 3
+    damages: $regional
+    adaptation: $regional
   R5.2REF:
     initial capital: 10 trillion US$2005/yr
-    damage factor: 0.7
+    damages: $regional
+    adaptation: $regional
 
 
 input:
@@ -59,24 +71,24 @@ economics:
   MAC:
     beta: 2
     rho: 0.82
-    gamma: 3926 USD2005/tCO2
+    gamma: 3926.2909 USD2005/tCO2
   damages:
-    coeff: 0.010038
     percentage reversible: 1
+    scale factor: 1
   adaptation:
-    gamma1: 0.115
-    gamma2: 3.6
     curr_level: 0.16
+    fixed: False
 
 emissions:
-  carbonbudget: 600 GtCO2     # False or a quantity
+  carbonbudget: 1000 GtCO2     # False or a quantity
   min level: -20 GtCO2/yr     # False or a quantity
+  not positive after budget year: True
   inertia:
     global: False     # False or a number < 0, % of initial emissions
     regional: -0.05     # False or a number < 0, % of initial emissions
 
 temperature:
-  initial: 1.09 delta_degC
+  initial: 1.096224 delta_degC
   TCRE: 0.62 delta_degC/(TtCO2)
 
 default units:

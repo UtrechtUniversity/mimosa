@@ -30,7 +30,7 @@ class MIMOSA:
         self.discretize()
 
 
-    @utils.timer('Concrete model creation')
+    # @utils.timer('Concrete model creation')
     def create_instance(self):
         
         # Create the data store
@@ -56,6 +56,7 @@ class MIMOSA:
             'inertia_regional': v(params['emissions']['inertia']['regional']),
             'inertia_global':   v(params['emissions']['inertia']['global']),
             'min_level':        v(quant(params['emissions']['min level'], 'emissionsrate_unit')),
+            'no_pos_emissions_after_budget_year': v(params['emissions']['not positive after budget year']),
 
             'T0':               v(quant(params['temperature']['initial'], 'temperature_unit')),
             'TCRE':             v(quant(params['temperature']['TCRE'], '(temperature_unit)/(emissions_unit)')),
@@ -64,12 +65,15 @@ class MIMOSA:
             'LBD_scaling':      v(quant('40 GtCO2', 'emissions_unit')),
             'LOT_rate':         v(0),
 
-            'damage_factor':    {r: self.regions[r].get('damage factor', 1) for r in self.regions},
-            'damage_coeff':     v(params['economics']['damages']['coeff']),
+            'damage_a1':        self.data_store.get_regional('damages', 'a1'),
+            'damage_a2':        self.data_store.get_regional('damages', 'a2'),
+            'damage_a3':        self.data_store.get_regional('damages', 'a3'),
+            'damage_scale_factor': v(params['economics']['damages']['scale factor']),
             'perc_reversible_damages': v(params['economics']['damages']['percentage reversible']),
-            'adapt_gamma1':     v(params['economics']['adaptation']['gamma1']),
-            'adapt_gamma2':     v(params['economics']['adaptation']['gamma2']),
+            'adapt_g1':         self.data_store.get_regional('adaptation', 'g1'),
+            'adapt_g2':         self.data_store.get_regional('adaptation', 'g2'),
             'adapt_curr_level': v(params['economics']['adaptation']['curr_level']),
+            'fixed_adaptation': v(params['economics']['adaptation']['fixed']),
             'MAC_gamma':        v(quant(params['economics']['MAC']['gamma'], 'currency_unit/emissionsrate_unit')),
             'MAC_beta':         v(params['economics']['MAC']['beta']),
 
@@ -85,18 +89,18 @@ class MIMOSA:
         return m
     
 
-    @utils.timer('Time discretisation')
+    # @utils.timer('Time discretisation')
     def discretize(self):
 
 
         num_steps = int(self.m.tf/self.params['time']['dt'])
         discretizer = TransformationFactory('dae.finite_difference')
         discretizer.apply_to(self.m, nfe=num_steps, scheme='BACKWARD')
+        # discretizer = TransformationFactory('dae.collocation')
+        # discretizer.apply_to(self.m, nfe=10, ncp=6)
 
         # TransformationFactory('contrib.aggregate_vars').apply_to(self.m)
         TransformationFactory('contrib.init_vars_midpoint').apply_to(self.m)
-        # discretizer = TransformationFactory('dae.collocation')
-        # discretizer.apply_to(m, nfe=6, ncp=7, scheme='LAGRANGE-RADAU')
 
 
     @utils.timer('Model solve')
@@ -105,7 +109,13 @@ class MIMOSA:
         # solver = 'conopt' # 'ipopt'
         # results = solver_manager.solve(self.m, opt=solver)
         opt = SolverFactory('ipopt')
-        results = opt.solve(self.m, tee=verbose, options={'tol': 1e-2})
+        results = opt.solve(self.m, tee=verbose)
+
+        if results.solver.status != SolverStatus.ok:
+            print("Status: {}, termination condition: {}".format(
+                results.solver.status, results.solver.termination_condition
+            ))
+            raise Exception("Solver did not exit with status OK")
 
         print('Final NPV:', value(self.m.NPV[self.m.tf]))
 

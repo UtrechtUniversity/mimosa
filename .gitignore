@@ -3,7 +3,6 @@
 
 # Debug files
 output/*
-input/*.py
 input/*.ipynb
 *.ipynb
 
