@@ -38,30 +38,7 @@ def calc_GDP(TFP, L, K, alpha):
 
 
 
-def MAC(a, factor, gamma, beta):
-    return gamma * factor * a**beta
-
-def AC(a, factor, gamma, beta):
-    return gamma * factor * a**(beta+1) / (beta+1)
 
 
 
-def damage_fct(T, a1, a2, a3, T0=None):
-    """Quadratic damage function
 
-    T: temperature
-    T0 [None]: if specified, substracts damage at T0
-    """
-    fct = lambda temp: a1 * temp + a2 * temp**a3
-    dmg = fct(T)
-    if T0 is not None:
-        dmg -= fct(T0)
-    return dmg
-
-def damage_fct_dot(T, a1, a2, a3):
-    return a1 + a2 * a3 * T ** (a3 - 1)
-
-
-
-def adaptation_costs(P, gamma1, gamma2):
-    return gamma1 * P**gamma2

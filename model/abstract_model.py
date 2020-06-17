@@ -10,6 +10,7 @@ from pyomo.environ import *
 from pyomo.dae import *
 
 from model.common import utils, economics
+from model.components import emissions, damages, abatement, cobbdouglas
 
 
 ######################
@@ -51,192 +52,31 @@ m.baseline_cumulative = baseline_cumulative
 
 
 ######################
-# Create variables
+# Components
 ######################
 
-## Global variables
-m.cumulative_emissions = Var(m.t)
-m.global_emissions = Var(m.t)
-m.NPV           = Var(m.t)
-
-## Regional variables
-# Control variable:
-m.relative_abatement = Var(m.t, m.regions, initialize=0, bounds=(0, 2))
-# State variables:
-m.init_capitalstock = Param(m.regions)
-m.capital_stock = Var(m.t, m.regions, initialize=lambda m,t,r: m.init_capitalstock[r])
-m.regional_emissions = Var(m.t, m.regions)
-
-## Derivatives
-m.cumulative_emissionsdot   = DerivativeVar(m.cumulative_emissions, wrt=m.t)
-m.global_emissionsdot       = DerivativeVar(m.global_emissions, wrt=m.t)
-m.NPVdot                    = DerivativeVar(m.NPV, wrt=m.t)
-m.capital_stockdot          = DerivativeVar(m.capital_stock, wrt=m.t)
-m.regional_emissionsdot     = DerivativeVar(m.regional_emissions, wrt=m.t)
+# Emissions and temperature equations
+emissions_reg, emissions_glob = emissions.constraints(m)
+regional_constraints.extend(emissions_reg)
+global_constraints.extend(emissions_glob)
 
 
-
-######################
-# Emission equations
-######################
-
-regional_constraints.append(lambda m,t,r: m.regional_emissions[t, r] == (1-m.relative_abatement[t, r]) * m.baseline(t, r))
-global_constraints.append(lambda m,t: m.global_emissions[t] == sum(m.regional_emissions[t, r] for r in m.regions))
-global_constraints.append(lambda m,t: m.cumulative_emissionsdot[t] == m.global_emissions[t])
-
-m.T0            = Param()
-m.temperature   = Var(m.t, initialize=lambda m,t: m.T0)
-m.temperaturedot = DerivativeVar(m.temperature, wrt=m.t)
-m.TCRE          = Param()
-global_constraints.append(lambda m,t: m.temperature[t] == m.T0 + m.TCRE * m.cumulative_emissions[t])
-
-
-# Emission constraints
-
-m.budget        = Param()
-m.inertia_global = Param()
-m.inertia_regional = Param()
-m.min_level     = Param()
-m.no_pos_emissions_after_budget_year = Param()
-global_constraints.extend([
-    lambda m,t: m.cumulative_emissions[t] - m.budget <= 0   if (t >= value(m.year2100) and value(m.budget) is not False) else Constraint.Skip,
-    lambda m,t: m.cumulative_emissions[t] >= 0,
-    lambda m,t: m.global_emissionsdot[t] >= m.inertia_global * sum(m.baseline(0, r) for r in m.regions) \
-                                                            if value(m.inertia_global) is not False else Constraint.Skip,
-    lambda m,t: m.global_emissions[t] >= m.min_level        if value(m.min_level) is not False else Constraint.Skip,
-    lambda m,t: m.global_emissions[t] <= 0                  if (
-            t >= value(m.year2100) and
-            value(m.no_pos_emissions_after_budget_year) is True and
-            value(m.budget) is not False
-        ) else Constraint.Skip
-])
-regional_constraints.append(
-    lambda m,t,r: m.regional_emissionsdot[t, r] >= m.inertia_regional * m.baseline(0, r) \
-                                                            if value(m.inertia_regional) is not False else Constraint.Skip
-)
-
-
-
-######################
 # Damage costs
-######################
-
-m.damage_costs  = Var(m.t, m.regions)
-m.smoothed_factor = Var(m.t)
-m.gross_damages = Var(m.t, m.regions)
-m.gross_damagesdot = DerivativeVar(m.gross_damages, wrt=m.t)
-m.resid_damages = Var(m.t, m.regions)
-m.adapt_costs   = Var(m.t, m.regions)
-m.adapt_level   = Var(m.t, m.regions, bounds=(0,1))
-
-m.damage_a1 = Param(m.regions)
-m.damage_a2 = Param(m.regions)
-m.damage_a3 = Param(m.regions)
-m.damage_scale_factor = Param()
-m.adapt_g1  = Param(m.regions)
-m.adapt_g2  = Param(m.regions)
-m.adapt_curr_level = Param()
-m.fixed_adaptation = Param()
+damages_reg, damages_glob = damages.constraints(m)
+regional_constraints.extend(damages_reg)
+global_constraints.extend(damages_glob)
 
 
-m.perc_reversible_damages = Param()
-
-global_constraints.append(
-    lambda m,t: ((
-        m.smoothed_factor[t] == (tanh((m.temperaturedot[t]) / 1e-3)+1)*(1-m.perc_reversible_damages)/2 +m.perc_reversible_damages
-    ) if m.perc_reversible_damages < 1 else (m.smoothed_factor[t] == 1))
-)
-
-regional_constraints.append(
-    lambda m,t,r: (
-        m.gross_damagesdot[t,r] == m.damage_scale_factor * (
-            economics.damage_fct_dot(m.temperature, m.damage_a1[r], m.damage_a2[r], m.damage_a3[r])
-            * m.smoothed_factor[t] * m.temperaturedot[t])
-    ) if m.perc_reversible_damages < 1 else (
-        m.gross_damages[t,r]  == m.damage_scale_factor * (
-            economics.damage_fct(m.temperature[t], m.damage_a1[r], m.damage_a2[r], m.damage_a3[r], m.T0))
-    )
-)
-
-regional_constraints.extend([
-    lambda m,t,r: m.adapt_level[t,r]    == m.adapt_curr_level if value(m.fixed_adaptation) else Constraint.Skip,
-    lambda m,t,r: m.resid_damages[t,r]  == m.gross_damages[t,r] * (1-m.adapt_level[t,r]),
-    lambda m,t,r: m.adapt_costs[t,r]    == economics.adaptation_costs(m.adapt_level[t,r], m.adapt_g1[r], m.adapt_g2[r]),
-    lambda m,t,r: m.damage_costs[t,r]   == m.resid_damages[t,r] + m.adapt_costs[t,r]
-])
-
-
-
-######################
 # Abatement costs
-######################
-
-### Technological learning
-m.LBD_rate      = Param()
-m.log_LBD_rate  = Param(initialize=log(m.LBD_rate) / log(2))
-m.LBD_scaling   = Param()
-m.LBD_factor    = Var(m.t)
-global_constraints.append(lambda m,t:
-    m.LBD_factor[t] == ((sum(m.baseline_cumulative(t, r) for r in m.regions) - m.cumulative_emissions[t])/m.LBD_scaling+1.0)**m.log_LBD_rate)
-
-m.LOT_rate      = Param()
-m.LOT_factor    = Var(m.t)
-global_constraints.append(lambda m,t: m.LOT_factor[t] == 1 / (1+m.LOT_rate)**t)
-
-m.learning_factor = Var(m.t)
-global_constraints.append(lambda m,t: m.learning_factor[t] == (m.LBD_factor[t] * m.LOT_factor[t]))
-
-m.abatement_costs = Var(m.t, m.regions)
-m.rel_abatement_costs = Var(m.t, m.regions)
-m.carbonprice = Var(m.t, m.regions)
-m.MAC_gamma     = Param()
-m.MAC_beta      = Param() # TODO Maybe move these params to economics.MAC/AC by including "m"
-
-regional_constraints.extend([
-    lambda m,t,r: m.abatement_costs[t,r] == economics.AC(m.relative_abatement[t,r], m.learning_factor[t], m.MAC_gamma, m.MAC_beta) * m.baseline(t, r),
-    lambda m,t,r: m.rel_abatement_costs[t,r] == m.abatement_costs[t,r] / m.GDP_gross[t,r], # GDP_gross is defined below
-    lambda m,t,r: m.carbonprice[t,r] == economics.MAC(m.relative_abatement[t,r], m.learning_factor[t], m.MAC_gamma, m.MAC_beta)
-])
+abatement_reg, abatement_glob = abatement.constraints(m)
+regional_constraints.extend(abatement_reg)
+global_constraints.extend(abatement_glob)
 
 
-
-######################
-# Cobb-Douglas (move this to other file)
-######################
-
-# Parameters
-m.alpha         = Param()
-m.dk            = Param()
-m.sr            = Param()
-m.elasmu        = Param()
-
-m.GDP_gross     = Var(m.t, m.regions, initialize=lambda m: m.GDP(0, m.regions.first()))
-m.GDP_net       = Var(m.t, m.regions)
-m.investments   = Var(m.t, m.regions)
-m.consumption   = Var(m.t, m.regions, initialize=lambda m: (1-m.sr)*m.GDP(0, m.regions.first()))
-m.utility       = Var(m.t, m.regions)
-m.L = lambda t,r: m.population(t, r)
-
-m.dt = Param()
-
-regional_constraints.extend([
-    lambda m,t,r: m.GDP_gross[t,r] == economics.calc_GDP(m.TFP(t, r), m.L(t,r), m.capital_stock[t,r], m.alpha),
-    lambda m,t,r: m.GDP_net[t,r] == m.GDP_gross[t,r] * (1-m.damage_costs[t,r]) - m.abatement_costs[t,r],
-    lambda m,t,r: m.investments[t,r] == m.sr * m.GDP_net[t,r],
-    lambda m,t,r: m.consumption[t,r] == (1-m.sr) * m.GDP_net[t,r],
-    lambda m,t,r: m.utility[t,r] == ( (m.consumption[t,r] / m.L(t,r)) ** (1-m.elasmu) - 1 ) / (1-m.elasmu) - 1,
-    lambda m,t,r: m.capital_stockdot[t,r] == economics.calc_dKdt(m.capital_stock[t,r], m.dk, m.investments[t,r], m.dt)
-])
-
-# m.consumption_NPV = Var(m.t, m.regions)
-# m.consumption_NPVdot = DerivativeVar(m.consumption_NPV, wrt=m.t)
-# m.baseline_consumption_NPV = Var(m.t, m.regions)
-# m.baseline_consumption_NPVdot = DerivativeVar(m.baseline_consumption_NPV, wrt=m.t)
-# m.baseline_consumption = lambda t,r: (1-m.sr) * m.GDP(t, r)
-# regional_constraints.extend([
-#     lambda m,t,r: m.consumption_NPVdot[t,r] == exp(-0.05 * t) * m.consumption[t,r],
-#     lambda m,t,r: m.baseline_consumption_NPVdot[t,r] == exp(-0.05 * t) * m.baseline_consumption(t,r)
-# ])
+# Cobb-Douglas and economics
+cobbdouglas_reg, cobbdouglas_glob = cobbdouglas.constraints(m)
+regional_constraints.extend(cobbdouglas_reg)
+global_constraints.extend(cobbdouglas_glob)
 
 
 
@@ -245,6 +85,8 @@ regional_constraints.extend([
 # Optimisation
 ######################
 
+m.NPV = Var(m.t)
+m.NPVdot = DerivativeVar(m.NPV, wrt=m.t)
 m.PRTP = Param()
 global_constraints.append(lambda m,t: m.NPVdot[t] == exp(-m.PRTP * t) * sum(m.L(t,r) * m.utility[t,r] for r in m.regions))
 

@@ -1,0 +1,55 @@
+##############################################
+# Model equations and constraints:
+# Abatement costs
+#
+##############################################
+
+from pyomo.environ import *
+from pyomo.dae import *
+
+def constraints(m):
+    regional_constraints = []
+    global_constraints = []
+    
+    ### Technological learning
+    m.LBD_rate      = Param()
+    m.log_LBD_rate  = Param(initialize=log(m.LBD_rate) / log(2))
+    m.LBD_scaling   = Param()
+    m.LBD_factor    = Var(m.t)
+    global_constraints.append(lambda m,t:
+        m.LBD_factor[t] == ((sum(m.baseline_cumulative(t, r) for r in m.regions) - m.cumulative_emissions[t])/m.LBD_scaling+1.0)**m.log_LBD_rate)
+
+    m.LOT_rate      = Param()
+    m.LOT_factor    = Var(m.t)
+    global_constraints.append(lambda m,t: m.LOT_factor[t] == 1 / (1+m.LOT_rate)**t)
+
+    m.learning_factor = Var(m.t)
+    global_constraints.append(lambda m,t: m.learning_factor[t] == (m.LBD_factor[t] * m.LOT_factor[t]))
+
+    m.abatement_costs = Var(m.t, m.regions)
+    m.rel_abatement_costs = Var(m.t, m.regions)
+    m.carbonprice = Var(m.t, m.regions)
+    m.MAC_gamma     = Param()
+    m.MAC_beta      = Param()
+
+    regional_constraints.extend([
+        lambda m,t,r: m.abatement_costs[t,r] == AC(m.relative_abatement[t,r], m.learning_factor[t], m.MAC_gamma, m.MAC_beta) * m.baseline(t, r),
+        lambda m,t,r: m.rel_abatement_costs[t,r] == m.abatement_costs[t,r] / m.GDP_gross[t,r], # GDP_gross is defined below
+        lambda m,t,r: m.carbonprice[t,r] == MAC(m.relative_abatement[t,r], m.learning_factor[t], m.MAC_gamma, m.MAC_beta)
+    ])
+
+    return regional_constraints, global_constraints
+
+
+
+
+#################
+## Utils
+#################
+
+
+def MAC(a, factor, gamma, beta):
+    return gamma * factor * a**beta
+
+def AC(a, factor, gamma, beta):
+    return gamma * factor * a**(beta+1) / (beta+1)
