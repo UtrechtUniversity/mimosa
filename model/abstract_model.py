@@ -22,8 +22,10 @@ m = AbstractModel()
 ## Constraints
 # Each global / regional constraint will be put in these lists,
 # then added to the model at the end of this file.
-global_constraints = []
-regional_constraints = []
+global_constraints      = []
+global_constraints_init = []
+regional_constraints    = []
+regional_constraints_init = []
 
 
 ## Time and region
@@ -56,27 +58,39 @@ m.baseline_cumulative = baseline_cumulative
 ######################
 
 # Emissions and temperature equations
-emissions_reg, emissions_glob = emissions.constraints(m)
-regional_constraints.extend(emissions_reg)
-global_constraints.extend(emissions_glob)
+c_emissions = emissions.constraints(m)
+
+global_constraints          .extend(c_emissions['global'])
+global_constraints_init     .extend(c_emissions['global_init'])
+regional_constraints        .extend(c_emissions['regional'])
+regional_constraints_init   .extend(c_emissions['regional_init'])
 
 
 # Damage costs
-damages_reg, damages_glob = damages.constraints(m)
-regional_constraints.extend(damages_reg)
-global_constraints.extend(damages_glob)
+c_damages = damages.constraints(m)
+
+global_constraints          .extend(c_damages['global'])
+global_constraints_init     .extend(c_damages['global_init'])
+regional_constraints        .extend(c_damages['regional'])
+regional_constraints_init   .extend(c_damages['regional_init'])
 
 
 # Abatement costs
-abatement_reg, abatement_glob = abatement.constraints(m)
-regional_constraints.extend(abatement_reg)
-global_constraints.extend(abatement_glob)
+c_abatement = abatement.constraints(m)
+
+global_constraints          .extend(c_abatement['global'])
+global_constraints_init     .extend(c_abatement['global_init'])
+regional_constraints        .extend(c_abatement['regional'])
+regional_constraints_init   .extend(c_abatement['regional_init'])
 
 
 # Cobb-Douglas and economics
-cobbdouglas_reg, cobbdouglas_glob = cobbdouglas.constraints(m)
-regional_constraints.extend(cobbdouglas_reg)
-global_constraints.extend(cobbdouglas_glob)
+c_cobbdouglas = cobbdouglas.constraints(m)
+
+global_constraints          .extend(c_cobbdouglas['global'])
+global_constraints_init     .extend(c_cobbdouglas['global_init'])
+regional_constraints        .extend(c_cobbdouglas['regional'])
+regional_constraints_init   .extend(c_cobbdouglas['regional_init'])
 
 
 
@@ -89,26 +103,16 @@ m.NPV = Var(m.t)
 m.NPVdot = DerivativeVar(m.NPV, wrt=m.t)
 m.PRTP = Param()
 global_constraints.append(lambda m,t: m.NPVdot[t] == exp(-m.PRTP * t) * sum(m.L(t,r) * m.utility[t,r] for r in m.regions))
+global_constraints_init.append(lambda m: m.NPV[0] == 0)
 
-
-def _init(m):
-    yield m.temperature[0] == m.T0
-    for r in m.regions:
-        yield m.regional_emissions[0,r] == m.baseline(0, r)
-        yield m.capital_stock[0,r] == m.init_capitalstock[r]
-        yield m.carbonprice[0,r] == 0
-        yield m.adapt_level[0,r] == m.adapt_curr_level
-        yield m.gross_damages[0,r] == 0
-        # yield m.consumption_NPV[0,r] == 0
-        # yield m.baseline_consumption_NPV[0,r] == 0
-    yield m.global_emissions[0] == sum(m.baseline(0, r) for r in m.regions)
-    yield m.cumulative_emissions[0] == 0
-    yield m.NPV[0] == 0
-m.init = ConstraintList(rule=_init)
     
 for fct in global_constraints:
     utils.add_constraint(m, Constraint(m.t, rule=fct))
+for fct in global_constraints_init:
+    utils.add_constraint(m, Constraint(rule=fct))
 for fct in regional_constraints:
     utils.add_constraint(m, Constraint(m.t, m.regions, rule=fct))
+for fct in regional_constraints_init:
+    utils.add_constraint(m, Constraint(m.regions, rule=fct))
 
 m.obj = Objective(rule=lambda m: m.NPV[m.tf], sense=maximize)

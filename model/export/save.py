@@ -4,6 +4,8 @@ import random
 from pyomo.environ import value
 import hashlib
 
+from model.common import utils
+
 def save_output(params, m, experiment=None, random_id=False):
 
     # 1. Create a unique identifier
@@ -93,7 +95,7 @@ def add_param_columns(df, params, id, experiment):
         'inertia': params['emissions']['inertia']['regional'],
         'gamma': params['economics']['MAC']['gamma'],
         'PRTP': params['economics']['PRTP'],
-        'damage_coeff': params['economics']['damages']['coeff'],
+        'damage_coeff': utils.first(params['regions'])['damages']['a2'], # NOTE, only for global run
         'perc_reversible': params['economics']['damages']['percentage reversible'],
         'TCRE': params['temperature']['TCRE']
     }

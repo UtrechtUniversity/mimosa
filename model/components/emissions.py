@@ -17,11 +17,17 @@ def constraints(m):
         m.temperature
 
     Returns:
-        list: regional_constraints
-        list: global_constraints
+        dict: {
+            global:         global_constraints,
+            global_init:    global_constraints_init,
+            regional:       regional_constraints,
+            regional_init:  regional_constraints_init
+        }
     """
-    regional_constraints = []
-    global_constraints = []
+    global_constraints      = []
+    global_constraints_init = []
+    regional_constraints    = []
+    regional_constraints_init = []
 
     m.regional_emissions = Var(m.t, m.regions)
     m.relative_abatement = Var(m.t, m.regions, initialize=0, bounds=(0, 2))
@@ -66,4 +72,21 @@ def constraints(m):
                                                                 if value(m.inertia_regional) is not False else Constraint.Skip
     )
 
-    return regional_constraints, global_constraints
+
+
+    global_constraints_init.extend([
+        lambda m: m.temperature[0] == m.T0,
+        lambda m: m.global_emissions[0] == sum(m.baseline(0,r) for r in m.regions),
+        lambda m: m.cumulative_emissions[0] == 0
+    ])
+    regional_constraints_init.extend([
+        lambda m,r: m.regional_emissions[0,r] == m.baseline(0,r),
+        lambda m,r: m.carbonprice[0,r] == 0
+    ])
+
+    return {
+        'global':       global_constraints,
+        'global_init':  global_constraints_init,
+        'regional':     regional_constraints,
+        'regional_init': regional_constraints_init
+    }

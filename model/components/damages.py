@@ -1,6 +1,6 @@
 ##############################################
 # Model equations and constraints:
-# Damage costs
+# Damage and adaptation costs, RICE specification
 #
 ##############################################
 
@@ -8,17 +8,24 @@ from pyomo.environ import *
 from pyomo.dae import *
 
 def constraints(m):
-    """Damage costs equations and constraints
+    """Damage and adaptation costs equations and constraints
+    (RICE specification)
 
     Necessary variables:
         m.damage_costs (sum of residual damages and adaptation costs, % of GDP)
 
     Returns:
-        list: regional_constraints
-        list: global_constraints
+        dict: {
+            global:         global_constraints,
+            global_init:    global_constraints_init,
+            regional:       regional_constraints,
+            regional_init:  regional_constraints_init
+        }
     """
-    regional_constraints = []
-    global_constraints = []
+    global_constraints      = []
+    global_constraints_init = []
+    regional_constraints    = []
+    regional_constraints_init = []
 
     m.damage_costs  = Var(m.t, m.regions)
     m.smoothed_factor = Var(m.t)
@@ -49,7 +56,7 @@ def constraints(m):
     regional_constraints.append(
         lambda m,t,r: (
             m.gross_damagesdot[t,r] == m.damage_scale_factor * (
-                damage_fct_dot(m.temperature, m, r)
+                damage_fct_dot(m.temperature[t], m, r)
                 * m.smoothed_factor[t] * m.temperaturedot[t])
         ) if m.perc_reversible_damages < 1 else (
             m.gross_damages[t,r]  == m.damage_scale_factor * (
@@ -64,7 +71,17 @@ def constraints(m):
         lambda m,t,r: m.damage_costs[t,r]   == m.resid_damages[t,r] + m.adapt_costs[t,r]
     ])
 
-    return regional_constraints, global_constraints
+    regional_constraints_init.extend([
+        lambda m,r: m.adapt_level[0,r] == m.adapt_curr_level,
+        lambda m,r: m.gross_damages[0,r] == 0
+    ])
+
+    return {
+        'global':       global_constraints,
+        'global_init':  global_constraints_init,
+        'regional':     regional_constraints,
+        'regional_init': regional_constraints_init
+    }
 
 
 

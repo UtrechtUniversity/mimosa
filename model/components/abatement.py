@@ -14,11 +14,17 @@ def constraints(m):
         m.abatement_costs
 
     Returns:
-        list: regional_constraints
-        list: global_constraints
+        dict: {
+            global:         global_constraints,
+            global_init:    global_constraints_init,
+            regional:       regional_constraints,
+            regional_init:  regional_constraints_init
+        }
     """
-    regional_constraints = []
-    global_constraints = []
+    global_constraints      = []
+    global_constraints_init = []
+    regional_constraints    = []
+    regional_constraints_init = []
     
     ### Technological learning
     m.LBD_rate      = Param()
@@ -47,7 +53,12 @@ def constraints(m):
         lambda m,t,r: m.carbonprice[t,r] == MAC(m.relative_abatement[t,r], m.learning_factor[t], m.MAC_gamma, m.MAC_beta)
     ])
 
-    return regional_constraints, global_constraints
+    return {
+        'global':       global_constraints,
+        'global_init':  global_constraints_init,
+        'regional':     regional_constraints,
+        'regional_init': regional_constraints_init
+    }
 
 
 

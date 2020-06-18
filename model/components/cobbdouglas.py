@@ -13,13 +13,21 @@ def constraints(m):
 
     Necessary variables:
         m.utility
+        m.L (equal to m.population)
+        m.dk
 
     Returns:
-        list: regional_constraints
-        list: global_constraints
+        dict: {
+            global:         global_constraints,
+            global_init:    global_constraints_init,
+            regional:       regional_constraints,
+            regional_init:  regional_constraints_init
+        }
     """
-    regional_constraints = []
-    global_constraints = []
+    global_constraints      = []
+    global_constraints_init = []
+    regional_constraints    = []
+    regional_constraints_init = []
 
     m.init_capitalstock = Param(m.regions)
     m.capital_stock = Var(m.t, m.regions, initialize=lambda m,t,r: m.init_capitalstock[r])
@@ -59,4 +67,13 @@ def constraints(m):
     #     lambda m,t,r: m.baseline_consumption_NPVdot[t,r] == exp(-0.05 * t) * m.baseline_consumption(t,r)
     # ])
 
-    return regional_constraints, global_constraints
+    regional_constraints_init.append(
+        lambda m,r: m.capital_stock[0,r] == m.init_capitalstock[r]
+    )
+
+    return {
+        'global':       global_constraints,
+        'global_init':  global_constraints_init,
+        'regional':     regional_constraints,
+        'regional_init': regional_constraints_init
+    }
