@@ -55,9 +55,9 @@ input:
     population: Population
 
 time:
-  start: 2015
+  start: 2020
   end: 2125
-  dt: 1
+  dt: 5
 
 SSP: 'SSP2'
 
@@ -71,7 +71,7 @@ economics:
   MAC:
     beta: 2
     rho: 0.82
-    gamma: 3926.2909 USD2005/tCO2
+    gamma: 2300 USD2005/tCO2
   damages:
     percentage reversible: 1
     scale factor: 1
@@ -80,7 +80,7 @@ economics:
     fixed: False
 
 emissions:
-  carbonbudget: 1000 GtCO2     # False or a quantity
+  carbonbudget: 800 GtCO2     # False or a quantity
   min level: -20 GtCO2/yr     # False or a quantity
   not positive after budget year: True
   inertia:
@@ -97,3 +97,6 @@ default units:
   emissions_unit: Gt CO2
   temperature_unit: delta_degC
   population_unit: billion
+
+model:
+  damage module: RICE2010 # WITCH or RICE

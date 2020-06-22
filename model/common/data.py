@@ -150,7 +150,7 @@ class DataStore:
         for param in params:
             curr_param = curr_param[param]
             if curr_param == '$regional':
-                return input.regional_data.get_param_value(r, params)
+                return input.regional_data.get_param_value(r, params, self.params)
         return curr_param
     
 

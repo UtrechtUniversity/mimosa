@@ -73,11 +73,18 @@ def constraints(m):
     )
 
 
+    m.emission_relative_cumulative = Var(m.t)
+    global_constraints.append(
+        lambda m,t: (
+            m.emission_relative_cumulative[t] == m.cumulative_emissions[t] / sum(m.baseline_cumulative(t, r) for r in m.regions)
+         ) if t > 0 else Constraint.Skip
+    )
 
     global_constraints_init.extend([
         lambda m: m.temperature[0] == m.T0,
         lambda m: m.global_emissions[0] == sum(m.baseline(0,r) for r in m.regions),
-        lambda m: m.cumulative_emissions[0] == 0
+        lambda m: m.cumulative_emissions[0] == 0,
+        lambda m: m.emission_relative_cumulative[0] == 1
     ])
     regional_constraints_init.extend([
         lambda m,r: m.regional_emissions[0,r] == m.baseline(0,r),

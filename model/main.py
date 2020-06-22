@@ -9,8 +9,9 @@ from model.common import data, utils, units, economics
 from model.export.plot import full_plot
 from model.export.save import save_output
 
-utils.tick('Abstract model creation')
-from model.abstract_model import m as abstract_model
+from model.abstract_model import create_abstract_model
+
+abstract_models = {}
 
 
 # Util to create a None-indexed dictionary for scalar components
@@ -26,8 +27,16 @@ class MIMOSA:
         self.regions = params['regions']
         self.quant = units.Quantity(params)
 
+        self.abstract_model = self.get_abstract_model()
         self.m = self.create_instance()
         self.discretize()
+
+    def get_abstract_model(self):
+        damage_module = self.params['model']['damage module']
+        if damage_module not in abstract_models:
+            abstract_models[damage_module] = create_abstract_model(damage_module)
+        
+        return abstract_models[damage_module]
 
 
     # @utils.timer('Concrete model creation')
@@ -38,10 +47,10 @@ class MIMOSA:
 
         # The data functions need to be changed in the abstract model
         # before initialization. 
-        abstract_model.baseline    = lambda t, region: self.data_store.interp_data(t, region, 'baseline')
-        abstract_model.population  = lambda t, region: self.data_store.interp_data(t, region, 'population')
-        abstract_model.GDP         = lambda t, region: self.data_store.interp_data(t, region, 'GDP')
-        abstract_model.TFP         = lambda t, region: self.data_store.interp_data(t, region, 'TFP')
+        self.abstract_model.baseline    = lambda t, region: self.data_store.interp_data(t, region, 'baseline')
+        self.abstract_model.population  = lambda t, region: self.data_store.interp_data(t, region, 'population')
+        self.abstract_model.GDP         = lambda t, region: self.data_store.interp_data(t, region, 'GDP')
+        self.abstract_model.TFP         = lambda t, region: self.data_store.interp_data(t, region, 'TFP')
 
         quant  = self.quant
         params = self.params
@@ -65,15 +74,9 @@ class MIMOSA:
             'LBD_scaling':      v(quant('40 GtCO2', 'emissions_unit')),
             'LOT_rate':         v(0),
 
-            'damage_a1':        self.data_store.get_regional('damages', 'a1'),
-            'damage_a2':        self.data_store.get_regional('damages', 'a2'),
-            'damage_a3':        self.data_store.get_regional('damages', 'a3'),
             'damage_scale_factor': v(params['economics']['damages']['scale factor']),
-            'perc_reversible_damages': v(params['economics']['damages']['percentage reversible']),
-            'adapt_g1':         self.data_store.get_regional('adaptation', 'g1'),
-            'adapt_g2':         self.data_store.get_regional('adaptation', 'g2'),
-            'adapt_curr_level': v(params['economics']['adaptation']['curr_level']),
             'fixed_adaptation': v(params['economics']['adaptation']['fixed']),
+
             'MAC_gamma':        v(quant(params['economics']['MAC']['gamma'], 'currency_unit/emissionsrate_unit')),
             'MAC_beta':         v(params['economics']['MAC']['beta']),
 
@@ -85,7 +88,53 @@ class MIMOSA:
             'PRTP':             v(params['economics']['PRTP'])
         }}
 
-        m = abstract_model.create_instance(instance_data)
+        # For RICE2010 damage/adaptation:
+        if params['model']['damage module'] == 'RICE2010':
+            instance_data[None].update({
+                'perc_reversible_damages': v(params['economics']['damages']['percentage reversible']),
+                'adapt_curr_level':     v(params['economics']['adaptation']['curr_level']),
+                'damage_a1':            self.data_store.get_regional('damages', 'a1'),
+                'damage_a2':            self.data_store.get_regional('damages', 'a2'),
+                'damage_a3':            self.data_store.get_regional('damages', 'a3'),
+                'adapt_g1':             self.data_store.get_regional('adaptation', 'g1'),
+                'adapt_g2':             self.data_store.get_regional('adaptation', 'g2'),
+            })
+
+        # For RICE2012 damage/adaptation:
+        if params['model']['damage module'] == 'RICE2012':
+            instance_data[None].update({
+                'adapt_curr_level':     v(params['economics']['adaptation']['curr_level']),
+                'damage_a1':            self.data_store.get_regional('damages', 'a1'),
+                'damage_a2':            self.data_store.get_regional('damages', 'a2'),
+                'damage_a3':            self.data_store.get_regional('damages', 'a3'),
+                'adapt_nu1':            self.data_store.get_regional('adaptation', 'nu1'),
+                'adapt_nu2':            self.data_store.get_regional('adaptation', 'nu2'),
+                'adapt_nu3':            self.data_store.get_regional('adaptation', 'nu3'),
+                'adapt_rho':            v(0.5),
+            })
+
+        # For WITCH damage/adaption:
+        if params['model']['damage module'] == 'WITCH':
+            instance_data[None].update({
+                'damage_omega1_pos':    self.data_store.get_regional('damages', 'omega1_pos'),
+                'damage_omega1_neg':    self.data_store.get_regional('damages', 'omega1_neg'),
+                'damage_omega2_pos':    self.data_store.get_regional('damages', 'omega2_pos'),
+                'damage_omega2_neg':    self.data_store.get_regional('damages', 'omega2_neg'),
+                'damage_omega3_pos':    self.data_store.get_regional('damages', 'omega3_pos'),
+                'damage_omega3_neg':    self.data_store.get_regional('damages', 'omega3_neg'),
+                'damage_omega4_pos':    self.data_store.get_regional('damages', 'omega4_pos'),
+                'damage_omega4_neg':    self.data_store.get_regional('damages', 'omega4_neg'),
+                
+                'adapt_omega_eff_ada':  self.data_store.get_regional('adaptation', 'omega_eff_ada'),
+                'adapt_omega_act':      self.data_store.get_regional('adaptation', 'omega_act'),
+                'adapt_omega_eff_act':  self.data_store.get_regional('adaptation', 'omega_eff_act'),
+                'adapt_omega_rada':     self.data_store.get_regional('adaptation', 'omega_rada'),
+                'adapt_rho_ada':        self.data_store.get_regional('adaptation', 'rho_ada'),
+                'adapt_rho_act':        self.data_store.get_regional('adaptation', 'rho_act'),
+                'adapt_eps':            self.data_store.get_regional('adaptation', 'eps')
+            })
+
+        m = self.abstract_model.create_instance(instance_data)
         return m
     
 
@@ -101,6 +150,7 @@ class MIMOSA:
 
         # TransformationFactory('contrib.aggregate_vars').apply_to(self.m)
         TransformationFactory('contrib.init_vars_midpoint').apply_to(self.m)
+        TransformationFactory('contrib.detect_fixed_vars').apply_to(self.m)
 
 
     @utils.timer('Model solve')
@@ -115,7 +165,7 @@ class MIMOSA:
             print("Status: {}, termination condition: {}".format(
                 results.solver.status, results.solver.termination_condition
             ))
-            raise Exception("Solver did not exit with status OK")
+            pass # raise Exception("Solver did not exit with status OK")
 
         print('Final NPV:', value(self.m.NPV[self.m.tf]))
 

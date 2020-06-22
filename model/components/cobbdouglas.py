@@ -57,15 +57,21 @@ def constraints(m):
         lambda m,t,r: m.capital_stockdot[t,r] == economics.calc_dKdt(m.capital_stock[t,r], m.dk, m.investments[t,r], m.dt)
     ])
 
-    # m.consumption_NPV = Var(m.t, m.regions)
-    # m.consumption_NPVdot = DerivativeVar(m.consumption_NPV, wrt=m.t)
-    # m.baseline_consumption_NPV = Var(m.t, m.regions)
-    # m.baseline_consumption_NPVdot = DerivativeVar(m.baseline_consumption_NPV, wrt=m.t)
-    # m.baseline_consumption = lambda t,r: (1-m.sr) * m.GDP(t, r)
-    # regional_constraints.extend([
-    #     lambda m,t,r: m.consumption_NPVdot[t,r] == exp(-0.05 * t) * m.consumption[t,r],
-    #     lambda m,t,r: m.baseline_consumption_NPVdot[t,r] == exp(-0.05 * t) * m.baseline_consumption(t,r)
-    # ])
+    m.consumption_NPV = Var(m.t)
+    m.consumption_NPVdot = DerivativeVar(m.consumption_NPV, wrt=m.t)
+    m.baseline_consumption_NPV = Var(m.t, initialize=0.01)
+    m.baseline_consumption_NPVdot = DerivativeVar(m.baseline_consumption_NPV, wrt=m.t)
+    m.consumption_loss = Var(m.t)
+    global_constraints.extend([
+        lambda m,t: m.consumption_NPVdot[t] == sum(exp(-0.05 * t) * m.consumption[t,r] for r in m.regions),
+        lambda m,t: m.baseline_consumption_NPVdot[t] == sum(exp(-0.05 * t) * (1-m.sr) * m.GDP(t,r) for r in m.regions),
+        lambda m,t: m.consumption_loss[t] == 1 - m.consumption_NPV[t] / m.baseline_consumption_NPV[t] if t > 0 else Constraint.Skip
+    ])
+    global_constraints_init.extend([
+        lambda m: m.consumption_NPV[0] == 0,
+        lambda m: m.baseline_consumption_NPV[0] == 0,
+        lambda m: m.consumption_loss[0] == 0
+    ])
 
     regional_constraints_init.append(
         lambda m,r: m.capital_stock[0,r] == m.init_capitalstock[r]
