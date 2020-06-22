@@ -148,9 +148,10 @@ class MIMOSA:
         # discretizer = TransformationFactory('dae.collocation')
         # discretizer.apply_to(self.m, nfe=10, ncp=6)
 
-        # TransformationFactory('contrib.aggregate_vars').apply_to(self.m)
+        TransformationFactory('contrib.aggregate_vars').apply_to(self.m)
         TransformationFactory('contrib.init_vars_midpoint').apply_to(self.m)
         TransformationFactory('contrib.detect_fixed_vars').apply_to(self.m)
+        TransformationFactory('contrib.propagate_fixed_vars').apply_to(self.m)
 
 
     @utils.timer('Model solve')
@@ -160,6 +161,9 @@ class MIMOSA:
         # results = solver_manager.solve(self.m, opt=solver)
         opt = SolverFactory('ipopt')
         results = opt.solve(self.m, tee=verbose)
+
+        # Restore aggregated variables
+        TransformationFactory('contrib.aggregate_vars').update_variables(self.m)
 
         if results.solver.status != SolverStatus.ok:
             print("Status: {}, termination condition: {}".format(

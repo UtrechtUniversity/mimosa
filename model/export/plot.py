@@ -28,6 +28,7 @@ def full_plot(m, filename):
     try:
         plot.add(m.emission_relative_cumulative, is_regional=False, row=4, secondary_y=True, visible='legendonly')
         plot.add(m.consumption_loss, is_regional=False, row=4, secondary_y=True, visible='legendonly')
+        plot.add(m.smoothed_factor, is_regional=False, row=4, secondary_y=True, visible='legendonly')
     except:
         pass
 
@@ -37,7 +38,6 @@ def full_plot(m, filename):
         plot.add(m.adapt_IAD, row=2, secondary_y=True, visible='legendonly')
         plot.add(m.adapt_FAD, row=2, secondary_y=True, visible='legendonly')
         plot.add(m.adapt_SAD, row=2, secondary_y=True, visible='legendonly')
-        plot.add(m.smoothed_factor, is_regional=False, row=4, secondary_y=True, visible='legendonly')
     except:
         pass
 

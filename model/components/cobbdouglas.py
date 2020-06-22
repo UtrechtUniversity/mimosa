@@ -54,7 +54,9 @@ def constraints(m):
         lambda m,t,r: m.investments[t,r] == m.sr * m.GDP_net[t,r],
         lambda m,t,r: m.consumption[t,r] == (1-m.sr) * m.GDP_net[t,r],
         lambda m,t,r: m.utility[t,r] == ( (m.consumption[t,r] / m.L(t,r)) ** (1-m.elasmu) - 1 ) / (1-m.elasmu) - 1,
-        lambda m,t,r: m.capital_stockdot[t,r] == economics.calc_dKdt(m.capital_stock[t,r], m.dk, m.investments[t,r], m.dt)
+        lambda m,t,r: (
+            m.capital_stockdot[t,r] == economics.calc_dKdt(m.capital_stock[t,r], m.dk, m.investments[t,r], m.dt)
+        ) if t > 0 else Constraint.Skip
     ])
 
     m.consumption_NPV = Var(m.t)

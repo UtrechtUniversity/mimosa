@@ -43,58 +43,44 @@ def constraints(m):
 
     m.adapt_level   = Var(m.t, m.regions, within=NonNegativeReals)
     m.adapt_costs   = Var(m.t, m.regions)
-    m.adapt_FAD     = Var(m.t, m.regions, bounds=(0, 0.5))
-    m.adapt_IAD     = Var(m.t, m.regions, bounds=(0, 0.5))
+    min_adapt_FAD   = 0.00001
+    m.adapt_FAD     = Var(m.t, m.regions, bounds=(min_adapt_FAD, 0.2))
+    m.adapt_IAD     = Var(m.t, m.regions, bounds=(min_adapt_FAD, 0.5))
     m.adapt_nu1     = Param(m.regions)
     m.adapt_nu2     = Param(m.regions)
     m.adapt_nu3     = Param(m.regions)
     m.adapt_rho     = Param()
     m.fixed_adaptation = Param()
 
-    m.adapt_SAD     = Var(m.t, m.regions, initialize=0.001)
+    m.adapt_SAD     = Var(m.t, m.regions, initialize=0.0002)
     m.adapt_SADdot  = DerivativeVar(m.adapt_SAD, wrt=m.t)
 
     regional_constraints.extend([
         lambda m,t,r: m.resid_damages[t,r]  == m.gross_damages[t,r] / (1 + m.adapt_level[t,r]),
         lambda m,t,r: m.adapt_level[t,r]    == (
-            # sqrt(m.adapt_nu1[r] * 0.0001 * t)  +
-            m.adapt_nu1[r]**(m.adapt_nu3[r] / m.adapt_rho) * (m.adapt_SAD[t,r]) +
-            m.adapt_nu2[r]**(m.adapt_nu3[r] / m.adapt_rho) * (m.adapt_FAD[t,r])
-        ), #**2  ** (m.adapt_nu3[r] / m.adapt_rho)
+            m.adapt_nu1[r] * sqrt(m.adapt_SAD[t,r]) +
+            m.adapt_nu2[r] * sqrt(m.adapt_FAD[t,r])
+        )** (2 * m.adapt_nu3[r]),
 
-        lambda m,t,r: m.adapt_costs[t,r]    == m.adapt_FAD[t,r] + m.adapt_IAD[t,r],
+        # NOTE: Not sure if " * m.dt" should be here
+        lambda m,t,r: m.adapt_costs[t,r]  == (m.adapt_FAD[t,r] + m.adapt_IAD[t,r]) * m.dt,
         lambda m,t,r: m.adapt_SADdot[t,r] == np.log(1-m.dk) * m.adapt_SAD[t,r] + m.adapt_IAD[t,r], 
     ])
 
-
-    m.perc_reversible_damages = Param()
-
-    global_constraints.append(
-        lambda m,t: ((
-            m.smoothed_factor[t] == (tanh((m.temperaturedot[t]) / 1e-3)+1)*(1-m.perc_reversible_damages)/2 +m.perc_reversible_damages
-        ) if m.perc_reversible_damages < 1 else (m.smoothed_factor[t] == 1))
-    )
-
     regional_constraints.append(
-        lambda m,t,r: ((
-            m.gross_damagesdot[t,r] == m.damage_scale_factor * (
-                damage_fct_dot(m.temperature[t], m, r)
-                * m.smoothed_factor[t] * m.temperaturedot[t])
-        ) if m.perc_reversible_damages < 1 else (
-            m.gross_damages[t,r]  == m.damage_scale_factor * (
-                damage_fct(m.temperature[t], m.T0, m, r))
-        )) if m.damage_scale_factor > 0 else (m.gross_damages[t,r] == 0)
+        lambda m,t,r: (m.gross_damages[t,r]  == m.damage_scale_factor * (
+                damage_fct(m.temperature[t], m.T0, m, r)
+            )) if m.damage_scale_factor > 0 else (m.gross_damages[t,r] == 0)
     )
 
     regional_constraints.extend([
-        # lambda m,t,r: m.adapt_level[t,r]    == m.adapt_curr_level if value(m.fixed_adaptation) else Constraint.Skip,
         lambda m,t,r: m.damage_costs[t,r]   == m.resid_damages[t,r] + m.adapt_costs[t,r]
     ])
 
     regional_constraints_init.extend([
         lambda m,r: m.adapt_IAD[0,r] == 0,
-        lambda m,r: m.adapt_FAD[0,r] == 0,
-        lambda m,r: m.adapt_SAD[0,r] == 0,
+        lambda m,r: m.adapt_FAD[0,r] == min_adapt_FAD,
+        lambda m,r: m.adapt_SAD[0,r] == min_adapt_FAD,
         # lambda m,r: m.gross_damages[0,r] == 0
     ])
 
