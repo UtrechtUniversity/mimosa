@@ -28,7 +28,7 @@ def constraints(m):
     regional_constraints_init = []
 
     m.damage_costs  = Var(m.t, m.regions)
-    m.smoothed_factor = Var(m.t)
+    m.smoothed_factor = Var(m.t, bounds=(0,1))
     m.gross_damages = Var(m.t, m.regions)
     m.gross_damagesdot = DerivativeVar(m.gross_damages, wrt=m.t)
     m.resid_damages = Var(m.t, m.regions)

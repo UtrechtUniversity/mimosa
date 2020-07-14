@@ -53,6 +53,10 @@ def constraints(m):
         lambda m,t,r: m.carbonprice[t,r] == MAC(m.relative_abatement[t,r], m.learning_factor[t], m.MAC_gamma, m.MAC_beta)
     ])
 
+    regional_constraints_init.append(
+        lambda m,r: m.carbonprice[0,r] == 0
+    )
+
     return {
         'global':       global_constraints,
         'global_init':  global_constraints_init,

@@ -87,8 +87,7 @@ def constraints(m):
         lambda m: m.emission_relative_cumulative[0] == 1
     ])
     regional_constraints_init.extend([
-        lambda m,r: m.regional_emissions[0,r] == m.baseline(0,r),
-        lambda m,r: m.carbonprice[0,r] == 0
+        lambda m,r: m.regional_emissions[0,r] == m.baseline(0,r)
     ])
 
     return {

@@ -57,7 +57,7 @@ input:
 time:
   start: 2020
   end: 2125
-  dt: 5
+  dt: 1
 
 SSP: 'SSP2'
 
@@ -71,7 +71,7 @@ economics:
   MAC:
     beta: 2
     rho: 0.82
-    gamma: 2300 USD2005/tCO2
+    gamma: 2442 USD2005/tCO2
   damages:
     percentage reversible: 1
     scale factor: 1
@@ -99,4 +99,4 @@ default units:
   population_unit: billion
 
 model:
-  damage module: RICE2010 # WITCH or RICE
+  damage module: RICE2012 # RICE2010, RICE2012 or WITCH

@@ -1,12 +1,13 @@
 import pandas as pd
 import json
+import os
 import random
 from pyomo.environ import value
 import hashlib
 
 from model.common import utils
 
-def save_output(params, m, experiment=None, random_id=False):
+def save_output(params, m, experiment=None, random_id=False, folder='output'):
 
     # 1. Create a unique identifier
     if random_id:
@@ -48,12 +49,16 @@ def save_output(params, m, experiment=None, random_id=False):
 
     add_param_columns(df, params, id, experiment)
 
+
+    # 3. Save the CSV file
+    os.makedirs(folder+'/', exist_ok=True)
     filename = f'{id}' if experiment is None else f'{experiment}_{id}'
 
-    df.to_csv(f'output/output_{filename}.csv', float_format='%.6g', index=False)
+    df.to_csv(f'{folder}/output_{filename}.csv', float_format='%.6g', index=False)
 
     # 3. Save the param file
-    with open (f'output/params/params_{filename}.json', 'w') as fp:
+    os.makedirs(f'{folder}/params/', exist_ok=True)
+    with open (f'{folder}/params/params_{filename}.json', 'w') as fp:
         json.dump({id: params}, fp)
 
 

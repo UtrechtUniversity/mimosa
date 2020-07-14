@@ -107,9 +107,9 @@ class MIMOSA:
                 'damage_a1':            self.data_store.get_regional('damages', 'a1'),
                 'damage_a2':            self.data_store.get_regional('damages', 'a2'),
                 'damage_a3':            self.data_store.get_regional('damages', 'a3'),
-                'adapt_nu1':            self.data_store.get_regional('adaptation', 'nu1'),
-                'adapt_nu2':            self.data_store.get_regional('adaptation', 'nu2'),
-                'adapt_nu3':            self.data_store.get_regional('adaptation', 'nu3'),
+                'adap1':            self.data_store.get_regional('adaptation', 'nu1'),
+                'adap2':            self.data_store.get_regional('adaptation', 'nu2'),
+                'adap3':            self.data_store.get_regional('adaptation', 'nu3'),
                 'adapt_rho':            v(0.5),
             })
 
@@ -148,10 +148,12 @@ class MIMOSA:
         # discretizer = TransformationFactory('dae.collocation')
         # discretizer.apply_to(self.m, nfe=10, ncp=6)
 
-        TransformationFactory('contrib.aggregate_vars').apply_to(self.m)
+        if len(self.regions) > 1:
+            TransformationFactory('contrib.aggregate_vars').apply_to(self.m)
         TransformationFactory('contrib.init_vars_midpoint').apply_to(self.m)
         TransformationFactory('contrib.detect_fixed_vars').apply_to(self.m)
-        TransformationFactory('contrib.propagate_fixed_vars').apply_to(self.m)
+        if len(self.regions) > 1:
+            TransformationFactory('contrib.propagate_fixed_vars').apply_to(self.m)
 
 
     @utils.timer('Model solve')
@@ -163,13 +165,14 @@ class MIMOSA:
         results = opt.solve(self.m, tee=verbose)
 
         # Restore aggregated variables
-        TransformationFactory('contrib.aggregate_vars').update_variables(self.m)
+        if len(self.regions) > 1:
+            TransformationFactory('contrib.aggregate_vars').update_variables(self.m)
 
         if results.solver.status != SolverStatus.ok:
             print("Status: {}, termination condition: {}".format(
                 results.solver.status, results.solver.termination_condition
             ))
-            pass # raise Exception("Solver did not exit with status OK")
+            raise Exception("Solver did not exit with status OK")
 
         print('Final NPV:', value(self.m.NPV[self.m.tf]))
 

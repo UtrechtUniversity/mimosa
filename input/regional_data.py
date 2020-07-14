@@ -19,8 +19,8 @@ SSP_to_RICE2012_regions = {
     'R5.2OECD': ['USA', 'JAPAN', 'EUROPE'],
     'R5.2ASIA': ['CHINA', 'INDIA', 'LI'],
     'R5.2LAM': ['MI'],
-    'R5.2MAF': ['AFRICA', 'HIO'],
-    'R5.2REF': ['RUSSIA'],
+    'R5.2MAF': ['AFRICA', 'OHI'],
+    'R5.2REF': ['RUSSIA', 'EE'],
 }
 
 def get_damage_adapt_coeffs_RICE2010(region, param_name):

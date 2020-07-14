@@ -43,27 +43,31 @@ def constraints(m):
 
     m.adapt_level   = Var(m.t, m.regions, within=NonNegativeReals)
     m.adapt_costs   = Var(m.t, m.regions)
-    min_adapt_FAD   = 0.00001
-    m.adapt_FAD     = Var(m.t, m.regions, bounds=(min_adapt_FAD, 0.2))
-    m.adapt_IAD     = Var(m.t, m.regions, bounds=(min_adapt_FAD, 0.5))
-    m.adapt_nu1     = Param(m.regions)
-    m.adapt_nu2     = Param(m.regions)
-    m.adapt_nu3     = Param(m.regions)
+    min_adapt_FAD   = 0.0
+    m.adapt_FAD     = Var(m.t, m.regions, bounds=(min_adapt_FAD, 0.02))
+    m.adapt_IAD     = Var(m.t, m.regions, bounds=(min_adapt_FAD, 0.02))
+    m.adap1     = Param(m.regions)
+    m.adap2     = Param(m.regions)
+    m.adap3     = Param(m.regions)
     m.adapt_rho     = Param()
     m.fixed_adaptation = Param()
 
-    m.adapt_SAD     = Var(m.t, m.regions, initialize=0.0002)
+    m.adapt_SAD     = Var(m.t, m.regions, initialize=0.5)
     m.adapt_SADdot  = DerivativeVar(m.adapt_SAD, wrt=m.t)
 
     regional_constraints.extend([
         lambda m,t,r: m.resid_damages[t,r]  == m.gross_damages[t,r] / (1 + m.adapt_level[t,r]),
-        lambda m,t,r: m.adapt_level[t,r]    == (
-            m.adapt_nu1[r] * sqrt(m.adapt_SAD[t,r]) +
-            m.adapt_nu2[r] * sqrt(m.adapt_FAD[t,r])
-        )** (2 * m.adapt_nu3[r]),
+        # lambda m,t,r: m.adapt_level[t,r]    == 266 * (
+        #     0.5     * sqrt(m.adapt_FAD[t,r]) +
+        #     0.5 * sqrt(m.adapt_SAD[t,r])
+        # )** (2* m.adap3[r]),
+        lambda m,t,r: m.adapt_level[t,r]    == m.adap1[r] * (
+            m.adap2[r]     * sqrt(m.adapt_FAD[t,r]) +
+            (1-m.adap2[r]) * sqrt(m.adapt_SAD[t,r])
+        )** (2 * m.adap3[r]),
 
         # NOTE: Not sure if " * m.dt" should be here
-        lambda m,t,r: m.adapt_costs[t,r]  == (m.adapt_FAD[t,r] + m.adapt_IAD[t,r]) * m.dt,
+        lambda m,t,r: m.adapt_costs[t,r]  == (m.adapt_FAD[t,r] + m.adapt_IAD[t,r]),
         lambda m,t,r: m.adapt_SADdot[t,r] == np.log(1-m.dk) * m.adapt_SAD[t,r] + m.adapt_IAD[t,r], 
     ])
 
