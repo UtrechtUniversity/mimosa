@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from model.common import economics
+from model.common import economics, utils
 import input.regional_data
 
 # To extrapolate: take growth rate 2090-2100, linearly bring it down to growth rate of 0 in 2150
@@ -44,6 +44,10 @@ class DataStore:
             'baseline': self._create_data_values('emissions', 'emissionsrate_unit'),
             'population': self._create_data_values('population', 'population_unit'),
             'GDP': self._create_data_values('GDP', 'currency_unit')
+        }
+        self.data_values['carbon_intensity'] = {
+            r: self.data_values['baseline'][r] / self.data_values['GDP'][r]
+            for r in params['regions']
         }
         self.data_values['TFP'] = {r: economics.get_TFP(r, self) for r in params['regions']}
 
@@ -140,6 +144,9 @@ class DataStore:
     def interp_data(self, t, region, variable):
         year = self.params['time']['start'] + t
         return np.interp(year, self.data_years, self.data_values[variable][region])
+
+    def data_object(self, variable):
+        return utils.FctToList(lambda t, region: self.interp_data(t, region, variable))
 
     def get_regional(self, *params):
         return {r: self._get_regional_param(params, r) for r in self.params['regions']}

@@ -47,10 +47,12 @@ class MIMOSA:
 
         # The data functions need to be changed in the abstract model
         # before initialization. 
-        self.abstract_model.baseline    = lambda t, region: self.data_store.interp_data(t, region, 'baseline')
-        self.abstract_model.population  = lambda t, region: self.data_store.interp_data(t, region, 'population')
-        self.abstract_model.GDP         = lambda t, region: self.data_store.interp_data(t, region, 'GDP')
-        self.abstract_model.TFP         = lambda t, region: self.data_store.interp_data(t, region, 'TFP')
+        self.abstract_model.baseline_emissions  = self.data_store.data_object('baseline')
+        self.abstract_model.population          = \
+        self.abstract_model.L                   = self.data_store.data_object('population')
+        self.abstract_model.GDP                 = self.data_store.data_object('GDP')
+        self.abstract_model.carbon_intensity    = self.data_store.data_object('carbon_intensity')
+        self.abstract_model.TFP                 = self.data_store.data_object('TFP')
 
         quant  = self.quant
         params = self.params
@@ -61,6 +63,7 @@ class MIMOSA:
             'dt':               v(params['time']['dt']),
             'regions':          v(params['regions'].keys()),
             
+            'baseline_carbon_intensity': v(params['emissions']['baseline carbon intensity']),
             'budget':           v(quant(params['emissions']['carbonbudget'], 'emissions_unit')),
             'inertia_regional': v(params['emissions']['inertia']['regional']),
             'inertia_global':   v(params['emissions']['inertia']['global']),
@@ -154,6 +157,8 @@ class MIMOSA:
         TransformationFactory('contrib.detect_fixed_vars').apply_to(self.m)
         if len(self.regions) > 1:
             TransformationFactory('contrib.propagate_fixed_vars').apply_to(self.m)
+
+        # self.m.baseline.fix()
 
 
     @utils.timer('Model solve')

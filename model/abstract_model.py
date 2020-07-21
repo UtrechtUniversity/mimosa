@@ -45,13 +45,14 @@ def create_abstract_model(damage_module='RICE'):
     # Will be initialised when creating a concrete instance of the model
     ######################
 
-    m.baseline      = None
-    m.population    = None
-    m.TFP           = None
-    m.GDP           = None
+    m.baseline_emissions    = None
+    m.population            = None
+    m.TFP                   = None
+    m.GDP                   = None
+    m.carbon_intensity      = None
     def baseline_cumulative(t_end, region):
         t_values = np.linspace(0, t_end, 100)
-        return np.trapz(m.baseline(t_values, region), x=t_values)
+        return np.trapz(m.baseline_emissions[t_values, region], x=t_values)
     m.baseline_cumulative = baseline_cumulative
 
 
@@ -111,7 +112,7 @@ def create_abstract_model(damage_module='RICE'):
     m.NPV = Var(m.t)
     m.NPVdot = DerivativeVar(m.NPV, wrt=m.t)
     m.PRTP = Param()
-    global_constraints.append(lambda m,t: m.NPVdot[t] == exp(-m.PRTP * t) * sum(m.L(t,r) * m.utility[t,r] for r in m.regions))
+    global_constraints.append(lambda m,t: m.NPVdot[t] == exp(-m.PRTP * t) * sum(m.L[t,r] * m.utility[t,r] for r in m.regions))
     global_constraints_init.append(lambda m: m.NPV[0] == 0)
 
         

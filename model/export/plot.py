@@ -6,7 +6,11 @@ def full_plot(m, filename):
 
     plot = Plot(m, horizontal_spacing=0.02, vertical_spacing=0.05)
     
-    plot.add(lambda t,r: m.baseline(t, r), row=1, is_fct=True, name='baseline_emissions')
+    plot.add(m.baseline_emissions, row=1, is_fct=True, name='baseline_emissions')
+    try:
+        plot.add(m.baseline, row=1)
+    except:
+        pass
     plot.add(m.regional_emissions, row=1)
     plot.add(m.carbonprice, row=1, secondary_y=True)
     plot.add(m.adapt_costs, row=2, stackgroup='costs')

@@ -39,21 +39,20 @@ def constraints(m):
     m.sr            = Param()
     m.elasmu        = Param()
 
-    m.GDP_gross     = Var(m.t, m.regions, initialize=lambda m: m.GDP(0, m.regions.first()))
+    m.GDP_gross     = Var(m.t, m.regions, initialize=lambda m: m.GDP[0, m.regions.first()])
     m.GDP_net       = Var(m.t, m.regions)
     m.investments   = Var(m.t, m.regions)
-    m.consumption   = Var(m.t, m.regions, initialize=lambda m: (1-m.sr)*m.GDP(0, m.regions.first()))
+    m.consumption   = Var(m.t, m.regions, initialize=lambda m: (1-m.sr)*m.GDP[0, m.regions.first()])
     m.utility       = Var(m.t, m.regions)
-    m.L = lambda t,r: m.population(t, r)
 
     m.dt = Param()
 
     regional_constraints.extend([
-        lambda m,t,r: m.GDP_gross[t,r] == economics.calc_GDP(m.TFP(t, r), m.L(t,r), m.capital_stock[t,r], m.alpha),
+        lambda m,t,r: m.GDP_gross[t,r] == economics.calc_GDP(m.TFP[t,r], m.L[t,r], m.capital_stock[t,r], m.alpha),
         lambda m,t,r: m.GDP_net[t,r] == m.GDP_gross[t,r] * (1-m.damage_costs[t,r]) - m.abatement_costs[t,r],
         lambda m,t,r: m.investments[t,r] == m.sr * m.GDP_net[t,r],
         lambda m,t,r: m.consumption[t,r] == (1-m.sr) * m.GDP_net[t,r],
-        lambda m,t,r: m.utility[t,r] == ( (m.consumption[t,r] / m.L(t,r)) ** (1-m.elasmu) - 1 ) / (1-m.elasmu) - 1,
+        lambda m,t,r: m.utility[t,r] == ( (m.consumption[t,r] / m.L[t,r]) ** (1-m.elasmu) - 1 ) / (1-m.elasmu) - 1,
         lambda m,t,r: (
             m.capital_stockdot[t,r] == economics.calc_dKdt(m.capital_stock[t,r], m.dk, m.investments[t,r], m.dt)
         ) if t > 0 else Constraint.Skip
@@ -66,7 +65,7 @@ def constraints(m):
     m.consumption_loss = Var(m.t)
     global_constraints.extend([
         lambda m,t: m.consumption_NPVdot[t] == sum(exp(-0.05 * t) * m.consumption[t,r] for r in m.regions),
-        lambda m,t: m.baseline_consumption_NPVdot[t] == sum(exp(-0.05 * t) * (1-m.sr) * m.GDP(t,r) for r in m.regions),
+        lambda m,t: m.baseline_consumption_NPVdot[t] == sum(exp(-0.05 * t) * (1-m.sr) * m.GDP[t,r] for r in m.regions),
         lambda m,t: m.consumption_loss[t] == 1 - m.consumption_NPV[t] / m.baseline_consumption_NPV[t] if t > 0 else Constraint.Skip
     ])
     global_constraints_init.extend([

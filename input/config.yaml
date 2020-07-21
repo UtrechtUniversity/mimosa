@@ -83,6 +83,7 @@ emissions:
   carbonbudget: 800 GtCO2     # False or a quantity
   min level: -20 GtCO2/yr     # False or a quantity
   not positive after budget year: True
+  baseline carbon intensity: True
   inertia:
     global: False     # False or a number < 0, % of initial emissions
     regional: -0.05     # False or a number < 0, % of initial emissions

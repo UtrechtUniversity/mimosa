@@ -3,8 +3,10 @@
 
 # Debug files
 output/*
+AD-RICE/*
 input/*.ipynb
 *.ipynb
+*.html
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -131,3 +133,6 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+no_net_negs.py
+log.txt
+experiment_nonegs_new.csv
