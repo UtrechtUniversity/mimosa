@@ -58,6 +58,21 @@ def constraints(m):
     m.TCRE          = Param()
     global_constraints.append(lambda m,t: m.temperature[t] == m.T0 + m.TCRE * m.cumulative_emissions[t])
 
+
+    m.perc_reversible_damages = Param()
+
+    m.overshoot = Var(m.t, initialize=0)
+    m.overshootdot = DerivativeVar(m.overshoot, wrt=m.t)
+    m.netnegative_emissions = Var(m.t)
+    global_constraints.extend([
+        lambda m,t: m.netnegative_emissions[t] == m.global_emissions[t] * (1-tanh(m.global_emissions[t] * 10))/2 if value(m.perc_reversible_damages) < 1 else Constraint.Skip,
+        lambda m,t: m.overshootdot[t] == (m.netnegative_emissions[t] if t <= value(m.year2100) and t > 0 else 0) if value(m.perc_reversible_damages) < 1 else Constraint.Skip
+    ])
+
+    global_constraints_init.extend([
+        lambda m: m.overshoot[0] == 0
+    ])
+
     # Emission constraints
 
     m.budget        = Param()
@@ -66,7 +81,10 @@ def constraints(m):
     m.min_level     = Param() 
     m.no_pos_emissions_after_budget_year = Param()
     global_constraints.extend([
-        lambda m,t: m.cumulative_emissions[t] - m.budget <= 0   if (t >= value(m.year2100) and value(m.budget) is not False) else Constraint.Skip,
+        lambda m,t: m.cumulative_emissions[t] - (
+            m.budget + 
+            (m.overshoot[t] * (1-m.perc_reversible_damages) if value(m.perc_reversible_damages) < 1 else 0)
+        ) <= 0   if (t >= value(m.year2100) and value(m.budget) is not False) else Constraint.Skip,
         lambda m,t: m.cumulative_emissions[t] >= 0,
         lambda m,t: m.global_emissionsdot[t] >= m.inertia_global * sum(m.baseline_emissions[0, r] for r in m.regions) \
                                                                 if value(m.inertia_global) is not False else Constraint.Skip,

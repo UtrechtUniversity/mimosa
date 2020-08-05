@@ -33,6 +33,8 @@ def full_plot(m, filename):
         plot.add(m.emission_relative_cumulative, is_regional=False, row=4, secondary_y=True, visible='legendonly')
         plot.add(m.consumption_loss, is_regional=False, row=4, secondary_y=True, visible='legendonly')
         plot.add(m.smoothed_factor, is_regional=False, row=4, secondary_y=True, visible='legendonly')
+        plot.add(m.netnegative_emissions, is_regional=False, row=4, visible='legendonly')
+        plot.add(m.overshoot, is_regional=False, row=4, visible='legendonly')
     except:
         pass
 

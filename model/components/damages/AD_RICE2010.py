@@ -44,9 +44,6 @@ def constraints(m):
     m.adapt_curr_level = Param()
     m.fixed_adaptation = Param()
 
-
-    m.perc_reversible_damages = Param()
-
     global_constraints.append(
         lambda m,t: ((
             m.smoothed_factor[t] == (tanh((m.temperaturedot[t]) / 1e-3)+1)*(1-m.perc_reversible_damages)/2 +m.perc_reversible_damages

@@ -79,6 +79,7 @@ class MIMOSA:
 
             'damage_scale_factor': v(params['economics']['damages']['scale factor']),
             'fixed_adaptation': v(params['economics']['adaptation']['fixed']),
+            'perc_reversible_damages': v(params['economics']['damages']['percentage reversible']),
 
             'MAC_gamma':        v(quant(params['economics']['MAC']['gamma'], 'currency_unit/emissionsrate_unit')),
             'MAC_beta':         v(params['economics']['MAC']['beta']),
@@ -94,7 +95,6 @@ class MIMOSA:
         # For RICE2010 damage/adaptation:
         if params['model']['damage module'] == 'RICE2010':
             instance_data[None].update({
-                'perc_reversible_damages': v(params['economics']['damages']['percentage reversible']),
                 'adapt_curr_level':     v(params['economics']['adaptation']['curr_level']),
                 'damage_a1':            self.data_store.get_regional('damages', 'a1'),
                 'damage_a2':            self.data_store.get_regional('damages', 'a2'),
@@ -102,6 +102,10 @@ class MIMOSA:
                 'adapt_g1':             self.data_store.get_regional('adaptation', 'g1'),
                 'adapt_g2':             self.data_store.get_regional('adaptation', 'g2'),
             })
+        elif params['economics']['damages']['percentage reversible'] != 1:
+            raise NotImplementedError(
+                'Partially irreversible damages not implemented for damage module "{}"'.format(params['model']['damage module'])
+            )
 
         # For RICE2012 damage/adaptation:
         if params['model']['damage module'] == 'RICE2012':
