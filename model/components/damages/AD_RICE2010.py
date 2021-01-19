@@ -62,14 +62,21 @@ def constraints(m):
     )
 
     regional_constraints.extend([
-        lambda m,t,r: m.adapt_level[t,r]    == m.adapt_curr_level if value(m.fixed_adaptation) else Constraint.Skip,
+        lambda m,t,r: m.adapt_level[t,r]    == (
+            m.adapt_curr_level
+            if value(m.fixed_adaptation) else 
+            (
+                optimal_adapt_level(m.gross_damages[t,r], m, r)
+                if value(m.adapt_g1[r]) * value(m.adapt_g2[r]) > 0 else
+                0
+            )
+        ),
         lambda m,t,r: m.resid_damages[t,r]  == m.gross_damages[t,r] * (1-m.adapt_level[t,r]),
         lambda m,t,r: m.adapt_costs[t,r]    == adaptation_costs(m.adapt_level[t,r], m, r),
         lambda m,t,r: m.damage_costs[t,r]   == m.resid_damages[t,r] + m.adapt_costs[t,r]
     ])
 
     regional_constraints_init.extend([
-        lambda m,r: m.adapt_level[0,r] == m.adapt_curr_level,
         lambda m,r: m.gross_damages[0,r] == 0
     ])
 
@@ -118,6 +125,10 @@ def _damage_fct_dot(T, a1, a2, a3):
 
 def adaptation_costs(P, m, r):
     return _adaptation_costs(P, m.adapt_g1[r], m.adapt_g2[r])
+
+def optimal_adapt_level(GD, m, r):
+    eps = 0.001
+    return (GD / (m.adapt_g1[r] * m.adapt_g2[r]) + eps) ** (1/(m.adapt_g2[r]-1))
 
 
 def _adaptation_costs(P, gamma1, gamma2):

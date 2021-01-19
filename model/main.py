@@ -114,9 +114,9 @@ class MIMOSA:
                 'damage_a1':            self.data_store.get_regional('damages', 'a1'),
                 'damage_a2':            self.data_store.get_regional('damages', 'a2'),
                 'damage_a3':            self.data_store.get_regional('damages', 'a3'),
-                'adap1':            self.data_store.get_regional('adaptation', 'nu1'),
-                'adap2':            self.data_store.get_regional('adaptation', 'nu2'),
-                'adap3':            self.data_store.get_regional('adaptation', 'nu3'),
+                'adap1':                self.data_store.get_regional('adaptation', 'nu1'),
+                'adap2':                self.data_store.get_regional('adaptation', 'nu2'),
+                'adap3':                self.data_store.get_regional('adaptation', 'nu3'),
                 'adapt_rho':            v(0.5),
             })
 

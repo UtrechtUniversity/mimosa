@@ -76,7 +76,7 @@ economics:
     percentage reversible: 1
     scale factor: 1
   adaptation:
-    curr_level: 0.16
+    curr_level: 0
     fixed: False
 
 emissions:

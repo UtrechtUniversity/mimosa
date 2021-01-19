@@ -49,7 +49,7 @@ def constraints(m):
 
     regional_constraints.extend([
         lambda m,t,r: m.abatement_costs[t,r] == AC(m.relative_abatement[t,r], m.learning_factor[t], m.MAC_gamma, m.MAC_beta) * m.baseline[t,r],
-        lambda m,t,r: m.rel_abatement_costs[t,r] == m.abatement_costs[t,r] / m.GDP_gross[t,r], # GDP_gross is defined below
+        lambda m,t,r: m.rel_abatement_costs[t,r] == m.abatement_costs[t,r] / m.GDP_gross[t,r],
         lambda m,t,r: m.carbonprice[t,r] == MAC(m.relative_abatement[t,r], m.learning_factor[t], m.MAC_gamma, m.MAC_beta)
     ])
 

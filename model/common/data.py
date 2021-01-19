@@ -6,7 +6,10 @@ import input.regional_data
 
 # To extrapolate: take growth rate 2090-2100, linearly bring it down to growth rate of 0 in 2150
 # Not sure if this should rather be a method of DataStore
-def extrapolate(input_values, years, extra_years, stabilising_years=50):
+def extrapolate(input_values, years, extra_years, meta_info, stabilising_years=50):
+
+    became_negative = False
+
     # First get final change rate
     change_rate = (input_values[-1] - input_values[-2]) / (years[-1] - years[-2])
     minmax = np.maximum if change_rate > 0 else np.minimum
@@ -19,12 +22,17 @@ def extrapolate(input_values, years, extra_years, stabilising_years=50):
     for t in extra_years:
         change = minmax(0.0, change_rate - change_rate * (t_prev - 2100.0) / stabilising_years)
         val = val_prev + change * (t-t_prev)
+        # if val < 0:
+        #     val = 0.1
+        #     became_negative = True
 
         new_values.append(val)
 
         val_prev = val
         t_prev = t
 
+    if became_negative:
+        print("Extrapolation became negative for", meta_info)
     return np.concatenate([input_values, new_values])
 
 
@@ -132,7 +140,7 @@ class DataStore:
 
         # 2. Extrapolate this data to beyond 2100
         extra_years = np.arange(2110, 2260, 10)
-        extended_data = extrapolate(values, years, extra_years)
+        extended_data = extrapolate(values, years, extra_years, [variable, region])
         extended_years = np.concatenate([years, extra_years])
 
         # 3. Interpolate the combined data
