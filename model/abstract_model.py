@@ -6,10 +6,8 @@
 ##############################################
 
 import numpy as np
-from pyomo.environ import *
-from pyomo.dae import *
-
 from model.common import utils, economics
+from model.common.pyomo import *
 from model.components import emissions, abatement, cobbdouglas, damages
 
 

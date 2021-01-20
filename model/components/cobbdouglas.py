@@ -4,8 +4,7 @@
 #
 ##############################################
 
-from pyomo.environ import *
-from pyomo.dae import *
+from model.common.pyomo import *
 from model.common import economics
 
 def constraints(m):
@@ -47,9 +46,11 @@ def constraints(m):
 
     m.dt = Param()
 
+    m.ignore_damages = Param()
+
     regional_constraints.extend([
         lambda m,t,r: m.GDP_gross[t,r] == economics.calc_GDP(m.TFP[t,r], m.L[t,r], m.capital_stock[t,r], m.alpha),
-        lambda m,t,r: m.GDP_net[t,r] == m.GDP_gross[t,r] * (1-m.damage_costs[t,r]) - m.abatement_costs[t,r],
+        lambda m,t,r: m.GDP_net[t,r] == m.GDP_gross[t,r] - (m.damage_costs[t,r] if not value(m.ignore_damages) else 0) - m.abatement_costs[t,r],
         lambda m,t,r: m.investments[t,r] == m.sr * m.GDP_net[t,r],
         lambda m,t,r: m.consumption[t,r] == (1-m.sr) * m.GDP_net[t,r],
         lambda m,t,r: m.utility[t,r] == ( (m.consumption[t,r] / m.L[t,r]) ** (1-m.elasmu) - 1 ) / (1-m.elasmu) - 1,

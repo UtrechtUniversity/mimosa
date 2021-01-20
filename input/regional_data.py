@@ -1,11 +1,18 @@
 import numpy as np
 import pandas as pd
 
+import importlib.resources as pkg_resources
+
+from . import data as package_data
+
 ##################
 ## RICE/AD-RICE:
 ##################
 
-AD_RICE_coeffs = pd.read_csv('input/data/rice_damages_adapt.csv', index_col=0)
+AD_RICE_coeffs = pd.read_csv(
+    pkg_resources.open_text(package_data, 'rice_damages_adapt.csv'),
+    index_col=0
+)
 
 SSP_to_RICE2010_regions = {
     'R5.2OECD': ['USA', 'JAPAN', 'EUROPE'],
@@ -42,7 +49,10 @@ def get_damage_adapt_coeffs_RICE2012(region, param_name):
 ## AD-WITCH:
 ##################
 
-AD_WITCH_coeffs = pd.read_csv('input/data/witch_damages_adapt.csv', index_col=0)
+AD_WITCH_coeffs = pd.read_csv(
+    pkg_resources.open_text(package_data, 'witch_damages_adapt.csv'),
+    index_col=0
+)
 
 SSP_to_WITCH_regions = { # KOSAU not used?
     'R5.2OECD': ['USA', 'Western EU', 'CAJAZ'],

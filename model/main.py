@@ -2,10 +2,8 @@
 
 import numpy as np
 
-from pyomo.environ import *
-from pyomo.dae import *
-
 from model.common import data, utils, units, economics
+from model.common.pyomo import *
 from model.export.plot import full_plot
 from model.export.save import save_output
 
@@ -80,6 +78,8 @@ class MIMOSA:
             'damage_scale_factor': v(params['economics']['damages']['scale factor']),
             'fixed_adaptation': v(params['economics']['adaptation']['fixed']),
             'perc_reversible_damages': v(params['economics']['damages']['percentage reversible']),
+
+            'ignore_damages': v(params['economics']['damages']['ignore damages']),
 
             'MAC_gamma':        v(quant(params['economics']['MAC']['gamma'], 'currency_unit/emissionsrate_unit')),
             'MAC_beta':         v(params['economics']['MAC']['beta']),

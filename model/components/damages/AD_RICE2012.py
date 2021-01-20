@@ -5,15 +5,14 @@
 ##############################################
 
 import numpy as np
-from pyomo.environ import *
-from pyomo.dae import *
+from model.common.pyomo import *
 
 def constraints(m):
     """Damage and adaptation costs equations and constraints
     (RICE specification)
 
     Necessary variables:
-        m.damage_costs (sum of residual damages and adaptation costs, % of GDP)
+        m.damage_costs (sum of residual damages and adaptation costs multiplied by gross GDP)
 
     Returns:
         dict: {
@@ -29,9 +28,7 @@ def constraints(m):
     regional_constraints_init = []
 
     m.damage_costs  = Var(m.t, m.regions)
-    m.smoothed_factor = Var(m.t)
     m.gross_damages = Var(m.t, m.regions)
-    m.gross_damagesdot = DerivativeVar(m.gross_damages, wrt=m.t)
     m.resid_damages = Var(m.t, m.regions)
 
 
@@ -43,49 +40,68 @@ def constraints(m):
 
     m.adapt_level   = Var(m.t, m.regions, within=NonNegativeReals)
     m.adapt_costs   = Var(m.t, m.regions)
-    min_adapt_FAD   = 0.0
-    m.adapt_FAD     = Var(m.t, m.regions, bounds=(min_adapt_FAD, 0.02))
-    m.adapt_IAD     = Var(m.t, m.regions, bounds=(min_adapt_FAD, 0.02))
+    m.adapt_FAD     = Var(m.t, m.regions, bounds=(0, 0.1))
+    m.adapt_IAD     = Var(m.t, m.regions, bounds=(0, 0.1))
     m.adap1     = Param(m.regions)
     m.adap2     = Param(m.regions)
     m.adap3     = Param(m.regions)
     m.adapt_rho     = Param()
     m.fixed_adaptation = Param()
 
-    m.adapt_SAD     = Var(m.t, m.regions, initialize=0.5)
+    m.adapt_SAD     = Var(m.t, m.regions, initialize=0.01)
     m.adapt_SADdot  = DerivativeVar(m.adapt_SAD, wrt=m.t)
 
+    # Gross damages
     regional_constraints.extend([
-        lambda m,t,r: m.resid_damages[t,r]  == m.gross_damages[t,r] / (1 + m.adapt_level[t,r]),
-        # lambda m,t,r: m.adapt_level[t,r]    == 266 * (
-        #     0.5     * sqrt(m.adapt_FAD[t,r]) +
-        #     0.5 * sqrt(m.adapt_SAD[t,r])
-        # )** (2* m.adap3[r]),
-        lambda m,t,r: m.adapt_level[t,r]    == m.adap1[r] * (
-            m.adap2[r]     * sqrt(m.adapt_FAD[t,r]) +
-            (1-m.adap2[r]) * sqrt(m.adapt_SAD[t,r])
-        )** (2 * m.adap3[r]),
+        lambda m,t,r: m.gross_damages[t,r] == m.damage_scale_factor * damage_fct(m.temperature[t], m.T0, m, r),
+        lambda m,t,r: m.resid_damages[t,r] == m.gross_damages[t,r] / (1 + m.adapt_level[t,r]),
+        
+        lambda m,t,r: m.adapt_level[t,r] == m.adap1[r] * (
+            m.adap2[r] * m.adapt_FAD[t,r] ** m.adapt_rho
+            +
+            (1-m.adap2[r]) * m.adapt_SAD[t,r] ** m.adapt_rho
+        ) ** (m.adap3[r] / m.adapt_rho),
+        #lambda m,t,r: m.adapt_FAD[t,r] == 0.0001,
+        lambda m,t,r: m.adapt_SADdot[t,r] == m.adapt_IAD[t,r] if t > 0 else Constraint.Skip,
+        lambda m,t,r: m.adapt_costs[t,r] == m.adapt_FAD[t,r] + m.adapt_IAD[t,r],
+
+        lambda m,t,r: m.damage_costs[t,r] == m.resid_damages[t,r] * m.GDP_gross[t,r] + m.adapt_costs[t,r],
+    ])
+
+    # Adaptation costs and residual damages
+    # regional_constraints.extend([
+        # lambda m,t,r: m.resid_damages[t,r]  == m.gross_damages[t,r] ,#/ (1 + m.adapt_level[t,r]),
+
+        # lambda m,t,r: m.adapt_level[t,r] == m.adap1[r] * (
+        #     ( m.adap2[r]    * m.adapt_FAD[t,r]**m.adapt_rho)
+        #     +
+        #     ((1-m.adap2[r]) * m.adapt_SAD[t,r]**m.adapt_rho)
+        # ) ** (m.adap3[r] / m.adapt_rho),
+
+        # lambda m,t,r: m.adapt_level[t,r] == m.adap1[r] * (
+        #     ( m.adap2[r]    * m.adapt_FAD[t,r])
+            
+        # ) ** (m.adap3[r]),
+
+        # lambda m,t,r: m.adapt_level[t,r]    == m.adap1[r] * (
+        #     m.adap2[r]     * sqrt(m.adapt_FAD[t,r]) +
+        #     (1-m.adap2[r]) * sqrt(m.adapt_SAD[t,r])
+        # )** (2 * m.adap3[r]),
 
         # NOTE: Not sure if " * m.dt" should be here
-        lambda m,t,r: m.adapt_costs[t,r]  == (m.adapt_FAD[t,r] + m.adapt_IAD[t,r]),
-        lambda m,t,r: m.adapt_SADdot[t,r] == np.log(1-m.dk) * m.adapt_SAD[t,r] + m.adapt_IAD[t,r], 
-    ])
+        #lambda m,t,r: m.adapt_costs[t,r]  == (m.adapt_FAD[t,r]),# + m.adapt_IAD[t,r]),
+        #lambda m,t,r: m.adapt_SADdot[t,r] == np.log(1-m.dk) * m.adapt_SAD[t,r] + m.adapt_IAD[t,r], 
+    # ])
 
-    regional_constraints.append(
-        lambda m,t,r: (m.gross_damages[t,r]  == m.damage_scale_factor * (
-                damage_fct(m.temperature[t], m.T0, m, r)
-            )) if m.damage_scale_factor > 0 else (m.gross_damages[t,r] == 0)
-    )
-
-    regional_constraints.extend([
-        lambda m,t,r: m.damage_costs[t,r]   == m.resid_damages[t,r] + m.adapt_costs[t,r]
-    ])
+    # regional_constraints.extend([
+    #     lambda m,t,r: m.damage_costs[t,r] == m.resid_damages[t,r] * m.GDP_gross[t,r]# + m.adapt_costs[t,r]
+    # ])
 
     regional_constraints_init.extend([
+        lambda m,r: m.adapt_FAD[0,r] == 0,
+        lambda m,r: m.adapt_SAD[0,r] == 0,
         lambda m,r: m.adapt_IAD[0,r] == 0,
-        lambda m,r: m.adapt_FAD[0,r] == min_adapt_FAD,
-        lambda m,r: m.adapt_SAD[0,r] == min_adapt_FAD,
-        # lambda m,r: m.gross_damages[0,r] == 0
+    #     # lambda m,r: m.gross_damages[0,r] == 0
     ])
 
     return {
@@ -108,9 +124,6 @@ def constraints(m):
 def damage_fct(T, T0, m, r):
     return _damage_fct(T, m.damage_a1[r], m.damage_a2[r], m.damage_a3[r], T0)
 
-def damage_fct_dot(T, m, r):
-    return _damage_fct_dot(T, m.damage_a1[r], m.damage_a2[r], m.damage_a3[r])
-
 
 def _damage_fct(T, a1, a2, a3, T0=None):
     """Quadratic damage function
@@ -123,10 +136,6 @@ def _damage_fct(T, a1, a2, a3, T0=None):
     if T0 is not None:
         dmg -= fct(T0)
     return dmg
-
-
-def _damage_fct_dot(T, a1, a2, a3):
-    return a1 + a2 * a3 * T ** (a3 - 1)
 
 
 # Adaptation cost function

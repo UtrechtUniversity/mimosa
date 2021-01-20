@@ -5,8 +5,7 @@
 ##############################################
 
 import numpy as np
-from pyomo.environ import *
-from pyomo.dae import *
+from model.common.pyomo import *
 
 def constraints(m):
     """Damage and adaptation costs equations and constraints

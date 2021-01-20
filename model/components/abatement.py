@@ -4,8 +4,7 @@
 #
 ##############################################
 
-from pyomo.environ import *
-from pyomo.dae import *
+from model.common.pyomo import *
 
 def constraints(m):
     """Abatement cost equations and constraints

@@ -75,6 +75,7 @@ economics:
   damages:
     percentage reversible: 1
     scale factor: 1
+    ignore damages: False
   adaptation:
     curr_level: 0
     fixed: False

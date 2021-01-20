@@ -42,9 +42,9 @@ def full_plot(m, filename):
     try:
         # RICE
         plot.add(m.adapt_level, row=2, secondary_y=True, visible='legendonly')
-        plot.add(m.adapt_IAD, row=2, secondary_y=True, visible='legendonly')
         plot.add(m.adapt_FAD, row=2, secondary_y=True, visible='legendonly')
         plot.add(m.adapt_SAD, row=2, secondary_y=True, visible='legendonly')
+        plot.add(m.adapt_IAD, row=2, secondary_y=True, visible='legendonly')
     except:
         pass
 
@@ -63,4 +63,6 @@ def full_plot(m, filename):
     plot.fig.update_yaxes(title='Adaptation level', row=2, col=len(plot.regions), secondary_y=True)
     plot.set_layout()
 
-    plot.fig.write_html('output/plots/{}.html'.format(filename))
+    outputfile = 'output/plots/{}.html'.format(filename)
+    print(f'Plot saved at {outputfile}')
+    plot.fig.write_html(outputfile)
