@@ -30,7 +30,6 @@ def constraints(m):
 
     m.init_capitalstock = Param(m.regions)
     m.capital_stock = Var(m.t, m.regions, initialize=lambda m,t,r: m.init_capitalstock[r])
-    m.capital_stockdot          = DerivativeVar(m.capital_stock, wrt=m.t)
 
     # Parameters
     m.alpha         = Param()
@@ -44,8 +43,6 @@ def constraints(m):
     m.consumption   = Var(m.t, m.regions, initialize=lambda m: (1-m.sr)*m.GDP[0, m.regions.first()])
     m.utility       = Var(m.t, m.regions)
 
-    m.dt = Param()
-
     m.ignore_damages = Param()
 
     regional_constraints.extend([
@@ -55,18 +52,16 @@ def constraints(m):
         lambda m,t,r: m.consumption[t,r] == (1-m.sr) * m.GDP_net[t,r],
         lambda m,t,r: m.utility[t,r] == ( (m.consumption[t,r] / m.L[t,r]) ** (1-m.elasmu) - 1 ) / (1-m.elasmu) - 1,
         lambda m,t,r: (
-            m.capital_stockdot[t,r] == economics.calc_dKdt(m.capital_stock[t,r], m.dk, m.investments[t,r], m.dt)
+            m.capital_stock[t,r] == m.capital_stock[t-1,r] + m.dt * economics.calc_dKdt(m.capital_stock[t,r], m.dk, m.investments[t,r], m.dt)
         ) if t > 0 else Constraint.Skip
     ])
 
     m.consumption_NPV = Var(m.t)
-    m.consumption_NPVdot = DerivativeVar(m.consumption_NPV, wrt=m.t)
     m.baseline_consumption_NPV = Var(m.t, initialize=0.01)
-    m.baseline_consumption_NPVdot = DerivativeVar(m.baseline_consumption_NPV, wrt=m.t)
     m.consumption_loss = Var(m.t)
     global_constraints.extend([
-        lambda m,t: m.consumption_NPVdot[t] == sum(exp(-0.05 * t) * m.consumption[t,r] for r in m.regions),
-        lambda m,t: m.baseline_consumption_NPVdot[t] == sum(exp(-0.05 * t) * (1-m.sr) * m.GDP[t,r] for r in m.regions),
+        lambda m,t: m.consumption_NPV[t] - m.consumption_NPV[t-1] == m.dt * sum(exp(-0.05 * (m.year[t] - m.beginyear)) * m.consumption[t,r] for r in m.regions) if t > 0 else Constraint.Skip,
+        lambda m,t: m.baseline_consumption_NPV[t] - m.baseline_consumption_NPV[t-1] == m.dt * sum(exp(-0.05 * (m.year[t] - m.beginyear)) * (1-m.sr) * m.GDP[t,r] for r in m.regions) if t > 0 else Constraint.Skip,
         lambda m,t: m.consumption_loss[t] == 1 - m.consumption_NPV[t] / m.baseline_consumption_NPV[t] if t > 0 else Constraint.Skip
     ])
     global_constraints_init.extend([

@@ -7,4 +7,4 @@ from pyomo.environ import (
     log, exp, tanh, 
     NonNegativeReals
 )
-from pyomo.dae import DerivativeVar, ContinuousSet
+# from pyomo.dae import DerivativeVar, ContinuousSet

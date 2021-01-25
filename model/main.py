@@ -55,10 +55,14 @@ class MIMOSA:
         quant  = self.quant
         params = self.params
 
+        num_years = int(np.ceil((params['time']['end'] - params['time']['start'])/params['time']['dt']))+1
+        self.abstract_model.year = utils.FctToList(lambda t: params['time']['start'] + t * params['time']['dt'])
+
         instance_data = {None: {
             'beginyear':        v(params['time']['start']),
-            'endyear':          v(params['time']['end']),
             'dt':               v(params['time']['dt']),
+            'tf':               v(num_years-1),
+            't':                v(range(num_years)),
             'regions':          v(params['regions'].keys()),
             
             'baseline_carbon_intensity': v(params['emissions']['baseline carbon intensity']),
@@ -149,9 +153,10 @@ class MIMOSA:
     def discretize(self):
 
 
-        num_steps = int(self.m.tf/self.params['time']['dt'])
-        discretizer = TransformationFactory('dae.finite_difference')
-        discretizer.apply_to(self.m, nfe=num_steps, scheme='BACKWARD')
+        # num_steps = int(self.m.tf/self.params['time']['dt'])
+        # discretizer = TransformationFactory('dae.finite_difference')
+        # discretizer.apply_to(self.m, nfe=num_steps, scheme='BACKWARD')
+
         # discretizer = TransformationFactory('dae.collocation')
         # discretizer.apply_to(self.m, nfe=10, ncp=6)
 

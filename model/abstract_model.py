@@ -30,10 +30,10 @@ def create_abstract_model(damage_module='RICE'):
 
     ## Time and region
     m.beginyear     = Param()
-    m.endyear       = Param()
-    m.tf            = Param(initialize=m.endyear - m.beginyear)
-    m.year2100      = Param(initialize=2100 - m.beginyear)
-    m.t             = ContinuousSet(bounds=(0, m.tf))
+    m.dt            = Param()
+    m.tf            = Param()
+    m.t             = Set()
+    m.year          = None  # Initialised with concrete instance
 
     m.regions = Set(ordered=True)
 
@@ -108,9 +108,8 @@ def create_abstract_model(damage_module='RICE'):
     ######################
 
     m.NPV = Var(m.t)
-    m.NPVdot = DerivativeVar(m.NPV, wrt=m.t)
     m.PRTP = Param()
-    global_constraints.append(lambda m,t: m.NPVdot[t] == exp(-m.PRTP * t) * sum(m.L[t,r] * m.utility[t,r] for r in m.regions))
+    global_constraints.append(lambda m,t: m.NPV[t] == m.NPV[t-1] + m.dt * exp(-m.PRTP * (m.year[t] - m.beginyear)) * sum(m.L[t,r] * m.utility[t,r] for r in m.regions) if t > 0 else Constraint.Skip)
     global_constraints_init.append(lambda m: m.NPV[0] == 0)
 
         

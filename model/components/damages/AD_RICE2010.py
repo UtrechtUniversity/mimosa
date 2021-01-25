@@ -29,7 +29,6 @@ def constraints(m):
     m.damage_costs  = Var(m.t, m.regions)
     m.smoothed_factor = Var(m.t, bounds=(0,1))
     m.gross_damages = Var(m.t, m.regions)
-    m.gross_damagesdot = DerivativeVar(m.gross_damages, wrt=m.t)
     m.resid_damages = Var(m.t, m.regions)
     m.adapt_costs   = Var(m.t, m.regions)
     m.adapt_level   = Var(m.t, m.regions, bounds=(0,1))
@@ -45,16 +44,16 @@ def constraints(m):
 
     global_constraints.append(
         lambda m,t: ((
-            m.smoothed_factor[t] == (tanh((m.temperaturedot[t]) / 1e-3)+1)*(1-m.perc_reversible_damages)/2 +m.perc_reversible_damages
-        ) if m.perc_reversible_damages < 1 else (m.smoothed_factor[t] == 1))
+            m.smoothed_factor[t] == (tanh(((m.temperature[t] - m.temperature[t-1]) / m.dt) / 1e-3)+1)*(1-m.perc_reversible_damages)/2 +m.perc_reversible_damages
+        ) if m.perc_reversible_damages < 1 and t > 0 else (m.smoothed_factor[t] == 1))
     )
 
     regional_constraints.append(
         lambda m,t,r: (
-            m.gross_damagesdot[t,r] == m.damage_scale_factor * (
+            m.gross_damages[t,r] == m.gross_damages[t-1, r] + m.dt * m.damage_scale_factor * (
                 damage_fct_dot(m.temperature[t], m, r)
-                * m.smoothed_factor[t] * m.temperaturedot[t])
-        ) if m.perc_reversible_damages < 1 else (
+                * m.smoothed_factor[t] * (m.temperature[t] - m.temperature[t-1]) / m.dt)
+        ) if m.perc_reversible_damages < 1 and t > 0 else ( ### TODO the "and t > 0" might break things up here when perc_reversible < 1
             m.gross_damages[t,r]  == m.damage_scale_factor * (
                 damage_fct(m.temperature[t], m.T0, m, r))
         )
