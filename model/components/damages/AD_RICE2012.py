@@ -49,7 +49,6 @@ def constraints(m):
     m.fixed_adaptation = Param()
 
     m.adapt_SAD     = Var(m.t, m.regions, initialize=0.01)
-    m.adapt_SADdot  = DerivativeVar(m.adapt_SAD, wrt=m.t)
 
     # Gross damages
     regional_constraints.extend([
@@ -62,7 +61,7 @@ def constraints(m):
             (1-m.adap2[r]) * m.adapt_SAD[t,r] ** m.adapt_rho
         ) ** (m.adap3[r] / m.adapt_rho),
         #lambda m,t,r: m.adapt_FAD[t,r] == 0.0001,
-        lambda m,t,r: m.adapt_SADdot[t,r] == np.log(1-m.dk) * m.adapt_SAD[t,r] + m.adapt_IAD[t,r] if t > 0 else Constraint.Skip,
+        lambda m,t,r: m.adapt_SAD[t,r] == m.adapt_SAD[t-1,r] + m.dt * np.log(1-m.dk) * m.adapt_SAD[t,r] + m.adapt_IAD[t,r] if t > 0 else Constraint.Skip,
         lambda m,t,r: m.adapt_costs[t,r] == m.adapt_FAD[t,r] + m.adapt_IAD[t,r],
 
         lambda m,t,r: m.damage_costs[t,r] == m.resid_damages[t,r] + m.adapt_costs[t,r],
