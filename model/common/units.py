@@ -30,6 +30,8 @@ class Quantity:
             value = args[0]
             unit = self._custom_replace(str(args[1]))
             quantity = ureg.Quantity(value, unit)
+        else:
+            raise Exception("Wrong usage of Quant function")
 
         if only_magnitude:
             return quantity.to(target_unit).magnitude

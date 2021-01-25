@@ -40,8 +40,8 @@ def constraints(m):
 
     m.adapt_level   = Var(m.t, m.regions, within=NonNegativeReals)
     m.adapt_costs   = Var(m.t, m.regions)
-    m.adapt_FAD     = Var(m.t, m.regions, bounds=(0, 0.1))
-    m.adapt_IAD     = Var(m.t, m.regions, bounds=(0, 0.1))
+    m.adapt_FAD     = Var(m.t, m.regions, bounds=(0, 0.05))
+    m.adapt_IAD     = Var(m.t, m.regions, bounds=(0, 0.15))
     m.adap1     = Param(m.regions)
     m.adap2     = Param(m.regions)
     m.adap3     = Param(m.regions)
@@ -62,10 +62,10 @@ def constraints(m):
             (1-m.adap2[r]) * m.adapt_SAD[t,r] ** m.adapt_rho
         ) ** (m.adap3[r] / m.adapt_rho),
         #lambda m,t,r: m.adapt_FAD[t,r] == 0.0001,
-        lambda m,t,r: m.adapt_SADdot[t,r] == m.adapt_IAD[t,r] if t > 0 else Constraint.Skip,
+        lambda m,t,r: m.adapt_SADdot[t,r] == np.log(1-m.dk) * m.adapt_SAD[t,r] + m.adapt_IAD[t,r] if t > 0 else Constraint.Skip,
         lambda m,t,r: m.adapt_costs[t,r] == m.adapt_FAD[t,r] + m.adapt_IAD[t,r],
 
-        lambda m,t,r: m.damage_costs[t,r] == m.resid_damages[t,r] * m.GDP_gross[t,r] + m.adapt_costs[t,r],
+        lambda m,t,r: m.damage_costs[t,r] == m.resid_damages[t,r] + m.adapt_costs[t,r],
     ])
 
     # Adaptation costs and residual damages

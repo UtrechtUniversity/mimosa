@@ -11,7 +11,7 @@ def constraints(m):
     (RICE specification)
 
     Necessary variables:
-        m.damage_costs (sum of residual damages and adaptation costs multiplied by gross GDP)
+        m.damage_costs (sum of residual damages and adaptation costs, as % of GDP)
 
     Returns:
         dict: {
@@ -27,7 +27,6 @@ def constraints(m):
     regional_constraints_init = []
 
     m.damage_costs  = Var(m.t, m.regions)
-    m.damage_costs_relative  = Var(m.t, m.regions)
     m.smoothed_factor = Var(m.t, bounds=(0,1))
     m.gross_damages = Var(m.t, m.regions)
     m.gross_damagesdot = DerivativeVar(m.gross_damages, wrt=m.t)
@@ -73,8 +72,7 @@ def constraints(m):
         ),
         lambda m,t,r: m.resid_damages[t,r]  == m.gross_damages[t,r] * (1-m.adapt_level[t,r]),
         lambda m,t,r: m.adapt_costs[t,r]    == adaptation_costs(m.adapt_level[t,r], m, r),
-        lambda m,t,r: m.damage_costs_relative[t,r]   == m.resid_damages[t,r] + m.adapt_costs[t,r],
-        lambda m,t,r: m.damage_costs[t,r]   == m.damage_costs_relative[t,r] * m.GDP_gross[t,r]
+        lambda m,t,r: m.damage_costs[t,r]   == m.resid_damages[t,r] + m.adapt_costs[t,r],
     ])
 
     regional_constraints_init.extend([

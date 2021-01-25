@@ -3,6 +3,7 @@ import pandas as pd
 
 from model.common import economics, utils
 import input.regional_data
+from scipy.interpolate import interp1d
 
 # To extrapolate: take growth rate 2090-2100, linearly bring it down to growth rate of 0 in 2150
 # Not sure if this should rather be a method of DataStore
@@ -144,8 +145,10 @@ class DataStore:
         extended_years = np.concatenate([years, extra_years])
 
         # 3. Interpolate the combined data
+        interp_fct = interp1d(extended_years, extended_data, kind='cubic')
         return {
-            'values': np.interp(year, extended_years, extended_data),
+            'values': interp_fct(year),
+            # 'values': np.interp(year, extended_years, extended_data),
             'unit': unit
         }
     
