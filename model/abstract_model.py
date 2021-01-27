@@ -22,6 +22,7 @@ def create_abstract_model(damage_module='RICE'):
     ## Constraints
     # Each global / regional constraint will be put in these lists,
     # then added to the model at the end of this file.
+    constraints = []
     global_constraints      = []
     global_constraints_init = []
     regional_constraints    = []
@@ -59,12 +60,7 @@ def create_abstract_model(damage_module='RICE'):
     ######################
 
     # Emissions and temperature equations
-    c_emissions = emissions.constraints(m)
-
-    global_constraints          .extend(c_emissions['global'])
-    global_constraints_init     .extend(c_emissions['global_init'])
-    regional_constraints        .extend(c_emissions['regional'])
-    regional_constraints_init   .extend(c_emissions['regional_init'])
+    constraints.extend(emissions.constraints(m))
 
 
     # Damage costs
@@ -109,8 +105,14 @@ def create_abstract_model(damage_module='RICE'):
 
     m.NPV = Var(m.t)
     m.PRTP = Param()
-    global_constraints.append(lambda m,t: m.NPV[t] == m.NPV[t-1] + m.dt * exp(-m.PRTP * (m.year[t] - m.beginyear)) * sum(m.L(m.year(t),r) * m.utility[t,r] for r in m.regions) if t > 0 else Constraint.Skip)
-    global_constraints_init.append(lambda m: m.NPV[0] == 0)
+    constraints.extend([
+        GlobalConstraint(
+            lambda m,t: m.NPV[t] == m.NPV[t-1] + m.dt * exp(-m.PRTP * (m.year[t] - m.beginyear)) * sum(m.L(m.year(t),r) * m.utility[t,r] for r in m.regions) 
+            if t > 0 else Constraint.Skip,
+            name='NPV'
+        ),
+        GlobalInitConstraint(lambda m: m.NPV[0] == 0)
+    ])
 
     
         
@@ -126,6 +128,9 @@ def create_abstract_model(damage_module='RICE'):
     for fct in regional_constraints_init:
         name, fct = name_and_fct(fct)
         fullname = utils.add_constraint(m, Constraint(m.regions, rule=fct), name)
+    
+    for constraint in constraints:
+        utils.add_constraint(m, constraint.to_pyomo_constraint(m), constraint.name)
 
     m.obj = Objective(rule=lambda m: m.NPV[m.tf], sense=maximize)
 
