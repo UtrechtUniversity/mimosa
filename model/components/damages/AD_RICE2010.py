@@ -14,17 +14,9 @@ def constraints(m):
         m.damage_costs (sum of residual damages and adaptation costs, as % of GDP)
 
     Returns:
-        dict: {
-            global:         global_constraints,
-            global_init:    global_constraints_init,
-            regional:       regional_constraints,
-            regional_init:  regional_constraints_init
-        }
+        list of constraints (GlobalConstraint, GlobalInitConstraint, RegionalConstraint, RegionalInitConstraint)
     """
-    global_constraints      = []
-    global_constraints_init = []
-    regional_constraints    = []
-    regional_constraints_init = []
+    constraints = []
 
     m.damage_costs  = Var(m.t, m.regions)
     m.smoothed_factor = Var(m.t, bounds=(0,1))
@@ -42,48 +34,54 @@ def constraints(m):
     m.adapt_curr_level = Param()
     m.fixed_adaptation = Param()
 
-    global_constraints.append(
-        lambda m,t: ((
-            m.smoothed_factor[t] == (tanh(((m.temperature[t] - m.temperature[t-1]) / m.dt) / 1e-3)+1)*(1-m.perc_reversible_damages)/2 +m.perc_reversible_damages
-        ) if m.perc_reversible_damages < 1 and t > 0 else (m.smoothed_factor[t] == 1))
-    )
+    constraints.extend([
 
-    regional_constraints.append(
-        lambda m,t,r: (
-            m.gross_damages[t,r] == m.gross_damages[t-1, r] + m.dt * m.damage_scale_factor * (
-                damage_fct_dot(m.temperature[t], m, r)
-                * m.smoothed_factor[t] * (m.temperature[t] - m.temperature[t-1]) / m.dt)
-        ) if m.perc_reversible_damages < 1 and t > 0 else ( ### TODO the "and t > 0" might break things up here when perc_reversible < 1
-            m.gross_damages[t,r]  == m.damage_scale_factor * (
-                damage_fct(m.temperature[t], m.T0, m, r))
-        )
-    )
-
-    regional_constraints.extend([
-        lambda m,t,r: m.adapt_level[t,r]    == (
-            m.adapt_curr_level
-            if value(m.fixed_adaptation) else 
-            (
-                optimal_adapt_level(m.gross_damages[t,r], m, r)
-                if value(m.adapt_g1[r]) * value(m.adapt_g2[r]) > 0 else
-                0
-            )
+        # Smoothing factor for partially reversible damages
+        GlobalConstraint(
+            lambda m,t: ((
+                m.smoothed_factor[t] == (tanh(((m.temperature[t] - m.temperature[t-1]) / m.dt) / 1e-3)+1)*(1-m.perc_reversible_damages)/2 +m.perc_reversible_damages
+            ) if m.perc_reversible_damages < 1 and t > 0 else (m.smoothed_factor[t] == 1)),
+            name='smoothed_factor'
         ),
-        lambda m,t,r: m.resid_damages[t,r]  == m.gross_damages[t,r] * (1-m.adapt_level[t,r]),
-        lambda m,t,r: m.adapt_costs[t,r]    == adaptation_costs(m.adapt_level[t,r], m, r),
-        lambda m,t,r: m.damage_costs[t,r]   == m.resid_damages[t,r] + m.adapt_costs[t,r],
+
+        # Gross damages
+        RegionalConstraint(
+            lambda m,t,r: (
+                m.gross_damages[t,r] == m.gross_damages[t-1, r] + m.dt * m.damage_scale_factor * (
+                    damage_fct_dot(m.temperature[t], m, r)
+                    * m.smoothed_factor[t] * (m.temperature[t] - m.temperature[t-1]) / m.dt)
+            ) if m.perc_reversible_damages < 1 and t > 0 else ( ### TODO the "and t > 0" might break things up here when perc_reversible < 1
+                m.gross_damages[t,r]  == m.damage_scale_factor * (
+                    damage_fct(m.temperature[t], m.T0, m, r))
+            ),
+            name='gross_damages'
+        ),
+        RegionalConstraint(lambda m,t,r: m.gross_damages[t,r] >= 0),
+        RegionalInitConstraint(lambda m,r: m.gross_damages[0,r] == 0)
+
     ])
 
-    regional_constraints_init.extend([
-        lambda m,r: m.gross_damages[0,r] == 0
+
+    # Adaptation
+    constraints.extend([
+        RegionalConstraint(
+            lambda m,t,r: m.adapt_level[t,r] == (
+                m.adapt_curr_level
+                if value(m.fixed_adaptation) else 
+                (
+                    optimal_adapt_level(m.gross_damages[t,r], m, r)
+                    if value(m.adapt_g1[r]) * value(m.adapt_g2[r]) > 0 else
+                    0
+                )
+            ),
+            name='adapt_level'
+        ),
+        RegionalConstraint(lambda m,t,r: m.resid_damages[t,r]  == m.gross_damages[t,r] * (1-m.adapt_level[t,r]), 'resid_damages'),
+        RegionalConstraint(lambda m,t,r: m.adapt_costs[t,r]    == adaptation_costs(m.adapt_level[t,r], m, r), 'adapt_costs'),
+        RegionalConstraint(lambda m,t,r: m.damage_costs[t,r]   == m.resid_damages[t,r] + m.adapt_costs[t,r], 'damage_costs')
     ])
 
-    return {
-        'global':       global_constraints,
-        'global_init':  global_constraints_init,
-        'regional':     regional_constraints,
-        'regional_init': regional_constraints_init
-    }
+    return constraints
 
 
 
@@ -126,7 +124,7 @@ def adaptation_costs(P, m, r):
 
 def optimal_adapt_level(GD, m, r):
     eps = 0.001
-    return (GD / (m.adapt_g1[r] * m.adapt_g2[r]) + eps) ** (1/(m.adapt_g2[r]-1))
+    return pow(GD / (m.adapt_g1[r] * m.adapt_g2[r]) + eps, 1/(m.adapt_g2[r]-1), abs=True)
 
 
 def _adaptation_costs(P, gamma1, gamma2):

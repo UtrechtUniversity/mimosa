@@ -56,15 +56,3 @@ def timer(name):
         return wrapper
     return decorator
 
-
-    
-class FctToList:
-    def __init__(self, fct):
-        self.fct = fct
-    def __getitem__(self, item):
-        if type(item) == tuple:
-            return self.fct(*item)
-        else:
-            return self.fct(item)
-    def __call__(self, *item):
-        return self.__getitem__(item)

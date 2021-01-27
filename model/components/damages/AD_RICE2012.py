@@ -15,17 +15,9 @@ def constraints(m):
         m.damage_costs (sum of residual damages and adaptation costs multiplied by gross GDP)
 
     Returns:
-        dict: {
-            global:         global_constraints,
-            global_init:    global_constraints_init,
-            regional:       regional_constraints,
-            regional_init:  regional_constraints_init
-        }
+        list of constraints (GlobalConstraint, GlobalInitConstraint, RegionalConstraint, RegionalInitConstraint)
     """
-    global_constraints      = []
-    global_constraints_init = []
-    regional_constraints    = []
-    regional_constraints_init = []
+    constraints = []
 
     m.damage_costs  = Var(m.t, m.regions)
     m.gross_damages = Var(m.t, m.regions)
@@ -71,86 +63,48 @@ def constraints(m):
     m.total_SLR = Var(m.t)
     m.SLR_damages = Var(m.t, m.regions)
 
-    global_constraints.extend([
+    constraints.extend([
         # Thermal expansion
-        lambda m,t: m.SLR[t] == (1-m.S3)**(m.dt/10) * m.SLR[t-1] + m.S3 * (m.dt/10) * (m.temperature[t] * m.S1) if t > 0 else Constraint.Skip,
+        GlobalConstraint(lambda m,t: m.SLR[t] == (1-m.S3)**(m.dt/10) * m.SLR[t-1] + m.S3 * (m.dt/10) * (m.temperature[t] * m.S1) if t > 0 else Constraint.Skip, 'SLR_thermal'),
+        GlobalInitConstraint(lambda m: m.SLR[0] == m.S2 + m.S3 * (m.T0 * m.S1 - m.S2)),
 
         # GSIC
-        lambda m,t: m.CUMGSIC[t] == m.CUMGSIC[t-1] + m.M1 / m.M2 * m.dt * (m.M2 - m.CUMGSIC[t-1]) * (m.temperature[t-1] - m.M3) if t > 0 else Constraint.Skip,
+        GlobalConstraint(lambda m,t: m.CUMGSIC[t] == m.CUMGSIC[t-1] + m.M1 / m.M2 * m.dt * (m.M2 - m.CUMGSIC[t-1]) * (m.temperature[t-1] - m.M3) if t > 0 else Constraint.Skip, 'SLR_GSIC'),
+        GlobalInitConstraint(lambda m: m.CUMGSIC[0] == 0.015),
 
         # GIS
-        lambda m,t: m.CUMGIS[t] == m.CUMGIS[t-1] + (m.dt/10) * (1/100) * (m.M4 * m.temperature[t-1] + m.M5) * (1 - m.CUMGIS[t-1]/m.M6) if t > 0 else Constraint.Skip,
+        GlobalConstraint(lambda m,t: m.CUMGIS[t] == m.CUMGIS[t-1] + (m.dt/10) * (1/100) * (m.M4 * m.temperature[t-1] + m.M5) * (1 - m.CUMGIS[t-1]/m.M6) if t > 0 else Constraint.Skip, 'SLR_GIS'),
+        GlobalInitConstraint(lambda m: m.CUMGIS[0] == 0.006),
 
-        lambda m,t: m.total_SLR[t] == m.SLR[t] + m.CUMGSIC[t] + m.CUMGIS[t],
+        # SLR damages resulting from total SLR
+        GlobalConstraint(lambda m,t: m.total_SLR[t] == m.SLR[t] + m.CUMGSIC[t] + m.CUMGIS[t], 'total_SLR'),
+        RegionalConstraint(lambda m,t,r: m.SLR_damages[t,r] == 4 * (m.SLRdam1[r] * m.total_SLR[t] + m.SLRdam2[r] * m.total_SLR[t]**2) * pow(m.GDP_gross[t,r] / m.GDP_gross[0,r], 0.25, True), 'SLR_damages')
     ])
-    global_constraints_init.extend([
-        lambda m: m.SLR[0] == m.S2 + m.S3 * (m.T0 * m.S1 - m.S2),
-        lambda m: m.CUMGSIC[0] == 0.015,
-        lambda m: m.CUMGIS[0] == 0.006
-    ])
-    regional_constraints.append(
-        lambda m,t,r: m.SLR_damages[t,r] == 4 * (m.SLRdam1[r] * m.total_SLR[t] + m.SLRdam2[r] * m.total_SLR[t]**2) * (m.GDP_gross[t,r] / m.GDP_gross[0,r])**0.25
-    )
 
-    # Gross damages
-    regional_constraints.extend([
-        lambda m,t,r: m.gross_damages[t,r] == m.damage_scale_factor * damage_fct(m.temperature[t], m.T0, m, r),
-        lambda m,t,r: m.resid_damages[t,r] == m.gross_damages[t,r] / (1 + m.adapt_level[t,r]) + m.SLR_damages[t,r],
+    # Gross damages and adaptation levels
+    constraints.extend([
+        RegionalConstraint(lambda m,t,r: m.gross_damages[t,r] == m.damage_scale_factor * damage_fct(m.temperature[t], m.T0, m, r), 'gross_damages'),
+        RegionalConstraint(lambda m,t,r: m.resid_damages[t,r] == m.gross_damages[t,r] / (1 + m.adapt_level[t,r]) + m.SLR_damages[t,r], 'resid_damages'),
         
-        lambda m,t,r: m.adapt_level[t,r] == m.adap1[r] * (
-            m.adap2[r] * (m.adapt_FAD[t,r]**2) ** (m.adapt_rho/2)
-            +
-            (1-m.adap2[r]) * (m.adapt_SAD[t,r]**2) ** (m.adapt_rho/2) # Because of positive bounds, this is valid
-        ) ** (m.adap3[r] / m.adapt_rho),
-        #lambda m,t,r: m.adapt_FAD[t,r] == 0.0001,
-        lambda m,t,r: m.adapt_SAD[t,r] == (1-m.dk)**m.dt * m.adapt_SAD[t-1,r] + m.adapt_IAD[t,r] if t > 0 else Constraint.Skip,
-        lambda m,t,r: m.adapt_costs[t,r] == m.adapt_FAD[t,r] + m.adapt_IAD[t,r],
+        RegionalConstraint(lambda m,t,r: m.adapt_SAD[t,r] == (1-m.dk)**m.dt * m.adapt_SAD[t-1,r] + m.adapt_IAD[t,r] if t > 0 else Constraint.Skip, 'adapt_SAD'),
+        RegionalInitConstraint(lambda m,r: m.adapt_SAD[0,r] == 0),
+        RegionalInitConstraint(lambda m,r: m.adapt_IAD[0,r] == 0),
+        RegionalInitConstraint(lambda m,r: m.adapt_FAD[0,r] == 0),
 
-        lambda m,t,r: m.damage_costs[t,r] == m.resid_damages[t,r] + m.adapt_costs[t,r],
+        RegionalConstraint(
+            lambda m,t,r: m.adapt_level[t,r] == m.adap1[r] * (
+                m.adap2[r] * pow(m.adapt_FAD[t,r], m.adapt_rho, abs=True)
+                +
+                (1-m.adap2[r]) * pow(m.adapt_SAD[t,r], m.adapt_rho, abs=True)
+            ) ** (m.adap3[r] / m.adapt_rho),
+            name='adapt_level'
+        ),
+        RegionalConstraint(lambda m,t,r: m.adapt_costs[t,r] == m.adapt_FAD[t,r] + m.adapt_IAD[t,r], 'adapt_costs'),
+
+        RegionalConstraint(lambda m,t,r: m.damage_costs[t,r] == m.resid_damages[t,r] + m.adapt_costs[t,r], 'damage_costs'),
     ])
 
-    # Adaptation costs and residual damages
-    # regional_constraints.extend([
-        # lambda m,t,r: m.resid_damages[t,r]  == m.gross_damages[t,r] ,#/ (1 + m.adapt_level[t,r]),
-
-        # lambda m,t,r: m.adapt_level[t,r] == m.adap1[r] * (
-        #     ( m.adap2[r]    * m.adapt_FAD[t,r]**m.adapt_rho)
-        #     +
-        #     ((1-m.adap2[r]) * m.adapt_SAD[t,r]**m.adapt_rho)
-        # ) ** (m.adap3[r] / m.adapt_rho),
-
-        # lambda m,t,r: m.adapt_level[t,r] == m.adap1[r] * (
-        #     ( m.adap2[r]    * m.adapt_FAD[t,r])
-            
-        # ) ** (m.adap3[r]),
-
-        # lambda m,t,r: m.adapt_level[t,r]    == m.adap1[r] * (
-        #     m.adap2[r]     * sqrt(m.adapt_FAD[t,r]) +
-        #     (1-m.adap2[r]) * sqrt(m.adapt_SAD[t,r])
-        # )** (2 * m.adap3[r]),
-
-        # NOTE: Not sure if " * m.dt" should be here
-        #lambda m,t,r: m.adapt_costs[t,r]  == (m.adapt_FAD[t,r]),# + m.adapt_IAD[t,r]),
-        #lambda m,t,r: m.adapt_SADdot[t,r] == np.log(1-m.dk) * m.adapt_SAD[t,r] + m.adapt_IAD[t,r], 
-    # ])
-
-    # regional_constraints.extend([
-    #     lambda m,t,r: m.damage_costs[t,r] == m.resid_damages[t,r] * m.GDP_gross[t,r]# + m.adapt_costs[t,r]
-    # ])
-
-    regional_constraints_init.extend([
-        lambda m,r: m.adapt_FAD[0,r] == 0,
-        lambda m,r: m.adapt_SAD[0,r] == 0,
-        lambda m,r: m.adapt_IAD[0,r] == 0,
-    #     # lambda m,r: m.gross_damages[0,r] == 0
-    ])
-
-    return {
-        'global':       global_constraints,
-        'global_init':  global_constraints_init,
-        'regional':     regional_constraints,
-        'regional_init': regional_constraints_init
-    }
+    return constraints
 
 
 

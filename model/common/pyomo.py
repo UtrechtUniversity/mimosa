@@ -11,6 +11,13 @@ from pyomo.environ import (
     NonNegativeReals
 )
 
+####### Extra functions
+def pow(x, a, abs=False):
+    if abs:
+        return (x**2)**(a/2)
+    else:
+        return x**a
+
 ####### Constraints
 
 class GeneralConstraint(ABC):

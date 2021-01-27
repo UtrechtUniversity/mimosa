@@ -37,7 +37,7 @@ class MIMOSA:
         return abstract_models[damage_module]
 
 
-    # @utils.timer('Concrete model creation')
+    @utils.timer('Concrete model creation')
     def create_instance(self):
         
         # Create the data store
@@ -56,7 +56,7 @@ class MIMOSA:
         params = self.params
 
         num_years = int(np.ceil((params['time']['end'] - params['time']['start'])/params['time']['dt']))+1
-        self.abstract_model.year = utils.FctToList(lambda t: params['time']['start'] + t * params['time']['dt'])
+        self.abstract_model.year = lambda t: params['time']['start'] + t * params['time']['dt']
 
         instance_data = {None: {
             'beginyear':        v(params['time']['start']),
@@ -184,12 +184,12 @@ class MIMOSA:
 
 
     @utils.timer('Model solve')
-    def solve(self, verbose=False):
+    def solve(self, verbose=False, halt_on_ampl_error='no'):
         # solver_manager = SolverManagerFactory('neos')
         # solver = 'conopt' # 'ipopt'
         # results = solver_manager.solve(self.m, opt=solver)
         opt = SolverFactory('ipopt')
-        opt.options['halt_on_ampl_error'] = 'yes'
+        opt.options['halt_on_ampl_error'] = halt_on_ampl_error
         results = opt.solve(self.m, tee=verbose, symbolic_solver_labels=True)
 
         # Restore aggregated variables

@@ -81,12 +81,12 @@ def constraints(m):
             lambda m,t: m.cumulative_emissions[t] - (
                 m.budget + 
                 (m.overshoot[t] * (1-m.perc_reversible_damages) if value(m.perc_reversible_damages) < 1 else 0)
-            ) <= 0   if (value(m.year[t]) >= 2100 and value(m.budget) is not False) else Constraint.Skip,
+            ) <= 0   if (m.year(t) >= 2100 and value(m.budget) is not False) else Constraint.Skip,
             name='carbon_budget'
         ),
         GlobalConstraint(
             lambda m,t: m.global_emissions[t] <= 0                  if (
-                value(m.year[t]) >= 2100 and
+                m.year(t) >= 2100 and
                 value(m.no_pos_emissions_after_budget_year) is True and
                 value(m.budget) is not False
             ) else Constraint.Skip,
