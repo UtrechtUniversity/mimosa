@@ -64,7 +64,7 @@ def create_abstract_model(damage_module='RICE'):
         constraints.extend(damages.AD_RICE2010.constraints(m))
     elif damage_module == 'WITCH':
         constraints.extend(damages.AD_WITCH.constraints(m))
-    if damage_module == 'RICE2012':
+    elif damage_module == 'RICE2012':
         constraints.extend(damages.AD_RICE2012.constraints(m))
     else:
         raise NotImplementedError
