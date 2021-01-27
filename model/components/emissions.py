@@ -38,11 +38,11 @@ def constraints(m):
 
     regional_constraints.extend([
         lambda m,t,r: (
-            m.baseline[t, r] == m.carbon_intensity[t, r] * m.GDP_net[t, r]
+            m.baseline[t, r] == m.carbon_intensity(m.year(t),r) * m.GDP_net[t, r]
         ) if value(m.baseline_carbon_intensity) else (
-            m.baseline[t, r] == m.baseline_emissions[t, r]
+            m.baseline[t, r] == m.baseline_emissions(m.year(t), r)
         ),
-        lambda m,t,r: m.regional_emissions[t,r] == (1-m.relative_abatement[t,r]) * m.baseline_emissions[t,r]
+        lambda m,t,r: m.regional_emissions[t,r] == (1-m.relative_abatement[t,r]) * m.baseline_emissions(m.year(t),r)
     ])
     global_constraints.append(lambda m,t: m.global_emissions[t] == sum(m.regional_emissions[t,r] for r in m.regions))
     global_constraints.append(lambda m,t: m.cumulative_emissions[t] == m.cumulative_emissions[t-1] + m.dt * m.global_emissions[t] if t > 0 else Constraint.Skip)
@@ -80,7 +80,7 @@ def constraints(m):
             (m.overshoot[t] * (1-m.perc_reversible_damages) if value(m.perc_reversible_damages) < 1 else 0)
         ) <= 0   if (value(m.year[t]) >= 2100 and value(m.budget) is not False) else Constraint.Skip,
         lambda m,t: m.cumulative_emissions[t] >= 0,
-        lambda m,t: m.global_emissions[t] - m.global_emissions[t-1] >= m.dt * m.inertia_global * sum(m.baseline_emissions[0, r] for r in m.regions) \
+        lambda m,t: m.global_emissions[t] - m.global_emissions[t-1] >= m.dt * m.inertia_global * sum(m.baseline_emissions(m.year(0), r) for r in m.regions) \
                                                                 if value(m.inertia_global) is not False and t > 0 else Constraint.Skip,
         lambda m,t: m.global_emissions[t] >= m.min_level        if value(m.min_level) is not False else Constraint.Skip,
         lambda m,t: m.global_emissions[t] <= 0                  if (
@@ -90,7 +90,7 @@ def constraints(m):
             ) else Constraint.Skip
     ])
     regional_constraints.append(
-        lambda m,t,r: m.regional_emissions[t, r] - m.regional_emissions[t-1, r] >= m.dt * m.inertia_regional * m.baseline_emissions[0, r] \
+        lambda m,t,r: m.regional_emissions[t, r] - m.regional_emissions[t-1, r] >= m.dt * m.inertia_regional * m.baseline_emissions(m.year(0), r) \
                                                                 if value(m.inertia_regional) is not False and t > 0 else Constraint.Skip
     )
 
@@ -98,18 +98,18 @@ def constraints(m):
     m.emission_relative_cumulative = Var(m.t)
     global_constraints.append(
         lambda m,t: (
-            m.emission_relative_cumulative[t] == m.cumulative_emissions[t] / sum(m.baseline_cumulative(t, r) for r in m.regions)
+            m.emission_relative_cumulative[t] == m.cumulative_emissions[t] / sum(m.baseline_cumulative(m.year(0), m.year(t), r) for r in m.regions)
          ) if t > 0 else Constraint.Skip
     )
 
     global_constraints_init.extend([
         lambda m: m.temperature[0] == m.T0,
-        lambda m: m.global_emissions[0] == sum(m.baseline_emissions[0,r] for r in m.regions),
+        lambda m: m.global_emissions[0] == sum(m.baseline_emissions(m.year(0),r) for r in m.regions),
         lambda m: m.cumulative_emissions[0] == 0,
         lambda m: m.emission_relative_cumulative[0] == 1
     ])
     regional_constraints_init.extend([
-        lambda m,r: m.regional_emissions[0,r] == m.baseline_emissions[0,r]
+        lambda m,r: m.regional_emissions[0,r] == m.baseline_emissions(m.year(0),r)
     ])
 
     return {

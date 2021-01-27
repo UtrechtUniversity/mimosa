@@ -122,6 +122,19 @@ class MIMOSA:
                 'adap2':                self.data_store.get_regional('adaptation', 'nu2'),
                 'adap3':                self.data_store.get_regional('adaptation', 'nu3'),
                 'adapt_rho':            v(0.5),
+
+                # Sea level rise:
+                'S1':                   v(0.5),
+                'S2':                   v(0.0920666936642),
+                'S3':                   v(0.024076141150722),
+                'M1':                   v(0.0008),
+                'M2':                   v(0.26),
+                'M3':                   v(-1),
+                'M4':                   v(1.11860081578514),
+                'M5':                   v(0.6),
+                'M6':                   v(7.3),
+                'SLRdam1':              self.data_store.get_regional('damages', 'SLRDAM1'),
+                'SLRdam2':              self.data_store.get_regional('damages', 'SLRDAM2')
             })
 
         # For WITCH damage/adaption:
@@ -176,7 +189,8 @@ class MIMOSA:
         # solver = 'conopt' # 'ipopt'
         # results = solver_manager.solve(self.m, opt=solver)
         opt = SolverFactory('ipopt')
-        results = opt.solve(self.m, tee=verbose)
+        opt.options['halt_on_ampl_error'] = 'yes'
+        results = opt.solve(self.m, tee=verbose, symbolic_solver_labels=True)
 
         # Restore aggregated variables
         if len(self.regions) > 1:

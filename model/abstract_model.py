@@ -48,9 +48,9 @@ def create_abstract_model(damage_module='RICE'):
     m.TFP                   = None
     m.GDP                   = None
     m.carbon_intensity      = None
-    def baseline_cumulative(t_end, region):
-        t_values = np.linspace(0, t_end, 100)
-        return np.trapz(m.baseline_emissions[t_values, region], x=t_values)
+    def baseline_cumulative(year_start, year_end, region):
+        years = np.linspace(year_start, year_end, 100)
+        return np.trapz(m.baseline_emissions(years, region), x=years)
     m.baseline_cumulative = baseline_cumulative
 
 
@@ -109,19 +109,32 @@ def create_abstract_model(damage_module='RICE'):
 
     m.NPV = Var(m.t)
     m.PRTP = Param()
-    global_constraints.append(lambda m,t: m.NPV[t] == m.NPV[t-1] + m.dt * exp(-m.PRTP * (m.year[t] - m.beginyear)) * sum(m.L[t,r] * m.utility[t,r] for r in m.regions) if t > 0 else Constraint.Skip)
+    global_constraints.append(lambda m,t: m.NPV[t] == m.NPV[t-1] + m.dt * exp(-m.PRTP * (m.year[t] - m.beginyear)) * sum(m.L(m.year(t),r) * m.utility[t,r] for r in m.regions) if t > 0 else Constraint.Skip)
     global_constraints_init.append(lambda m: m.NPV[0] == 0)
 
+    
         
     for fct in global_constraints:
-        utils.add_constraint(m, Constraint(m.t, rule=fct))
+        name, fct = name_and_fct(fct)
+        fullname = utils.add_constraint(m, Constraint(m.t, rule=fct), name)
     for fct in global_constraints_init:
-        utils.add_constraint(m, Constraint(rule=fct))
+        name, fct = name_and_fct(fct)
+        fullname = utils.add_constraint(m, Constraint(rule=fct), name)
     for fct in regional_constraints:
-        utils.add_constraint(m, Constraint(m.t, m.regions, rule=fct))
+        name, fct = name_and_fct(fct)
+        fullname = utils.add_constraint(m, Constraint(m.t, m.regions, rule=fct), name)
     for fct in regional_constraints_init:
-        utils.add_constraint(m, Constraint(m.regions, rule=fct))
+        name, fct = name_and_fct(fct)
+        fullname = utils.add_constraint(m, Constraint(m.regions, rule=fct), name)
 
     m.obj = Objective(rule=lambda m: m.NPV[m.tf], sense=maximize)
 
     return m
+
+def name_and_fct(fct):
+    if isinstance(fct, tuple):
+        name = fct[1]
+        fct = fct[0]
+    else:
+        name = None
+    return name, fct

@@ -4,7 +4,7 @@ from pyomo.environ import (
     TransformationFactory, SolverFactory, SolverStatus,
     Objective, Param, Var, Constraint, 
     value, maximize, 
-    log, exp, tanh, 
+    log, exp, tanh, sqrt,
     NonNegativeReals
 )
 # from pyomo.dae import DerivativeVar, ContinuousSet

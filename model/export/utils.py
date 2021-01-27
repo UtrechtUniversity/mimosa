@@ -11,7 +11,7 @@ class Plot:
     def __init__(self, m, numrows=4, globalrows=[4], coltitles=None, **kwargs):
         self.m = m
         self.regions = m.regions
-        self.years = value(m.beginyear) + np.array(m.t)
+        self.years = m.year(np.array(m.t))
         self.t = m.t
         
         n = len(m.regions)
