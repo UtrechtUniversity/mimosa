@@ -68,6 +68,3 @@ def MAC(a, factor, gamma, beta):
 
 def AC(a, factor, gamma, beta):
     return gamma * factor * a**(beta+1) / (beta+1)
-
-def soft_relu(x, a=10.0):
-    return 1/a * log(1+exp(a*x))

@@ -21,6 +21,8 @@ def full_plot(m, filename):
     plot.add(m.capital_stock, row=3)
     plot.add(m.GDP_gross, row=3)
     plot.add(m.GDP_net, row=3)
+    plot.add(m.consumption, row=3, visible='legendonly')
+    plot.add(m.utility, row=3, secondary_y=True, visible='legendonly')
     plot.add(m.abatement_costs, row=3, visible='legendonly')
     plot.add(m.global_emissions, is_regional=False, row=4)
     plot.add(m.temperature, is_regional=False, row=4, secondary_y=True)

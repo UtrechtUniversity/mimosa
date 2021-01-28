@@ -32,7 +32,7 @@ def constraints(m):
 
     m.adapt_level   = Var(m.t, m.regions, within=NonNegativeReals)
     m.adapt_costs   = Var(m.t, m.regions)
-    m.adapt_FAD     = Var(m.t, m.regions, bounds=(0, 0.05))
+    m.adapt_FAD     = Var(m.t, m.regions, bounds=(0, 0.15))
     m.adapt_IAD     = Var(m.t, m.regions, bounds=(0, 0.15))
     m.adap1     = Param(m.regions)
     m.adap2     = Param(m.regions)
@@ -131,13 +131,3 @@ def _damage_fct(T, a1, a2, a3, T0=None):
     if T0 is not None:
         dmg -= fct(T0)
     return dmg
-
-
-# Adaptation cost function
-
-def adaptation_costs(P, m, r):
-    return _adaptation_costs(P, m.adapt_g1[r], m.adapt_g2[r])
-
-
-def _adaptation_costs(P, gamma1, gamma2):
-    return gamma1 * P**gamma2

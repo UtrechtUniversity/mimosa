@@ -18,6 +18,9 @@ def pow(x, a, abs=False):
     else:
         return x**a
 
+def soft_relu(x, a=10.0):
+    return 1/a * log(1+exp(a*x))
+
 ####### Constraints
 
 class GeneralConstraint(ABC):
