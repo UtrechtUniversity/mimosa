@@ -27,7 +27,7 @@ class MIMOSA:
 
         self.abstract_model = self.get_abstract_model()
         self.m = self.create_instance()
-        self.discretize()
+        self.preparation()
 
     def get_abstract_model(self):
         damage_module = self.params['model']['damage module']
@@ -162,16 +162,7 @@ class MIMOSA:
         return m
     
 
-    # @utils.timer('Time discretisation')
-    def discretize(self):
-
-
-        # num_steps = int(self.m.tf/self.params['time']['dt'])
-        # discretizer = TransformationFactory('dae.finite_difference')
-        # discretizer.apply_to(self.m, nfe=num_steps, scheme='BACKWARD')
-
-        # discretizer = TransformationFactory('dae.collocation')
-        # discretizer.apply_to(self.m, nfe=10, ncp=6)
+    def preparation(self):
 
         if len(self.regions) > 1:
             TransformationFactory('contrib.aggregate_vars').apply_to(self.m)
@@ -180,7 +171,6 @@ class MIMOSA:
         if len(self.regions) > 1:
             TransformationFactory('contrib.propagate_fixed_vars').apply_to(self.m)
 
-        # self.m.baseline.fix()
 
 
     @utils.timer('Model solve')
