@@ -21,6 +21,8 @@ def full_plot(m, filename):
     plot.add(m.capital_stock, row=3)
     plot.add(m.GDP_gross, row=3)
     plot.add(m.GDP_net, row=3)
+    plot.add(m.consumption, row=3, visible='legendonly')
+    plot.add(m.utility, row=3, secondary_y=True, visible='legendonly')
     plot.add(m.abatement_costs, row=3, visible='legendonly')
     plot.add(m.global_emissions, is_regional=False, row=4)
     plot.add(m.temperature, is_regional=False, row=4, secondary_y=True)
@@ -45,6 +47,13 @@ def full_plot(m, filename):
         plot.add(m.adapt_FAD, row=2, secondary_y=True, visible='legendonly')
         plot.add(m.adapt_SAD, row=2, secondary_y=True, visible='legendonly')
         plot.add(m.adapt_IAD, row=2, secondary_y=True, visible='legendonly')
+        plot.add(m.SLR_damages, row=2, visible='legendonly')
+        plot.add(m.total_SLR, is_regional=False, row=4, secondary_y=True, visible='legendonly')
+        plot.add(m.SLR, is_regional=False, row=4, secondary_y=True, visible='legendonly')
+        plot.add(m.CUMGSIC, is_regional=False, row=4, secondary_y=True, visible='legendonly')
+        plot.add(m.CUMGIS, is_regional=False, row=4, secondary_y=True, visible='legendonly')
+        plot.add(m.LBD_factor , is_regional=False, row=4, secondary_y=True, visible='legendonly')
+        plot.add(m.test , is_regional=False, row=4, secondary_y=True, visible='legendonly')
     except:
         pass
 

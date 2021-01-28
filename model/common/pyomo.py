@@ -1,10 +1,58 @@
+import typing
+from abc import ABC, abstractmethod
+
 from pyomo.environ import (
     AbstractModel,
     Set, 
     TransformationFactory, SolverFactory, SolverStatus,
     Objective, Param, Var, Constraint, 
     value, maximize, 
-    log, exp, tanh, 
+    log, exp, tanh, sqrt,
     NonNegativeReals
 )
-from pyomo.dae import DerivativeVar, ContinuousSet
+
+####### Extra functions
+def pow(x, a, abs=False):
+    if abs:
+        return (x**2)**(a/2)
+    else:
+        return x**a
+
+def soft_relu(x, a=10.0):
+    return 1/a * log(1+exp(a*x))
+
+####### Constraints
+
+class GeneralConstraint(ABC):
+    
+    def __init__(self, rule: typing.Callable, name: str=None):
+        """Adds a constraint to the Pyomo model.
+
+        Args:
+            rule (typing.Callable): function with parameters m, [t], [r]
+            name (str, optional): name of the constraint, useful for debugging. Defaults to None.
+        """
+
+        self.name = name
+        self.rule = rule
+
+    @abstractmethod
+    def to_pyomo_constraint(self, m):
+        pass
+
+
+class GlobalConstraint(GeneralConstraint):
+    def to_pyomo_constraint(self, m):
+        return Constraint(m.t, rule=self.rule)
+
+class GlobalInitConstraint(GeneralConstraint):
+    def to_pyomo_constraint(self, m):
+        return Constraint(rule=self.rule)
+
+class RegionalConstraint(GeneralConstraint):
+    def to_pyomo_constraint(self, m):
+        return Constraint(m.t, m.regions, rule=self.rule)
+
+class RegionalInitConstraint(GeneralConstraint):
+    def to_pyomo_constraint(self, m):
+        return Constraint(m.regions, rule=self.rule)

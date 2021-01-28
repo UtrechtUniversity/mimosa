@@ -15,17 +15,9 @@ def constraints(m):
         m.damage_costs (sum of residual damages and adaptation costs, % of GDP)
 
     Returns:
-        dict: {
-            global:         global_constraints,
-            global_init:    global_constraints_init,
-            regional:       regional_constraints,
-            regional_init:  regional_constraints_init
-        }
+        list of constraints (GlobalConstraint, GlobalInitConstraint, RegionalConstraint, RegionalInitConstraint)
     """
-    global_constraints      = []
-    global_constraints_init = []
-    regional_constraints    = []
-    regional_constraints_init = []
+    constraints = []
 
     m.damage_costs  = Var(m.t, m.regions)
 
@@ -47,9 +39,9 @@ def constraints(m):
 
     m.damage_scale_factor = Param()
 
-    regional_constraints.extend([
-        lambda m,t,r: m.gross_damages[t,r] == m.damage_scale_factor * damage_fct(m.temperature[t], 0, m.T0, m, r),
-        lambda m,t,r: m.resid_damages[t,r] == m.damage_scale_factor * damage_fct(m.temperature[t], m.adapt_Q_ada[t,r]**m.adapt_eps[r], m.T0, m, r)
+    constraints.extend([
+        RegionalConstraint(lambda m,t,r: m.gross_damages[t,r] == m.damage_scale_factor * damage_fct(m.temperature[t], 0, m.T0, m, r), 'gross_damages'),
+        RegionalConstraint(lambda m,t,r: m.resid_damages[t,r] == m.damage_scale_factor * damage_fct(m.temperature[t], pow(m.adapt_Q_ada[t,r], m.adapt_eps[r], True), m.T0, m, r), 'resid_damages')
     ])
 
     # Adaptation costs (protection costs, PC)
@@ -59,13 +51,17 @@ def constraints(m):
     # m.adapt_costs_speccap     = Var(m.t, m.regions) # I_SCAP, specific adaptive capacity
     m.fixed_adaptation = Param()
 
-    regional_constraints.append(
-        lambda m,t,r: m.adapt_costs[t,r] == (
-            m.adapt_costs_reactive[t,r] # +
-            # m.adapt_costs_proactive[t,r] +
-            # m.adapt_costs_speccap[t,r]
-        )
-    )
+    constraints.extend([
+        RegionalConstraint(
+            lambda m,t,r: m.adapt_costs[t,r] == (
+                m.adapt_costs_reactive[t,r] # +
+                # m.adapt_costs_proactive[t,r] +
+                # m.adapt_costs_speccap[t,r]
+            ),
+            name='adapt_costs'
+        ),
+        RegionalInitConstraint(lambda m,r: m.adapt_costs_reactive[0,r] == 0)
+    ])
 
     ## Nested Constant Elasticity of Substitution (CES)
 
@@ -80,8 +76,11 @@ def constraints(m):
     # m.adapt_Q_act = Var(m.t, m.regions, initialize=0.1)
     m.adapt_Q_cap = Var(m.t, m.regions, initialize=0.1)
 
-    regional_constraints.extend([
-        lambda m,t,r: m.adapt_Q_ada[t,r] == m.adapt_omega_eff_ada[r] * m.adapt_omega_eff_act[r] * m.adapt_costs_reactive[t,r]
+    constraints.extend([
+        RegionalConstraint(lambda m,t,r: m.adapt_Q_ada[t,r] == m.adapt_omega_eff_ada[r] * m.adapt_omega_eff_act[r] * m.adapt_costs_reactive[t,r], 'adapt_Q_ada'),
+
+        # Extra constraint necessary to avoid negative GDP
+        RegionalConstraint(lambda m,t,r: m.GDP_net[t,r] >= 0)
     ])
 
     # regional_constraints.append(lambda m,t,r: m.adapt_Q_ada[t,r] == CES(
@@ -111,22 +110,11 @@ def constraints(m):
     # ])
 
     
-    regional_constraints.extend([
-        lambda m,t,r: m.damage_costs[t,r] == m.resid_damages[t,r] + m.adapt_costs[t,r]
+    constraints.extend([
+        RegionalConstraint(lambda m,t,r: m.damage_costs[t,r] == m.resid_damages[t,r] + m.adapt_costs[t,r], 'damage_costs')
     ])
 
-    regional_constraints_init.extend([
-        # lambda m,r: m.adapt_K_proactive[0,r] == 0,
-        lambda m,r: m.adapt_costs_reactive[0,r] == 0,
-        # lambda m,r: m.adapt_costs[0,r] == 0
-    ])
-
-    return {
-        'global':       global_constraints,
-        'global_init':  global_constraints_init,
-        'regional':     regional_constraints,
-        'regional_init': regional_constraints_init
-    }
+    return constraints
 
 
 

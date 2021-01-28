@@ -152,12 +152,11 @@ class DataStore:
             'unit': unit
         }
     
-    def interp_data(self, t, region, variable):
-        year = self.params['time']['start'] + t
+    def interp_data(self, year, region, variable):
         return np.interp(year, self.data_years, self.data_values[variable][region])
 
     def data_object(self, variable):
-        return utils.FctToList(lambda t, region: self.interp_data(t, region, variable))
+        return lambda year, region: self.interp_data(year, region, variable)
 
     def get_regional(self, *params):
         return {r: self._get_regional_param(params, r) for r in self.params['regions']}

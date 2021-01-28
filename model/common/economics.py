@@ -34,7 +34,7 @@ def calc_dKdt(K, dk, I, dt):
     # return ( (1-dk)**dt - 1)/dt * K + I
 
 def calc_GDP(TFP, L, K, alpha):
-    return TFP * L**(1-alpha) * K**alpha
+    return TFP * L**(1-alpha) * (K**2)**(alpha/2)
 
 
 

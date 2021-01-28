@@ -37,7 +37,7 @@ class MIMOSA:
         return abstract_models[damage_module]
 
 
-    # @utils.timer('Concrete model creation')
+    @utils.timer('Concrete model creation')
     def create_instance(self):
         
         # Create the data store
@@ -55,10 +55,14 @@ class MIMOSA:
         quant  = self.quant
         params = self.params
 
+        num_years = int(np.ceil((params['time']['end'] - params['time']['start'])/params['time']['dt']))+1
+        self.abstract_model.year = lambda t: params['time']['start'] + t * params['time']['dt']
+
         instance_data = {None: {
             'beginyear':        v(params['time']['start']),
-            'endyear':          v(params['time']['end']),
             'dt':               v(params['time']['dt']),
+            'tf':               v(num_years-1),
+            't':                v(range(num_years)),
             'regions':          v(params['regions'].keys()),
             
             'baseline_carbon_intensity': v(params['emissions']['baseline carbon intensity']),
@@ -118,6 +122,19 @@ class MIMOSA:
                 'adap2':                self.data_store.get_regional('adaptation', 'nu2'),
                 'adap3':                self.data_store.get_regional('adaptation', 'nu3'),
                 'adapt_rho':            v(0.5),
+
+                # Sea level rise:
+                'S1':                   v(0.5),
+                'S2':                   v(0.0920666936642),
+                'S3':                   v(0.024076141150722),
+                'M1':                   v(0.0008),
+                'M2':                   v(0.26),
+                'M3':                   v(-1),
+                'M4':                   v(1.11860081578514),
+                'M5':                   v(0.6),
+                'M6':                   v(7.3),
+                'SLRdam1':              self.data_store.get_regional('damages', 'SLRDAM1'),
+                'SLRdam2':              self.data_store.get_regional('damages', 'SLRDAM2')
             })
 
         # For WITCH damage/adaption:
@@ -149,9 +166,10 @@ class MIMOSA:
     def discretize(self):
 
 
-        num_steps = int(self.m.tf/self.params['time']['dt'])
-        discretizer = TransformationFactory('dae.finite_difference')
-        discretizer.apply_to(self.m, nfe=num_steps, scheme='BACKWARD')
+        # num_steps = int(self.m.tf/self.params['time']['dt'])
+        # discretizer = TransformationFactory('dae.finite_difference')
+        # discretizer.apply_to(self.m, nfe=num_steps, scheme='BACKWARD')
+
         # discretizer = TransformationFactory('dae.collocation')
         # discretizer.apply_to(self.m, nfe=10, ncp=6)
 
@@ -166,12 +184,13 @@ class MIMOSA:
 
 
     @utils.timer('Model solve')
-    def solve(self, verbose=False):
+    def solve(self, verbose=False, halt_on_ampl_error='no'):
         # solver_manager = SolverManagerFactory('neos')
         # solver = 'conopt' # 'ipopt'
         # results = solver_manager.solve(self.m, opt=solver)
         opt = SolverFactory('ipopt')
-        results = opt.solve(self.m, tee=verbose)
+        opt.options['halt_on_ampl_error'] = halt_on_ampl_error
+        results = opt.solve(self.m, tee=verbose, symbolic_solver_labels=True)
 
         # Restore aggregated variables
         if len(self.regions) > 1:
