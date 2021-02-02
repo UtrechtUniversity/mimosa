@@ -195,8 +195,8 @@ class MIMOSA:
         print('Final NPV:', value(self.m.NPV[self.m.tf]))
 
     @utils.timer('Plotting results')
-    def plot(self, filename='result'):
-        full_plot(self.m, filename)
+    def plot(self, filename='result', **kwargs):
+        full_plot(self.m, filename, **kwargs)
 
     def save(self, experiment=None, **kwargs):
         save_output(self.params, self.m, experiment, **kwargs)

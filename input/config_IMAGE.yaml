@@ -1,0 +1,209 @@
+regions:
+  # World:
+  #   initial capital: 190 trillion US$2005/yr
+  #   damages:
+  #     a1: 0
+  #     a2: 0.010038
+  #     a3: 2
+  #   adaptation:
+  #     g1: 0.115
+  #     g2: 3.6
+  # R5.2OECD:
+  #   initial capital: 80000 billion US$2005/yr
+  #   damages: $regional
+  #   adaptation: $regional
+  # R5.2ASIA:
+  #   initial capital: 45 trillion US$2005/yr
+  #   damages: $regional
+  #   adaptation: $regional
+  # R5.2LAM:
+  #   initial capital: 20 trillion US$2005/yr
+  #   damages: $regional
+  #   adaptation: $regional
+  # R5.2MAF:
+  #   initial capital: 20 trillion US$2005/yr
+  #   damages: $regional
+  #   adaptation: $regional
+  # R5.2REF:
+  #   initial capital: 10 trillion US$2005/yr
+  #   damages: $regional
+  #   adaptation: $regional
+  BRA:
+   initial capital: 7473 billion US$2005/yr
+   damages: $regional
+   adaptation: $regional
+  CAN:
+   initial capital: 4027 billion US$2005/yr
+   damages: $regional
+   adaptation: $regional
+  CEU:
+   initial capital: 8318 billion US$2005/yr
+   damages: $regional
+   adaptation: $regional
+  CHN:
+   initial capital: 60695 billion US$2005/yr
+   damages: $regional
+   adaptation: $regional
+  # EAF:
+  #  initial capital: 1239 billion US$2005/yr
+  #  damages: $regional
+  #  adaptation: $regional
+  INDIA:
+   initial capital: 15505 billion US$2005/yr
+   damages: $regional
+   adaptation: $regional
+  INDO:
+   initial capital: 4932 billion US$2005/yr
+   damages: $regional
+   adaptation: $regional
+  JAP:
+   initial capital: 17962 billion US$2005/yr
+   damages: $regional
+   adaptation: $regional
+  KOR:
+   initial capital: 6117 billion US$2005/yr
+   damages: $regional
+   adaptation: $regional
+  ME:
+   initial capital: 12937 billion US$2005/yr
+   damages: $regional
+   adaptation: $regional
+  MEX:
+   initial capital: 4373 billion US$2005/yr
+   damages: $regional
+   adaptation: $regional
+  NAF:
+   initial capital: 4122 billion US$2005/yr
+   damages: $regional
+   adaptation: $regional
+  OCE:
+   initial capital: 3797 billion US$2005/yr
+   damages: $regional
+   adaptation: $regional
+  RCAM:
+   initial capital: 2508 billion US$2005/yr
+   damages: $regional
+   adaptation: $regional
+  # RSAF:
+  #  initial capital: 1426 billion US$2005/yr
+  #  damages: $regional
+  #  adaptation: $regional
+  RSAM:
+   initial capital: 8500 billion US$2005/yr
+   damages: $regional
+   adaptation: $regional
+  # RSAS:
+  #  initial capital: 2695 billion US$2005/yr
+  #  damages: $regional
+  #  adaptation: $regional
+  RUS:
+   initial capital: 19438 billion US$2005/yr
+   damages: $regional
+   adaptation: $regional
+  SAF:
+   initial capital: 2046 billion US$2005/yr
+   damages: $regional
+   adaptation: $regional
+  SEAS:
+   initial capital: 9428 billion US$2005/yr
+   damages: $regional
+   adaptation: $regional
+  STAN:
+   initial capital: 3095 billion US$2005/yr
+   damages: $regional
+   adaptation: $regional
+  TUR:
+   initial capital: 4097 billion US$2005/yr
+   damages: $regional
+   adaptation: $regional
+  UKR:
+   initial capital: 3313 billion US$2005/yr
+   damages: $regional
+   adaptation: $regional
+  USA:
+   initial capital: 35304 billion US$2005/yr
+   damages: $regional
+   adaptation: $regional
+  # WAF:
+  #  initial capital: 2420 billion US$2005/yr
+  #  damages: $regional
+  #  adaptation: $regional
+  WEU:
+   initial capital: 43305 billion US$2005/yr
+   damages: $regional
+   adaptation: $regional
+
+
+input:
+  db_filename: input/data/data_IMAGE_SSP.csv
+  # db_filename: ../../Databases/SSP_IAM_V2_201811.csv
+  baselines:
+    SSP1:
+      scenario: SSP1-Ref-SPA0-V17
+      model: IMAGE
+    SSP2:
+      scenario: SSP2-Ref-SPA0-V17
+      model: IMAGE
+    SSP3:
+      scenario: SSP3-Ref-SPA0-V17
+      model: IMAGE
+    SSP4:
+      scenario: SSP4-Ref-SPA0-V17
+      model: IMAGE
+    SSP5:
+      scenario: SSP5-Ref-SPA0-V17
+      model: IMAGE
+
+  variables:
+    GDP: GDP|PPP
+    emissions: Emissions|CO2
+    population: Population
+
+time:
+  start: 2020
+  end: 2125
+  dt: 1
+
+SSP: 'SSP2'
+
+economics:
+  PRTP: 0.015
+  elasmu: 1.45
+  GDP:
+    alpha: 0.3
+    depreciation of capital: 0.1
+    savings rate: 0.21
+  MAC:
+    beta: 2
+    rho: 0.82
+    gamma: 2442 USD2005/tCO2
+  damages:
+    percentage reversible: 1
+    scale factor: 1
+    ignore damages: False
+  adaptation:
+    curr_level: 0
+    fixed: False
+
+emissions:
+  carbonbudget: 800 GtCO2     # False or a quantity
+  min level: -20 GtCO2/yr     # False or a quantity
+  not positive after budget year: True
+  baseline carbon intensity: True
+  inertia:
+    global: False     # False or a number < 0, % of initial emissions
+    regional: -0.05     # False or a number < 0, % of initial emissions
+
+temperature:
+  initial: 1.096224 delta_degC
+  TCRE: 0.62 delta_degC/(TtCO2)
+
+default units:
+  currency_unit: trillion USD2005/yr
+  emissionsrate_unit: emissions_unit/yr
+  emissions_unit: Gt CO2
+  temperature_unit: delta_degC
+  population_unit: billion
+
+model:
+  damage module: RICE2012 # RICE2010, RICE2012 or WITCH

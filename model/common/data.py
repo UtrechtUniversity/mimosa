@@ -1,4 +1,5 @@
 import numpy as np
+from numpy.lib.function_base import interp
 import pandas as pd
 
 from model.common import economics, utils
@@ -65,7 +66,9 @@ class DataStore:
         """Makes sure the file doesn't need to be read multiple times"""
         filename = self.params['input']['db_filename']
         if filename not in self.databases:
-            self.databases[filename] = pd.read_csv(filename)
+            df = pd.read_csv(filename)
+            df.columns= df.columns.str.lower()
+            self.databases[filename] = df
             self.cached_data[filename] = {}
             
         self.database = self.databases[filename]
@@ -106,10 +109,10 @@ class DataStore:
         if key not in self.cache:
             database = self.database
             selection = database.loc[
-                (database['MODEL'] == model)
-                & (database['SCENARIO'] == scenario)
-                & (database['REGION'] == (region[:-1] if region[-1] == '#' else region))
-                & (database['VARIABLE'] == variablename)
+                (database['model'] == model)
+                & (database['scenario'] == scenario)
+                & (database['region'] == (region[:-1] if region[-1] == '#' else region))
+                & (database['variable'] == variablename)
             ]
 
             if len(selection) != 1:
@@ -122,7 +125,7 @@ class DataStore:
             self.cache[key] = {
                 'years': selection.loc[:,'2010':].columns.values.astype(float),
                 'values': selection.loc[:,'2010':].values[0],
-                'unit': selection.iloc[0]['UNIT']
+                'unit': selection.iloc[0]['unit']
             }
         return self.cache[key]
     
@@ -146,6 +149,8 @@ class DataStore:
 
         # 3. Interpolate the combined data
         interp_fct = interp1d(extended_years, extended_data, kind='cubic')
+        # desample = np.array([2020, 2100, 2250]) # remove all info between 2020 and 2100
+        # interp_fct = interp1d(desample, interp_fct(desample), kind='quadratic') 
         return {
             'values': interp_fct(year),
             # 'values': np.interp(year, extended_years, extended_data),

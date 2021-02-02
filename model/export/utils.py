@@ -37,7 +37,7 @@ class Plot:
     
     def _value(self, var, region, is_fct):
         if is_fct:
-            return [var(t, region) for t in self.t]
+            return [var(t, region) for t in self.years]
         else:
             return [value(var[t,region]) for t in self.t]
     

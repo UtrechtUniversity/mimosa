@@ -26,7 +26,9 @@ def constraints(m):
     m.LBD_factor    = Var(m.t)
     constraints.append(
         GlobalConstraint(
-            lambda m,t: m.LBD_factor[t] == (sqrt(((sum(m.baseline_cumulative(m.year(0), m.year(t),r) for r in m.regions) - m.cumulative_emissions[t])/m.LBD_scaling)**2)+1.0)**m.log_LBD_rate,
+            lambda m,t: m.LBD_factor[t] == (
+                sqrt((   (sum(m.baseline_cumulative(m.year(0), m.year(t),r) for r in m.regions) - m.cumulative_emissions[t])/m.LBD_scaling+1.0   )**2)
+            )**m.log_LBD_rate,
             name='LBD'
         )
     )

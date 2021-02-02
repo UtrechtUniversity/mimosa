@@ -128,5 +128,5 @@ def optimal_adapt_level(GD, m, r):
 
 
 def _adaptation_costs(P, gamma1, gamma2):
-    return gamma1 * pow(soft_relu(P, a=15), gamma2, abs=False)
-    # return gamma1 * pow(P, gamma2, abs=False)
+    # return gamma1 * pow(soft_relu(P, a=15), gamma2, abs=False)
+    return gamma1 * pow(P, gamma2, abs=False)

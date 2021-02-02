@@ -19,8 +19,6 @@ def save_output(params, m, experiment=None, random_id=False, folder='output'):
     global_vars = [
         m.global_emissions,
         m.temperature,
-        m.temperaturedot,
-        m.smoothed_factor,
         m.cumulative_emissions,
         m.learning_factor
     ]
@@ -40,6 +38,13 @@ def save_output(params, m, experiment=None, random_id=False, folder='output'):
         m.consumption,
         m.utility
     ]
+    try:
+        global_vars.extend([
+            m.temperaturedot,
+            m.smoothed_factor
+        ])
+    except:
+        pass
     rows = []
     for var in global_vars:
         var_to_row(rows, m, var, False)
