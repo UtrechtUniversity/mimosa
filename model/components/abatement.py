@@ -43,16 +43,24 @@ def constraints(m):
     ])
 
     # Abatement costs and MAC
-    m.abatement_costs = Var(m.t, m.regions)
+    m.abatement_costs = Var(m.t, m.regions, within=NonNegativeReals)
+    m.area_under_MAC = Var(m.t, m.regions, within=NonNegativeReals)
     m.rel_abatement_costs = Var(m.t, m.regions)
     m.MAC_gamma     = Param()
     m.MAC_beta      = Param()
     m.carbonprice = Var(m.t, m.regions, bounds=lambda m: (0, m.MAC_gamma))
     constraints.extend([
-        RegionalConstraint(lambda m,t,r: m.abatement_costs[t,r] == AC(m.relative_abatement[t,r], m.learning_factor[t], m.MAC_gamma, m.MAC_beta) * m.baseline[t,r], 'abatement_costs'),
-        RegionalConstraint(lambda m,t,r: m.rel_abatement_costs[t,r] == m.abatement_costs[t,r] / m.GDP_gross[t,r], 'rel_abatement_costs'),
+        RegionalConstraint(lambda m,t,r: m.area_under_MAC[t,r] == AC(m.relative_abatement[t,r], m.learning_factor[t], m.MAC_gamma, m.MAC_beta) * m.baseline[t,r], 'abatement_costs'),
+        RegionalConstraint(lambda m,t,r: m.rel_abatement_costs[t,r] == m.area_under_MAC[t,r] / m.GDP_gross[t,r], 'rel_abatement_costs'),
         RegionalConstraint(lambda m,t,r: m.carbonprice[t,r] == MAC(m.relative_abatement[t,r], m.learning_factor[t], m.MAC_gamma, m.MAC_beta), 'carbonprice'),
         RegionalInitConstraint(lambda m,r: m.carbonprice[0,r] == 0)
+    ])
+
+    # How are mitigation costs distributed over regions?
+    m.allow_trade   = Param()
+    constraints.extend([
+        GlobalConstraint(lambda m,t: sum(m.abatement_costs[t,r] for r in m.regions) == sum(m.area_under_MAC[t,r] for r in m.regions) if m.allow_trade else Constraint.Skip),
+        RegionalConstraint(lambda m,t,r: m.abatement_costs[t,r] == m.area_under_MAC[t,r] if not m.allow_trade else Constraint.Skip),
     ])
 
     return constraints

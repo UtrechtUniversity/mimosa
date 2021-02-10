@@ -29,10 +29,10 @@ def constraints(m):
     m.sr            = Param()
     m.elasmu        = Param()
 
-    m.GDP_gross     = Var(m.t, m.regions, initialize=lambda m,t,r: m.GDP(m.year(0), r))#, initialize=lambda m,t,r: m.GDP(m.year(t), r))
+    m.GDP_gross     = Var(m.t, m.regions, initialize=lambda m,t,r: m.GDP(m.year(0), r))
     m.GDP_net       = Var(m.t, m.regions)
     m.investments   = Var(m.t, m.regions)
-    m.consumption   = Var(m.t, m.regions)#, initialize=lambda m,t,r: (1-m.sr)*m.GDP(m.year(t), r))
+    m.consumption   = Var(m.t, m.regions)
     m.utility       = Var(m.t, m.regions)
 
     m.ignore_damages = Param()

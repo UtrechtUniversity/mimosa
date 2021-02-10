@@ -97,7 +97,9 @@ class MIMOSA:
             'dk':               v(params['economics']['GDP']['depreciation of capital']),
             'sr':               v(params['economics']['GDP']['savings rate']),
             'elasmu':           v(params['economics']['elasmu']),
-            'PRTP':             v(params['economics']['PRTP'])
+            'PRTP':             v(params['economics']['PRTP']),
+
+            'allow_trade':      v(params['model']['allow trade'])
         }}
 
         # For RICE2010 damage/adaptation:
