@@ -2,9 +2,9 @@
 from model.export.utils import Plot
 
 
-def full_plot(m, filename, include_plotlyjs=True):
+def full_plot(m, filename, include_plotlyjs=True, custom_layout={}):
 
-    plot = Plot(m, horizontal_spacing=0.02, vertical_spacing=0.05)
+    plot = Plot(m, horizontal_spacing=0.005, vertical_spacing=0.05)
     
     plot.add(m.baseline_emissions, row=1, is_fct=True, name='baseline_emissions')
     try:
@@ -74,6 +74,7 @@ def full_plot(m, filename, include_plotlyjs=True):
     plot.fig.update_yaxes(title='Carbon price', row=1, col=len(plot.regions), secondary_y=True)
     plot.fig.update_yaxes(title='Adaptation level', row=2, col=len(plot.regions), secondary_y=True)
     plot.set_layout()
+    plot.fig.update_layout(custom_layout)
 
     outputfile = 'output/plots/{}.html'.format(filename)
     print(f'Plot saved at {outputfile}')

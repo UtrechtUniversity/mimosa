@@ -1,13 +1,14 @@
 import typing
 from abc import ABC, abstractmethod
+from numpy import pi
 
 from pyomo.environ import (
-    AbstractModel,
+    AbstractModel, ConcreteModel,
     Set, 
-    TransformationFactory, SolverFactory, SolverStatus,
+    TransformationFactory, SolverFactory, SolverStatus, SolverManagerFactory,
     Objective, Param, Var, Constraint, 
-    value, maximize, 
-    log, exp, tanh, sqrt,
+    value, maximize, minimize,
+    log, exp, tanh, sqrt, atan,
     NonNegativeReals
 )
 
@@ -20,6 +21,34 @@ def pow(x, a, abs=False):
 
 def soft_relu(x, a=10.0):
     return 1/a * log(1+exp(a*x))
+
+def scale_to_a(scale):
+    return 25.0/scale
+
+def soft_switch(x, scale=1.0):
+    """Approximates 0 for x <= 0 and 1 for x > 0
+
+    Args:
+        x
+        scale (float, optional): order of magnitude of expected values. Defaults to 1.0.
+    """
+    a = scale_to_a(scale)
+    return atan(a*x)/pi+0.5
+
+def soft_min(x, scale=1.0):
+    """Soft minimum: approximates the function f(x)=x for x > 0 and f(x)=0 for x <= 0
+
+    Args:
+        x
+        scale (float, optional): order of magnitude of expected values. Defaults to 1.0.
+
+    Returns:
+        approximately x if x > 0 and 0 if x <= 0
+    """
+    a = scale_to_a(scale)
+    soft_min_value = soft_switch(x,scale)*x+1/(a*pi)
+    return soft_min_value
+    return sqrt(soft_min_value**2) # Make sure the final answer is positive. Increases computing time, but reduces errors.
 
 ####### Constraints
 

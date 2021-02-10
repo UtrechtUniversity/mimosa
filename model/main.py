@@ -1,5 +1,6 @@
 ### Import packages
 
+import os
 import numpy as np
 
 from model.common import data, utils, units, economics
@@ -57,12 +58,14 @@ class MIMOSA:
 
         num_years = int(np.ceil((params['time']['end'] - params['time']['start'])/params['time']['dt']))+1
         self.abstract_model.year = lambda t: params['time']['start'] + t * params['time']['dt']
+        year2100 = int((2100-params['time']['start']) / params['time']['dt'])
 
         instance_data = {None: {
             'beginyear':        v(params['time']['start']),
             'dt':               v(params['time']['dt']),
             'tf':               v(num_years-1),
             't':                v(range(num_years)),
+            'year2100':         v(year2100),
             'regions':          v(params['regions'].keys()),
             
             'baseline_carbon_intensity': v(params['emissions']['baseline carbon intensity']),
@@ -88,7 +91,7 @@ class MIMOSA:
             'MAC_gamma':        v(quant(params['economics']['MAC']['gamma'], 'currency_unit/emissionsrate_unit')),
             'MAC_beta':         v(params['economics']['MAC']['beta']),
 
-            'init_capitalstock': {r: quant(self.regions[r]['initial capital'], 'currency_unit') for r in self.regions},
+            'init_capitalstock_factor': {r: self.regions[r]['initial capital factor'] for r in self.regions},
             'alpha':            v(params['economics']['GDP']['alpha']),
             'dk':               v(params['economics']['GDP']['depreciation of capital']),
             'sr':               v(params['economics']['GDP']['savings rate']),
@@ -174,13 +177,16 @@ class MIMOSA:
 
 
     @utils.timer('Model solve')
-    def solve(self, verbose=False, halt_on_ampl_error='no'):
-        # solver_manager = SolverManagerFactory('neos')
-        # solver = 'conopt' # 'ipopt'
-        # results = solver_manager.solve(self.m, opt=solver)
-        opt = SolverFactory('ipopt')
-        opt.options['halt_on_ampl_error'] = halt_on_ampl_error
-        results = opt.solve(self.m, tee=verbose, symbolic_solver_labels=True)
+    def solve(self, verbose=False, halt_on_ampl_error='no', use_NEOS=False, NEOS_EMAIL=None):
+        if use_NEOS:
+            os.environ['NEOS_EMAIL'] = NEOS_EMAIL
+            solver_manager = SolverManagerFactory('neos')
+            solver = 'conopt' # 'ipopt'
+            results = solver_manager.solve(self.m, opt=solver)
+        else:
+            opt = SolverFactory('ipopt')
+            opt.options['halt_on_ampl_error'] = halt_on_ampl_error
+            results = opt.solve(self.m, tee=verbose, symbolic_solver_labels=True)
 
         # Restore aggregated variables
         if len(self.regions) > 1:
@@ -190,7 +196,8 @@ class MIMOSA:
             print("Status: {}, termination condition: {}".format(
                 results.solver.status, results.solver.termination_condition
             ))
-            raise Exception("Solver did not exit with status OK")
+            if results.solver.status != SolverStatus.warning:
+                raise Exception("Solver did not exit with status OK")
 
         print('Final NPV:', value(self.m.NPV[self.m.tf]))
 

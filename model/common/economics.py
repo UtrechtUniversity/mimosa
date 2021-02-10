@@ -14,8 +14,8 @@ def get_TFP(region, data_store):
     sr = params['economics']['GDP']['savings rate']
 
     # Initialise capital
-    K0_data = quant(params['regions'][region]['initial capital'], 'currency_unit', only_magnitude=False)
-    K = K0_data.magnitude
+    # K0_data = quant(params['regions'][region]['initial capital factor'], 'currency_unit', only_magnitude=False)
+    K = params['regions'][region]['initial capital factor'] * data_store.data_object('GDP')(time[0], region)# K0_data.magnitude
     
     # Get data
     GDP_data = data_store.data_values['GDP'][region]
@@ -30,11 +30,11 @@ def get_TFP(region, data_store):
 
 
 def calc_dKdt(K, dk, I, dt):
-    return np.log(1-dk) * K + I
-    # return ( (1-dk)**dt - 1)/dt * K + I
+    # return np.log(1-dk) * K + I # TODO CHECK
+    return ( (1-dk)**dt - 1)/dt * K + I
 
 def calc_GDP(TFP, L, K, alpha):
-    return TFP * L**(1-alpha) * (K**2)**(alpha/2)
+    return TFP * L**(1-alpha) * K**alpha
 
 
 

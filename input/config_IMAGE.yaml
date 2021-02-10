@@ -28,108 +28,108 @@ regions:
   #   initial capital: 10 trillion US$2005/yr
   #   damages: $regional
   #   adaptation: $regional
-  BRA:
-   initial capital: 7473 billion US$2005/yr
-   damages: $regional
-   adaptation: $regional
   CAN:
-   initial capital: 4027 billion US$2005/yr
-   damages: $regional
-   adaptation: $regional
-  CEU:
-   initial capital: 8318 billion US$2005/yr
-   damages: $regional
-   adaptation: $regional
-  CHN:
-   initial capital: 60695 billion US$2005/yr
-   damages: $regional
-   adaptation: $regional
-  # EAF:
-  #  initial capital: 1239 billion US$2005/yr
-  #  damages: $regional
-  #  adaptation: $regional
-  INDIA:
-   initial capital: 15505 billion US$2005/yr
-   damages: $regional
-   adaptation: $regional
-  INDO:
-   initial capital: 4932 billion US$2005/yr
-   damages: $regional
-   adaptation: $regional
-  JAP:
-   initial capital: 17962 billion US$2005/yr
-   damages: $regional
-   adaptation: $regional
-  KOR:
-   initial capital: 6117 billion US$2005/yr
-   damages: $regional
-   adaptation: $regional
-  ME:
-   initial capital: 12937 billion US$2005/yr
-   damages: $regional
-   adaptation: $regional
-  MEX:
-   initial capital: 4373 billion US$2005/yr
-   damages: $regional
-   adaptation: $regional
-  NAF:
-   initial capital: 4122 billion US$2005/yr
-   damages: $regional
-   adaptation: $regional
-  OCE:
-   initial capital: 3797 billion US$2005/yr
-   damages: $regional
-   adaptation: $regional
-  RCAM:
-   initial capital: 2508 billion US$2005/yr
-   damages: $regional
-   adaptation: $regional
-  # RSAF:
-  #  initial capital: 1426 billion US$2005/yr
-  #  damages: $regional
-  #  adaptation: $regional
-  RSAM:
-   initial capital: 8500 billion US$2005/yr
-   damages: $regional
-   adaptation: $regional
-  # RSAS:
-  #  initial capital: 2695 billion US$2005/yr
-  #  damages: $regional
-  #  adaptation: $regional
-  RUS:
-   initial capital: 19438 billion US$2005/yr
-   damages: $regional
-   adaptation: $regional
-  SAF:
-   initial capital: 2046 billion US$2005/yr
-   damages: $regional
-   adaptation: $regional
-  SEAS:
-   initial capital: 9428 billion US$2005/yr
-   damages: $regional
-   adaptation: $regional
-  STAN:
-   initial capital: 3095 billion US$2005/yr
-   damages: $regional
-   adaptation: $regional
-  TUR:
-   initial capital: 4097 billion US$2005/yr
-   damages: $regional
-   adaptation: $regional
-  UKR:
-   initial capital: 3313 billion US$2005/yr
+   initial capital factor: 1.992
    damages: $regional
    adaptation: $regional
   USA:
-   initial capital: 35304 billion US$2005/yr
+   initial capital factor: 2.035
+   damages: $regional
+   adaptation: $regional
+  MEX:
+   initial capital factor: 1.893
+   damages: $regional
+   adaptation: $regional
+  RCAM:
+   initial capital factor: 1.041
+   damages: $regional
+   adaptation: $regional
+  BRA:
+   initial capital factor: 1.973
+   damages: $regional
+   adaptation: $regional
+  RSAM:
+   initial capital factor: 2.005
+   damages: $regional
+   adaptation: $regional
+  NAF:
+   initial capital factor: 1.798
    damages: $regional
    adaptation: $regional
   # WAF:
-  #  initial capital: 2420 billion US$2005/yr
+  #  initial capital factor: 1.416
   #  damages: $regional
   #  adaptation: $regional
+  # EAF:
+  #  initial capital factor: 1.66
+  #  damages: $regional
+  #  adaptation: $regional
+  SAF:
+   initial capital factor: 2.317
+   damages: $regional
+   adaptation: $regional
   WEU:
-   initial capital: 43305 billion US$2005/yr
+   initial capital factor: 1.942
+   damages: $regional
+   adaptation: $regional
+  CEU:
+   initial capital factor: 1.665
+   damages: $regional
+   adaptation: $regional
+  TUR:
+   initial capital factor: 1.533
+   damages: $regional
+   adaptation: $regional
+  UKR:
+   initial capital factor: 2.095
+   damages: $regional
+   adaptation: $regional
+  STAN:
+   initial capital factor: 1.281
+   damages: $regional
+   adaptation: $regional
+  RUS:
+   initial capital factor: 1.509
+   damages: $regional
+   adaptation: $regional
+  ME:
+   initial capital factor: 2.026
+   damages: $regional
+   adaptation: $regional
+  INDIA:
+   initial capital factor: 1.859
+   damages: $regional
+   adaptation: $regional
+  KOR:
+   initial capital factor: 2.434
+   damages: $regional
+   adaptation: $regional
+  CHN:
+   initial capital factor: 2.175
+   damages: $regional
+   adaptation: $regional
+  SEAS:
+   initial capital factor: 2.376
+   damages: $regional
+   adaptation: $regional
+  INDO:
+   initial capital factor: 1.714
+   damages: $regional
+   adaptation: $regional
+  JAP:
+   initial capital factor: 2.627
+   damages: $regional
+   adaptation: $regional
+  OCE:
+   initial capital factor: 2.176
+   damages: $regional
+   adaptation: $regional
+  # RSAS:
+  #  initial capital factor: 1.745
+  #  damages: $regional
+  #  adaptation: $regional
+  RSAF:
+   initial capital factor: 2.054
    damages: $regional
    adaptation: $regional
 
@@ -171,7 +171,7 @@ economics:
   elasmu: 1.45
   GDP:
     alpha: 0.3
-    depreciation of capital: 0.1
+    depreciation of capital: 0.05
     savings rate: 0.21
   MAC:
     beta: 2

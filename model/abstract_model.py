@@ -31,6 +31,7 @@ def create_abstract_model(damage_module='RICE'):
     m.tf            = Param()
     m.t             = Set()
     m.year          = None  # Initialised with concrete instance
+    m.year2100      = Param()
 
     m.regions = Set(ordered=True)
 
@@ -49,6 +50,7 @@ def create_abstract_model(damage_module='RICE'):
         years = np.linspace(year_start, year_end, 100)
         return np.trapz(m.baseline_emissions(years, region), x=years)
     m.baseline_cumulative = baseline_cumulative
+    m.baseline_cumulative_global = lambda m, year_start, year_end: sum(baseline_cumulative(year_start, year_end, r) for r in m.regions)
 
 
     ######################
@@ -101,6 +103,12 @@ def create_abstract_model(damage_module='RICE'):
         utils.add_constraint(m, constraint.to_pyomo_constraint(m), constraint.name)
 
     m.obj = Objective(rule=lambda m: m.NPV[m.tf], sense=maximize)
+    # m.obj = Objective(rule=lambda m: m.NPV[m.tf] * (
+    #     soft_switch(m.budget-(
+    #         m.cumulative_emissions[m.year2100]
+    #         + sum(soft_min(m.global_emissions[t]) for t in m.t if m.year(t) >= 2100)
+    #     ), scale=1)
+    # ), sense=maximize)
 
     return m
 

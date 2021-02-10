@@ -18,7 +18,7 @@ def constraints(m):
     """
     constraints = []
 
-    m.damage_costs  = Var(m.t, m.regions)
+    m.damage_costs  = Var(m.t, m.regions, initialize=0.0)
     constraints.extend([
         RegionalConstraint(lambda m,t,r: m.damage_costs[t,r] == 0.0, 'zero_damage_costs')
     ])
