@@ -32,8 +32,8 @@ def constraints(m):
 
     m.adapt_level   = Var(m.t, m.regions, within=NonNegativeReals)
     m.adapt_costs   = Var(m.t, m.regions)
-    m.adapt_FAD     = Var(m.t, m.regions, bounds=(0, 0.15))
-    m.adapt_IAD     = Var(m.t, m.regions, bounds=(0, 0.15))
+    m.adapt_FAD     = Var(m.t, m.regions, bounds=(0, 0.15), initialize=0)
+    m.adapt_IAD     = Var(m.t, m.regions, bounds=(0, 0.15), initialize=0)
     m.adap1     = Param(m.regions)
     m.adap2     = Param(m.regions)
     m.adap3     = Param(m.regions)
@@ -78,7 +78,7 @@ def constraints(m):
 
         # SLR damages resulting from total SLR
         GlobalConstraint(lambda m,t: m.total_SLR[t] == m.SLR[t] + m.CUMGSIC[t] + m.CUMGIS[t], 'total_SLR'),
-        RegionalConstraint(lambda m,t,r: m.SLR_damages[t,r] == 4 * (m.SLRdam1[r] * m.total_SLR[t] + m.SLRdam2[r] * m.total_SLR[t]**2) * pow(m.GDP_gross[t,r] / m.GDP_gross[0,r], 0.25, True), 'SLR_damages')
+        RegionalConstraint(lambda m,t,r: m.SLR_damages[t,r] == 4 * (m.SLRdam1[r] * m.total_SLR[t] + m.SLRdam2[r] * m.total_SLR[t]**2) * soft_min(m.GDP_gross[t,r] / m.GDP_gross[0,r])**0.25, 'SLR_damages')
     ])
 
     # Gross damages and adaptation levels
@@ -93,9 +93,9 @@ def constraints(m):
 
         RegionalConstraint(
             lambda m,t,r: m.adapt_level[t,r] == m.adap1[r] * (
-                m.adap2[r] * pow(m.adapt_FAD[t,r], m.adapt_rho, abs=True)
+                m.adap2[r] * soft_min(m.adapt_FAD[t,r], scale=0.005)**m.adapt_rho
                 +
-                (1-m.adap2[r]) * pow(m.adapt_SAD[t,r], m.adapt_rho, abs=True)
+                (1-m.adap2[r]) * soft_min(m.adapt_SAD[t,r], scale=0.005)**m.adapt_rho
             ) ** (m.adap3[r] / m.adapt_rho),
             name='adapt_level'
         ),
@@ -117,7 +117,7 @@ def constraints(m):
 # Damage function
 
 def damage_fct(T, T0, m, r):
-    return _damage_fct(T, m.damage_a1[r], m.damage_a2[r], m.damage_a3[r], T0)
+    return _damage_fct(soft_min(T), m.damage_a1[r], m.damage_a2[r], m.damage_a3[r], T0)
 
 
 def _damage_fct(T, a1, a2, a3, T0=None):

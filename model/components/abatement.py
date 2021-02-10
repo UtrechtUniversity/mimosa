@@ -23,11 +23,11 @@ def constraints(m):
     m.LBD_rate      = Param()
     m.log_LBD_rate  = Param(initialize=log(m.LBD_rate) / log(2))
     m.LBD_scaling   = Param()
-    m.LBD_factor    = Var(m.t)
+    m.LBD_factor    = Var(m.t)#, bounds=(0,1), initialize=1)
     constraints.append(
         GlobalConstraint(
-            lambda m,t: m.LBD_factor[t] == (
-                sqrt((   (sum(m.baseline_cumulative(m.year(0), m.year(t),r) for r in m.regions) - m.cumulative_emissions[t])/m.LBD_scaling+1.0   )**2)
+            lambda m,t: m.LBD_factor[t] == soft_min(
+                (m.baseline_cumulative_global(m, m.year(0), m.year(t)) - m.cumulative_emissions[t])/m.LBD_scaling+1.0
             )**m.log_LBD_rate,
             name='LBD'
         )
@@ -45,9 +45,9 @@ def constraints(m):
     # Abatement costs and MAC
     m.abatement_costs = Var(m.t, m.regions)
     m.rel_abatement_costs = Var(m.t, m.regions)
-    m.carbonprice = Var(m.t, m.regions)
     m.MAC_gamma     = Param()
     m.MAC_beta      = Param()
+    m.carbonprice = Var(m.t, m.regions, bounds=lambda m: (0, m.MAC_gamma))
     constraints.extend([
         RegionalConstraint(lambda m,t,r: m.abatement_costs[t,r] == AC(m.relative_abatement[t,r], m.learning_factor[t], m.MAC_gamma, m.MAC_beta) * m.baseline[t,r], 'abatement_costs'),
         RegionalConstraint(lambda m,t,r: m.rel_abatement_costs[t,r] == m.abatement_costs[t,r] / m.GDP_gross[t,r], 'rel_abatement_costs'),

@@ -22,11 +22,15 @@ def constraints(m):
 
     m.regional_emissions = Var(m.t, m.regions)
     m.baseline = Var(m.t, m.regions)
+    # m.regional_emissions = Var(m.t, m.regions, initialize=lambda m,t,r: m.baseline_emissions(m.year(t),r))
+    # m.baseline = Var(m.t, m.regions, initialize=lambda m,t,r: m.baseline_emissions(m.year(t),r))
     m.baseline_carbon_intensity = Param()
         
     m.relative_abatement = Var(m.t, m.regions, initialize=0, bounds=(0, 2))
     m.cumulative_emissions = Var(m.t)
     m.global_emissions = Var(m.t)
+    # m.cumulative_emissions = Var(m.t, initialize=lambda m,t: m.baseline_cumulative_global(m, m.year(0), m.year(t)))
+    # m.global_emissions = Var(m.t, initialize=lambda m,t: sum(m.baseline_emissions(m.year(t),r) for r in m.regions))
 
     constraints.extend([
         RegionalConstraint(
@@ -110,11 +114,11 @@ def constraints(m):
     ])
 
 
-    m.emission_relative_cumulative = Var(m.t)
+    m.emission_relative_cumulative = Var(m.t, initialize=1)
     constraints.extend([
         GlobalConstraint(
             lambda m,t: (
-                m.emission_relative_cumulative[t] == m.cumulative_emissions[t] / sum(m.baseline_cumulative(m.year(0), m.year(t), r) for r in m.regions)
+                m.emission_relative_cumulative[t] == m.cumulative_emissions[t] / m.baseline_cumulative_global(m, m.year(0), m.year(t))
             ) if t > 0 else Constraint.Skip,
             name='relative_cumulative_emissions'
         ),

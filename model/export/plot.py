@@ -73,6 +73,7 @@ def full_plot(m, filename, include_plotlyjs=True, custom_layout={}):
     plot.set_yaxes_titles(['GtCO<sub>2</sub>/yr','% GDP', 'trillion US$2005/yr', 'GtCO<sub>2</sub>/yr'])
     plot.fig.update_yaxes(title='Carbon price', row=1, col=len(plot.regions), secondary_y=True)
     plot.fig.update_yaxes(title='Adaptation level', row=2, col=len(plot.regions), secondary_y=True)
+    plot.fig.update_yaxes(rangemode='tozero', row=2)
     plot.set_layout()
     plot.fig.update_layout(custom_layout)
 

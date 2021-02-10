@@ -94,7 +94,7 @@ def constraints(m):
 # Damage function
 
 def damage_fct(T, T0, m, r):
-    return _damage_fct(T, m.damage_a1[r], m.damage_a2[r], m.damage_a3[r], T0)
+    return _damage_fct(soft_min(T), m.damage_a1[r], m.damage_a2[r], m.damage_a3[r], T0)
 
 def damage_fct_dot(T, m, r):
     return _damage_fct_dot(T, m.damage_a1[r], m.damage_a2[r], m.damage_a3[r])
@@ -106,7 +106,7 @@ def _damage_fct(T, a1, a2, a3, T0=None):
     T: temperature
     T0 [None]: if specified, substracts damage at T0
     """
-    fct = lambda temp: a1 * temp + a2 * pow(temp, a3, abs=True)
+    fct = lambda temp: a1 * temp + a2 * temp**a3
     dmg = fct(T)
     if T0 is not None:
         dmg -= fct(T0)
@@ -124,9 +124,10 @@ def adaptation_costs(P, m, r):
 
 def optimal_adapt_level(GD, m, r):
     eps = 0.0005
-    return pow(GD / (m.adapt_g1[r] * m.adapt_g2[r]) + eps, 1/(m.adapt_g2[r]-1), abs=True)
+    return (soft_min(GD, 0.01) / (m.adapt_g1[r] * m.adapt_g2[r]) + eps)**( 1/(m.adapt_g2[r]-1) )
+    # return pow(GD / (m.adapt_g1[r] * m.adapt_g2[r]) + eps, 1/(m.adapt_g2[r]-1), abs=True)
 
 
 def _adaptation_costs(P, gamma1, gamma2):
     # return gamma1 * pow(soft_relu(P, a=15), gamma2, abs=False)
-    return gamma1 * pow(P, gamma2, abs=False)
+    return gamma1 * soft_min(P)**gamma2
