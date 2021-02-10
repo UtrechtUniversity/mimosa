@@ -31,11 +31,12 @@ class MIMOSA:
         self.preparation()
 
     def get_abstract_model(self):
-        damage_module = self.params['model']['damage module']
-        if damage_module not in abstract_models:
-            abstract_models[damage_module] = create_abstract_model(damage_module)
+        damage_module       = self.params['model']['damage module']
+        objective_module    = self.params['model']['objective module']
+        if (damage_module, objective_module) not in abstract_models:
+            abstract_models[(damage_module, objective_module)] = create_abstract_model(damage_module, objective_module)
         
-        return abstract_models[damage_module]
+        return abstract_models[(damage_module, objective_module)]
 
 
     @utils.timer('Concrete model creation')

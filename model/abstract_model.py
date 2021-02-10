@@ -8,14 +8,14 @@
 import numpy as np
 from model.common import utils, economics
 from model.common.pyomo import *
-from model.components import emissions, abatement, cobbdouglas, damages
+from model.components import emissions, abatement, cobbdouglas, damages, objective
 
 
 ######################
 # Create model
 ######################
 
-def create_abstract_model(damage_module='RICE'):
+def create_abstract_model(damage_module, objective_module):
 
     m = AbstractModel()
 
@@ -82,40 +82,27 @@ def create_abstract_model(damage_module='RICE'):
     constraints.extend(cobbdouglas.constraints(m))
 
 
+    # Objective of optimisation
+    if objective_module == 'utility':
+        objective_rule, objective_constraints = objective.utility.constraints(m)
+    elif objective_module == 'globalcosts':
+        objective_rule, objective_constraints = objective.globalcosts.constraints(m)
+    else:
+        raise NotImplementedError
+
+    constraints.extend(objective_constraints)
+
+
 
 
     ######################
-    # Optimisation
+    # Add constraints to abstract model
     ######################
-
-    m.NPV = Var(m.t)
-    m.PRTP = Param()
-    constraints.extend([
-        GlobalConstraint(
-            lambda m,t: m.NPV[t] == m.NPV[t-1] + m.dt * exp(-m.PRTP * (m.year(t) - m.beginyear)) * sum(m.L(m.year(t),r) * m.utility[t,r] for r in m.regions) 
-            if t > 0 else Constraint.Skip,
-            name='NPV'
-        ),
-        GlobalInitConstraint(lambda m: m.NPV[0] == 0)
-    ])
     
     for constraint in constraints:
         utils.add_constraint(m, constraint.to_pyomo_constraint(m), constraint.name)
 
-    m.obj = Objective(rule=lambda m: m.NPV[m.tf], sense=maximize)
-    # m.obj = Objective(rule=lambda m: m.NPV[m.tf] * (
-    #     soft_switch(m.budget-(
-    #         m.cumulative_emissions[m.year2100]
-    #         + sum(soft_min(m.global_emissions[t]) for t in m.t if m.year(t) >= 2100)
-    #     ), scale=1)
-    # ), sense=maximize)
+        
+    m.obj = objective_rule
 
     return m
-
-def name_and_fct(fct):
-    if isinstance(fct, tuple):
-        name = fct[1]
-        fct = fct[0]
-    else:
-        name = None
-    return name, fct
