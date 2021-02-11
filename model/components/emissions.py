@@ -33,18 +33,24 @@ def constraints(m):
     # m.global_emissions = Var(m.t, initialize=lambda m,t: sum(m.baseline_emissions(m.year(t),r) for r in m.regions))
 
     constraints.extend([
+
+        # Baseline emissions based on emissions or carbon intensity
         RegionalConstraint(
             lambda m,t,r: (m.baseline[t, r] == m.carbon_intensity(m.year(t),r) * m.GDP_net[t, r]) 
             if value(m.baseline_carbon_intensity) else 
             (m.baseline[t, r] == m.baseline_emissions(m.year(t), r)),
             name='baseline_emissions'
         ),
+
+        # Regional emissions from baseline and relative abatement
         RegionalConstraint(lambda m,t,r: m.regional_emissions[t,r] == (1-m.relative_abatement[t,r]) * m.baseline_emissions(m.year(t),r), 'regional_abatement'),
         RegionalInitConstraint(lambda m,r: m.regional_emissions[0,r] == m.baseline_emissions(m.year(0),r)),
 
+        # Global emissions (sum from regional emissions)
         GlobalConstraint(lambda m,t: m.global_emissions[t] == sum(m.regional_emissions[t,r] for r in m.regions), 'global_emissions'),
         GlobalInitConstraint(lambda m: m.global_emissions[0] == sum(m.baseline_emissions(m.year(0),r) for r in m.regions), 'global_emissions_init'),
 
+        # Cumulative global emissions
         GlobalConstraint(lambda m,t: m.cumulative_emissions[t] == m.cumulative_emissions[t-1] + m.dt * m.global_emissions[t] if t > 0 else Constraint.Skip, 'cumulative_emissions'),
         GlobalInitConstraint(lambda m: m.cumulative_emissions[0] == 0)
     ])

@@ -43,8 +43,8 @@ def constraints(m):
     ])
 
     # Abatement costs and MAC
-    m.abatement_costs = Var(m.t, m.regions, within=NonNegativeReals)
-    m.area_under_MAC = Var(m.t, m.regions, within=NonNegativeReals)
+    m.abatement_costs = Var(m.t, m.regions, within=NonNegativeReals, initialize=0)
+    m.area_under_MAC = Var(m.t, m.regions, within=NonNegativeReals, initialize=0)
     m.rel_abatement_costs = Var(m.t, m.regions)
     m.MAC_gamma     = Param()
     m.MAC_beta      = Param()
