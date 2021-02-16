@@ -14,8 +14,7 @@ def get_TFP(region, data_store):
     sr = params['economics']['GDP']['savings rate']
 
     # Initialise capital
-    # K0_data = quant(params['regions'][region]['initial capital factor'], 'currency_unit', only_magnitude=False)
-    K = params['regions'][region]['initial capital factor'] * data_store.data_object('GDP')(time[0], region)# K0_data.magnitude
+    K = params['regions'][region]['initial capital factor'] * data_store.data_object('GDP')(time[0], region)
     
     # Get data
     GDP_data = data_store.data_values['GDP'][region]
