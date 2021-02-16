@@ -11,7 +11,7 @@ def constraints(m):
     (utility specification)
 
     Necessary variables:
-        
+        -
 
     Returns:
         - Objective
@@ -32,6 +32,9 @@ def constraints(m):
 
 
 
+    
+
+    ## If carbon budget is a soft constraint (not in use now):
     
     # m.obj = Objective(rule=lambda m: m.NPV[m.tf] * (
     #     soft_switch(m.budget-(
