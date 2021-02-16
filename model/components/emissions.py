@@ -22,15 +22,11 @@ def constraints(m):
 
     m.regional_emissions = Var(m.t, m.regions)
     m.baseline = Var(m.t, m.regions)
-    # m.regional_emissions = Var(m.t, m.regions, initialize=lambda m,t,r: m.baseline_emissions(m.year(t),r))
-    # m.baseline = Var(m.t, m.regions, initialize=lambda m,t,r: m.baseline_emissions(m.year(t),r))
     m.baseline_carbon_intensity = Param()
         
     m.relative_abatement = Var(m.t, m.regions, initialize=0, bounds=(0, 2))
     m.cumulative_emissions = Var(m.t)
     m.global_emissions = Var(m.t)
-    # m.cumulative_emissions = Var(m.t, initialize=lambda m,t: m.baseline_cumulative_global(m, m.year(0), m.year(t)))
-    # m.global_emissions = Var(m.t, initialize=lambda m,t: sum(m.baseline_emissions(m.year(t),r) for r in m.regions))
 
     constraints.extend([
 

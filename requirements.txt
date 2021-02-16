@@ -1,6 +1,8 @@
 numpy
 pandas
 pyomo
+ipopt
+glpk
 pint
 yaml
 time

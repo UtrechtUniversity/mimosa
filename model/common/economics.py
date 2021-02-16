@@ -30,7 +30,6 @@ def get_TFP(region, data_store):
 
 
 def calc_dKdt(K, dk, I, dt):
-    # return np.log(1-dk) * K + I # TODO CHECK
     return ( (1-dk)**dt - 1)/dt * K + I
 
 def calc_GDP(TFP, L, K, alpha):
