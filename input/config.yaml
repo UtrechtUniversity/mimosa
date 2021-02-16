@@ -8,46 +8,151 @@ regions:
   #   adaptation:
   #     g1: 0.115
   #     g2: 3.6
-  R5.2OECD:
-    initial capital: 80000 billion US$2005/yr
-    damages: $regional
-    adaptation: $regional
-  R5.2ASIA:
-    initial capital: 45 trillion US$2005/yr
-    damages: $regional
-    adaptation: $regional
-  R5.2LAM:
-    initial capital: 20 trillion US$2005/yr
-    damages: $regional
-    adaptation: $regional
-  R5.2MAF:
-    initial capital: 20 trillion US$2005/yr
-    damages: $regional
-    adaptation: $regional
-  R5.2REF:
-    initial capital: 10 trillion US$2005/yr
-    damages: $regional
-    adaptation: $regional
+  # R5.2OECD:
+  #   initial capital: 80000 billion US$2005/yr
+  #   damages: $regional
+  #   adaptation: $regional
+  # R5.2ASIA:
+  #   initial capital: 45 trillion US$2005/yr
+  #   damages: $regional
+  #   adaptation: $regional
+  # R5.2LAM:
+  #   initial capital: 20 trillion US$2005/yr
+  #   damages: $regional
+  #   adaptation: $regional
+  # R5.2MAF:
+  #   initial capital: 20 trillion US$2005/yr
+  #   damages: $regional
+  #   adaptation: $regional
+  # R5.2REF:
+  #   initial capital: 10 trillion US$2005/yr
+  #   damages: $regional
+  #   adaptation: $regional
+  CAN:
+   initial capital factor: 1.992
+   damages: $regional
+   adaptation: $regional
+  USA:
+   initial capital factor: 2.035
+   damages: $regional
+   adaptation: $regional
+  MEX:
+   initial capital factor: 1.893
+   damages: $regional
+   adaptation: $regional
+  RCAM:
+   initial capital factor: 1.041
+   damages: $regional
+   adaptation: $regional
+  BRA:
+   initial capital factor: 1.973
+   damages: $regional
+   adaptation: $regional
+  RSAM:
+   initial capital factor: 2.005
+   damages: $regional
+   adaptation: $regional
+  NAF:
+   initial capital factor: 1.798
+   damages: $regional
+   adaptation: $regional
+  WAF:
+   initial capital factor: 1.416
+   damages: $regional
+   adaptation: $regional
+  EAF:
+   initial capital factor: 1.66
+   damages: $regional
+   adaptation: $regional
+  SAF:
+   initial capital factor: 2.317
+   damages: $regional
+   adaptation: $regional
+  WEU:
+   initial capital factor: 1.942
+   damages: $regional
+   adaptation: $regional
+  CEU:
+   initial capital factor: 1.665
+   damages: $regional
+   adaptation: $regional
+  TUR:
+   initial capital factor: 1.533
+   damages: $regional
+   adaptation: $regional
+  UKR:
+   initial capital factor: 2.095
+   damages: $regional
+   adaptation: $regional
+  STAN:
+   initial capital factor: 1.281
+   damages: $regional
+   adaptation: $regional
+  RUS:
+   initial capital factor: 1.509
+   damages: $regional
+   adaptation: $regional
+  ME:
+   initial capital factor: 2.026
+   damages: $regional
+   adaptation: $regional
+  INDIA:
+   initial capital factor: 1.859
+   damages: $regional
+   adaptation: $regional
+  KOR:
+   initial capital factor: 2.434
+   damages: $regional
+   adaptation: $regional
+  CHN:
+   initial capital factor: 2.175
+   damages: $regional
+   adaptation: $regional
+  SEAS:
+   initial capital factor: 2.376
+   damages: $regional
+   adaptation: $regional
+  INDO:
+   initial capital factor: 1.714
+   damages: $regional
+   adaptation: $regional
+  JAP:
+   initial capital factor: 2.627
+   damages: $regional
+   adaptation: $regional
+  OCE:
+   initial capital factor: 2.176
+   damages: $regional
+   adaptation: $regional
+  RSAS:
+   initial capital factor: 1.745
+   damages: $regional
+   adaptation: $regional
+  RSAF:
+   initial capital factor: 2.054
+   damages: $regional
+   adaptation: $regional
 
 
 input:
-  db_filename: ../../Databases/SSP_IAM_V2_201811.csv
+  db_filename: input/data/data_IMAGE_SSP.csv
+  # db_filename: ../../Databases/SSP_IAM_V2_201811.csv
   baselines:
     SSP1:
-      scenario: SSP1-Baseline
+      scenario: SSP1-Ref-SPA0-V17
       model: IMAGE
     SSP2:
-      scenario: SSP2-Baseline
-      model: MESSAGE-GLOBIOM
+      scenario: SSP2-Ref-SPA0-V17
+      model: IMAGE
     SSP3:
-      scenario: SSP3-Baseline
-      model: AIM/CGE
+      scenario: SSP3-Ref-SPA0-V17
+      model: IMAGE
     SSP4:
-      scenario: SSP4-Baseline
-      model: GCAM4
+      scenario: SSP4-Ref-SPA0-V17
+      model: IMAGE
     SSP5:
-      scenario: SSP5-Baseline
-      model: REMIND-MAGPIE
+      scenario: SSP5-Ref-SPA0-V17
+      model: IMAGE
 
   variables:
     GDP: GDP|PPP
@@ -66,7 +171,7 @@ economics:
   elasmu: 1.45
   GDP:
     alpha: 0.3
-    depreciation of capital: 0.1
+    depreciation of capital: 0.05
     savings rate: 0.21
   MAC:
     beta: 2
@@ -82,7 +187,8 @@ economics:
 
 emissions:
   carbonbudget: 800 GtCO2     # False or a quantity
-  min level: -20 GtCO2/yr     # False or a quantity
+  global min level: -20 GtCO2/yr     # False or a quantity
+  regional min level: -10 GtCO2/yr     # False or a quantity
   not positive after budget year: True
   baseline carbon intensity: True
   inertia:
@@ -102,3 +208,5 @@ default units:
 
 model:
   damage module: RICE2012 # RICE2010, RICE2012 or WITCH
+  objective module: utility # utility or globalcosts
+  allow trade: True 
