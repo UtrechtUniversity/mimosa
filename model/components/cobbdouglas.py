@@ -55,20 +55,4 @@ def constraints(m):
         RegionalInitConstraint(lambda m,r: m.capital_stock[0,r] == m.init_capitalstock_factor[r] * m.GDP(m.year(0), r))
     ])
 
-    # NPV consumption and consumption loss (when utility is not used)
-    # m.consumption_NPV = Var(m.t)
-    # m.baseline_consumption_NPV = Var(m.t, initialize=0.01)
-    # m.consumption_loss = Var(m.t)
-    # constraints.extend([
-
-    #     GlobalConstraint(lambda m,t: m.consumption_NPV[t] - m.consumption_NPV[t-1] == m.dt * sum(exp(-0.05 * (m.year(t) - m.beginyear)) * m.consumption[t,r] for r in m.regions) if t > 0 else Constraint.Skip, 'consumption_NPV'),
-    #     GlobalInitConstraint(lambda m: m.consumption_NPV[0] == 0),
-
-    #     GlobalConstraint(lambda m,t: m.baseline_consumption_NPV[t] - m.baseline_consumption_NPV[t-1] == m.dt * sum(exp(-0.05 * (m.year(t) - m.beginyear)) * (1-m.sr) * m.GDP(m.year(t),r) for r in m.regions) if t > 0 else Constraint.Skip, 'baseline_consumption_NPV'),
-    #     GlobalInitConstraint(lambda m: m.baseline_consumption_NPV[0] == 0),
-
-    #     GlobalConstraint(lambda m,t: m.consumption_loss[t] == 1 - m.consumption_NPV[t] / m.baseline_consumption_NPV[t] if t > 0 else Constraint.Skip, 'consumption_loss'),
-    #     GlobalInitConstraint(lambda m: m.consumption_loss[0] == 0)
-    # ])
-
     return constraints

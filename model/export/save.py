@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 import json
 import os
@@ -20,7 +21,8 @@ def save_output(params, m, experiment=None, random_id=False, folder='output'):
         m.global_emissions,
         m.temperature,
         m.cumulative_emissions,
-        m.learning_factor
+        m.learning_factor,
+        m.global_rel_abatement_costs,
     ]
     regional_vars = [
         [m.baseline, 'baseline'],
@@ -29,15 +31,20 @@ def save_output(params, m, experiment=None, random_id=False, folder='output'):
         m.carbonprice,
         m.capital_stock,
         m.GDP_gross, m.GDP_net,
-        m.abatement_costs,
-        m.damage_costs,
-        m.resid_damages,
-        m.gross_damages,
-        m.adapt_costs,
-        m.adapt_level,
         m.consumption,
-        m.utility
+        m.utility,
+        m.abatement_costs,
+        m.damage_costs
     ]
+    try:
+        regional_vars.extend([
+            m.resid_damages,
+            m.gross_damages,
+            m.adapt_costs,
+            m.adapt_level,
+        ])
+    except:
+        pass
     try:
         global_vars.extend([
             m.temperaturedot,
@@ -92,7 +99,7 @@ def var_to_row(rows, m, var, is_regional):
 
     
 def rows_to_dataframe(rows, m):
-    years = ['{:g}'.format(value(m.beginyear)+t) for t in m.t]
+    years = ['{:g}'.format(year) for year in m.year(np.array(m.t))]
     columns = ['Variable', 'Region'] + years
     df = pd.DataFrame(rows, columns=columns)
     return df

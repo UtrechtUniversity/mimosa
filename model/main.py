@@ -5,7 +5,7 @@ import numpy as np
 
 from model.common import data, utils, units, economics
 from model.common.pyomo import *
-from model.export.plot import full_plot
+from model.export.plot import full_plot, visualise_IPOPT_output
 from model.export.save import save_output
 
 from model.abstract_model import create_abstract_model
@@ -73,7 +73,8 @@ class MIMOSA:
             'budget':           v(quant(params['emissions']['carbonbudget'], 'emissions_unit')),
             'inertia_regional': v(params['emissions']['inertia']['regional']),
             'inertia_global':   v(params['emissions']['inertia']['global']),
-            'min_level':        v(quant(params['emissions']['min level'], 'emissionsrate_unit')),
+            'global_min_level': v(quant(params['emissions']['global min level'], 'emissionsrate_unit')),
+            'regional_min_level': v(quant(params['emissions']['regional min level'], 'emissionsrate_unit')),
             'no_pos_emissions_after_budget_year': v(params['emissions']['not positive after budget year']),
 
             'T0':               v(quant(params['temperature']['initial'], 'temperature_unit')),
@@ -180,7 +181,7 @@ class MIMOSA:
 
 
     @utils.timer('Model solve')
-    def solve(self, verbose=False, halt_on_ampl_error='no', use_NEOS=False, NEOS_EMAIL=None):
+    def solve(self, verbose=False, halt_on_ampl_error='no', use_NEOS=False, NEOS_EMAIL=None, IPOPT_output_file=None):
         if use_NEOS:
             os.environ['NEOS_EMAIL'] = NEOS_EMAIL
             solver_manager = SolverManagerFactory('neos')
@@ -189,11 +190,15 @@ class MIMOSA:
         else:
             opt = SolverFactory('ipopt')
             opt.options['halt_on_ampl_error'] = halt_on_ampl_error
+            opt.options['output_file'] = IPOPT_output_file
             results = opt.solve(self.m, tee=verbose, symbolic_solver_labels=True)
+            if IPOPT_output_file is not None:
+                visualise_IPOPT_output(IPOPT_output_file)
 
         # Restore aggregated variables
         if len(self.regions) > 1:
             TransformationFactory('contrib.aggregate_vars').update_variables(self.m)
+            
 
         if results.solver.status != SolverStatus.ok:
             print("Status: {}, termination condition: {}".format(
@@ -203,6 +208,8 @@ class MIMOSA:
                 raise Exception("Solver did not exit with status OK")
 
         print('Final NPV:', value(self.m.NPV[self.m.tf]))
+
+
 
     @utils.timer('Plotting results')
     def plot(self, filename='result', **kwargs):

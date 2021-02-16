@@ -92,8 +92,6 @@ class DataStore:
     
 
     def _get_data_from_database(self, region, variable):
-        
-        database = self.database
     
         SSP = self.params['SSP']
         model = self.params['input']['baselines'][SSP]['model']

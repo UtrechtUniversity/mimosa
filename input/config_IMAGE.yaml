@@ -56,14 +56,14 @@ regions:
    initial capital factor: 1.798
    damages: $regional
    adaptation: $regional
-  # WAF:
-  #  initial capital factor: 1.416
-  #  damages: $regional
-  #  adaptation: $regional
-  # EAF:
-  #  initial capital factor: 1.66
-  #  damages: $regional
-  #  adaptation: $regional
+  WAF:
+   initial capital factor: 1.416
+   damages: $regional
+   adaptation: $regional
+  EAF:
+   initial capital factor: 1.66
+   damages: $regional
+   adaptation: $regional
   SAF:
    initial capital factor: 2.317
    damages: $regional
@@ -124,10 +124,10 @@ regions:
    initial capital factor: 2.176
    damages: $regional
    adaptation: $regional
-  # RSAS:
-  #  initial capital factor: 1.745
-  #  damages: $regional
-  #  adaptation: $regional
+  RSAS:
+   initial capital factor: 1.745
+   damages: $regional
+   adaptation: $regional
   RSAF:
    initial capital factor: 2.054
    damages: $regional
@@ -187,7 +187,8 @@ economics:
 
 emissions:
   carbonbudget: 800 GtCO2     # False or a quantity
-  min level: -20 GtCO2/yr     # False or a quantity
+  global min level: -20 GtCO2/yr     # False or a quantity
+  regional min level: -10 GtCO2/yr     # False or a quantity
   not positive after budget year: True
   baseline carbon intensity: True
   inertia:

@@ -1,5 +1,5 @@
 
-from model.export.utils import Plot
+from model.export.utils import Plot, visualise_IPOPT_output
 
 
 def full_plot(m, filename, include_plotlyjs=True, custom_layout={}):
@@ -30,6 +30,11 @@ def full_plot(m, filename, include_plotlyjs=True, custom_layout={}):
     plot.add(m.global_emissions, is_regional=False, row=4)
     plot.add(m.temperature, is_regional=False, row=4, secondary_y=True)
     plot.add(m.cumulative_emissions, is_regional=False, row=4, visible='legendonly')
+
+    try:
+        plot.add(m.global_rel_abatement_costs, is_regional=False, row=4, secondary_y=True, visible='legendonly')
+    except:
+        pass
 
     
 

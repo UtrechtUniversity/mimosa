@@ -83,7 +83,8 @@ def constraints(m):
     m.budget        = Param()
     m.inertia_global = Param()
     m.inertia_regional = Param()
-    m.min_level     = Param() 
+    m.global_min_level = Param() 
+    m.regional_min_level = Param() 
     m.no_pos_emissions_after_budget_year = Param()
     constraints.extend([
         # Carbon budget constraints:
@@ -116,7 +117,8 @@ def constraints(m):
             name='regional_constraint'
         ),
 
-        GlobalConstraint(lambda m,t: m.global_emissions[t] >= m.min_level if value(m.min_level) is not False else Constraint.Skip, 'min_level')
+        GlobalConstraint(lambda m,t: m.global_emissions[t] >= m.global_min_level if value(m.global_min_level) is not False else Constraint.Skip, 'global_min_level'),
+        RegionalConstraint(lambda m,t,r: m.regional_emissions[t,r] >= m.regional_min_level if value(m.regional_min_level) is not False else Constraint.Skip, 'regional_min_level')
     ])
 
 

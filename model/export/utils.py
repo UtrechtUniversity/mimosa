@@ -1,5 +1,7 @@
 import numpy as np
+import pandas as pd
 import plotly.graph_objects as go
+import plotly.express as px
 from plotly.subplots import make_subplots
 from pyomo.environ import value
 
@@ -97,3 +99,46 @@ class Plot:
 
 
 
+def visualise_IPOPT_output(output_file):
+    file = open(output_file, 'r')
+    in_iterations = False
+
+    iterations = []
+
+    for line in file:
+        if line.startswith('iter '):
+            in_iterations = True
+        if line.strip() == '':
+            in_iterations = False
+
+        if in_iterations and not line.startswith('iter '):
+            split = line.strip().split(' ')[:4]
+
+            # Check if it was a recovered iteration
+            if 'r' in split[0]:
+                recovered = True
+                split = split[0].split('r') + split[1:-1]
+            else:
+                recovered = False
+            iterations.append(split+[recovered])
+
+    iterations_df = pd.DataFrame(iterations, columns=['iter', 'objective', 'inf_pr', 'inf_du', 'recovered'])
+    iterations_df['iter']       = iterations_df['iter'].astype(int)
+    iterations_df['objective']  = iterations_df['objective'].astype(float)
+    iterations_df['inf_pr']     = iterations_df['inf_pr'].astype(float)
+    iterations_df['inf_du']     = iterations_df['inf_du'].astype(float)
+
+    file.close()
+
+    fig = (
+        px
+        .scatter(
+            iterations_df,
+            x='iter', y=['objective', 'inf_pr', 'inf_du'],
+            facet_row='variable', color='recovered'
+        )
+        .update_yaxes(matches=None, type='log')
+        .update_yaxes(row=3, type='linear')
+    )
+
+    fig.write_html(output_file.split('.')[0]+'.html', include_plotlyjs='cdn')
