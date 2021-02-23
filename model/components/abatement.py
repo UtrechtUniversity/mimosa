@@ -48,13 +48,14 @@ def constraints(m):
     m.rel_abatement_costs = Var(m.t, m.regions, bounds=(0, 0.3))
     m.MAC_gamma     = Param()
     m.MAC_beta      = Param()
+    m.MAC_scaling_factor = Param(m.regions) # Regional scaling of the MAC
     m.carbonprice = Var(m.t, m.regions, bounds=lambda m: (0, m.MAC_gamma))
     constraints.extend([
         RegionalConstraint(lambda m,t,r: (
             m.area_under_MAC[t,r] if value(m.allow_trade) else m.abatement_costs[t,r]
-        ) == AC(m.relative_abatement[t,r], m.learning_factor[t], m.MAC_gamma, m.MAC_beta) * m.baseline[t,r], 'abatement_costs'),
+        ) == AC(m.relative_abatement[t,r], m.learning_factor[t], m.MAC_gamma, m.MAC_beta, m.MAC_scaling_factor[r]) * m.baseline[t,r], 'abatement_costs'),
         RegionalConstraint(lambda m,t,r: m.rel_abatement_costs[t,r] == m.abatement_costs[t,r] / m.GDP_gross[t,r], 'rel_abatement_costs'),
-        RegionalConstraint(lambda m,t,r: m.carbonprice[t,r] == MAC(m.relative_abatement[t,r], m.learning_factor[t], m.MAC_gamma, m.MAC_beta), 'carbonprice'),
+        RegionalConstraint(lambda m,t,r: m.carbonprice[t,r] == MAC(m.relative_abatement[t,r], m.learning_factor[t], m.MAC_gamma, m.MAC_beta, m.MAC_scaling_factor[r]), 'carbonprice'),
         RegionalInitConstraint(lambda m,r: m.carbonprice[0,r] == 0)
     ])
 
@@ -80,8 +81,8 @@ def constraints(m):
 #################
 
 
-def MAC(a, factor, gamma, beta):
-    return gamma * factor * a**beta
+def MAC(a, factor, gamma, beta, MAC_scaling_factor):
+    return gamma * factor * MAC_scaling_factor * a**beta
 
-def AC(a, factor, gamma, beta):
-    return gamma * factor * a**(beta+1) / (beta+1)
+def AC(a, factor, gamma, beta, MAC_scaling_factor):
+    return gamma * factor * MAC_scaling_factor * a**(beta+1) / (beta+1)

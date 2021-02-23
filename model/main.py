@@ -92,6 +92,7 @@ class MIMOSA:
 
             'MAC_gamma':        v(quant(params['economics']['MAC']['gamma'], 'currency_unit/emissionsrate_unit')),
             'MAC_beta':         v(params['economics']['MAC']['beta']),
+            'MAC_scaling_factor': {r: self.regions[r]['MAC scaling factor'] for r in self.regions},
 
             'init_capitalstock_factor': {r: self.regions[r]['initial capital factor'] for r in self.regions},
             'alpha':            v(params['economics']['GDP']['alpha']),
