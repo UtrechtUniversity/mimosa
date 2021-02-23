@@ -92,11 +92,11 @@ def constraints(m):
         RegionalInitConstraint(lambda m,r: m.adapt_FAD[0,r] == 0),
 
         RegionalConstraint(
-            lambda m,t,r: m.adapt_level[t,r] == m.adap1[r] * (
+            lambda m,t,r: ( m.adapt_level[t,r] == m.adap1[r] * (
                 m.adap2[r] * soft_min(m.adapt_FAD[t,r], scale=0.005)**m.adapt_rho
                 +
                 (1-m.adap2[r]) * soft_min(m.adapt_SAD[t,r], scale=0.005)**m.adapt_rho
-            ) ** (m.adap3[r] / m.adapt_rho),
+            ) ** (m.adap3[r] / m.adapt_rho) ) if t > 0 else (m.adapt_level[t,r] == 0),
             name='adapt_level'
         ),
         RegionalConstraint(lambda m,t,r: m.adapt_costs[t,r] == m.adapt_FAD[t,r] + m.adapt_IAD[t,r], 'adapt_costs'),
