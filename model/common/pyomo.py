@@ -93,10 +93,10 @@ class RegionalInitConstraint(GeneralConstraint):
 class UsefulVar:
     def __init__(self, m, name: str):
         self.m = m
-        var = getattr(m, name)
+        self.var = getattr(m, name)
         
         self.name = name
-        self.is_regional, self.indices = self._get_indices(var)
+        self.is_regional, self.indices = self._get_indices(self.var)
 
         self.index_values = {
             index: list(getattr(m, index))

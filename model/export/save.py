@@ -7,6 +7,7 @@ from pyomo.environ import value
 import hashlib
 
 from model.common import utils
+from model.common.pyomo import *
 
 def save_output(params, m, experiment=None, random_id=False, folder='output'):
 
@@ -16,50 +17,21 @@ def save_output(params, m, experiment=None, random_id=False, folder='output'):
     else:
         id = hashlib.md5(json.dumps(params).encode()).hexdigest()[:9]
 
-    # 2. Save the data
-    global_vars = [
-        m.global_emissions,
-        m.temperature,
-        m.cumulative_emissions,
-        m.learning_factor,
-        m.global_rel_abatement_costs,
+    # 2. Save the Pyomo variables and data functions
+    all_variables = get_all_variables(m)
+
+    all_functions = [
+        [m.population, 'population']
     ]
-    regional_vars = [
-        [m.baseline, 'baseline'],
-        [m.population, 'population'],
-        m.regional_emissions,
-        m.carbonprice,
-        m.capital_stock,
-        m.GDP_gross, m.GDP_net,
-        m.consumption,
-        m.utility,
-        m.abatement_costs,
-        m.damage_costs
-    ]
-    try:
-        regional_vars.extend([
-            m.resid_damages,
-            m.gross_damages,
-            m.adapt_costs,
-            m.adapt_level,
-        ])
-    except:
-        pass
-    try:
-        global_vars.extend([
-            m.temperaturedot,
-            m.smoothed_factor
-        ])
-    except:
-        pass
+    
     rows = []
-    for var in global_vars:
-        var_to_row(rows, m, var, False)
-    for var in regional_vars:
+    for var in all_functions:
         var_to_row(rows, m, var, True)
+    for useful_var in all_variables:
+        var_to_row(rows, m, useful_var.var, useful_var.is_regional)
     df = rows_to_dataframe(rows, m)
 
-    add_param_columns(df, params, id, experiment)
+    # add_param_columns(df, params, id, experiment)
 
 
     # 3. Save the CSV file
@@ -69,9 +41,8 @@ def save_output(params, m, experiment=None, random_id=False, folder='output'):
     df.to_csv(f'{folder}/output_{filename}.csv', float_format='%.6g', index=False)
 
     # 3. Save the param file
-    os.makedirs(f'{folder}/params/', exist_ok=True)
-    with open (f'{folder}/params/params_{filename}.json', 'w') as fp:
-        json.dump({id: params}, fp)
+    with open (f'{folder}/output_{filename}.csv.params.json', 'w') as fp:
+        json.dump(params, fp)
 
 
 
@@ -108,7 +79,7 @@ def rows_to_dataframe(rows, m):
 def add_param_columns(df, params, id, experiment):
     values = {
         'carbonbudget': params['emissions']['carbonbudget'],
-        'minlevel': params['emissions']['min level'],
+        'minlevel': params['emissions']['global min level'],
         'inertia': params['emissions']['inertia']['regional'],
         'gamma': params['economics']['MAC']['gamma'],
         'PRTP': params['economics']['PRTP'],

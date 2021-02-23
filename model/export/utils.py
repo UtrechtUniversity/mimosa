@@ -111,7 +111,7 @@ def visualise_IPOPT_output(output_file):
         if line.strip() == '':
             in_iterations = False
 
-        if in_iterations and not line.startswith('iter '):
+        if in_iterations and line.startswith(' '):
             split = line.strip().split(' ')[:4]
 
             # Check if it was a recovered iteration
