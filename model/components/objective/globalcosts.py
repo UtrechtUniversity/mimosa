@@ -1,17 +1,26 @@
-##############################################
-# Model equations and constraints:
-# Objective function
-#
-##############################################
+"""
+Model equations and constraints:
+Objective function
+"""
 
-from model.common.pyomo import *
+from model.common.pyomo import (
+    Param,
+    Var,
+    GlobalConstraint,
+    GlobalInitConstraint,
+    Constraint,
+    Objective,
+    exp,
+    minimize,
+)
 
-def constraints(m):
+
+def get_constraints(m):
     """Equations and constraints for the objective of the optimisation
     (global costs specification)
 
     Necessary variables:
-        
+
 
     Returns:
         - Objective
@@ -21,17 +30,24 @@ def constraints(m):
 
     m.NPV = Var(m.t)
     m.PRTP = Param()
-    constraints.extend([
-        GlobalConstraint(
-            lambda m,t: m.NPV[t] == m.NPV[t-1] + m.dt * exp(-m.PRTP * (m.year(t) - m.beginyear)) * (
-                sum(m.abatement_costs[t,r] for r in m.regions) 
-                + sum(m.damage_costs[t,r] * m.GDP_gross[t,r] for r in m.regions)
-            )
-            if t > 0 else Constraint.Skip,
-            name='NPV'
-        ),
-        GlobalInitConstraint(lambda m: m.NPV[0] == 0)
-    ])
+    constraints.extend(
+        [
+            GlobalConstraint(
+                lambda m, t: m.NPV[t]
+                == m.NPV[t - 1]
+                + m.dt
+                * exp(-m.PRTP * (m.year(t) - m.beginyear))
+                * (
+                    sum(m.abatement_costs[t, r] for r in m.regions)
+                    + sum(m.damage_costs[t, r] * m.GDP_gross[t, r] for r in m.regions)
+                )
+                if t > 0
+                else Constraint.Skip,
+                name="NPV",
+            ),
+            GlobalInitConstraint(lambda m: m.NPV[0] == 0),
+        ]
+    )
 
     objective = Objective(rule=lambda m: m.NPV[m.tf], sense=minimize)
 

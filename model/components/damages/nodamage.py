@@ -1,12 +1,12 @@
-##############################################
-# Model equations and constraints:
-# Damage and adaptation costs
-#
-##############################################
+"""
+Model equations and constraints:
+Damage and adaptation costs
+"""
 
-from model.common.pyomo import *
+from model.common.pyomo import Var, RegionalConstraint
 
-def constraints(m):
+
+def get_constraints(m):
     """Damage and adaptation costs equations and constraints
     (no-damage specification)
 
@@ -18,9 +18,13 @@ def constraints(m):
     """
     constraints = []
 
-    m.damage_costs  = Var(m.t, m.regions, initialize=0.0)
-    constraints.extend([
-        RegionalConstraint(lambda m,t,r: m.damage_costs[t,r] == 0.0, 'zero_damage_costs')
-    ])
+    m.damage_costs = Var(m.t, m.regions, initialize=0.0)
+    constraints.extend(
+        [
+            RegionalConstraint(
+                lambda m, t, r: m.damage_costs[t, r] == 0.0, "zero_damage_costs"
+            )
+        ]
+    )
 
     return constraints

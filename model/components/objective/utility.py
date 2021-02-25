@@ -1,12 +1,21 @@
-##############################################
-# Model equations and constraints:
-# Objective function
-#
-##############################################
+"""
+Model equations and constraints:
+Objective function
+"""
 
-from model.common.pyomo import *
+from model.common.pyomo import (
+    Param,
+    Var,
+    GlobalConstraint,
+    GlobalInitConstraint,
+    Constraint,
+    Objective,
+    exp,
+    maximize,
+)
 
-def constraints(m):
+
+def get_constraints(m):
     """Equations and constraints for the objective of the optimisation
     (utility specification)
 
@@ -21,21 +30,24 @@ def constraints(m):
 
     m.NPV = Var(m.t)
     m.PRTP = Param()
-    constraints.extend([
-        GlobalConstraint(
-            lambda m,t: m.NPV[t] == m.NPV[t-1] + m.dt * exp(-m.PRTP * (m.year(t) - m.beginyear)) * sum(m.L(m.year(t),r) * m.utility[t,r] for r in m.regions) 
-            if t > 0 else Constraint.Skip,
-            name='NPV'
-        ),
-        GlobalInitConstraint(lambda m: m.NPV[0] == 0)
-    ])
-
-
-
-    
+    constraints.extend(
+        [
+            GlobalConstraint(
+                lambda m, t: m.NPV[t]
+                == m.NPV[t - 1]
+                + m.dt
+                * exp(-m.PRTP * (m.year(t) - m.beginyear))
+                * sum(m.L(m.year(t), r) * m.utility[t, r] for r in m.regions)
+                if t > 0
+                else Constraint.Skip,
+                name="NPV",
+            ),
+            GlobalInitConstraint(lambda m: m.NPV[0] == 0),
+        ]
+    )
 
     ## If carbon budget is a soft constraint (not in use now):
-    
+
     # m.obj = Objective(rule=lambda m: m.NPV[m.tf] * (
     #     soft_switch(m.budget-(
     #         m.cumulative_emissions[m.year2100]

@@ -1,19 +1,19 @@
-##############################################
-# Abstract representation of the model
-# --------------------------------------------
-# Contains all model equations and constraints
-#
-##############################################
+"""
+Abstract representation of the model
+--------------------------------------------
+Contains all model equations and constraints
+"""
 
 import numpy as np
-from model.common import utils, economics
-from model.common.pyomo import *
+from model.common import utils
+from model.common.pyomo import Param, AbstractModel, Set
 from model.components import emissions, abatement, cobbdouglas, damages, objective
 
 
 ######################
 # Create model
 ######################
+
 
 def create_abstract_model(damage_module, objective_module):
 
@@ -24,85 +24,78 @@ def create_abstract_model(damage_module, objective_module):
     # then added to the model at the end of this file.
     constraints = []
 
-
     ## Time and region
-    m.beginyear     = Param()
-    m.dt            = Param()
-    m.tf            = Param()
-    m.t             = Set()
-    m.year          = None  # Initialised with concrete instance
-    m.year2100      = Param()
+    m.beginyear = Param()
+    m.dt = Param()
+    m.tf = Param()
+    m.t = Set()
+    m.year = None  # Initialised with concrete instance
+    m.year2100 = Param()
 
     m.regions = Set(ordered=True)
-
 
     ######################
     # Create data functions
     # Will be initialised when creating a concrete instance of the model
     ######################
 
-    m.baseline_emissions    = None
-    m.population            = None
-    m.TFP                   = None
-    m.GDP                   = None
-    m.carbon_intensity      = None
+    m.baseline_emissions = None
+    m.population = None
+    m.TFP = None
+    m.GDP = None
+    m.carbon_intensity = None
+
     def baseline_cumulative(year_start, year_end, region):
         years = np.linspace(year_start, year_end, 100)
         return np.trapz(m.baseline_emissions(years, region), x=years)
-    m.baseline_cumulative = baseline_cumulative
-    m.baseline_cumulative_global = lambda m, year_start, year_end: sum(baseline_cumulative(year_start, year_end, r) for r in m.regions)
 
+    m.baseline_cumulative = baseline_cumulative
+    m.baseline_cumulative_global = lambda m, year_start, year_end: sum(
+        baseline_cumulative(year_start, year_end, r) for r in m.regions
+    )
 
     ######################
     # Components
     ######################
 
     # Emissions and temperature equations
-    constraints.extend(emissions.constraints(m))
-
+    constraints.extend(emissions.get_constraints(m))
 
     # Damage costs
-    if damage_module == 'RICE2010':
+    if damage_module == "RICE2010":
         constraints.extend(damages.AD_RICE2010.constraints(m))
-    elif damage_module == 'WITCH':
+    elif damage_module == "WITCH":
         constraints.extend(damages.AD_WITCH.constraints(m))
-    elif damage_module == 'RICE2012':
-        constraints.extend(damages.AD_RICE2012.constraints(m))
-    elif damage_module == 'nodamage':
-        constraints.extend(damages.nodamage.constraints(m))
+    elif damage_module == "RICE2012":
+        constraints.extend(damages.AD_RICE2012.get_constraints(m))
+    elif damage_module == "nodamage":
+        constraints.extend(damages.nodamage.get_constraints(m))
     else:
         raise NotImplementedError
 
-
     # Abatement costs
-    constraints.extend(abatement.constraints(m))
-
+    constraints.extend(abatement.get_constraints(m))
 
     # Cobb-Douglas and economics
-    constraints.extend(cobbdouglas.constraints(m))
-
+    constraints.extend(cobbdouglas.get_constraints(m))
 
     # Objective of optimisation
-    if objective_module == 'utility':
-        objective_rule, objective_constraints = objective.utility.constraints(m)
-    elif objective_module == 'globalcosts':
-        objective_rule, objective_constraints = objective.globalcosts.constraints(m)
+    if objective_module == "utility":
+        objective_rule, objective_constraints = objective.utility.get_constraints(m)
+    elif objective_module == "globalcosts":
+        objective_rule, objective_constraints = objective.globalcosts.get_constraints(m)
     else:
         raise NotImplementedError
 
     constraints.extend(objective_constraints)
 
-
-
-
     ######################
     # Add constraints to abstract model
     ######################
-    
+
     for constraint in constraints:
         utils.add_constraint(m, constraint.to_pyomo_constraint(m), constraint.name)
 
-        
     m.obj = objective_rule
 
     return m
