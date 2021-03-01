@@ -4,7 +4,7 @@ Economics and Cobb-Douglas
 """
 
 from typing import Sequence
-from model.common.pyomo import (
+from model.common import (
     AbstractModel,
     Param,
     Var,
@@ -14,8 +14,8 @@ from model.common.pyomo import (
     Constraint,
     value,
     soft_min,
+    economics,
 )
-from model.common import economics
 
 
 def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:

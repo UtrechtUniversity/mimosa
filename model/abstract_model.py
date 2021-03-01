@@ -5,8 +5,7 @@ Contains all model equations and constraints
 """
 
 import numpy as np
-from model.common import utils
-from model.common.pyomo import Param, AbstractModel, Set
+from model.common import Param, AbstractModel, Set, add_constraint
 from model.components import emissions, abatement, cobbdouglas, damages, objective
 
 
@@ -39,11 +38,11 @@ def create_abstract_model(damage_module: str, objective_module: str) -> Abstract
     # Will be initialised when creating a concrete instance of the model
     ######################
 
-    m.baseline_emissions = None
-    m.population = None
-    m.TFP = None
-    m.GDP = None
-    m.carbon_intensity = None
+    m.baseline_emissions = lambda year, region: None
+    m.population = lambda year, region: None
+    m.TFP = lambda year, region: None
+    m.GDP = lambda year, region: None
+    m.carbon_intensity = lambda year, region: None
 
     def baseline_cumulative(year_start, year_end, region):
         years = np.linspace(year_start, year_end, 100)
@@ -94,7 +93,7 @@ def create_abstract_model(damage_module: str, objective_module: str) -> Abstract
     ######################
 
     for constraint in constraints:
-        utils.add_constraint(m, constraint.to_pyomo_constraint(m), constraint.name)
+        add_constraint(m, constraint.to_pyomo_constraint(m), constraint.name)
 
     m.obj = objective_rule
 

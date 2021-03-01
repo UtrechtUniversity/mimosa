@@ -10,8 +10,7 @@ Finally, the export functions are called here.
 import os
 import numpy as np
 
-from model.common import data, utils, units
-from model.common.pyomo import (
+from model.common import (
     AbstractModel,
     TransformationFactory,
     SolverFactory,
@@ -19,6 +18,9 @@ from model.common.pyomo import (
     SolverStatus,
     value,
     OptSolver,
+    data,
+    utils,
+    units,
 )
 from model.export.plot import full_plot, visualise_IPOPT_output
 from model.export.save import save_output
@@ -29,7 +31,7 @@ ABSTRACT_MODELS = {}
 
 # Util to create a None-indexed dictionary for scalar components
 # (see https://pyomo.readthedocs.io/en/stable/working_abstractmodels/data/raw_dicts.html)
-v = lambda val: {None: val}
+V = lambda val: {None: val}
 
 
 class MIMOSA:
@@ -174,68 +176,68 @@ class MIMOSA:
         self.abstract_model.year = lambda t: t_start + t * dt
         year2100 = int((2100 - t_start) / dt)
         return {
-            "beginyear": v(t_start),
-            "dt": v(dt),
-            "tf": v(num_years - 1),
-            "t": v(range(num_years)),
-            "year2100": v(year2100),
-            "regions": v(params["regions"].keys()),
-            "baseline_carbon_intensity": v(
+            "beginyear": V(t_start),
+            "dt": V(dt),
+            "tf": V(num_years - 1),
+            "t": V(range(num_years)),
+            "year2100": V(year2100),
+            "regions": V(params["regions"].keys()),
+            "baseline_carbon_intensity": V(
                 params["emissions"]["baseline carbon intensity"]
             ),
-            "budget": v(quant(params["emissions"]["carbonbudget"], "emissions_unit")),
-            "inertia_regional": v(params["emissions"]["inertia"]["regional"]),
-            "inertia_global": v(params["emissions"]["inertia"]["global"]),
-            "global_min_level": v(
+            "budget": V(quant(params["emissions"]["carbonbudget"], "emissions_unit")),
+            "inertia_regional": V(params["emissions"]["inertia"]["regional"]),
+            "inertia_global": V(params["emissions"]["inertia"]["global"]),
+            "global_min_level": V(
                 quant(params["emissions"]["global min level"], "emissionsrate_unit")
             ),
-            "regional_min_level": v(
+            "regional_min_level": V(
                 quant(params["emissions"]["regional min level"], "emissionsrate_unit")
             ),
-            "no_pos_emissions_after_budget_year": v(
+            "no_pos_emissions_after_budget_year": V(
                 params["emissions"]["not positive after budget year"]
             ),
-            "T0": v(quant(params["temperature"]["initial"], "temperature_unit")),
-            "TCRE": v(
+            "T0": V(quant(params["temperature"]["initial"], "temperature_unit")),
+            "TCRE": V(
                 quant(
                     params["temperature"]["TCRE"],
                     "(temperature_unit)/(emissions_unit)",
                 )
             ),
-            "LBD_rate": v(params["economics"]["MAC"]["rho"]),
-            "LBD_scaling": v(quant("40 GtCO2", "emissions_unit")),
-            "LOT_rate": v(0),
-            "damage_scale_factor": v(params["economics"]["damages"]["scale factor"]),
-            "fixed_adaptation": v(params["economics"]["adaptation"]["fixed"]),
-            "perc_reversible_damages": v(
+            "LBD_rate": V(params["economics"]["MAC"]["rho"]),
+            "LBD_scaling": V(quant("40 GtCO2", "emissions_unit")),
+            "LOT_rate": V(0),
+            "damage_scale_factor": V(params["economics"]["damages"]["scale factor"]),
+            "fixed_adaptation": V(params["economics"]["adaptation"]["fixed"]),
+            "perc_reversible_damages": V(
                 params["economics"]["damages"]["percentage reversible"]
             ),
-            "ignore_damages": v(params["economics"]["damages"]["ignore damages"]),
-            "MAC_gamma": v(
+            "ignore_damages": V(params["economics"]["damages"]["ignore damages"]),
+            "MAC_gamma": V(
                 quant(
                     params["economics"]["MAC"]["gamma"],
                     "currency_unit/emissionsrate_unit",
                 )
             ),
-            "MAC_beta": v(params["economics"]["MAC"]["beta"]),
+            "MAC_beta": V(params["economics"]["MAC"]["beta"]),
             "MAC_scaling_factor": {
                 r: self.regions[r]["MAC scaling factor"] for r in self.regions
             },
             "init_capitalstock_factor": {
                 r: self.regions[r]["initial capital factor"] for r in self.regions
             },
-            "alpha": v(params["economics"]["GDP"]["alpha"]),
-            "dk": v(params["economics"]["GDP"]["depreciation of capital"]),
-            "sr": v(params["economics"]["GDP"]["savings rate"]),
-            "elasmu": v(params["economics"]["elasmu"]),
-            "PRTP": v(params["economics"]["PRTP"]),
-            "allow_trade": v(params["model"]["allow trade"]),
+            "alpha": V(params["economics"]["GDP"]["alpha"]),
+            "dk": V(params["economics"]["GDP"]["depreciation of capital"]),
+            "sr": V(params["economics"]["GDP"]["savings rate"]),
+            "elasmu": V(params["economics"]["elasmu"]),
+            "PRTP": V(params["economics"]["PRTP"]),
+            "allow_trade": V(params["model"]["allow trade"]),
         }
 
     def __instance_data_rice2010(self) -> dict:
         params = self.params
         return {
-            "adapt_curr_level": v(params["economics"]["adaptation"]["curr_level"]),
+            "adapt_curr_level": V(params["economics"]["adaptation"]["curr_level"]),
             "damage_a1": self.data_store.get_regional("damages", "a1"),
             "damage_a2": self.data_store.get_regional("damages", "a2"),
             "damage_a3": self.data_store.get_regional("damages", "a3"),
@@ -244,28 +246,24 @@ class MIMOSA:
         }
 
     def __instance_data_rice2012(self) -> dict:
-        params = self.params
         return {
-            "adapt_curr_level": v(
-                params["economics"]["adaptation"]["curr_level"]
-            ),  # TODO unused?
             "damage_a1": self.data_store.get_regional("damages", "a1"),
             "damage_a2": self.data_store.get_regional("damages", "a2"),
             "damage_a3": self.data_store.get_regional("damages", "a3"),
             "adap1": self.data_store.get_regional("adaptation", "nu1"),
             "adap2": self.data_store.get_regional("adaptation", "nu2"),
             "adap3": self.data_store.get_regional("adaptation", "nu3"),
-            "adapt_rho": v(0.5),
+            "adapt_rho": V(0.5),
             # Sea level rise:
-            "S1": v(0.5),
-            "S2": v(0.0920666936642),
-            "S3": v(0.024076141150722),
-            "M1": v(0.0008),
-            "M2": v(0.26),
-            "M3": v(-1),
-            "M4": v(1.11860081578514),
-            "M5": v(0.6),
-            "M6": v(7.3),
+            "S1": V(0.5),
+            "S2": V(0.0920666936642),
+            "S3": V(0.024076141150722),
+            "M1": V(0.0008),
+            "M2": V(0.26),
+            "M3": V(-1),
+            "M4": V(1.11860081578514),
+            "M5": V(0.6),
+            "M6": V(7.3),
             "SLRdam1": self.data_store.get_regional("damages", "SLRDAM1"),
             "SLRdam2": self.data_store.get_regional("damages", "SLRDAM2"),
         }

@@ -4,15 +4,16 @@ Objective function
 """
 
 from typing import Sequence, Tuple
-from model.common.pyomo import (
+
+from model.common import (
     AbstractModel,
-    Param,
-    Var,
+    Constraint,
     GeneralConstraint,
     GlobalConstraint,
     GlobalInitConstraint,
-    Constraint,
     Objective,
+    Param,
+    Var,
     exp,
     minimize,
 )

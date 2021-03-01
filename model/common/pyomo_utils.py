@@ -2,30 +2,7 @@ import typing
 from abc import ABC, abstractmethod
 from numpy import pi
 
-# pylint: disable=unused-import
-from pyomo.environ import (
-    AbstractModel,
-    ConcreteModel,
-    Set,
-    TransformationFactory,
-    SolverFactory,
-    SolverStatus,
-    SolverManagerFactory,
-    Objective,
-    Param,
-    Var,
-    Constraint,
-    value,
-    maximize,
-    minimize,
-    log,
-    exp,
-    tanh,
-    sqrt,
-    atan,
-    NonNegativeReals,
-)
-from pyomo.opt.base.solvers import OptSolver
+from pyomo.environ import Var, Constraint, atan
 
 ####### Extra functions
 

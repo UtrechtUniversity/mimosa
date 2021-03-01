@@ -4,7 +4,7 @@ Abatement costs
 """
 
 from typing import Sequence
-from model.common.pyomo import (
+from model.common import (
     AbstractModel,
     Param,
     Var,

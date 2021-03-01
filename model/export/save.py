@@ -5,8 +5,7 @@ import hashlib
 import numpy as np
 import pandas as pd
 
-from model.common import utils
-from model.common.pyomo import get_all_variables, value
+from model.common import first, get_all_variables, value
 
 
 def save_output(params, m, experiment=None, random_id=False, folder="output"):
@@ -79,7 +78,7 @@ def add_param_columns(df, params, exp_id, experiment):
         "inertia": params["emissions"]["inertia"]["regional"],
         "gamma": params["economics"]["MAC"]["gamma"],
         "PRTP": params["economics"]["PRTP"],
-        "damage_coeff": utils.first(params["regions"])["damages"][
+        "damage_coeff": first(params["regions"])["damages"][
             "a2"
         ],  # NOTE, only for global run
         "perc_reversible": params["economics"]["damages"]["percentage reversible"],

@@ -4,7 +4,7 @@ Damage and adaptation costs
 """
 
 from typing import Sequence
-from model.common.pyomo import AbstractModel, Var, GeneralConstraint, RegionalConstraint
+from model.common import AbstractModel, Var, GeneralConstraint, RegionalConstraint
 
 
 def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
