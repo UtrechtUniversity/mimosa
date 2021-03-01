@@ -15,7 +15,7 @@ from model.components import emissions, abatement, cobbdouglas, damages, objecti
 ######################
 
 
-def create_abstract_model(damage_module, objective_module):
+def create_abstract_model(damage_module: str, objective_module: str) -> AbstractModel:
 
     m = AbstractModel()
 

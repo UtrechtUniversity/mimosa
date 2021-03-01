@@ -3,9 +3,12 @@ Model equations and constraints:
 Emissions and temperature
 """
 
+from typing import Sequence
 from model.common.pyomo import (
+    AbstractModel,
     Param,
     Var,
+    GeneralConstraint,
     GlobalConstraint,
     GlobalInitConstraint,
     RegionalConstraint,
@@ -15,7 +18,7 @@ from model.common.pyomo import (
 )
 
 
-def get_constraints(m):
+def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     """Emissions and temperature equations and constraints
 
     Necessary variables:

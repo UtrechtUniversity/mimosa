@@ -3,9 +3,12 @@ Model equations and constraints:
 Damage and adaptation costs, RICE specification
 """
 
+from typing import Sequence
 from model.common.pyomo import (
+    AbstractModel,
     Param,
     Var,
+    GeneralConstraint,
     GlobalConstraint,
     GlobalInitConstraint,
     RegionalConstraint,
@@ -16,7 +19,7 @@ from model.common.pyomo import (
 )
 
 
-def get_constraints(m):
+def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     """Damage and adaptation costs equations and constraints
     (RICE specification)
 

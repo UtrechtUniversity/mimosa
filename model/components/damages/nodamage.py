@@ -3,10 +3,11 @@ Model equations and constraints:
 Damage and adaptation costs
 """
 
-from model.common.pyomo import Var, RegionalConstraint
+from typing import Sequence
+from model.common.pyomo import AbstractModel, Var, GeneralConstraint, RegionalConstraint
 
 
-def get_constraints(m):
+def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     """Damage and adaptation costs equations and constraints
     (no-damage specification)
 

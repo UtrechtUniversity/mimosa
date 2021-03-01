@@ -3,9 +3,12 @@ Model equations and constraints:
 Economics and Cobb-Douglas
 """
 
+from typing import Sequence
 from model.common.pyomo import (
+    AbstractModel,
     Param,
     Var,
+    GeneralConstraint,
     RegionalConstraint,
     RegionalInitConstraint,
     Constraint,
@@ -15,7 +18,7 @@ from model.common.pyomo import (
 from model.common import economics
 
 
-def get_constraints(m):
+def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     """Economics and Cobb-Douglas equations and constraints
 
     Necessary variables:

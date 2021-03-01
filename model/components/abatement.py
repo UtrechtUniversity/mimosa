@@ -3,9 +3,12 @@ Model equations and constraints:
 Abatement costs
 """
 
+from typing import Sequence
 from model.common.pyomo import (
+    AbstractModel,
     Param,
     Var,
+    GeneralConstraint,
     GlobalConstraint,
     RegionalConstraint,
     RegionalInitConstraint,
@@ -17,7 +20,7 @@ from model.common.pyomo import (
 )
 
 
-def get_constraints(m):
+def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     """Abatement cost equations and constraints
 
     Necessary variables:

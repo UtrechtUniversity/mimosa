@@ -25,6 +25,7 @@ from pyomo.environ import (
     atan,
     NonNegativeReals,
 )
+from pyomo.opt.base.solvers import OptSolver
 
 ####### Extra functions
 

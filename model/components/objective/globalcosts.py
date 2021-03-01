@@ -3,9 +3,12 @@ Model equations and constraints:
 Objective function
 """
 
+from typing import Sequence, Tuple
 from model.common.pyomo import (
+    AbstractModel,
     Param,
     Var,
+    GeneralConstraint,
     GlobalConstraint,
     GlobalInitConstraint,
     Constraint,
@@ -15,7 +18,7 @@ from model.common.pyomo import (
 )
 
 
-def get_constraints(m):
+def get_constraints(m: AbstractModel) -> Tuple[Objective, Sequence[GeneralConstraint]]:
     """Equations and constraints for the objective of the optimisation
     (global costs specification)
 
