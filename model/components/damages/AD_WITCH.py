@@ -16,7 +16,12 @@ def constraints(m):
         m.damage_costs (sum of residual damages and adaptation costs, % of GDP)
 
     Returns:
-        list of constraints (GlobalConstraint, GlobalInitConstraint, RegionalConstraint, RegionalInitConstraint)
+        list of constraints (any of:
+           - GlobalConstraint
+           - GlobalInitConstraint
+           - RegionalConstraint
+           - RegionalInitConstraint
+        )
     """
     constraints = []
 

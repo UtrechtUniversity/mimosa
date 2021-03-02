@@ -9,6 +9,15 @@ UREG.load_definitions("input/units.txt")
 
 
 class Quantity:
+    """
+    The Quantity object creates a callable object which parses quantities
+    with units (see __call__ usage).
+
+    Args:
+        params (dict): contains all Param values
+
+    """
+
     def __init__(self, params):
         self.params = params
 
@@ -26,14 +35,14 @@ class Quantity:
             return False
 
         # First parse target units with default units
-        target_unit = self._parse_default_units(self._custom_replace(args[-1]))
+        target_unit = self._parse_default_units(custom_replace(args[-1]))
 
         if len(args) == 2:
-            string = self._custom_replace(str(args[0]))
+            string = custom_replace(str(args[0]))
             quantity = UREG.Quantity(string)
         elif len(args) == 3:
             value = args[0]
-            unit = self._custom_replace(str(args[1]))
+            unit = custom_replace(str(args[1]))
             quantity = UREG.Quantity(value, unit)
         else:
             raise Exception("Wrong usage of Quant function")
@@ -56,6 +65,6 @@ class Quantity:
             units = units.replace(key, f"({value})")
         return units
 
-    def _custom_replace(self, units):
-        return units.replace("US$", "USD")
 
+def custom_replace(units):
+    return units.replace("US$", "USD")

@@ -35,7 +35,24 @@ V = lambda val: {None: val}
 
 
 class MIMOSA:
-    def __init__(self, params):
+    """
+    The MIMOSA object creates an AbstractModel, makes a Concrete instance
+    out of it, solves it and saves the results.
+
+    Args:
+        params (dict): contains all Param values, and is based on `input/config.yaml`
+
+    Attributes:
+        params (dict)
+        regions (dict): taken from params
+        quant (Quantity): callable object used to parse and convert quantities with units
+        abstract_model (AbstractModel): the AbstractModel taken from the cache `ABSTRACT_MODELS`
+        data_store (DataStore): object used to access regional data from the input database
+        m (ConcreteModel): concrete instance of `abstract_model`
+
+    """
+
+    def __init__(self, params: dict):
         self.params = params
         self.regions = params["regions"]
         self.quant = units.Quantity(params)
@@ -45,6 +62,17 @@ class MIMOSA:
         self.preparation()
 
     def get_abstract_model(self) -> AbstractModel:
+        """
+        Since the AbstractModel only depends on the damage module
+        and objective module, it doesn't need to be recreated everytime
+        different parameter values are used. That's why we put it in the
+        cache, with access key the tuple (damage_module, objective_module).
+        These values are obtained from self.params.
+
+
+        Returns:
+            AbstractModel: model corresponding to the damage/objective module combination
+        """
         damage_module = self.params["model"]["damage module"]
         objective_module = self.params["model"]["objective module"]
         if (damage_module, objective_module) not in ABSTRACT_MODELS:
@@ -292,4 +320,3 @@ class MIMOSA:
             "adapt_rho_act": self.data_store.get_regional("adaptation", "rho_act"),
             "adapt_eps": self.data_store.get_regional("adaptation", "eps"),
         }
-

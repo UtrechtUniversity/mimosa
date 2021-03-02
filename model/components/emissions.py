@@ -28,7 +28,12 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
         m.temperature
 
     Returns:
-        list of constraints (GlobalConstraint, GlobalInitConstraint, RegionalConstraint, RegionalInitConstraint)
+        list of constraints (any of:
+           - GlobalConstraint
+           - GlobalInitConstraint
+           - RegionalConstraint
+           - RegionalInitConstraint
+        )
     """
     constraints = []
 
@@ -105,14 +110,20 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     # m.overshoot = Var(m.t, initialize=0)
     # m.overshootdot = DerivativeVar(m.overshoot, wrt=m.t)
     # m.netnegative_emissions = Var(m.t)
-    # global_constraints.extend([
-    #     lambda m,t: m.netnegative_emissions[t] == m.global_emissions[t] * (1-tanh(m.global_emissions[t] * 10))/2 if value(m.perc_reversible_damages) < 1 else Constraint.Skip,
-    #     lambda m,t: m.overshootdot[t] == (m.netnegative_emissions[t] if t <= value(m.year2100) and t > 0 else 0) if value(m.perc_reversible_damages) < 1 else Constraint.Skip
-    # ])
+    # global_constraints.extend(
+    #     [
+    #         lambda m, t: m.netnegative_emissions[t]
+    #         == m.global_emissions[t] * (1 - tanh(m.global_emissions[t] * 10)) / 2
+    #         if value(m.perc_reversible_damages) < 1
+    #         else Constraint.Skip,
+    #         lambda m, t: m.overshootdot[t]
+    #         == (m.netnegative_emissions[t] if t <= value(m.year2100) and t > 0 else 0)
+    #         if value(m.perc_reversible_damages) < 1
+    #         else Constraint.Skip,
+    #     ]
+    # )
 
-    # global_constraints_init.extend([
-    #     lambda m: m.overshoot[0] == 0
-    # ])
+    # global_constraints_init.extend([lambda m: m.overshoot[0] == 0])
 
     # Emission constraints
 

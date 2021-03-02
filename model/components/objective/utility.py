@@ -27,7 +27,12 @@ def get_constraints(m: AbstractModel) -> Tuple[Objective, Sequence[GeneralConstr
 
     Returns:
         - Objective
-        - list of constraints (GlobalConstraint, GlobalInitConstraint, RegionalConstraint, RegionalInitConstraint)
+        - list of constraints (any of:
+           - GlobalConstraint
+           - GlobalInitConstraint
+           - RegionalConstraint
+           - RegionalInitConstraint
+        )
     """
     constraints = []
 

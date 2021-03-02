@@ -1,13 +1,24 @@
-##############################################
-# Model equations and constraints:
-# Damage and adaptation costs, RICE specification
-#
-##############################################
+"""
+Model equations and constraints:
+Damage and adaptation costs, RICE specification
+"""
 
-from model.common import *
+from typing import Sequence
+from model.common import (
+    AbstractModel,
+    Param,
+    Var,
+    GeneralConstraint,
+    GlobalConstraint,
+    RegionalConstraint,
+    RegionalInitConstraint,
+    soft_min,
+    value,
+    tanh,
+)
 
 
-def constraints(m):
+def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     """Damage and adaptation costs equations and constraints
     (RICE specification)
 
@@ -15,7 +26,12 @@ def constraints(m):
         m.damage_costs (sum of residual damages and adaptation costs, as % of GDP)
 
     Returns:
-        list of constraints (GlobalConstraint, GlobalInitConstraint, RegionalConstraint, RegionalInitConstraint)
+        list of constraints (any of:
+           - GlobalConstraint
+           - GlobalInitConstraint
+           - RegionalConstraint
+           - RegionalInitConstraint
+        )
     """
     constraints = []
 
@@ -39,45 +55,14 @@ def constraints(m):
         [
             # Smoothing factor for partially reversible damages
             GlobalConstraint(
-                lambda m, t: (
-                    (
-                        m.smoothed_factor[t]
-                        == (
-                            tanh(
-                                ((m.temperature[t] - m.temperature[t - 1]) / m.dt)
-                                / 1e-3
-                            )
-                            + 1
-                        )
-                        * (1 - m.perc_reversible_damages)
-                        / 2
-                        + m.perc_reversible_damages
-                    )
-                    if m.perc_reversible_damages < 1 and t > 0
-                    else (m.smoothed_factor[t] == 1)
-                ),
+                lambda m, t: m.smoothed_factor[t]
+                == smoothed_factor(t, m.temperature, m.dt, m.perc_reversible_damages),
                 name="smoothed_factor",
             ),
             # Gross damages
             RegionalConstraint(
-                lambda m, t, r: (
-                    m.gross_damages[t, r]
-                    == m.gross_damages[t - 1, r]
-                    + m.dt
-                    * m.damage_scale_factor
-                    * (
-                        damage_fct_dot(m.temperature[t], m, r)
-                        * m.smoothed_factor[t]
-                        * (m.temperature[t] - m.temperature[t - 1])
-                        / m.dt
-                    )
-                )
-                if m.perc_reversible_damages < 1 and t > 0
-                else (  ### TODO the "and t > 0" might break things up here when perc_reversible < 1
-                    m.gross_damages[t, r]
-                    == m.damage_scale_factor
-                    * (damage_fct(m.temperature[t], m.T0, m, r))
-                ),
+                lambda m, t, r: m.gross_damages[t, r]
+                == calc_gross_damages(m, t, r, m.perc_reversible_damages),
                 name="gross_damages",
             ),
             RegionalConstraint(lambda m, t, r: m.gross_damages[t, r] >= 0),
@@ -93,11 +78,7 @@ def constraints(m):
                 == (
                     m.adapt_curr_level
                     if value(m.fixed_adaptation)
-                    else (
-                        optimal_adapt_level(m.gross_damages[t, r], m, r)
-                        if value(m.adapt_g1[r]) * value(m.adapt_g2[r]) > 0
-                        else 0
-                    )
+                    else optimal_adapt_level(m.gross_damages[t, r], m, r)
                 ),
                 name="adapt_level",
             ),
@@ -130,46 +111,67 @@ def constraints(m):
 # Damage function
 
 
-def damage_fct(T, T0, m, r):
-    return _damage_fct(soft_min(T), m.damage_a1[r], m.damage_a2[r], m.damage_a3[r], T0)
+def calc_gross_damages(m, t, r, perc_reversible_damages):
+    # If using partially irreversible damage, the damages
+    # are calculated using a differential equation (delta_damage)
+    if perc_reversible_damages < 1 and t > 0:
+        delta_temperature = m.temperature[t] - m.temperature[t - 1]
+        delta_damage = (
+            damage_fct_dot(m.temperature[t], m, r)
+            * m.smoothed_factor
+            * delta_temperature
+            / m.dt
+        )
+        return m.gross_damages[t - 1, r] + m.dt * m.damage_scale_factor * delta_damage
+
+    # Otherwise, simply use the damage function
+    return m.damage_scale_factor * damage_fct(m.temperature[t], m.T0, m, r)
 
 
-def damage_fct_dot(T, m, r):
-    return _damage_fct_dot(T, m.damage_a1[r], m.damage_a2[r], m.damage_a3[r])
+def damage_fct(temperature, init_temp, m, r):
+    power_fct = (
+        lambda temp: m.damage_a1[r] * temp + m.damage_a2[r] * temp ** m.damage_a3[r]
+    )
+
+    damage = power_fct(soft_min(temperature))
+    if init_temp is not None:
+        damage -= power_fct(init_temp)
+
+    return damage
 
 
-def _damage_fct(T, a1, a2, a3, T0=None):
-    """Quadratic damage function
-
-    T: temperature
-    T0 [None]: if specified, substracts damage at T0
+def damage_fct_dot(temperature, m, r):
     """
-    fct = lambda temp: a1 * temp + a2 * temp ** a3
-    dmg = fct(T)
-    if T0 is not None:
-        dmg -= fct(T0)
-    return dmg
-
-
-def _damage_fct_dot(T, a1, a2, a3):
-    return a1 + a2 * a3 * T ** (a3 - 1)
+    Derivative of the power function
+    """
+    return m.damage_a1[r] + m.damage_a2[r] * m.damage_a3[r] * temperature ** (
+        m.damage_a3[r] - 1
+    )
 
 
 # Adaptation cost function
+def adaptation_costs(adapt_level, m, r):
+    return m.adapt_g1[r] * soft_min(adapt_level) ** m.adapt_g2[r]
 
 
-def adaptation_costs(P, m, r):
-    return _adaptation_costs(P, m.adapt_g1[r], m.adapt_g2[r])
+def optimal_adapt_level(gross_damages, m, r):
+    if value(m.adapt_g1[r]) * value(m.adapt_g2[r]) == 0:
+        return 0
 
-
-def optimal_adapt_level(GD, m, r):
     eps = 0.0005
-    return (soft_min(GD, 0.01) / (m.adapt_g1[r] * m.adapt_g2[r]) + eps) ** (
+    return (soft_min(gross_damages, 0.01) / (m.adapt_g1[r] * m.adapt_g2[r]) + eps) ** (
         1 / (m.adapt_g2[r] - 1)
     )
+
     # return pow(GD / (m.adapt_g1[r] * m.adapt_g2[r]) + eps, 1/(m.adapt_g2[r]-1), abs=True)
 
 
-def _adaptation_costs(P, gamma1, gamma2):
-    return gamma1 * soft_min(P) ** gamma2
+# Partially irreversible damages:
+def smoothed_factor(t, temperature, dt, perc_revers):
+    if perc_revers < 1 and t > 0:
+        delta_temp = temperature[t] - temperature[t - 1]
+        return (tanh((delta_temp / dt) / 1e-3) + 1) * (
+            1 - perc_revers
+        ) / 2 + perc_revers
 
+    return 1

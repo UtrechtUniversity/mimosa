@@ -1,3 +1,8 @@
+"""
+Generates a CSV file with a row for each variable (`Var`)
+in the ConcreteModel `m`.
+"""
+
 import json
 import os
 import random
@@ -26,7 +31,7 @@ def save_output(params, m, experiment=None, random_id=False, folder="output"):
         var_to_row(rows, m, var, True)
     for useful_var in all_variables:
         var_to_row(rows, m, useful_var.var, useful_var.is_regional)
-    df = rows_to_dataframe(rows, m)
+    dataframe = rows_to_dataframe(rows, m)
 
     # add_param_columns(df, params, id, experiment)
 
@@ -34,11 +39,13 @@ def save_output(params, m, experiment=None, random_id=False, folder="output"):
     os.makedirs(folder + "/", exist_ok=True)
     filename = f"{exp_id}" if experiment is None else f"{experiment}_{exp_id}"
 
-    df.to_csv(f"{folder}/output_{filename}.csv", float_format="%.6g", index=False)
+    dataframe.to_csv(
+        f"{folder}/output_{filename}.csv", float_format="%.6g", index=False
+    )
 
     # 3. Save the param file
-    with open(f"{folder}/output_{filename}.csv.params.json", "w") as fp:
-        json.dump(params, fp)
+    with open(f"{folder}/output_{filename}.csv.params.json", "w") as fh:
+        json.dump(params, fh)
 
     return
 
@@ -67,11 +74,10 @@ def var_to_row(rows, m, var, is_regional):
 def rows_to_dataframe(rows, m):
     years = ["{:g}".format(year) for year in m.year(np.array(m.t))]
     columns = ["Variable", "Region"] + years
-    df = pd.DataFrame(rows, columns=columns)
-    return df
+    return pd.DataFrame(rows, columns=columns)
 
 
-def add_param_columns(df, params, exp_id, experiment):
+def add_param_columns(dataframe, params, exp_id, experiment):
     values = {
         "carbonbudget": params["emissions"]["carbonbudget"],
         "minlevel": params["emissions"]["global min level"],
@@ -85,10 +91,9 @@ def add_param_columns(df, params, exp_id, experiment):
         "TCRE": params["temperature"]["TCRE"],
     }
     for i, (name, val) in enumerate(values.items()):
-        df.insert(i + 2, name, val)
+        dataframe.insert(i + 2, name, val)
 
     # Add ID:
-    df.insert(0, "ID", exp_id)
+    dataframe.insert(0, "ID", exp_id)
     if experiment is not None:
-        df.insert(1, "Experiment", experiment)
-
+        dataframe.insert(1, "Experiment", experiment)
