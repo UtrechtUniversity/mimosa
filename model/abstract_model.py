@@ -62,11 +62,11 @@ def create_abstract_model(damage_module: str, objective_module: str) -> Abstract
 
     # Damage costs
     if damage_module == "RICE2010":
-        constraints.extend(damages.AD_RICE2010.get_constraints(m))
+        constraints.extend(damages.ad_rice2010.get_constraints(m))
     elif damage_module == "WITCH":
-        constraints.extend(damages.AD_WITCH.constraints(m))
+        constraints.extend(damages.ad_witch.constraints(m))
     elif damage_module == "RICE2012":
-        constraints.extend(damages.AD_RICE2012.get_constraints(m))
+        constraints.extend(damages.ad_rice2012.get_constraints(m))
     elif damage_module == "nodamage":
         constraints.extend(damages.nodamage.get_constraints(m))
     else:

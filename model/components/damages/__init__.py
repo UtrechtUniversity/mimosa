@@ -1,7 +1,7 @@
 """
 Imports the different damage modules
 """
-from . import AD_RICE2010
-from . import AD_RICE2012
-from . import AD_WITCH
+from . import ad_rice2010
+from . import ad_rice2012
+from . import ad_witch
 from . import nodamage
