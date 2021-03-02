@@ -94,9 +94,7 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
             # GSIC
             GlobalConstraint(
                 lambda m, t: m.CUMGSIC[t]
-                == slr_gsic(
-                    m.CUMGIS[t - 1], m.temperature[t - 1], m.M1, m.M2, m.M3, m.dt
-                )
+                == slr_gsic(m.CUMGIS[t - 1], m.temperature[t - 1], m)
                 if t > 0
                 else Constraint.Skip,
                 "SLR_GSIC",
@@ -105,9 +103,7 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
             # GIS
             GlobalConstraint(
                 lambda m, t: m.CUMGIS[t]
-                == slr_gis(
-                    m.CUMGIS[t - 1], m.temperature[t - 1], m.M4, m.M5, m.M6, m.dt
-                )
+                == slr_gis(m.CUMGIS[t - 1], m.temperature[t - 1], m)
                 if t > 0
                 else Constraint.Skip,
                 "SLR_GIS",
@@ -196,42 +192,45 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
 # Damage function
 
 
-def damage_fct(temperature, temperature_0, m, r):
-    return _damage_fct(
-        soft_min(temperature),
-        m.damage_a1[r],
-        m.damage_a2[r],
-        m.damage_a3[r],
-        temperature_0,
+def damage_fct(temperature, init_temp, m, r):
+
+    power_fct = (
+        lambda temp: m.damage_a1[r] * temp + m.damage_a2[r] * temp ** m.damage_a3[r]
     )
 
+    damage = power_fct(soft_min(temperature))
+    if init_temp is not None:
+        damage -= power_fct(init_temp)
 
-def _damage_fct(temperature, a1, a2, a3, temperature_0=None):
-    """Quadratic damage function
-
-    T: temperature
-    T0 [None]: if specified, substracts damage at T0
-    """
-    fct = lambda temp: a1 * temp + a2 * temp ** a3
-    dmg = fct(temperature)
-    if temperature_0 is not None:
-        dmg -= fct(temperature_0)
-    return dmg
+    return damage
 
 
 # Sea level rise
 
 
-def slr_gsic(cumgsic, temperature, m1, m2, m3, dt):
-    return cumgsic + m1 / m2 * dt * (m2 - cumgsic) * (temperature - m3)
+def slr_gsic(cumgsic, temperature, m):
+
+    melt_rate = m.M1
+    total_ice = m.M2
+    equil_temp = m.M3
+
+    return cumgsic + melt_rate / total_ice * m.dt * (total_ice - cumgsic) * (
+        temperature - equil_temp
+    )
 
 
-def slr_gis(cumgis, temperature, m4, m5, m6, dt):
-    return cumgis + (dt / 10) * (1 / 100) * (m4 * temperature + m5) * (1 - cumgis / m6)
+def slr_gis(cumgis, temperature, m):
+
+    melt_rate_above_thresh = m.M4
+    init_melt_rate = m.M5
+    init_ice_vol = m.M6
+
+    return cumgis + (m.dt / 10) * (1 / 100) * (
+        melt_rate_above_thresh * temperature + init_melt_rate
+    ) * (1 - cumgis / init_ice_vol)
 
 
 def slr_damages(total_slr, gdp_t, gdp_0, dam1, dam2):
     return (
         4 * (dam1 * total_slr + dam2 * total_slr ** 2) * soft_min(gdp_t / gdp_0) ** 0.25
     )
-
