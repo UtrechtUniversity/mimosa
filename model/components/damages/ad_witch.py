@@ -1,14 +1,20 @@
-##############################################
-# Model equations and constraints:
-# Damage and adaptation costs, WITCH specification
-#
-##############################################
+"""
+Model equations and constraints:
+Damage and adaptation costs, WITCH specification
+"""
 
-import numpy as np
-from model.common import *
+from typing import Sequence
+from model.common import (
+    AbstractModel,
+    Param,
+    Var,
+    GeneralConstraint,
+    RegionalConstraint,
+    RegionalInitConstraint,
+)
 
 
-def constraints(m):
+def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     """Damage and adaptation costs equations and constraints
     (WITCH specification)
 
