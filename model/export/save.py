@@ -61,13 +61,10 @@ def var_to_row(rows, m, var, is_regional):
     # Check if var is a function or a pyomo variable
     if is_regional:
         fct = lambda t, r: (var(m.year(t), r) if callable(var) else value(var[t, r]))
-    else:
-        fct = lambda t: (var(m.year(t)) if callable(var) else value(var[t]))
-
-    if is_regional:
         for r in m.regions:
             rows.append([name, r] + [fct(t, r) for t in m.t])
     else:
+        fct = lambda t: (var(m.year(t)) if callable(var) else value(var[t]))
         rows.append([name, "Global"] + [fct(t) for t in m.t])
 
 

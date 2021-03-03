@@ -18,7 +18,7 @@ def first(dictionary):
 
 def add_constraint(m, constraint, name=None):
     """Adds a constraint to the model
-    
+
     It first generates a unique name, then adds
     the constraint using this new name
     """
@@ -32,18 +32,18 @@ def add_constraint(m, constraint, name=None):
     return name
 
 
-curr_tick_time = None
-curr_tick_name = None
+CURR_TICK_TIME = 0
+CURR_TICK_NAME = None
 
 
 def tick(name=None):
-    global curr_tick_time, curr_tick_name
+    global CURR_TICK_TIME, CURR_TICK_NAME
     now = time.time()
-    if curr_tick_name is not None:
+    if CURR_TICK_NAME is not None:
         # TODO set debug logging level
-        print("{} took {:.3g} seconds.".format(curr_tick_name, now - curr_tick_time))
-    curr_tick_time = now
-    curr_tick_name = name
+        print("{} took {:.3g} seconds.".format(CURR_TICK_NAME, now - CURR_TICK_TIME))
+    CURR_TICK_TIME = now
+    CURR_TICK_NAME = name
 
 
 def timer(name):
@@ -63,4 +63,3 @@ def timer(name):
         return wrapper
 
     return decorator
-
