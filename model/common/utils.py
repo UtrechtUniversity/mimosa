@@ -32,20 +32,6 @@ def add_constraint(m, constraint, name=None):
     return name
 
 
-CURR_TICK_TIME = 0
-CURR_TICK_NAME = None
-
-
-def tick(name=None):
-    global CURR_TICK_TIME, CURR_TICK_NAME
-    now = time.time()
-    if CURR_TICK_NAME is not None:
-        # TODO set debug logging level
-        print("{} took {:.3g} seconds.".format(CURR_TICK_NAME, now - CURR_TICK_TIME))
-    CURR_TICK_TIME = now
-    CURR_TICK_NAME = name
-
-
 def timer(name):
     """Decorator which times functions
 
@@ -55,9 +41,10 @@ def timer(name):
 
     def decorator(fct):
         def wrapper(*args, **kwargs):
-            tick(name)
+            time1 = time.time()
             result = fct(*args, **kwargs)
-            tick()
+            time2 = time.time()
+            print("{} took {:.3g} seconds.".format(name, time2 - time1))
             return result
 
         return wrapper

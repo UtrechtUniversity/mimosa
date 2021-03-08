@@ -39,7 +39,7 @@ from .pyomo_utils import (
 )
 
 # Other utils
-from .utils import first, add_constraint, tick
+from .utils import first, add_constraint
 
 # # Datastore
 # from .data import DataStore

@@ -1,7 +1,10 @@
 from model.export.utils import Plot, visualise_IPOPT_output
 
 
-def full_plot(m, filename, include_plotlyjs=True, custom_layout={}):
+def full_plot(m, filename, include_plotlyjs=True, custom_layout=None):
+
+    if custom_layout is None:
+        custom_layout = {}
 
     plot = Plot(m, horizontal_spacing=0.005, vertical_spacing=0.05)
 
