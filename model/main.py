@@ -22,8 +22,7 @@ from model.common import (
     utils,
     units,
 )
-from model.export.plot import full_plot, visualise_IPOPT_output
-from model.export.save import save_output
+from model.export import full_plot, visualise_ipopt_output, save_output
 from model.abstract_model import create_abstract_model
 
 # Module-wide parameter containing the abstract models. Serves as a cache.
@@ -162,7 +161,7 @@ class MIMOSA:
             opt.options["output_file"] = ipopt_output_file
             results = opt.solve(self.m, tee=verbose, symbolic_solver_labels=True)
             if ipopt_output_file is not None:
-                visualise_IPOPT_output(ipopt_output_file)
+                visualise_ipopt_output(ipopt_output_file)
 
         # Restore aggregated variables
         if len(self.regions) > 1:

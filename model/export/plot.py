@@ -1,4 +1,12 @@
-from model.export.utils import Plot, visualise_IPOPT_output
+"""
+Creates a big Plotly figure with each column a region, and these rows:
+  Row 1: regional emissions (with baseline) and carbon price
+  Row 2: Adapt/damage costs and adaptation levels
+  Row 3: GDP (gross/net), consumption, capital stock and utility
+  Row 4: Global emissions, temperature and sea level rise
+"""
+
+from model.export.utils import Plot
 
 
 def full_plot(m, filename, include_plotlyjs=True, custom_layout=None):

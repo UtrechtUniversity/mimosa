@@ -1,6 +1,8 @@
+"""
+Plot functions. Not necessary if dashboard is used.
+"""
 import numpy as np
 import pandas as pd
-import plotly.graph_objects as go
 import plotly.express as px
 from plotly.subplots import make_subplots
 from pyomo.environ import value
@@ -26,7 +28,16 @@ COLORS_PBL = [
 
 
 class Plot:
-    def __init__(self, m, numrows=4, globalrows=[4], coltitles=None, **kwargs):
+    """
+    Wrapper for a Plotly figure.
+
+    First it creates a subplot figure, then using the function `add`,
+    a trace can be added given a Pyomo variable.
+    """
+
+    def __init__(self, m, numrows=4, globalrows=None, coltitles=None, **kwargs):
+        if globalrows is None:
+            globalrows = [4]
         self.m = m
         self.regions = m.regions
         self.years = m.year(np.array(m.t))
@@ -51,8 +62,8 @@ class Plot:
         for i in range(numrows):
             ref = next(self.fig.select_yaxes(row=i + 1, col=1, secondary_y=True))
             ref_name = ref.plotly_name.replace("axis", "")
-            for ax in self.fig.select_yaxes(row=i + 1, secondary_y=True):
-                ax.matches = ref_name
+            for axis in self.fig.select_yaxes(row=i + 1, secondary_y=True):
+                axis.matches = ref_name
 
         self.curr_values = {}
 
@@ -68,10 +79,10 @@ class Plot:
         else:
             return [value(var[t]) for t in self.t]
 
-    def add_scatter(self, value, name, color, row, col, showlegend, **kwargs):
+    def add_scatter(self, values, name, color, row, col, showlegend, **kwargs):
         self.fig.add_scatter(
             x=self.years,
-            y=value,
+            y=values,
             name=name,
             legendgroup=name,
             line_color=color,
@@ -88,7 +99,7 @@ class Plot:
 
     def add(self, var, is_regional=True, is_fct=False, name=None, row=1, **kwargs):
 
-        if not is_fct and name == None:
+        if not is_fct and name is None:
             name = var.name
         new = name not in self.curr_values
 
@@ -98,9 +109,8 @@ class Plot:
 
         if is_regional:
             for i, r in enumerate(self.regions):
-                value = self._value(var, r, is_fct)
                 self.add_scatter(
-                    value,
+                    self._value(var, r, is_fct),
                     name,
                     color,
                     row,
@@ -109,8 +119,15 @@ class Plot:
                     **kwargs
                 )
         else:
-            value = self._value_global(var, is_fct)
-            self.add_scatter(value, name, color, row, col=1, showlegend=new, **kwargs)
+            self.add_scatter(
+                self._value_global(var, is_fct),
+                name,
+                color,
+                row,
+                col=1,
+                showlegend=new,
+                **kwargs
+            )
 
     def set_layout(self):
         self.fig.update_xaxes(range=[self.years[0], 2100])
@@ -131,7 +148,7 @@ class Plot:
         return self.fig
 
 
-def visualise_IPOPT_output(output_file):
+def visualise_ipopt_output(output_file):
     file = open(output_file, "r")
     in_iterations = False
 
@@ -176,4 +193,3 @@ def visualise_IPOPT_output(output_file):
     )
 
     fig.write_html(output_file.split(".")[0] + ".html", include_plotlyjs="cdn")
-
