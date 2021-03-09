@@ -22,7 +22,7 @@ def add_constraint(m, constraint, name=None):
     It first generates a unique name, then adds
     the constraint using this new name
     """
-    n = len([_ for _ in m.component_objects()])
+    n = len(list(m.component_objects()))
     name = (
         "constraint_{}".format(n)
         if name is None

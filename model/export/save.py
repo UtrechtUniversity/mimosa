@@ -47,8 +47,6 @@ def save_output(params, m, experiment=None, random_id=False, folder="output"):
     with open(f"{folder}/output_{filename}.csv.params.json", "w") as fh:
         json.dump(params, fh)
 
-    return
-
 
 def var_to_row(rows, m, var, is_regional):
     # If var is a list, second element is the name
