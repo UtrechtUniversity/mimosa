@@ -2,10 +2,11 @@
 Utils to calculate TFP using the Cobb-Douglas equation
 """
 
+from model.common.regional_params import RegionalParamStore
 import numpy as np
 
 
-def get_TFP(region, data_store):
+def get_TFP(region, data_store, regional_param_store: RegionalParamStore):
     params = data_store.params
     # quant = data_store.quant
     time = data_store.data_years
@@ -18,9 +19,9 @@ def get_TFP(region, data_store):
     savings_rate = params["economics"]["GDP"]["savings rate"]
 
     # Initialise capital
-    capital = params["regions"][region][
-        "initial capital factor"
-    ] * data_store.data_object("GDP")(time[0], region)
+    capital = regional_param_store.getregional(
+        "init_capital_factor", "init_capital_factor", region
+    ) * data_store.data_object("GDP")(time[0], region)
 
     # Get data
     GDP_data = data_store.data_values["GDP"][region]

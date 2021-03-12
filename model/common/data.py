@@ -17,7 +17,7 @@ class DataStore:
     databases = {}
     cached_data = {}
 
-    def __init__(self, params, quant):
+    def __init__(self, params, quant, regional_param_store):
         self.params = params
         self.quant = quant  # Quantity object for unit conversion
         self._select_database()
@@ -32,7 +32,8 @@ class DataStore:
             for r in params["regions"]
         }
         self.data_values["TFP"] = {
-            r: economics.get_TFP(r, self) for r in params["regions"]
+            r: economics.get_TFP(r, self, regional_param_store)
+            for r in params["regions"]
         }
 
     def _select_database(self):

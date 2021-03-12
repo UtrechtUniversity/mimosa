@@ -29,139 +29,86 @@ regions:
   #   damages: $regional
   #   adaptation: $regional
   CAN:
-   initial capital factor: 1.992
-   MAC scaling factor: 1.297
-   damages: $regional
-   adaptation: $regional
+    damages: $regional
+    adaptation: $regional
   USA:
-   initial capital factor: 2.035
-   MAC scaling factor: 1.135
-   damages: $regional
-   adaptation: $regional
+    damages: $regional
+    adaptation: $regional
   MEX:
-   initial capital factor: 1.893
-   MAC scaling factor: 0.884
-   damages: $regional
-   adaptation: $regional
+    damages: $regional
+    adaptation: $regional
   RCAM:
-   initial capital factor: 1.041
-   MAC scaling factor: 1.103
-   damages: $regional
-   adaptation: $regional
+    damages: $regional
+    adaptation: $regional
   BRA:
-   initial capital factor: 1.973
-   MAC scaling factor: 0.3117
-   damages: $regional
-   adaptation: $regional
+    damages: $regional
+    adaptation: $regional
   RSAM:
-   initial capital factor: 2.005
-   MAC scaling factor: 0.3672
-   damages: $regional
-   adaptation: $regional
+    damages: $regional
+    adaptation: $regional
   NAF:
-   initial capital factor: 1.798
-   MAC scaling factor: 2.797
-   damages: $regional
-   adaptation: $regional
+    damages: $regional
+    adaptation: $regional
   WAF:
-   initial capital factor: 1.416
-   MAC scaling factor: 0.6225
-   damages: $regional
-   adaptation: $regional
+    damages: $regional
+    adaptation: $regional
   EAF:
-   initial capital factor: 1.66
-   MAC scaling factor: 0.9211
-   damages: $regional
-   adaptation: $regional
+    damages: $regional
+    adaptation: $regional
   SAF:
-   initial capital factor: 2.054
-   MAC scaling factor: 0.7552
-   damages: $regional
-   adaptation: $regional
+    damages: $regional
+    adaptation: $regional
   WEU:
-   initial capital factor: 1.942
-   MAC scaling factor: 1.838
-   damages: $regional
-   adaptation: $regional
+    damages: $regional
+    adaptation: $regional
   CEU:
-   initial capital factor: 1.665
-   MAC scaling factor: 1.268
-   damages: $regional
-   adaptation: $regional
+    damages: $regional
+    adaptation: $regional
   TUR:
-   initial capital factor: 1.533
-   MAC scaling factor: 1.855
-   damages: $regional
-   adaptation: $regional
+    damages: $regional
+    adaptation: $regional
   UKR:
-   initial capital factor: 2.095
-   MAC scaling factor: 1.286
-   damages: $regional
-   adaptation: $regional
+    damages: $regional
+    adaptation: $regional
   STAN:
-   initial capital factor: 1.281
-   MAC scaling factor: 2.814
-   damages: $regional
-   adaptation: $regional
+    damages: $regional
+    adaptation: $regional
   RUS:
-   initial capital factor: 1.509
-   MAC scaling factor: 2.184
-   damages: $regional
-   adaptation: $regional
+    damages: $regional
+    adaptation: $regional
   ME:
-   initial capital factor: 2.026
-   MAC scaling factor: 1.758
-   damages: $regional
-   adaptation: $regional
+    damages: $regional
+    adaptation: $regional
   INDIA:
-   initial capital factor: 1.859
-   MAC scaling factor: 1.0
-   damages: $regional
-   adaptation: $regional
+    damages: $regional
+    adaptation: $regional
   KOR:
-   initial capital factor: 2.434
-   MAC scaling factor: 1.253
-   damages: $regional
-   adaptation: $regional
+    damages: $regional
+    adaptation: $regional
   CHN:
-   initial capital factor: 2.175
-   MAC scaling factor: 0.8578
-   damages: $regional
-   adaptation: $regional
+    damages: $regional
+    adaptation: $regional
   SEAS:
-   initial capital factor: 2.376
-   MAC scaling factor: 1.15
-   damages: $regional
-   adaptation: $regional
+    damages: $regional
+    adaptation: $regional
   INDO:
-   initial capital factor: 1.714
-   MAC scaling factor: 1.016
-   damages: $regional
-   adaptation: $regional
+    damages: $regional
+    adaptation: $regional
   JAP:
-   initial capital factor: 2.627
-   MAC scaling factor: 1.014
-   damages: $regional
-   adaptation: $regional
+    damages: $regional
+    adaptation: $regional
   OCE:
-   initial capital factor: 2.176
-   MAC scaling factor: 0.6085
-   damages: $regional
-   adaptation: $regional
+    damages: $regional
+    adaptation: $regional
   RSAS:
-   initial capital factor: 1.745
-   MAC scaling factor: 1.204
-   damages: $regional
-   adaptation: $regional
+    damages: $regional
+    adaptation: $regional
   RSAF:
-   initial capital factor: 2.317
-   MAC scaling factor: 1.507
-   damages: $regional
-   adaptation: $regional
-
+    damages: $regional
+    adaptation: $regional
 
 input:
-  db_filename: input/data/data_IMAGE_SSP.csv
+  db_filename: inputdata/data/data_IMAGE_SSP.csv
   # db_filename: ../../Databases/SSP_IAM_V2_201811.csv
   baselines:
     SSP1:
@@ -190,7 +137,7 @@ time:
   end: 2125
   dt: 1
 
-SSP: 'SSP2'
+SSP: "SSP2"
 
 economics:
   PRTP: 0.015
@@ -212,14 +159,14 @@ economics:
     fixed: False
 
 emissions:
-  carbonbudget: 800 GtCO2     # False or a quantity
-  global min level: -20 GtCO2/yr     # False or a quantity
-  regional min level: -10 GtCO2/yr     # False or a quantity
+  carbonbudget: 800 GtCO2 # False or a quantity
+  global min level: -20 GtCO2/yr # False or a quantity
+  regional min level: -10 GtCO2/yr # False or a quantity
   not positive after budget year: True
   baseline carbon intensity: True
   inertia:
-    global: False     # False or a number < 0, % of initial emissions
-    regional: -0.05     # False or a number < 0, % of initial emissions
+    global: False # False or a number < 0, % of initial emissions
+    regional: -0.05 # False or a number < 0, % of initial emissions
 
 temperature:
   initial: 1.096224 delta_degC
@@ -235,4 +182,4 @@ default units:
 model:
   damage module: RICE2012 # RICE2010, RICE2012 or WITCH
   objective module: utility # utility or globalcosts
-  allow trade: True 
+  allow trade: True

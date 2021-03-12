@@ -19,6 +19,7 @@ from model.common import (
     value,
     OptSolver,
     data,
+    regional_params,
     utils,
     units,
 )
@@ -84,8 +85,11 @@ class MIMOSA:
     @utils.timer("Concrete model creation")
     def create_instance(self):
 
+        # Create the regional parameter store
+        self.regional_param_store = regional_params.RegionalParamStore(self.params)
+
         # Create the data store
-        self.data_store = data.DataStore(self.params, self.quant)
+        self.data_store = data.DataStore(self.params, self.quant, self.regional_param_store)
 
         # The data functions need to be changed in the abstract model
         # before initialization.
@@ -202,6 +206,7 @@ class MIMOSA:
         num_years = int(np.ceil((t_end - t_start) / dt)) + 1
         self.abstract_model.year = lambda t: t_start + t * dt
         year2100 = int((2100 - t_start) / dt)
+
         return {
             "beginyear": V(t_start),
             "dt": V(dt),
@@ -247,12 +252,10 @@ class MIMOSA:
                 )
             ),
             "MAC_beta": V(params["economics"]["MAC"]["beta"]),
-            "MAC_scaling_factor": {
-                r: self.regions[r]["MAC scaling factor"] for r in self.regions
-            },
-            "init_capitalstock_factor": {
-                r: self.regions[r]["initial capital factor"] for r in self.regions
-            },
+            "MAC_scaling_factor": self.regional_param_store.get("mac", "kappa"),
+            "init_capitalstock_factor": self.regional_param_store.get(
+                "init_capital_factor", "init_capital_factor"
+            ),
             "alpha": V(params["economics"]["GDP"]["alpha"]),
             "dk": V(params["economics"]["GDP"]["depreciation of capital"]),
             "sr": V(params["economics"]["GDP"]["savings rate"]),

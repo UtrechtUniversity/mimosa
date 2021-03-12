@@ -18,6 +18,9 @@ These regional values are:
 
 """
 
+import os
+import pandas as pd
+
 
 class RegionalParamStore:
     """
@@ -26,9 +29,27 @@ class RegionalParamStore:
 
     def __init__(self, params):
         self.params = params
+        self.regions = params["regions"]
 
-    def get(self, region, name):
-        pass
+        self.categories = {
+            "init_capital_factor": RegionalParameters("init_capital_factor.csv"),
+            "mac": RegionalParameters("mac.csv"),
+        }
+
+    def get(self, category, paramname):
+        return {
+            region: self.getregional(category, paramname, region)
+            for region in self.regions
+        }
+
+    def getregional(self, category, paramname, region):
+        # First check if parameter is set manually in config file
+        try:
+            return self.params["regions"][region][category][paramname]
+        except (KeyError, TypeError):
+            pass
+
+        return self.categories[category].get(paramname, region)
 
 
 # Make one object for Main, for RICE2010, for RICE2012 since they each have
@@ -36,6 +57,11 @@ class RegionalParamStore:
 
 
 class RegionalParameters:
-    def __init__(self):
-        test = RegionalParamStore(1)
+    def __init__(self, filename):
+        full_filename = os.path.join(
+            os.path.dirname(__file__), "../../inputdata/params", filename,
+        )
+        self.data = pd.read_csv(full_filename).set_index("region")
 
+    def get(self, paramname, region):
+        return self.data.loc[region, paramname]
