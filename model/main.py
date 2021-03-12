@@ -89,7 +89,9 @@ class MIMOSA:
         self.regional_param_store = regional_params.RegionalParamStore(self.params)
 
         # Create the data store
-        self.data_store = data.DataStore(self.params, self.quant, self.regional_param_store)
+        self.data_store = data.DataStore(
+            self.params, self.quant, self.regional_param_store
+        )
 
         # The data functions need to be changed in the abstract model
         # before initialization.
@@ -119,8 +121,8 @@ class MIMOSA:
             instance_data[None].update(self.__instance_data_rice2012())
 
         # For WITCH damage/adaption:
-        if damage_module == "WITCH":
-            instance_data[None].update(self._instance_data_witch())
+        # if damage_module == "WITCH":
+        #     instance_data[None].update(self._instance_data_witch())
 
         # Raise warning for partially irreversible damages when damage module != RICE2010:
         if (
@@ -252,9 +254,9 @@ class MIMOSA:
                 )
             ),
             "MAC_beta": V(params["economics"]["MAC"]["beta"]),
-            "MAC_scaling_factor": self.regional_param_store.get("mac", "kappa"),
+            "MAC_scaling_factor": self.regional_param_store.get("MAC", "kappa"),
             "init_capitalstock_factor": self.regional_param_store.get(
-                "init_capital_factor", "init_capital_factor"
+                "economics", "init_capital_factor"
             ),
             "alpha": V(params["economics"]["GDP"]["alpha"]),
             "dk": V(params["economics"]["GDP"]["depreciation of capital"]),
@@ -268,21 +270,21 @@ class MIMOSA:
         params = self.params
         return {
             "adapt_curr_level": V(params["economics"]["adaptation"]["curr_level"]),
-            "damage_a1": self.data_store.get_regional("damages", "a1"),
-            "damage_a2": self.data_store.get_regional("damages", "a2"),
-            "damage_a3": self.data_store.get_regional("damages", "a3"),
-            "adapt_g1": self.data_store.get_regional("adaptation", "g1"),
-            "adapt_g2": self.data_store.get_regional("adaptation", "g2"),
+            "damage_a1": self.regional_param_store.get("ADRICE2010", "a1"),
+            "damage_a2": self.regional_param_store.get("ADRICE2010", "a2"),
+            "damage_a3": self.regional_param_store.get("ADRICE2010", "a3"),
+            "adapt_g1": self.regional_param_store.get("ADRICE2010", "g1"),
+            "adapt_g2": self.regional_param_store.get("ADRICE2010", "g2"),
         }
 
     def __instance_data_rice2012(self) -> dict:
         return {
-            "damage_a1": self.data_store.get_regional("damages", "a1"),
-            "damage_a2": self.data_store.get_regional("damages", "a2"),
-            "damage_a3": self.data_store.get_regional("damages", "a3"),
-            "adap1": self.data_store.get_regional("adaptation", "nu1"),
-            "adap2": self.data_store.get_regional("adaptation", "nu2"),
-            "adap3": self.data_store.get_regional("adaptation", "nu3"),
+            "damage_a1": self.regional_param_store.get("ADRICE2012", "a1"),
+            "damage_a2": self.regional_param_store.get("ADRICE2012", "a2"),
+            "damage_a3": self.regional_param_store.get("ADRICE2012", "a3"),
+            "adap1": self.regional_param_store.get("ADRICE2012", "nu1"),
+            "adap2": self.regional_param_store.get("ADRICE2012", "nu2"),
+            "adap3": self.regional_param_store.get("ADRICE2012", "nu3"),
             "adapt_rho": V(0.5),
             # Sea level rise:
             "S1": V(0.5),
@@ -294,31 +296,31 @@ class MIMOSA:
             "M4": V(1.11860081578514),
             "M5": V(0.6),
             "M6": V(7.3),
-            "SLRdam1": self.data_store.get_regional("damages", "SLRDAM1"),
-            "SLRdam2": self.data_store.get_regional("damages", "SLRDAM2"),
+            "SLRdam1": self.regional_param_store.get("ADRICE2012", "slrdam1"),
+            "SLRdam2": self.regional_param_store.get("ADRICE2012", "slrdam2"),
         }
 
-    def _instance_data_witch(self) -> dict:
-        return {
-            "damage_omega1_pos": self.data_store.get_regional("damages", "omega1_pos"),
-            "damage_omega1_neg": self.data_store.get_regional("damages", "omega1_neg"),
-            "damage_omega2_pos": self.data_store.get_regional("damages", "omega2_pos"),
-            "damage_omega2_neg": self.data_store.get_regional("damages", "omega2_neg"),
-            "damage_omega3_pos": self.data_store.get_regional("damages", "omega3_pos"),
-            "damage_omega3_neg": self.data_store.get_regional("damages", "omega3_neg"),
-            "damage_omega4_pos": self.data_store.get_regional("damages", "omega4_pos"),
-            "damage_omega4_neg": self.data_store.get_regional("damages", "omega4_neg"),
-            "adapt_omega_eff_ada": self.data_store.get_regional(
-                "adaptation", "omega_eff_ada"
-            ),
-            "adapt_omega_act": self.data_store.get_regional("adaptation", "omega_act"),
-            "adapt_omega_eff_act": self.data_store.get_regional(
-                "adaptation", "omega_eff_act"
-            ),
-            "adapt_omega_rada": self.data_store.get_regional(
-                "adaptation", "omega_rada"
-            ),
-            "adapt_rho_ada": self.data_store.get_regional("adaptation", "rho_ada"),
-            "adapt_rho_act": self.data_store.get_regional("adaptation", "rho_act"),
-            "adapt_eps": self.data_store.get_regional("adaptation", "eps"),
-        }
+    # def _instance_data_witch(self) -> dict:
+    #     return {
+    #         "damage_omega1_pos": self.data_store.get_regional("damages", "omega1_pos"),
+    #         "damage_omega1_neg": self.data_store.get_regional("damages", "omega1_neg"),
+    #         "damage_omega2_pos": self.data_store.get_regional("damages", "omega2_pos"),
+    #         "damage_omega2_neg": self.data_store.get_regional("damages", "omega2_neg"),
+    #         "damage_omega3_pos": self.data_store.get_regional("damages", "omega3_pos"),
+    #         "damage_omega3_neg": self.data_store.get_regional("damages", "omega3_neg"),
+    #         "damage_omega4_pos": self.data_store.get_regional("damages", "omega4_pos"),
+    #         "damage_omega4_neg": self.data_store.get_regional("damages", "omega4_neg"),
+    #         "adapt_omega_eff_ada": self.data_store.get_regional(
+    #             "adaptation", "omega_eff_ada"
+    #         ),
+    #         "adapt_omega_act": self.data_store.get_regional("adaptation", "omega_act"),
+    #         "adapt_omega_eff_act": self.data_store.get_regional(
+    #             "adaptation", "omega_eff_act"
+    #         ),
+    #         "adapt_omega_rada": self.data_store.get_regional(
+    #             "adaptation", "omega_rada"
+    #         ),
+    #         "adapt_rho_ada": self.data_store.get_regional("adaptation", "rho_ada"),
+    #         "adapt_rho_act": self.data_store.get_regional("adaptation", "rho_act"),
+    #         "adapt_eps": self.data_store.get_regional("adaptation", "eps"),
+    #     }

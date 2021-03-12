@@ -20,7 +20,7 @@ def get_TFP(region, data_store, regional_param_store: RegionalParamStore):
 
     # Initialise capital
     capital = regional_param_store.getregional(
-        "init_capital_factor", "init_capital_factor", region
+        "economics", "init_capital_factor", region
     ) * data_store.data_object("GDP")(time[0], region)
 
     # Get data

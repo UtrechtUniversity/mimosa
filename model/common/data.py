@@ -8,7 +8,6 @@ import pandas as pd
 from scipy.interpolate import interp1d
 
 from model.common import economics
-import input.regional_data
 
 
 class DataStore:
@@ -124,18 +123,6 @@ class DataStore:
 
     def data_object(self, variable):
         return lambda year, region: self.interp_data(year, region, variable)
-
-    def get_regional(self, *params):
-        return {r: self._get_regional_param(params, r) for r in self.params["regions"]}
-
-    def _get_regional_param(self, params, r):
-        # Loop down the tree of parameters, checking for @regional
-        curr_param = self.params["regions"][r]
-        for param in params:
-            curr_param = curr_param[param]
-            if curr_param == "$regional":
-                return input.regional_data.get_param_value(r, params, self.params)
-        return curr_param
 
     def __repr__(self):
         return "DataStore with data values {} calculated on the years {}-{} from input file {} for the regions {} and {}".format(
