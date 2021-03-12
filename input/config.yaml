@@ -1,112 +1,31 @@
 regionstype: IMAGE26
 regions:
-  # World:
-  #   initial capital: 190 trillion US$2005/yr
-  #   damages:
-  #     a1: 0
-  #     a2: 0.010038
-  #     a3: 2
-  #   adaptation:
-  #     g1: 0.115
-  #     g2: 3.6
-  # R5.2OECD:
-  #   initial capital: 80000 billion US$2005/yr
-  #   damages: $regional
-  #   adaptation: $regional
-  # R5.2ASIA:
-  #   initial capital: 45 trillion US$2005/yr
-  #   damages: $regional
-  #   adaptation: $regional
-  # R5.2LAM:
-  #   initial capital: 20 trillion US$2005/yr
-  #   damages: $regional
-  #   adaptation: $regional
-  # R5.2MAF:
-  #   initial capital: 20 trillion US$2005/yr
-  #   damages: $regional
-  #   adaptation: $regional
-  # R5.2REF:
-  #   initial capital: 10 trillion US$2005/yr
-  #   damages: $regional
-  #   adaptation: $regional
   CAN:
-    damages: $regional
-    adaptation: $regional
   USA:
-    damages: $regional
-    adaptation: $regional
   MEX:
-    damages: $regional
-    adaptation: $regional
   RCAM:
-    damages: $regional
-    adaptation: $regional
   BRA:
-    damages: $regional
-    adaptation: $regional
   RSAM:
-    damages: $regional
-    adaptation: $regional
   NAF:
-    damages: $regional
-    adaptation: $regional
   WAF:
-    damages: $regional
-    adaptation: $regional
   EAF:
-    damages: $regional
-    adaptation: $regional
   SAF:
-    damages: $regional
-    adaptation: $regional
   WEU:
-    damages: $regional
-    adaptation: $regional
   CEU:
-    damages: $regional
-    adaptation: $regional
   TUR:
-    damages: $regional
-    adaptation: $regional
   UKR:
-    damages: $regional
-    adaptation: $regional
   STAN:
-    damages: $regional
-    adaptation: $regional
   RUS:
-    damages: $regional
-    adaptation: $regional
   ME:
-    damages: $regional
-    adaptation: $regional
   INDIA:
-    damages: $regional
-    adaptation: $regional
   KOR:
-    damages: $regional
-    adaptation: $regional
   CHN:
-    damages: $regional
-    adaptation: $regional
   SEAS:
-    damages: $regional
-    adaptation: $regional
   INDO:
-    damages: $regional
-    adaptation: $regional
   JAP:
-    damages: $regional
-    adaptation: $regional
   OCE:
-    damages: $regional
-    adaptation: $regional
   RSAS:
-    damages: $regional
-    adaptation: $regional
   RSAF:
-    damages: $regional
-    adaptation: $regional
 
 input:
   db_filename: inputdata/data/data_IMAGE_SSP.csv
