@@ -2,10 +2,14 @@
 Uses the Pint package to parse quantities with units.
 The custom units are loaded from a text file.
 """
+import os
 from pint import UnitRegistry
 
+
 UREG = UnitRegistry()
-UREG.load_definitions("input/units.txt")
+UREG.load_definitions(
+    os.path.join(os.path.dirname(__file__), "../../inputdata/config", "units.txt")
+)
 
 
 class Quantity:

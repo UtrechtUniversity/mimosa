@@ -26,9 +26,6 @@ from model.common import (
 from model.export import full_plot, visualise_ipopt_output, save_output
 from model.abstract_model import create_abstract_model
 
-# Module-wide parameter containing the abstract models. Serves as a cache.
-ABSTRACT_MODELS = {}
-
 # Util to create a None-indexed dictionary for scalar components
 # (see https://pyomo.readthedocs.io/en/stable/working_abstractmodels/data/raw_dicts.html)
 V = lambda val: {None: val}
@@ -46,7 +43,7 @@ class MIMOSA:
         params (dict)
         regions (dict): taken from params
         quant (Quantity): callable object used to parse and convert quantities with units
-        abstract_model (AbstractModel): the AbstractModel taken from the cache `ABSTRACT_MODELS`
+        abstract_model (AbstractModel): the AbstractModel created using the chosen damage/objective modules
         data_store (DataStore): object used to access regional data from the input database
         m (ConcreteModel): concrete instance of `abstract_model`
 
@@ -63,24 +60,13 @@ class MIMOSA:
 
     def get_abstract_model(self) -> AbstractModel:
         """
-        Since the AbstractModel only depends on the damage module
-        and objective module, it doesn't need to be recreated everytime
-        different parameter values are used. That's why we put it in the
-        cache, with access key the tuple (damage_module, objective_module).
-        These values are obtained from self.params.
-
-
         Returns:
             AbstractModel: model corresponding to the damage/objective module combination
         """
         damage_module = self.params["model"]["damage module"]
         objective_module = self.params["model"]["objective module"]
-        if (damage_module, objective_module) not in ABSTRACT_MODELS:
-            ABSTRACT_MODELS[(damage_module, objective_module)] = create_abstract_model(
-                damage_module, objective_module
-            )
 
-        return ABSTRACT_MODELS[(damage_module, objective_module)]
+        return create_abstract_model(damage_module, objective_module)
 
     @utils.timer("Concrete model creation")
     def create_instance(self):
