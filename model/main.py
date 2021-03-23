@@ -96,15 +96,15 @@ class MIMOSA:
         instance_data = {None: {}}
 
         # Main instance data
-        instance_data[None].update(self.__instance_data_main())
+        self._set_instance_data_main(instance_data)
 
         # Instance data for RICE2010 damage/adaptation:
         if damage_module == "RICE2010":
-            instance_data[None].update(self.__instance_data_rice2010())
+            self._set_instance_data_rice2010(instance_data)
 
         # Instance data for RICE2012 damage/adaptation:
         if damage_module == "RICE2012":
-            instance_data[None].update(self.__instance_data_rice2012())
+            self._set_instance_data_rice2012(instance_data)
 
         # For WITCH damage/adaption:
         # if damage_module == "WITCH":
@@ -183,7 +183,7 @@ class MIMOSA:
     #
     ########################
 
-    def __instance_data_main(self) -> dict:
+    def _set_instance_data_main(self, instance_data) -> None:
 
         params = self.params
         quant = self.quant
@@ -195,7 +195,7 @@ class MIMOSA:
         self.abstract_model.year = lambda t: t_start + t * dt
         year2100 = int((2100 - t_start) / dt)
 
-        return {
+        parameter_mapping = {
             "beginyear": V(t_start),
             "dt": V(dt),
             "tf": V(num_years - 1),
@@ -252,9 +252,11 @@ class MIMOSA:
             "allow_trade": V(params["model"]["allow trade"]),
         }
 
-    def __instance_data_rice2010(self) -> dict:
+        instance_data[None].update(parameter_mapping)
+
+    def _set_instance_data_rice2010(self, instance_data) -> None:
         params = self.params
-        return {
+        parameter_mapping = {
             "adapt_curr_level": V(params["economics"]["adaptation"]["curr_level"]),
             "damage_a1": self.regional_param_store.get("ADRICE2010", "a1"),
             "damage_a2": self.regional_param_store.get("ADRICE2010", "a2"),
@@ -263,8 +265,10 @@ class MIMOSA:
             "adapt_g2": self.regional_param_store.get("ADRICE2010", "g2"),
         }
 
-    def __instance_data_rice2012(self) -> dict:
-        return {
+        instance_data[None].update(parameter_mapping)
+
+    def _set_instance_data_rice2012(self, instance_data) -> None:
+        parameter_mapping = {
             "damage_a1": self.regional_param_store.get("ADRICE2012", "a1"),
             "damage_a2": self.regional_param_store.get("ADRICE2012", "a2"),
             "damage_a3": self.regional_param_store.get("ADRICE2012", "a3"),
@@ -272,6 +276,17 @@ class MIMOSA:
             "adap2": self.regional_param_store.get("ADRICE2012", "nu2"),
             "adap3": self.regional_param_store.get("ADRICE2012", "nu3"),
             "adapt_rho": V(0.5),
+            "SLRdam1": self.regional_param_store.get("ADRICE2012", "slrdam1"),
+            "SLRdam2": self.regional_param_store.get("ADRICE2012", "slrdam2"),
+        }
+
+        instance_data[None].update(parameter_mapping)
+
+        # Set sea level rise parameters
+        self._set_instance_data_rice2012_slr(instance_data)
+
+    def _set_instance_data_rice2012_slr(self, instance_data) -> None:
+        parameter_mapping = {
             # Sea level rise:
             "S1": V(0.5),
             "S2": V(0.0920666936642),
@@ -282,9 +297,9 @@ class MIMOSA:
             "M4": V(1.11860081578514),
             "M5": V(0.6),
             "M6": V(7.3),
-            "SLRdam1": self.regional_param_store.get("ADRICE2012", "slrdam1"),
-            "SLRdam2": self.regional_param_store.get("ADRICE2012", "slrdam2"),
         }
+
+        instance_data[None].update(parameter_mapping)
 
     # def _instance_data_witch(self) -> dict:
     #     return {
