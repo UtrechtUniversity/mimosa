@@ -58,62 +58,15 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     m.adapt_SAD = Var(m.t, m.regions, initialize=0.01, within=NonNegativeReals)
 
     # Sea level rise
-    m.S1 = Param()
-    m.S2 = Param()
-    m.S3 = Param()
-    m.SLR = Var(m.t)
+    constraints.extend(get_slr_constraints(m))
 
-    m.M1 = Param()
-    m.M2 = Param()
-    m.M3 = Param()
-    m.M4 = Param()
-    m.M5 = Param()
-    m.M6 = Param()
-    m.CUMGSIC = Var(m.t)
-    m.CUMGIS = Var(m.t)
-
+    # SLR damages
     m.SLRdam1 = Param(m.regions)
     m.SLRdam2 = Param(m.regions)
-    m.total_SLR = Var(m.t)
     m.SLR_damages = Var(m.t, m.regions)
 
     constraints.extend(
         [
-            # Thermal expansion
-            GlobalConstraint(
-                lambda m, t: m.SLR[t]
-                == (1 - m.S3) ** (m.dt / 10) * m.SLR[t - 1]
-                + m.S3 * (m.dt / 10) * (m.temperature[t] * m.S1)
-                if t > 0
-                else Constraint.Skip,
-                "SLR_thermal",
-            ),
-            GlobalInitConstraint(
-                lambda m: m.SLR[0] == m.S2 + m.S3 * (m.T0 * m.S1 - m.S2)
-            ),
-            # GSIC
-            GlobalConstraint(
-                lambda m, t: m.CUMGSIC[t]
-                == slr_gsic(m.CUMGIS[t - 1], m.temperature[t - 1], m)
-                if t > 0
-                else Constraint.Skip,
-                "SLR_GSIC",
-            ),
-            GlobalInitConstraint(lambda m: m.CUMGSIC[0] == 0.015),
-            # GIS
-            GlobalConstraint(
-                lambda m, t: m.CUMGIS[t]
-                == slr_gis(m.CUMGIS[t - 1], m.temperature[t - 1], m)
-                if t > 0
-                else Constraint.Skip,
-                "SLR_GIS",
-            ),
-            GlobalInitConstraint(lambda m: m.CUMGIS[0] == 0.006),
-            # SLR damages resulting from total SLR
-            GlobalConstraint(
-                lambda m, t: m.total_SLR[t] == m.SLR[t] + m.CUMGSIC[t] + m.CUMGIS[t],
-                "total_SLR",
-            ),
             RegionalConstraint(
                 lambda m, t, r: m.SLR_damages[t, r]
                 == slr_damages(
@@ -180,6 +133,69 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
             ),
         ]
     )
+
+    return constraints
+
+
+#################
+## Sea level rise constraints
+#################
+
+
+def get_slr_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
+
+    # Parameters and variables necessary for sea level rise
+    m.S1 = Param()
+    m.S2 = Param()
+    m.S3 = Param()
+    m.SLR = Var(m.t)
+
+    m.M1 = Param()
+    m.M2 = Param()
+    m.M3 = Param()
+    m.M4 = Param()
+    m.M5 = Param()
+    m.M6 = Param()
+    m.CUMGSIC = Var(m.t)
+    m.CUMGIS = Var(m.t)
+    m.total_SLR = Var(m.t)
+
+    # Constraints relating to SLR
+    constraints = [
+        # Thermal expansion
+        GlobalConstraint(
+            lambda m, t: m.SLR[t]
+            == (1 - m.S3) ** (m.dt / 10) * m.SLR[t - 1]
+            + m.S3 * (m.dt / 10) * (m.temperature[t] * m.S1)
+            if t > 0
+            else Constraint.Skip,
+            "SLR_thermal",
+        ),
+        GlobalInitConstraint(lambda m: m.SLR[0] == m.S2 + m.S3 * (m.T0 * m.S1 - m.S2)),
+        # GSIC
+        GlobalConstraint(
+            lambda m, t: m.CUMGSIC[t]
+            == slr_gsic(m.CUMGIS[t - 1], m.temperature[t - 1], m)
+            if t > 0
+            else Constraint.Skip,
+            "SLR_GSIC",
+        ),
+        GlobalInitConstraint(lambda m: m.CUMGSIC[0] == 0.015),
+        # GIS
+        GlobalConstraint(
+            lambda m, t: m.CUMGIS[t]
+            == slr_gis(m.CUMGIS[t - 1], m.temperature[t - 1], m)
+            if t > 0
+            else Constraint.Skip,
+            "SLR_GIS",
+        ),
+        GlobalInitConstraint(lambda m: m.CUMGIS[0] == 0.006),
+        # SLR damages resulting from total SLR
+        GlobalConstraint(
+            lambda m, t: m.total_SLR[t] == m.SLR[t] + m.CUMGSIC[t] + m.CUMGIS[t],
+            "total_SLR",
+        ),
+    ]
 
     return constraints
 

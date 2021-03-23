@@ -106,6 +106,10 @@ class MIMOSA:
         if damage_module == "RICE2012":
             self._set_instance_data_rice2012(instance_data)
 
+        # Instance data for COACCH damages:
+        if damage_module == "COACCH":
+            self._set_instance_data_coacch(instance_data)
+
         # For WITCH damage/adaption:
         # if damage_module == "WITCH":
         #     instance_data[None].update(self._instance_data_witch())
@@ -297,6 +301,24 @@ class MIMOSA:
             "M4": V(1.11860081578514),
             "M5": V(0.6),
             "M6": V(7.3),
+        }
+
+        instance_data[None].update(parameter_mapping)
+
+    def _set_instance_data_coacch(self, instance_data) -> None:
+        # First, set sea level rise parameters from AD-RICE2012
+        self._set_instance_data_rice2012_slr(instance_data)
+
+        parameter_mapping = {
+            # Non-SLR damages:
+            "damage_noslr_b1": self.regional_param_store.get("COACCH", "noslr_b1"),
+            "damage_noslr_b2": self.regional_param_store.get("COACCH", "noslr_b2"),
+            "damage_noslr_a": self.regional_param_store.get(
+                "COACCH", "noslr_a (q=0.5)"
+            ),  # TODO add parameter for damage quantile
+            # SLR damages:
+            "damage_slr_b1": self.regional_param_store.get("COACCH", "slr_ad_b1"),
+            "damage_slr_a": self.regional_param_store.get("COACCH", "slr_ad_a (q=0.5)"),
         }
 
         instance_data[None].update(parameter_mapping)
