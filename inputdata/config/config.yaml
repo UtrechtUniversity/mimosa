@@ -75,6 +75,7 @@ economics:
     scale factor: 1
     ignore damages: False
     quantile: 0.5 # Only used for COACCH
+    coacch_slr_withadapt: True # Only used for COACCH
   adaptation:
     curr_level: 0
     fixed: False

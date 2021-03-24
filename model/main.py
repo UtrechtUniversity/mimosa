@@ -314,8 +314,11 @@ class MIMOSA:
         except KeyError:
             damage_quantile = 0.5
 
+        slr_withadapt = self.params["economics"]["damages"]["coacch_slr_withadapt"]
+        prfx = "SLR-Ad" if slr_withadapt else "SLR-NoAd"
+
         factor_noslr = f"NoSLR_a (q={damage_quantile})"
-        factor_slr_ad = f"SLR-Ad_a (q={damage_quantile})"
+        factor_slr_ad = f"{prfx}_a (q={damage_quantile})"
 
         parameter_mapping = {
             # Non-SLR damages:
@@ -325,10 +328,10 @@ class MIMOSA:
             "damage_noslr_b3": self.regional_param_store.get("COACCH", "NoSLR_b3"),
             "damage_noslr_a": self.regional_param_store.get("COACCH", factor_noslr),
             # SLR damages:
-            "damage_slr_form": self.regional_param_store.get("COACCH", "SLR-Ad_form"),
-            "damage_slr_b1": self.regional_param_store.get("COACCH", "SLR-Ad_b1"),
-            "damage_slr_b2": self.regional_param_store.get("COACCH", "SLR-Ad_b2"),
-            "damage_slr_b3": self.regional_param_store.get("COACCH", "SLR-Ad_b3"),
+            "damage_slr_form": self.regional_param_store.get("COACCH", f"{prfx}_form"),
+            "damage_slr_b1": self.regional_param_store.get("COACCH", f"{prfx}_b1"),
+            "damage_slr_b2": self.regional_param_store.get("COACCH", f"{prfx}_b2"),
+            "damage_slr_b3": self.regional_param_store.get("COACCH", f"{prfx}_b3"),
             "damage_slr_a": self.regional_param_store.get("COACCH", factor_slr_ad),
         }
 
