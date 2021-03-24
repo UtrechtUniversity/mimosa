@@ -117,7 +117,12 @@ class RegionalParameters:
             ).set_index("region")
 
     def get(self, paramname, region):
-        return float(self.data.loc[region, paramname])
+        value = self.data.loc[region, paramname]
+        try:
+            return float(value)
+        except ValueError:
+            # If unable to convert to float:
+            return value
 
 
 ###########################
@@ -162,10 +167,16 @@ class RegionMapper:
             how="outer",
         ).drop(columns=["region", regiontype_from])
 
-        # Group by region_to (if there are multiple regions mapping to one, take average)
+        # Group by region_to (if there are multiple regions mapping to one,
+        # take average, or the first value for non-numeric columns)
+        aggregation_methods = {
+            col_name: "mean" if pd.api.types.is_numeric_dtype(column) else "first"
+            for col_name, column in data_merged.items()
+            if col_name != regiontype_to
+        }
         data_grouped = (
             data_merged.groupby(regiontype_to)
-            .mean()
+            .agg(aggregation_methods)
             .reset_index()
             .rename(columns={regiontype_to: "region"})
         )

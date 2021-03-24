@@ -309,16 +309,27 @@ class MIMOSA:
         # First, set sea level rise parameters from AD-RICE2012
         self._set_instance_data_rice2012_slr(instance_data)
 
+        try:
+            damage_quantile = self.params["economics"]["damages"]["quantile"]
+        except KeyError:
+            damage_quantile = 0.5
+
+        factor_noslr = f"NoSLR_a (q={damage_quantile})"
+        factor_slr_ad = f"SLR-Ad_a (q={damage_quantile})"
+
         parameter_mapping = {
             # Non-SLR damages:
-            "damage_noslr_b1": self.regional_param_store.get("COACCH", "noslr_b1"),
-            "damage_noslr_b2": self.regional_param_store.get("COACCH", "noslr_b2"),
-            "damage_noslr_a": self.regional_param_store.get(
-                "COACCH", "noslr_a (q=0.5)"
-            ),  # TODO add parameter for damage quantile
+            "damage_noslr_form": self.regional_param_store.get("COACCH", "NoSLR_form"),
+            "damage_noslr_b1": self.regional_param_store.get("COACCH", "NoSLR_b1"),
+            "damage_noslr_b2": self.regional_param_store.get("COACCH", "NoSLR_b2"),
+            "damage_noslr_b3": self.regional_param_store.get("COACCH", "NoSLR_b3"),
+            "damage_noslr_a": self.regional_param_store.get("COACCH", factor_noslr),
             # SLR damages:
-            "damage_slr_b1": self.regional_param_store.get("COACCH", "slr_ad_b1"),
-            "damage_slr_a": self.regional_param_store.get("COACCH", "slr_ad_a (q=0.5)"),
+            "damage_slr_form": self.regional_param_store.get("COACCH", "SLR-Ad_form"),
+            "damage_slr_b1": self.regional_param_store.get("COACCH", "SLR-Ad_b1"),
+            "damage_slr_b2": self.regional_param_store.get("COACCH", "SLR-Ad_b2"),
+            "damage_slr_b3": self.regional_param_store.get("COACCH", "SLR-Ad_b3"),
+            "damage_slr_a": self.regional_param_store.get("COACCH", factor_slr_ad),
         }
 
         instance_data[None].update(parameter_mapping)

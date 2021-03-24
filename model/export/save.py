@@ -39,12 +39,10 @@ def save_output(params, m, experiment=None, random_id=False, folder="output"):
     os.makedirs(folder + "/", exist_ok=True)
     filename = f"{exp_id}" if experiment is None else f"{experiment}_{exp_id}"
 
-    dataframe.to_csv(
-        f"{folder}/output_{filename}.csv", float_format="%.6g", index=False
-    )
+    dataframe.to_csv(f"{folder}/{filename}.csv", float_format="%.6g", index=False)
 
     # 3. Save the param file
-    with open(f"{folder}/output_{filename}.csv.params.json", "w") as fh:
+    with open(f"{folder}/{filename}.csv.params.json", "w") as fh:
         json.dump(params, fh)
 
 

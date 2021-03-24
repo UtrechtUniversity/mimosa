@@ -21,6 +21,7 @@ from pyomo.environ import (
     maximize,
     minimize,
     NonNegativeReals,
+    Any,
 )
 from pyomo.opt.base.solvers import OptSolver
 
