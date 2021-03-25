@@ -11,6 +11,7 @@ from model.common import (
     GeneralConstraint,
     RegionalConstraint,
     value,
+    soft_max,
     Any,
     exp,
 )
@@ -137,4 +138,5 @@ def damage_fct(x, x0, m, r, is_slr):
 
 
 def logistic(x, b1, b2, b3):
-    return b1 / (1 + b2 * exp(-b3 * x)) - b1 / (1 + b2)
+    exponent = soft_max(-b3 * x, 10, scale=0.1)  # Avoid exponential overflow
+    return b1 / (1 + b2 * exp(exponent)) - b1 / (1 + b2)
