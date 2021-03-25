@@ -42,6 +42,10 @@ def soft_min(x, scale=1.0):
     # )
 
 
+def soft_max(x, maxval, scale=1.0):
+    return -soft_min(maxval - x, scale) + maxval
+
+
 ####### Constraints
 
 

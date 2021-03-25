@@ -36,6 +36,7 @@ from .pyomo_utils import (
     UsefulVar,
     soft_switch,
     soft_min,
+    soft_max,
     get_all_variables,
 )
 
