@@ -16,6 +16,7 @@ from pyomo.environ import (
     Var,
     exp,
     log,
+    sqrt,
     tanh,
     value,
     maximize,
@@ -38,10 +39,11 @@ from .pyomo_utils import (
     soft_min,
     soft_max,
     get_all_variables,
+    add_constraint,
 )
 
 # Other utils
-from .utils import first, add_constraint
+from .utils import first
 
 # # Datastore
 # from .data import DataStore

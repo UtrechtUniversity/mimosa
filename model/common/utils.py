@@ -16,22 +16,6 @@ def first(dictionary):
     return dictionary[firstk(dictionary)]
 
 
-def add_constraint(m, constraint, name=None):
-    """Adds a constraint to the model
-
-    It first generates a unique name, then adds
-    the constraint using this new name
-    """
-    n = len(list(m.component_objects()))
-    name = (
-        "constraint_{}".format(n)
-        if name is None
-        else "constraint_{}_{}".format(name, n)
-    )
-    m.add_component(name, constraint)
-    return name
-
-
 def timer(name):
     """Decorator which times functions
 
