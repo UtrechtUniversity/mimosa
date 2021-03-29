@@ -105,3 +105,8 @@ model:
   damage module: RICE2012 # RICE2010, RICE2012 or WITCH
   objective module: utility # utility or globalcosts
   allow trade: True
+
+simulation:
+  simulationmode: False
+  constraint_variables: # Dict of `variablename`: `path_to_output_file`
+  deactivated_constraints: # List of constraint names to be disabled

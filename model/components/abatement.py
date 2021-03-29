@@ -118,7 +118,9 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
                 ),
                 "carbonprice",
             ),
-            RegionalInitConstraint(lambda m, r: m.carbonprice[0, r] == 0),
+            RegionalInitConstraint(
+                lambda m, r: m.carbonprice[0, r] == 0, "init_carbon_price"
+            ),
         ]
     )
 
