@@ -42,6 +42,10 @@ def soft_min(x, scale=1.0):
     # )
 
 
+def soft_max(x, maxval, scale=1.0):
+    return -soft_min(maxval - x, scale) + maxval
+
+
 ####### Constraints
 
 
@@ -80,6 +84,18 @@ class RegionalConstraint(GeneralConstraint):
 class RegionalInitConstraint(GeneralConstraint):
     def to_pyomo_constraint(self, m):
         return Constraint(m.regions, rule=self.rule)
+
+
+def add_constraint(m, constraint, name=None):
+    """Adds a constraint to the model
+
+    It first generates a unique name, then adds
+    the constraint using this new name
+    """
+    n = len(list(m.component_objects()))
+    name = f"constraint_{n}" if name is None else f"constraint_{name}"
+    m.add_component(name, constraint)
+    return name
 
 
 ####### Get all variables of a model

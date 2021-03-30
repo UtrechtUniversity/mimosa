@@ -1,4 +1,4 @@
-from model.main import MIMOSA
+from model.mimosa import MIMOSA
 
 from model.common.config import params
 

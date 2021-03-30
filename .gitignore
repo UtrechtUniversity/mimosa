@@ -6,9 +6,10 @@
 # Debug files
 output/*
 AD-RICE/*
-input/*.ipynb
+extra_scripts/*
 *.ipynb
 *.html
+None
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
