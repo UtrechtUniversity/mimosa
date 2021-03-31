@@ -143,3 +143,4 @@ combine_data.py
 log_CBA.txt
 log_dynamicCB.txt
 run_current.py
+minimax.py

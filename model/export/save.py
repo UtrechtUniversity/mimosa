@@ -70,23 +70,23 @@ def rows_to_dataframe(rows, m):
     return pd.DataFrame(rows, columns=columns)
 
 
-def add_param_columns(dataframe, params, exp_id, experiment):
-    values = {
-        "carbonbudget": params["emissions"]["carbonbudget"],
-        "minlevel": params["emissions"]["global min level"],
-        "inertia": params["emissions"]["inertia"]["regional"],
-        "gamma": params["economics"]["MAC"]["gamma"],
-        "PRTP": params["economics"]["PRTP"],
-        "damage_coeff": first(params["regions"])["damages"][
-            "a2"
-        ],  # NOTE, only for global run
-        "perc_reversible": params["economics"]["damages"]["percentage reversible"],
-        "TCRE": params["temperature"]["TCRE"],
-    }
-    for i, (name, val) in enumerate(values.items()):
-        dataframe.insert(i + 2, name, val)
+# def add_param_columns(dataframe, params, exp_id, experiment):
+#     values = {
+#         "carbonbudget": params["emissions"]["carbonbudget"],
+#         "minlevel": params["emissions"]["global min level"],
+#         "inertia": params["emissions"]["inertia"]["regional"],
+#         "gamma": params["economics"]["MAC"]["gamma"],
+#         "PRTP": params["economics"]["PRTP"],
+#         "damage_coeff": first(params["regions"])["damages"][
+#             "a2"
+#         ],  # NOTE, only for global run
+#         "perc_reversible": params["economics"]["damages"]["percentage reversible"],
+#         "TCRE": params["temperature"]["TCRE"],
+#     }
+#     for i, (name, val) in enumerate(values.items()):
+#         dataframe.insert(i + 2, name, val)
 
-    # Add ID:
-    dataframe.insert(0, "ID", exp_id)
-    if experiment is not None:
-        dataframe.insert(1, "Experiment", experiment)
+#     # Add ID:
+#     dataframe.insert(0, "ID", exp_id)
+#     if experiment is not None:
+#         dataframe.insert(1, "Experiment", experiment)

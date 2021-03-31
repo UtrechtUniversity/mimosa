@@ -52,7 +52,7 @@ class MIMOSA:
         self.regions = params["regions"]
 
         self.abstract_model = self.get_abstract_model()
-        self.m = self.create_instance()
+        self.concrete_model = self.create_instance()
         self.preparation()
 
     def get_abstract_model(self) -> AbstractModel:
@@ -97,11 +97,17 @@ class MIMOSA:
     def preparation(self) -> None:
 
         if len(self.regions) > 1:
-            TransformationFactory("contrib.aggregate_vars").apply_to(self.m)
-        TransformationFactory("contrib.init_vars_midpoint").apply_to(self.m)
-        TransformationFactory("contrib.detect_fixed_vars").apply_to(self.m)
+            TransformationFactory("contrib.aggregate_vars").apply_to(
+                self.concrete_model
+            )
+        TransformationFactory("contrib.init_vars_midpoint").apply_to(
+            self.concrete_model
+        )
+        TransformationFactory("contrib.detect_fixed_vars").apply_to(self.concrete_model)
         if len(self.regions) > 1:
-            TransformationFactory("contrib.propagate_fixed_vars").apply_to(self.m)
+            TransformationFactory("contrib.propagate_fixed_vars").apply_to(
+                self.concrete_model
+            )
 
     @utils.timer("Model solve")
     def solve(
@@ -116,18 +122,22 @@ class MIMOSA:
             os.environ["NEOS_EMAIL"] = neos_email
             solver_manager = SolverManagerFactory("neos")
             solver = "conopt"  # 'ipopt'
-            results = solver_manager.solve(self.m, opt=solver)
+            results = solver_manager.solve(self.concrete_model, opt=solver)
         else:
             opt: OptSolver = SolverFactory("ipopt")
             opt.options["halt_on_ampl_error"] = halt_on_ampl_error
             opt.options["output_file"] = ipopt_output_file
-            results = opt.solve(self.m, tee=verbose, symbolic_solver_labels=True)
+            results = opt.solve(
+                self.concrete_model, tee=verbose, symbolic_solver_labels=True
+            )
             if ipopt_output_file is not None:
                 visualise_ipopt_output(ipopt_output_file)
 
         # Restore aggregated variables
         if len(self.regions) > 1:
-            TransformationFactory("contrib.aggregate_vars").update_variables(self.m)
+            TransformationFactory("contrib.aggregate_vars").update_variables(
+                self.concrete_model
+            )
 
         if results.solver.status != SolverStatus.ok:
             print(
@@ -138,12 +148,11 @@ class MIMOSA:
             if results.solver.status != SolverStatus.warning:
                 raise Exception("Solver did not exit with status OK")
 
-        print("Final NPV:", value(self.m.NPV[self.m.tf]))
+        print("Final NPV:", value(self.concrete_model.NPV[self.concrete_model.tf]))
 
     @utils.timer("Plotting results")
     def plot(self, filename="result", **kwargs):
-        full_plot(self.m, filename, **kwargs)
+        full_plot(self.concrete_model, filename, **kwargs)
 
     def save(self, experiment=None, **kwargs):
-        save_output(self.params, self.m, experiment, **kwargs)
-
+        save_output(self.params, self.concrete_model, experiment, **kwargs)
