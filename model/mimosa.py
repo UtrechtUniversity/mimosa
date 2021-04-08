@@ -67,6 +67,16 @@ class MIMOSA:
 
     @utils.timer("Concrete model creation")
     def create_instance(self) -> ConcreteModel:
+        """
+        Creates the objects necessary for the concrete model:
+          - Quantity object, for unit handling
+          - Regional parameter store
+          - Data store
+        Using these, it transforms the AbstractModel into a ConcreteModel
+
+        Returns:
+            ConcreteModel: model instantiated with parameter values and data functions
+        """
 
         # Create a Quantity object for automatic unit handling
         self.quant = units.Quantity(self.params)
@@ -95,6 +105,14 @@ class MIMOSA:
         return m
 
     def preparation(self) -> None:
+        """
+        Pyomo can apply certain pre-processing steps before sending the model
+        to the solver. These include:
+          - Aggregate variables that are linked by equality constraints
+          - Initialise non-fixed variables to midpoint of their boundaries
+          - Fix variables that are de-facto fixed
+          - Propagate variable fixing for equalities of type x = y
+        """
 
         if len(self.regions) > 1:
             TransformationFactory("contrib.aggregate_vars").apply_to(
@@ -118,6 +136,18 @@ class MIMOSA:
         neos_email=None,
         ipopt_output_file=None,
     ) -> None:
+        """Sends the concrete model to a solver.
+
+        Args:
+            verbose (bool, optional): Prints intermediate IPOPT results. Defaults to False.
+            halt_on_ampl_error (str, optional): Lets IPOPT stop when invalid values are encountered. Defaults to "no".
+            use_neos (bool, optional): Uses the external NEOS server for solving. Defaults to False.
+            neos_email (str or None, optional): E-mail address for NEOS server. Defaults to None.
+            ipopt_output_file (str or None, optional): Filename for IPOPT intermediate output. Defaults to None.
+
+        Raises:
+            Exception: raised if solver did not exit with status OK
+        """
         if use_neos:
             os.environ["NEOS_EMAIL"] = neos_email
             solver_manager = SolverManagerFactory("neos")

@@ -2,6 +2,9 @@
 Imports all common modules and extra imports
 """
 
+# General imports
+from dataclasses import dataclass
+
 # Pyomo imports
 from pyomo.environ import (
     AbstractModel,

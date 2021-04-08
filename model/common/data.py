@@ -3,11 +3,12 @@ Create a DataStore object which reads and parses regional data
 from a data file in IIASA database format
 """
 
+from typing import Iterable
 import numpy as np
 import pandas as pd
 from scipy.interpolate import interp1d
 
-from model.common import economics
+from model.common import economics, dataclass
 
 
 class DataStore:
@@ -57,7 +58,7 @@ class DataStore:
     def _create_data_values(self, variable, to_unit=None):
         regions = self.params["regions"]
         return {
-            region: self.get_data(self.data_years, region, variable, to_unit)["values"]
+            region: self.get_data(self.data_years, region, variable, to_unit).values
             for region in regions
         }
 
@@ -116,7 +117,7 @@ class DataStore:
 
         # 3. Interpolate the combined data
         interp_fct = interp1d(extended_years, extended_data, kind="cubic")
-        return {"values": interp_fct(year), "unit": unit}
+        return ValueUnit(interp_fct(year), unit)
 
     def interp_data(self, year, region, variable):
         return np.interp(year, self.data_years, self.data_values[variable][region])
@@ -140,6 +141,13 @@ class DataStore:
 ## Utils
 ##
 ###########################
+
+
+@dataclass
+class ValueUnit:
+    values: Iterable
+    unit: str
+
 
 # To extrapolate: take growth rate 2090-2100, linearly bring it down to growth rate of 0 in 2150
 # Not sure if this should rather be a method of DataStore
