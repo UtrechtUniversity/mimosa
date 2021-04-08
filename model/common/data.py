@@ -40,9 +40,9 @@ class DataStore:
         """Makes sure the file doesn't need to be read multiple times"""
         filename = self.params["input"]["db_filename"]
         if filename not in DataStore.databases:
-            df = pd.read_csv(filename)
-            df.columns = df.columns.str.lower()
-            DataStore.databases[filename] = df
+            database = pd.read_csv(filename)
+            database.columns = database.columns.str.lower()
+            DataStore.databases[filename] = database
             self.cached_data[filename] = {}
 
         self.database = DataStore.databases[filename]
