@@ -146,7 +146,7 @@ class MIMOSA:
             ipopt_output_file (str or None, optional): Filename for IPOPT intermediate output. Defaults to None.
 
         Raises:
-            Exception: raised if solver did not exit with status OK
+            SolverException: raised if solver did not exit with status OK
         """
         if use_neos:
             os.environ["NEOS_EMAIL"] = neos_email
@@ -176,7 +176,7 @@ class MIMOSA:
                 )
             )
             if results.solver.status != SolverStatus.warning:
-                raise Exception("Solver did not exit with status OK")
+                raise SolverException("Solver did not exit with status OK")
 
         print("Final NPV:", value(self.concrete_model.NPV[self.concrete_model.tf]))
 
@@ -186,3 +186,16 @@ class MIMOSA:
 
     def save(self, experiment=None, **kwargs):
         save_output(self.params, self.concrete_model, experiment, **kwargs)
+
+
+###########################
+##
+## Utils
+##
+###########################
+
+
+class SolverException(Exception):
+    """Raised when Pyomo solver does not exit with status OK"""
+
+    pass
