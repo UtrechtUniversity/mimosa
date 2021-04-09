@@ -53,7 +53,7 @@ class MIMOSA:
 
         self.abstract_model = self.get_abstract_model()
         self.concrete_model = self.create_instance()
-        self.preparation()
+        self.preprocessing()
 
     def get_abstract_model(self) -> AbstractModel:
         """
@@ -104,7 +104,7 @@ class MIMOSA:
 
         return m
 
-    def preparation(self) -> None:
+    def preprocessing(self) -> None:
         """
         Pyomo can apply certain pre-processing steps before sending the model
         to the solver. These include:
@@ -124,6 +124,13 @@ class MIMOSA:
         TransformationFactory("contrib.detect_fixed_vars").apply_to(self.concrete_model)
         if len(self.regions) > 1:
             TransformationFactory("contrib.propagate_fixed_vars").apply_to(
+                self.concrete_model
+            )
+
+    def postprocessing(self) -> None:
+        """Post-processing tasks to restore aggregate variables in pre-processing step"""
+        if len(self.regions) > 1:
+            TransformationFactory("contrib.aggregate_vars").update_variables(
                 self.concrete_model
             )
 
@@ -148,26 +155,27 @@ class MIMOSA:
         Raises:
             SolverException: raised if solver did not exit with status OK
         """
+
         if use_neos:
+            # Send concrete model to external solver on NEOS server
+            # Requires authenticated email address
             os.environ["NEOS_EMAIL"] = neos_email
             solver_manager = SolverManagerFactory("neos")
-            solver = "conopt"  # 'ipopt'
+            solver = "ipopt"  # or "conopt'
             results = solver_manager.solve(self.concrete_model, opt=solver)
         else:
+            # Solve locally using ipopt
             opt: OptSolver = SolverFactory("ipopt")
             opt.options["halt_on_ampl_error"] = halt_on_ampl_error
-            opt.options["output_file"] = ipopt_output_file
+            if ipopt_output_file is not None:
+                opt.options["output_file"] = ipopt_output_file
             results = opt.solve(
                 self.concrete_model, tee=verbose, symbolic_solver_labels=True
             )
             if ipopt_output_file is not None:
                 visualise_ipopt_output(ipopt_output_file)
 
-        # Restore aggregated variables
-        if len(self.regions) > 1:
-            TransformationFactory("contrib.aggregate_vars").update_variables(
-                self.concrete_model
-            )
+        self.postprocessing()
 
         if results.solver.status != SolverStatus.ok:
             print(
@@ -197,5 +205,3 @@ class MIMOSA:
 
 class SolverException(Exception):
     """Raised when Pyomo solver does not exit with status OK"""
-
-    pass
