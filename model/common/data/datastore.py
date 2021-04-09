@@ -9,7 +9,7 @@ import pandas as pd
 from scipy.interpolate import interp1d
 
 from model.common import economics
-from .data_utils import UnitValues, extrapolate
+from .utils import UnitValues, extrapolate
 
 
 class DataStore:

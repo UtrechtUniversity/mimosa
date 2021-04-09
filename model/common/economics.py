@@ -2,9 +2,9 @@
 Utils to calculate TFP using the Cobb-Douglas equation
 """
 
-from model.common.data_utils import UnitValues
-from model.common.regional_params import RegionalParamStore
 import numpy as np
+from model.common.data.utils import UnitValues
+from model.common.regional_params import RegionalParamStore
 
 
 def get_TFP(
