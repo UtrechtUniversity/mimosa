@@ -2,37 +2,44 @@
 Utils to calculate TFP using the Cobb-Douglas equation
 """
 
+from model.common.data_utils import UnitValues
 from model.common.regional_params import RegionalParamStore
 import numpy as np
 
 
-def get_TFP(region, data_store, regional_param_store: RegionalParamStore):
-    params = data_store.params
+def get_TFP(
+    region,
+    years,
+    gdp_all_regions,
+    population_all_regions,
+    regional_param_store: RegionalParamStore,
+) -> UnitValues:
+    params = regional_param_store.params
     # quant = data_store.quant
-    time = data_store.data_years
-    TFP = []
-    dt = time[1] - time[0]
+    tfp = []
+    dt = years[1] - years[0]
 
     # Parameters
     alpha = params["economics"]["GDP"]["alpha"]
     depr_cap = params["economics"]["GDP"]["depreciation of capital"]
     savings_rate = params["economics"]["GDP"]["savings rate"]
 
-    # Initialise capital
-    capital = regional_param_store.getregional(
-        "economics", "init_capital_factor", region
-    ) * data_store.data_object("GDP")(time[0], region)
-
     # Get data
-    GDP_data = data_store.data_values["GDP"][region]
-    population_data = data_store.data_values["population"][region]
+    gdp_data = gdp_all_regions[region]
+    population_data = population_all_regions[region]
 
-    for GDP, pop in zip(GDP_data, population_data):
-        TFP.append(GDP / calc_GDP(1, pop, capital, alpha))
-        dKdt = calc_dKdt(capital, depr_cap, savings_rate * GDP, dt)
+    # Initialise capital
+    capital = (
+        regional_param_store.getregional("economics", "init_capital_factor", region)
+        * gdp_data.yvalues[0]
+    )
+
+    for gdp, pop in zip(gdp_data.yvalues, population_data.yvalues):
+        tfp.append(gdp / calc_GDP(1, pop, capital, alpha))
+        dKdt = calc_dKdt(capital, depr_cap, savings_rate * gdp, dt)
         capital = dKdt * dt + capital
 
-    return np.array(TFP)
+    return UnitValues(gdp_data.xvalues, np.array(tfp))
 
 
 def calc_dKdt(K, dk, I, dt):

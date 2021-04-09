@@ -3,15 +3,28 @@ Create a DataStore object which reads and parses regional data
 from a data file in IIASA database format
 """
 
-from typing import Iterable
+from typing import Callable, Dict
 import numpy as np
 import pandas as pd
 from scipy.interpolate import interp1d
 
-from model.common import economics, dataclass
+from model.common import economics
+from .data_utils import UnitValues, extrapolate
 
 
 class DataStore:
+    """The DataStore object is used when instantiating a concrete model from the
+    abstract model. It provides values for time and region dependent data:
+      - baseline emissions
+      - population
+      - baseline GDP / carbon intensity
+      - TFP
+    This data is read from a data file in IIASA format, and automatically transformed
+    to the right units as specified in the config file.
+
+    Usage: once the data store is initialised, only the method `DataStore.data_object` will
+    be used.
+    """
 
     # Class property and not instance property to reduce redundancy
     databases = {}
@@ -22,18 +35,24 @@ class DataStore:
         self.quant = quant  # Quantity object for unit conversion
         self._select_database()
         self._create_data_years()
-        self.data_values = {
-            "baseline": self._create_data_values("emissions", "emissionsrate_unit"),
-            "population": self._create_data_values("population", "population_unit"),
-            "GDP": self._create_data_values("GDP", "currency_unit"),
-        }
-        self.data_values["carbon_intensity"] = {
-            r: self.data_values["baseline"][r] / self.data_values["GDP"][r]
-            for r in params["regions"]
-        }
-        self.data_values["TFP"] = {
-            r: economics.get_TFP(r, self, regional_param_store)
-            for r in params["regions"]
+
+        baseline = self._create_data_values("emissions", "emissionsrate_unit")
+        population = self._create_data_values("population", "population_unit")
+        gdp = self._create_data_values("GDP", "currency_unit")
+        self._data_values = {
+            "baseline": baseline,
+            "population": population,
+            "GDP": gdp,
+            "carbon_intensity": {
+                r: UnitValues(baseline[r].xvalues, baseline[r].yvalues / gdp[r].yvalues)
+                for r in params["regions"]
+            },
+            "TFP": {
+                r: economics.get_TFP(
+                    r, self.data_years, gdp, population, regional_param_store
+                )
+                for r in params["regions"]
+            },
         }
 
     def _select_database(self):
@@ -55,10 +74,10 @@ class DataStore:
         dt = self.params["time"]["dt"]
         self.data_years = np.arange(beginyear, endyear, dt)
 
-    def _create_data_values(self, variable, to_unit=None):
+    def _create_data_values(self, variable, to_unit=None) -> Dict[str, UnitValues]:
         regions = self.params["regions"]
         return {
-            region: self.get_data(self.data_years, region, variable, to_unit).values
+            region: self._get_data(self.data_years, region, variable, to_unit)
             for region in regions
         }
 
@@ -100,7 +119,7 @@ class DataStore:
             }
         return self.cache[key]
 
-    def get_data(self, year, region, variable, to_unit=None):
+    def _get_data(self, output_years, region, variable, to_unit=None) -> UnitValues:
 
         # 1. Get data from database
         years, values, unit = self._get_data_from_database(region, variable)
@@ -117,67 +136,29 @@ class DataStore:
 
         # 3. Interpolate the combined data
         interp_fct = interp1d(extended_years, extended_data, kind="cubic")
-        return ValueUnit(interp_fct(year), unit)
+        return UnitValues(output_years, interp_fct(output_years), unit)
 
-    def interp_data(self, year, region, variable):
-        return np.interp(year, self.data_years, self.data_values[variable][region])
+    def _interp_data(self, year, region, variable):
+        values = self._data_values[variable][region]
+        return np.interp(year, values.xvalues, values.yvalues)
 
-    def data_object(self, variable):
-        return lambda year, region: self.interp_data(year, region, variable)
+    def data_object(self, variable: str) -> Callable[[int, str], float]:
+        """Creates a function giving the value of `variable` at a given year and regions.
+
+        Args:
+            variable (str): any of the keys of self._data_values
+
+        Returns:
+            Callable[[int, str], float]: interpolating function of type f(year, region)
+        """
+        return lambda year, region: self._interp_data(year, region, variable)
 
     def __repr__(self):
         return "DataStore with data values {} calculated on the years {}-{} from input file {} for the regions {} and {}".format(
-            list(self.data_values.keys()),
+            list(self._data_values.keys()),
             self.data_years[0],
             self.data_years[-1],
             self.filename,
             list(self.params["regions"].keys()),
             self.params["SSP"],
         )
-
-
-###########################
-##
-## Utils
-##
-###########################
-
-
-@dataclass
-class ValueUnit:
-    values: Iterable
-    unit: str
-
-
-# To extrapolate: take growth rate 2090-2100, linearly bring it down to growth rate of 0 in 2150
-# Not sure if this should rather be a method of DataStore
-def extrapolate(input_values, years, extra_years, meta_info, stabilising_years=50):
-
-    became_negative = False
-
-    # First get final change rate
-    change_rate = (input_values[-1] - input_values[-2]) / (years[-1] - years[-2])
-    minmax = np.maximum if change_rate > 0 else np.minimum
-
-    t_prev = years[-1]
-    val_prev = input_values[-1]
-
-    new_values = []
-
-    for t in extra_years:
-        change = minmax(
-            0.0, change_rate - change_rate * (t_prev - 2100.0) / stabilising_years
-        )
-        val = val_prev + change * (t - t_prev)
-        # if val < 0:
-        #     val = 0.1
-        #     became_negative = True
-
-        new_values.append(val)
-
-        val_prev = val
-        t_prev = t
-
-    if became_negative:
-        print("Extrapolation became negative for", meta_info)
-    return np.concatenate([input_values, new_values])
