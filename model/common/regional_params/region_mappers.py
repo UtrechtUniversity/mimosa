@@ -1,4 +1,7 @@
-"""Define region mappers"""
+"""Define region mappers, used to transform one regional definition to another.
+
+Currently, only `mean` is used. In future versions, this will be extended
+and automatic region mapping will be used by transforming to country level first."""
 
 import os
 import typing
