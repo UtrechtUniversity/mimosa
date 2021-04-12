@@ -93,6 +93,7 @@ emissions:
 temperature:
   initial: 1.096224 delta_degC
   TCRE: 0.62 delta_degC/(TtCO2)
+  target: False # False or a quantity
 
 default units:
   currency_unit: trillion USD2005/yr

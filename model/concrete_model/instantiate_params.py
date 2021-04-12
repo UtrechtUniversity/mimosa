@@ -126,6 +126,9 @@ class InstantiatedModel:
                 params["emissions"]["not positive after budget year"]
             ),
             "T0": V(quant(params["temperature"]["initial"], "temperature_unit")),
+            "temperature_target": V(
+                quant(params["temperature"]["target"], "temperature_unit")
+            ),
             "TCRE": V(
                 quant(
                     params["temperature"]["TCRE"],

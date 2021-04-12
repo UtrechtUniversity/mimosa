@@ -94,6 +94,7 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     m.T0 = Param()
     m.temperature = Var(m.t, initialize=lambda m, t: m.T0)
     m.TCRE = Param()
+    m.temperature_target = Param()
     constraints.extend(
         [
             GlobalConstraint(
@@ -102,6 +103,12 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
                 "temperature",
             ),
             GlobalInitConstraint(lambda m: m.temperature[0] == m.T0),
+            GlobalConstraint(
+                lambda m, t: m.temperature[t] <= m.temperature_target
+                if (m.year(t) >= 2100 and value(m.temperature_target) is not False)
+                else Constraint.Skip,
+                name="temperature_target",
+            ),
         ]
     )
 
