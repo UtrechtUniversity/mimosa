@@ -3,6 +3,7 @@ Create a DataStore object which reads and parses regional data
 from a data file in IIASA database format
 """
 
+import os
 from typing import Callable, Dict
 import numpy as np
 import pandas as pd
@@ -57,7 +58,9 @@ class DataStore:
 
     def _select_database(self):
         """Makes sure the file doesn't need to be read multiple times"""
-        filename = self.params["input"]["db_filename"]
+        filename = os.path.join(
+            os.path.dirname(__file__), "../../../", self.params["input"]["db_filename"],
+        )
         if filename not in DataStore.databases:
             database = pd.read_csv(filename)
             database.columns = database.columns.str.lower()

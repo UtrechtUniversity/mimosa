@@ -15,7 +15,13 @@ At the same time, certain constraints can be deactivated. These are defined in:
 
 from glob import glob
 import pandas as pd
-from model.common import RegionalConstraint, ConcreteModel, add_constraint
+from model.common import (
+    ConcreteModel,
+    RegionalConstraint,
+    GlobalConstraint,
+    is_regional,
+    add_constraint,
+)
 
 
 def set_simulation_mode(m: ConcreteModel, params: dict) -> None:
@@ -33,7 +39,7 @@ def _set_constraints_fixed_variables(m, params):
 
     for variable_name, filepath in params["simulation"]["constraint_variables"].items():
         extra_constraints.extend(
-            _fixed_data_constraint(variable_name, filepath, data_cache)
+            _fixed_data_constraint(m, variable_name, filepath, data_cache)
         )
 
     # Add constraints to concrete model
@@ -41,7 +47,7 @@ def _set_constraints_fixed_variables(m, params):
         add_constraint(m, constraint.to_pyomo_constraint(m), constraint.name)
 
 
-def _fixed_data_constraint(variable_name, filepath, data_cache):
+def _fixed_data_constraint(m, variable_name, filepath, data_cache):
     # 1. Read datafile
     if filepath not in data_cache:
         data_cache[filepath] = _read_csv(filepath)
@@ -54,8 +60,16 @@ def _fixed_data_constraint(variable_name, filepath, data_cache):
     # 3. Create constraints out of this
     eps = 1e-3  # TODO make eps a variable
 
-    # TODO allow for global constraints here
-    extra_constraints = [
+    if is_regional(getattr(m, variable_name)):
+        extra_constraints = _extra_regional_constraint(variable_name, fixed_data, eps)
+    else:
+        extra_constraints = _extra_global_constraint(variable_name, fixed_data, eps)
+
+    return extra_constraints
+
+
+def _extra_regional_constraint(variable_name, fixed_data, eps):
+    return [
         RegionalConstraint(
             lambda m, t, r: getattr(m, variable_name)[t, r]
             - fixed_data.loc[r, str(int(m.year(t)))]
@@ -68,7 +82,20 @@ def _fixed_data_constraint(variable_name, filepath, data_cache):
         ),
     ]
 
-    return extra_constraints
+
+def _extra_global_constraint(variable_name, fixed_data, eps):
+    return [
+        GlobalConstraint(
+            lambda m, t: getattr(m, variable_name)[t]
+            - fixed_data.loc["Global", str(int(m.year(t)))]
+            <= eps
+        ),
+        GlobalConstraint(
+            lambda m, t: getattr(m, variable_name)[t]
+            - fixed_data.loc["Global", str(int(m.year(t)))]
+            >= -eps
+        ),
+    ]
 
 
 def _deactivate_constraints(m, params):

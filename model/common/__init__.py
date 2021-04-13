@@ -43,6 +43,8 @@ from .pyomo_utils import (
     soft_max,
     get_all_variables,
     add_constraint,
+    is_regional,
+    get_indices,
 )
 
 # Other utils

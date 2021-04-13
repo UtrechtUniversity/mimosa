@@ -107,19 +107,10 @@ class UsefulVar:
         self.var = getattr(m, name)
 
         self.name = name
-        self.is_regional, self.indices = self._get_indices(self.var)
+        self.is_regional = is_regional(self.var)
+        self.indices = get_indices(self.var)
 
         self.index_values = {index: list(getattr(m, index)) for index in self.indices}
-
-    # Private functions
-    def _get_indices(self, var):
-        # Check if variable has multiple indices:
-        if var._implicit_subsets is None:
-            # Variable has a single index
-            return False, [var.index_set().name]
-        else:
-            # Variable has multiple indices
-            return True, [index.name for index in var._implicit_subsets]
 
 
 def get_all_variables(m):
@@ -128,3 +119,18 @@ def get_all_variables(m):
         for var in m.component_objects(Var)
         if not var.name.startswith("_")
     ]
+
+
+def is_regional(var):
+    """Returns true if the Pyomo variable `var` is regional, false if it is global"""
+    # While there is no explicit Pyomo way to obtain the indices, we can use
+    # this private property to check if variable has multiple indices
+    if var._implicit_subsets is None:
+        return False
+    return True
+
+
+def get_indices(var):
+    if is_regional(var):
+        return [var.index_set().name]
+    return [index.name for index in var._implicit_subsets]
