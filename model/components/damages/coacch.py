@@ -16,8 +16,6 @@ from model.common import (
     exp,
 )
 
-from .ad_rice2012 import get_slr_constraints
-
 
 def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     """Damage and adaptation costs equations and constraints
@@ -35,9 +33,6 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
         )
     """
     constraints = []
-
-    # Sea level rise
-    constraints.extend(get_slr_constraints(m))
 
     m.damage_costs = Var(m.t, m.regions)
     m.damage_scale_factor = Param()

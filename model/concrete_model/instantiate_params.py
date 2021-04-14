@@ -165,6 +165,27 @@ class InstantiatedModel:
 
         instance_data[None].update(parameter_mapping)
 
+        # Set sea level rise parameters
+        self._set_instance_data_slr(instance_data)
+
+    def _set_instance_data_slr(self, instance_data) -> None:
+        parameter_mapping = {
+            # Sea level rise:
+            "slr_thermal_equil": V(0.5),  # Equilibrium
+            "slr_thermal_init": V(0.0920666936642),  # Initial condition
+            "slr_thermal_adjust_rate": V(0.024076141150722),  # Adjustment rate
+            "slr_gsic_melt_rate": V(0.0008),  # Melt rate
+            "slr_gsic_total_ice": V(0.26),  # Total ice
+            "slr_gsic_equil_temp": V(-1),  # Equil temp
+            "slr_gis_melt_rate_above_thresh": V(
+                1.11860081578514
+            ),  # Melt rate above threshold
+            "slr_gis_init_melt_rate": V(0.6),  # Initial melt rate
+            "slr_gis_init_ice_vol": V(7.3),  # Initial ice volume
+        }
+
+        instance_data[None].update(parameter_mapping)
+
     def _set_instance_data_rice2010(self, instance_data) -> None:
         params = self.params
         parameter_mapping = {
@@ -193,28 +214,7 @@ class InstantiatedModel:
 
         instance_data[None].update(parameter_mapping)
 
-        # Set sea level rise parameters
-        self._set_instance_data_rice2012_slr(instance_data)
-
-    def _set_instance_data_rice2012_slr(self, instance_data) -> None:
-        parameter_mapping = {
-            # Sea level rise:
-            "S1": V(0.5), # Equilibrium
-            "S2": V(0.0920666936642), # Initial condition
-            "S3": V(0.024076141150722), # Adjustment rate
-            "M1": V(0.0008), # Melt rate
-            "M2": V(0.26), # Total ice
-            "M3": V(-1), # Equil temp
-            "M4": V(1.11860081578514), # Melt rate above threshold
-            "M5": V(0.6), # Initial melt rate
-            "M6": V(7.3), # Initial ice volume
-        }
-
-        instance_data[None].update(parameter_mapping)
-
     def _set_instance_data_coacch(self, instance_data) -> None:
-        # First, set sea level rise parameters from AD-RICE2012
-        self._set_instance_data_rice2012_slr(instance_data)
 
         try:
             damage_quantile = self.params["economics"]["damages"]["quantile"]

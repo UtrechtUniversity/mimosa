@@ -9,8 +9,6 @@ from model.common import (
     Param,
     Var,
     GeneralConstraint,
-    GlobalConstraint,
-    GlobalInitConstraint,
     RegionalConstraint,
     RegionalInitConstraint,
     Constraint,
@@ -56,9 +54,6 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     m.fixed_adaptation = Param()
 
     m.adapt_SAD = Var(m.t, m.regions, initialize=0.01, within=NonNegativeReals)
-
-    # Sea level rise
-    constraints.extend(get_slr_constraints(m))
 
     # SLR damages
     m.SLRdam1 = Param(m.regions)
@@ -138,69 +133,6 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
 
 
 #################
-## Sea level rise constraints
-#################
-
-
-def get_slr_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
-
-    # Parameters and variables necessary for sea level rise
-    m.S1 = Param()
-    m.S2 = Param()
-    m.S3 = Param()
-    m.SLR = Var(m.t)
-
-    m.M1 = Param()
-    m.M2 = Param()
-    m.M3 = Param()
-    m.M4 = Param()
-    m.M5 = Param()
-    m.M6 = Param()
-    m.CUMGSIC = Var(m.t)
-    m.CUMGIS = Var(m.t)
-    m.total_SLR = Var(m.t)
-
-    # Constraints relating to SLR
-    constraints = [
-        # Thermal expansion
-        GlobalConstraint(
-            lambda m, t: m.SLR[t]
-            == (1 - m.S3) ** (m.dt / 10) * m.SLR[t - 1]
-            + m.S3 * (m.dt / 10) * (m.temperature[t] * m.S1)
-            if t > 0
-            else Constraint.Skip,
-            "SLR_thermal",
-        ),
-        GlobalInitConstraint(lambda m: m.SLR[0] == m.S2 + m.S3 * (m.T0 * m.S1 - m.S2)),
-        # GSIC
-        GlobalConstraint(
-            lambda m, t: m.CUMGSIC[t]
-            == slr_gsic(m.CUMGIS[t - 1], m.temperature[t - 1], m)
-            if t > 0
-            else Constraint.Skip,
-            "SLR_GSIC",
-        ),
-        GlobalInitConstraint(lambda m: m.CUMGSIC[0] == 0.015),
-        # GIS
-        GlobalConstraint(
-            lambda m, t: m.CUMGIS[t]
-            == slr_gis(m.CUMGIS[t - 1], m.temperature[t - 1], m)
-            if t > 0
-            else Constraint.Skip,
-            "SLR_GIS",
-        ),
-        GlobalInitConstraint(lambda m: m.CUMGIS[0] == 0.006),
-        # SLR damages resulting from total SLR
-        GlobalConstraint(
-            lambda m, t: m.total_SLR[t] == m.SLR[t] + m.CUMGSIC[t] + m.CUMGIS[t],
-            "total_SLR",
-        ),
-    ]
-
-    return constraints
-
-
-#################
 ## Utils
 #################
 
@@ -222,28 +154,6 @@ def damage_fct(temperature, init_temp, m, r):
 
 
 # Sea level rise
-
-
-def slr_gsic(cumgsic, temperature, m):
-
-    melt_rate = m.M1
-    total_ice = m.M2
-    equil_temp = m.M3
-
-    return cumgsic + melt_rate / total_ice * m.dt * (total_ice - cumgsic) * (
-        temperature - equil_temp
-    )
-
-
-def slr_gis(cumgis, temperature, m):
-
-    melt_rate_above_thresh = m.M4
-    init_melt_rate = m.M5
-    init_ice_vol = m.M6
-
-    return cumgis + (m.dt / 10) * (1 / 100) * (
-        melt_rate_above_thresh * temperature + init_melt_rate
-    ) * (1 - cumgis / init_ice_vol)
 
 
 def slr_damages(total_slr, gdp_t, gdp_0, dam1, dam2):

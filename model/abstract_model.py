@@ -6,7 +6,14 @@ Contains all model equations and constraints
 
 import numpy as np
 from model.common import Param, AbstractModel, Set, add_constraint
-from model.components import emissions, abatement, cobbdouglas, damages, objective
+from model.components import (
+    emissions,
+    abatement,
+    cobbdouglas,
+    damages,
+    objective,
+    sealevelrise,
+)
 
 
 ######################
@@ -59,6 +66,9 @@ def create_abstract_model(damage_module: str, objective_module: str) -> Abstract
 
     # Emissions and temperature equations
     constraints.extend(emissions.get_constraints(m))
+
+    # Sea level rise
+    constraints.extend(sealevelrise.get_constraints(m))
 
     # Damage costs
     if damage_module == "RICE2010":
