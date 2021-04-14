@@ -13,6 +13,7 @@ transformed into a `ConcreteModel` by putting all the parameter values in it. Th
 
 * [Abstract model](model/abstract_model.py)
   * [Emission module](model/components/emissions.py)
+  * [Sea level rise module](model/components/sealevelrise.py)
   * Damage and adaptation module
     * [AD-RICE 2010](model/components/damages/AD_RICE2010.py)
     * [AD-RICE 2012](model/components/damages/AD_RICE2012.py)
@@ -23,16 +24,19 @@ transformed into a `ConcreteModel` by putting all the parameter values in it. Th
   * Objective module
     * [Maximise utility](model/components/objective/utility.py)
     * [Minimise global costs](model/components/objective/globalcosts.py)
+  * [Concrete model](model/concrete_model/instantiate_params.py)
     
 ### Data
 
-The parameter values are defined in the [`config.yaml`](input/config.yaml) file in the `input` directory.
+The parameter values are defined in the [`config.yaml`](inputdata/config.yaml) file in the `input` directory.
 The baseline emissions, baseline GDP (for calculation of Total Factor Productivity) and population data is read in IIASA
-database format. By default, the IMAGE data of [`input/data/data_IMAGE_SSP.csv`](input/data/data_IMAGE_SSP.csv) is used.
-Damage and adaptation coefficients are read from [`input/data/rice_damages_adapt.csv`](input/data/rice_damages_adapt.csv).
+database format. By default, the IMAGE data of [`inputdata/data/data_IMAGE_SSP.csv`](inputdata/data/data_IMAGE_SSP.csv) is used.
+Damage and adaptation coefficients are read from [`inputdata/params/rice_damages_adapt.csv`](inputdata/params/rice_damages_adapt.csv).
 
 The config parameter values and the input data are combined with the `AbstractModel` to create the `ConcreteModel` in
-[`model/main.py`](model/main.py)
+[`model/concrete_model/instantiate_params.py`](model/concrete_model/instantiate_params.py).
+
+The main file of the model, where concrete model is created and the model is solved, is [`model/mimosa.py`](model/mimosa.py).
 
 ### Running the model
 
