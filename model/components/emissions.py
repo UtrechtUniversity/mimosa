@@ -185,7 +185,7 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
                 >= m.dt * m.inertia_regional * m.baseline_emissions(m.year(0), r)
                 if value(m.inertia_regional) is not False and t > 0
                 else Constraint.Skip,
-                name="regional_emissions",
+                name="regional_inertia",
             ),
             GlobalConstraint(
                 lambda m, t: m.global_emissions[t] >= m.global_min_level

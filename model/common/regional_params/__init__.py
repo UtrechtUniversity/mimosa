@@ -1,1 +1,1 @@
-from .regional_param_store import RegionalParamStore
+from .main import RegionalParamStore

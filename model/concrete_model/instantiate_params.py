@@ -199,15 +199,15 @@ class InstantiatedModel:
     def _set_instance_data_rice2012_slr(self, instance_data) -> None:
         parameter_mapping = {
             # Sea level rise:
-            "S1": V(0.5),
-            "S2": V(0.0920666936642),
-            "S3": V(0.024076141150722),
-            "M1": V(0.0008),
-            "M2": V(0.26),
-            "M3": V(-1),
-            "M4": V(1.11860081578514),
-            "M5": V(0.6),
-            "M6": V(7.3),
+            "S1": V(0.5), # Equilibrium
+            "S2": V(0.0920666936642), # Initial condition
+            "S3": V(0.024076141150722), # Adjustment rate
+            "M1": V(0.0008), # Melt rate
+            "M2": V(0.26), # Total ice
+            "M3": V(-1), # Equil temp
+            "M4": V(1.11860081578514), # Melt rate above threshold
+            "M5": V(0.6), # Initial melt rate
+            "M6": V(7.3), # Initial ice volume
         }
 
         instance_data[None].update(parameter_mapping)

@@ -132,5 +132,5 @@ def is_regional(var):
 
 def get_indices(var):
     if is_regional(var):
-        return [var.index_set().name]
-    return [index.name for index in var._implicit_subsets]
+        return [index.name for index in var._implicit_subsets]
+    return [var.index_set().name]

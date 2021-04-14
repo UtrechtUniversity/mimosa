@@ -10,7 +10,7 @@ import hashlib
 import numpy as np
 import pandas as pd
 
-from model.common import first, get_all_variables, value
+from model.common import get_all_variables, value
 
 
 def save_output(params, m, experiment=None, random_id=False, folder="output"):
