@@ -24,7 +24,7 @@ transformed into a `ConcreteModel` by putting all the parameter values in it. Th
   * Objective module
     * [Maximise utility](model/components/objective/utility.py)
     * [Minimise global costs](model/components/objective/globalcosts.py)
-  * [Concrete model](model/concrete_model/instantiate_params.py)
+* [Concrete model](model/concrete_model/instantiate_params.py)
     
 ### Data
 
