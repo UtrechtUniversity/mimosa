@@ -177,9 +177,7 @@ class InstantiatedModel:
             "slr_gsic_melt_rate": V(0.0008),  # Melt rate
             "slr_gsic_total_ice": V(0.26),  # Total ice
             "slr_gsic_equil_temp": V(-1),  # Equil temp
-            "slr_gis_melt_rate_above_thresh": V(
-                1.11860081578514
-            ),  # Melt rate above threshold
+            "slr_gis_melt_rate_above_thresh": V(1.11860082),  # Melt rate above threshol
             "slr_gis_init_melt_rate": V(0.6),  # Initial melt rate
             "slr_gis_init_ice_vol": V(7.3),  # Initial ice volume
         }
