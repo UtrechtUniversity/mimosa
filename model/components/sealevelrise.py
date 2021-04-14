@@ -1,6 +1,7 @@
 """
 Model equations and constraints:
 Sea level rise (height of sea level rise, not SLR damages)
+From RICE 2010
 """
 
 from typing import Sequence
@@ -56,7 +57,7 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
             == slr_thermal_expansion(m.slr_thermal[t - 1], m.temperature[t - 1], m)
             if t > 0
             else Constraint.Skip,
-            "SLR_thermal",
+            name="SLR_thermal",
         ),
         GlobalInitConstraint(
             lambda m: m.slr_thermal[0]
@@ -70,7 +71,7 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
             == slr_gsic(m.slr_cumgsic[t - 1], m.temperature[t - 1], m)
             if t > 0
             else Constraint.Skip,
-            "SLR_GSIC",
+            name="SLR_GSIC",
         ),
         GlobalInitConstraint(lambda m: m.slr_cumgsic[0] == 0.015),
         # GIS
@@ -79,14 +80,14 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
             == slr_gis(m.slr_cumgis[t - 1], m.temperature[t - 1], m)
             if t > 0
             else Constraint.Skip,
-            "SLR_GIS",
+            name="SLR_GIS",
         ),
         GlobalInitConstraint(lambda m: m.slr_cumgis[0] == 0.006),
-        # SLR damages resulting from total SLR
+        # Total SLR is sum of each contributing factors
         GlobalConstraint(
             lambda m, t: m.total_SLR[t]
             == m.slr_thermal[t] + m.slr_cumgsic[t] + m.slr_cumgis[t],
-            "total_SLR",
+            name="total_SLR",
         ),
     ]
 
@@ -94,6 +95,7 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
 
 
 def slr_thermal_expansion(slr_thermal, temperature, m: AbstractModel):
+    """Calculates next-step SLR due to thermal expansian"""
 
     equilib = m.slr_thermal_equil
     adjust_rate = m.slr_thermal_adjust_rate
@@ -104,6 +106,7 @@ def slr_thermal_expansion(slr_thermal, temperature, m: AbstractModel):
 
 
 def slr_gsic(cumgsic, temperature, m: AbstractModel):
+    """Calculates next-step SLR due to glaciers and small ice caps"""
 
     melt_rate = m.slr_gsic_melt_rate
     total_ice = m.slr_gsic_total_ice
@@ -115,6 +118,7 @@ def slr_gsic(cumgsic, temperature, m: AbstractModel):
 
 
 def slr_gis(cumgis, temperature, m: AbstractModel):
+    """Calculates next-step SLR due to the Greenland ice sheet"""
 
     melt_rate_above_thresh = m.slr_gis_melt_rate_above_thresh
     init_melt_rate = m.slr_gis_init_melt_rate
