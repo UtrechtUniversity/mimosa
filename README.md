@@ -13,26 +13,33 @@ transformed into a `ConcreteModel` by putting all the parameter values in it. Th
 
 * [Abstract model](model/abstract_model.py)
   * [Emission module](model/components/emissions.py)
+  * [Sea level rise module](model/components/sealevelrise.py)
   * Damage and adaptation module
-    * [AD-RICE 2010](model/components/damages/AD_RICE2010.py)
-    * [AD-RICE 2012](model/components/damages/AD_RICE2012.py)
-    * [AD-WITCH](model/components/AD_WITCH.py) (not implemented yet)
+    * [AD-RICE 2010](model/components/damages/ad_rice2010.py)
+    * [AD-RICE 2012](model/components/damages/ad_rice2012.py)
+    * [AD-WITCH](model/components/damages/ad_witch.py) (not implemented yet)
     * [No damages](model/components/damages/nodamage.py)
   * [Abatement module](model/components/abatement.py)
   * [Cobb-Douglas and economics module](model/components/cobbdouglas.py)
   * Objective module
     * [Maximise utility](model/components/objective/utility.py)
     * [Minimise global costs](model/components/objective/globalcosts.py)
+* [Concrete model](model/concrete_model/instantiate_params.py)
+  * [Simulation mode](model/concrete_model/simulation_mode/main.py) (when emission/temperature paths are imposed exogenously)
     
 ### Data
 
-The parameter values are defined in the [`config.yaml`](input/config.yaml) file in the `input` directory.
+The parameter values are defined in the [`config.yaml`](inputdata/config/config.yaml) file in the `input` directory, and for region- and component-specific parameters in:
+* Initial capital factor: [`economics.csv`](inputdata/params/economics.csv)
+* MAC factors: [`mac.csv`](inputdata/params/mac.csv)
+* Regional damages and adaptation coefficients: [`ADRICE2010.csv`](inputdata/params/ADRICE2010.csv), [`ADRICE2012.csv`](inputdata/params/ADRICE2012.csv), ...
 The baseline emissions, baseline GDP (for calculation of Total Factor Productivity) and population data is read in IIASA
-database format. By default, the IMAGE data of [`input/data/data_IMAGE_SSP.csv`](input/data/data_IMAGE_SSP.csv) is used.
-Damage and adaptation coefficients are read from [`input/data/rice_damages_adapt.csv`](input/data/rice_damages_adapt.csv).
+database format. By default, the IMAGE data of [`inputdata/data/data_IMAGE_SSP.csv`](inputdata/data/data_IMAGE_SSP.csv) is used.
 
 The config parameter values and the input data are combined with the `AbstractModel` to create the `ConcreteModel` in
-[`model/main.py`](model/main.py)
+[`model/concrete_model/instantiate_params.py`](model/concrete_model/instantiate_params.py).
+
+The main file of the model, where concrete model is created and the model is solved, is [`model/mimosa.py`](model/mimosa.py).
 
 ### Running the model
 
