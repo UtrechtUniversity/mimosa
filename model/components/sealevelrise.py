@@ -53,7 +53,7 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
         # Thermal expansion
         GlobalConstraint(
             lambda m, t: m.slr_thermal[t]
-            == slr_thermal_expansion(m.slr_thermal[t - 1], m.temperature[t], m)
+            == slr_thermal_expansion(m.slr_thermal[t - 1], m.temperature[t - 1], m)
             if t > 0
             else Constraint.Skip,
             "SLR_thermal",
