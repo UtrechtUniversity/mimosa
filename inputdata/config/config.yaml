@@ -55,7 +55,7 @@ input:
 time:
   start: 2020
   end: 2150
-  dt: 1
+  dt: 5
 
 SSP: "SSP2"
 
