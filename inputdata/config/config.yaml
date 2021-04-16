@@ -54,7 +54,7 @@ input:
 
 time:
   start: 2020
-  end: 2125
+  end: 2150
   dt: 1
 
 SSP: "SSP2"
@@ -103,7 +103,7 @@ default units:
   population_unit: billion
 
 model:
-  damage module: RICE2012 # RICE2010, RICE2012 or WITCH
+  damage module: COACCH # RICE2010, RICE2012 or COACCH
   objective module: utility # utility or globalcosts
   allow trade: True
 
