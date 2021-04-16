@@ -109,15 +109,15 @@ def functional_form(x, m, r, is_slr=False):
         a = m.damage_noslr_a[r]
 
     # Linear functional form
-    if value(form) in ["Robust-Linear", "OLS-Linear"]:
+    if "Linear" in value(form):
         return a * b1 * x / 100.0
 
     # Quadratic functional form
-    if value(form) in ["Robust-Quadratic", "OLS-Quadratic"]:
+    if "Quadratic" in value(form):
         return a * (b1 * x + b2 * x ** 2) / 100.0
 
     # Logistic functional form
-    if value(form) in ["Robust-Logistic", "OLS-Logistic"]:
+    if "Logistic" in value(form):
         return a * logistic(x, b1, b2, b3) / 100.0
 
     raise NotImplementedError
