@@ -342,6 +342,7 @@ temperature:
     type: quantity
     unit: temperature_unit
     default: False
+    can_be_false: True
 
 ##################
 

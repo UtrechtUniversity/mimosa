@@ -55,26 +55,46 @@ class GeneralParser(ABC):
             to_be_parsed = self.default
         return self.parse(to_be_parsed)
 
+    def check_false(self, value):
+        if self.can_be_false and self.is_falsy(value):
+            return True
+        return False
+
     def __repr__(self):
         return f"{self.__class__}: ({self.descr}). Default: {self.default}"
+
+    @staticmethod
+    def is_truthy(value):
+        return value in [1, True, "True", "true", "yes"]
+
+    @staticmethod
+    def is_falsy(value):
+        return value in [0, False, "False", "false", "no"]
 
 
 class StringParser(GeneralParser):
     def parse(self, value):
+        if self.check_false(value):
+            return False
         return str(value)
 
 
 class FilepathParser(GeneralParser):
     def parse(self, value):
+        if self.check_false(value):
+            return False
         # Should check whether file exists here
         return str(value)
 
 
 class BoolParser(GeneralParser):
     def parse(self, value):
-        if value in [1, True, "True", "true", "yes"]:
+        if self.check_false(value):
+            return False
+
+        if self.is_truthy(value):
             parsed_value = True
-        elif value in [0, False, "False", "false", "no"]:
+        elif self.is_falsy(value):
             parsed_value = False
         else:
             raise ValueError(f"Value {value} can not be parsed to a valid boolean")
@@ -92,6 +112,8 @@ class NumParser(GeneralParser):
         self.max = node.get("max", np.inf)
 
     def parse(self, value):
+        if self.check_false(value):
+            return False
         try:
             parsed_value = self.num_type_fct(value)
         except ValueError:
@@ -124,6 +146,8 @@ class EnumParser(GeneralParser):
         self.allowed_values = node["values"]
 
     def parse(self, value):
+        if self.check_false(value):
+            return False
         if value not in self.allowed_values:
             raise ValueError(
                 f"Value {value} not in allowed values {self.allowed_values}"
@@ -138,16 +162,20 @@ class QuantityParser(GeneralParser):
         self.quant = quant
 
     def parse(self, value):
+        if self.check_false(value):
+            return False
         # Try to parse the quantity
         try:
-            parsed = self.quant(value, self.unit)
+            parsed = self.quant(value, self.unit, can_be_false=False)
         except (
             DimensionalityError,
             DefinitionSyntaxError,
             OffsetUnitCalculusError,
             UndefinedUnitError,
         ):
-            raise ValueError(f"Cannot parse quantity `{value}` to unit `{self.unit}`")
+            raise ValueError(
+                f"Cannot parse quantity `{value}` to unit `{self.unit}`. Description: {self.descr}"
+            )
         return value  # Returns the string, unit will be really converted when instantiating the model
 
 
@@ -165,6 +193,8 @@ class ListParser(GeneralParser):
         return parser.parse(value) if parser is not None else value
 
     def parse(self, value):
+        if self.check_false(value):
+            return False
         if isinstance(value, list):
             parsed_list = [
                 self.parse_if_not_none(self.values_parser, list_value)
@@ -187,6 +217,8 @@ class DictParser(ListParser):
         )
 
     def parse(self, value):
+        if self.check_false(value):
+            return False
         if isinstance(value, dict):
             parsed_dict = {
                 self.parse_if_not_none(
