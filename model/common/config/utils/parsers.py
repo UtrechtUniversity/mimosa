@@ -43,6 +43,17 @@ class GeneralParser(ABC):
         self.default = node.get("default", None)
         self.can_be_false = node.get("can_be_false", False)
 
+    def error(self, error_message):
+        raise ValueError(
+            f"""
+            {error_message}
+            Type: {self.type}
+            Description: {self.descr}
+            Default value: {self.default}
+            Can be false: {self.can_be_false}
+        """
+        )
+
     @abstractmethod
     def parse(self, value):
         pass
@@ -97,7 +108,7 @@ class BoolParser(GeneralParser):
         elif self.is_falsy(value):
             parsed_value = False
         else:
-            raise ValueError(f"Value {value} can not be parsed to a valid boolean")
+            self.error(f"Value {value} can not be parsed to a valid boolean")
         return parsed_value
 
 
@@ -117,12 +128,12 @@ class NumParser(GeneralParser):
         try:
             parsed_value = self.num_type_fct(value)
         except ValueError:
-            raise ValueError(
+            self.error(
                 f"Value {value} can not be parsed to a {self.num_type_fct.__name__}"
             )
         # Check if value within bounds
         if parsed_value < self.min or parsed_value > self.max:
-            raise ValueError(
+            self.error(
                 f"Value {parsed_value} not within bounds ({self.min}, {self.max})"
             )
         return parsed_value
@@ -149,9 +160,7 @@ class EnumParser(GeneralParser):
         if self.check_false(value):
             return False
         if value not in self.allowed_values:
-            raise ValueError(
-                f"Value {value} not in allowed values {self.allowed_values}"
-            )
+            self.error(f"Value {value} not in allowed values {self.allowed_values}")
         return value
 
 
@@ -173,9 +182,7 @@ class QuantityParser(GeneralParser):
             OffsetUnitCalculusError,
             UndefinedUnitError,
         ):
-            raise ValueError(
-                f"Cannot parse quantity `{value}` to unit `{self.unit}`. Description: {self.descr}"
-            )
+            self.error(f"Cannot parse quantity `{value}` to unit `{self.unit}`")
         return value  # Returns the string, unit will be really converted when instantiating the model
 
 
@@ -203,7 +210,7 @@ class ListParser(GeneralParser):
             return parsed_list
         elif value is None:
             return []
-        raise ValueError(f"Cannot parse list {value}")
+        self.error(f"Cannot parse list {value}")
 
 
 class DictParser(ListParser):
@@ -229,7 +236,7 @@ class DictParser(ListParser):
             return parsed_dict
         elif value is None:
             return {}
-        raise ValueError(f"Cannot parse dictionary {value}")
+        self.error(f"Cannot parse dictionary {value}")
 
 
 class ParserFactory:
