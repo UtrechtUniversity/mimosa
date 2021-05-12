@@ -1,0 +1,16 @@
+default units:
+  currency_unit:
+    type: str
+    default: trillion USD2005/yr
+  emissionsrate_unit:
+    type: str
+    default: emissions_unit/yr
+  emissions_unit:
+    type: str
+    default: Gt CO2
+  temperature_unit:
+    type: str
+    default: delta_degC
+  population_unit:
+    type: str
+    default: billion

@@ -1,0 +1,402 @@
+regionstype:
+  descr: Name of the region definition. Used in the mapping of the regional parameters.
+  type: enum
+  values:
+    - IMAGE26
+    - SSP5
+    - World
+  default: IMAGE26
+
+##################
+
+regions:
+  descr: >-
+    Dictionary of all regions with optional dictionaries defining, optionally,
+    manual values for certain parameters for that specific region.
+  type: dict
+  keys:
+    descr: region name
+    type: str
+  values:
+    descr: optional dict to manually override certain regional parameters
+    type: dict
+  default:
+    CAN:
+    USA:
+    MEX:
+    RCAM:
+    BRA:
+    RSAM:
+    NAF:
+    WAF:
+    EAF:
+    SAF:
+    WEU:
+    CEU:
+    TUR:
+    UKR:
+    STAN:
+    RUS:
+    ME:
+    INDIA:
+    KOR:
+    CHN:
+    SEAS:
+    INDO:
+    JAP:
+    OCE:
+    RSAS:
+    RSAF:
+
+##################
+
+input:
+  db_filename:
+    descr: Path to IAMC-formatted CSV file for baseline data
+    type: filepath
+    default: inputdata/data/data_IMAGE_SSP.csv
+    # default_SSP5: ../../Databases/SSP_IAM_V2_201811.csv
+
+  baselines:
+    SSP1:
+      scenario:
+        descr: Scenario name of SSP1 baseline
+        type: str
+        default: SSP1-Ref-SPA0-V17
+      model:
+        descr: Model name of SSP1 baseline
+        type: str
+        default: IMAGE
+    SSP2:
+      scenario:
+        descr: Scenario name of SSP2 baseline
+        type: str
+        default: SSP2-Ref-SPA0-V17
+      model:
+        descr: Model name of SSP2 baseline
+        type: str
+        default: IMAGE
+    SSP3:
+      scenario:
+        descr: Scenario name of SSP3 baseline
+        type: str
+        default: SSP3-Ref-SPA0-V17
+      model:
+        descr: Model name of SSP3 baseline
+        type: str
+        default: IMAGE
+    SSP4:
+      scenario:
+        descr: Scenario name of SSP4 baseline
+        type: str
+        default: SSP4-Ref-SPA0-V17
+      model:
+        descr: Model name of SSP4 baseline
+        type: str
+        default: IMAGE
+    SSP5:
+      scenario:
+        descr: Scenario name of SSP5 baseline
+        type: str
+        default: SSP5-Ref-SPA0-V17
+      model:
+        descr: Model name of SSP5 baseline
+        type: str
+        default: IMAGE
+
+  variables:
+    GDP:
+      descr: Variable name for GDP in data file
+      type: enum
+      values:
+        - GDP|PPP
+        - GDP|MER
+      default: GDP|PPP
+
+    emissions:
+      descr: Variable name for emissions variable
+      type: str
+      default: Emissions|CO2
+
+    population:
+      descr: Variable name for population variable
+      type: str
+      default: Population
+
+##################
+
+time:
+  start:
+    descr: Year in which the model starts
+    type: int
+    min: 1900
+    max: 2100
+    default: 2020
+
+  end:
+    descr: Last year of the model run
+    type: int
+    min: 1901
+    max: 2300
+    default: 2150
+
+  dt:
+    descr: Timestep in years
+    type: float
+    min: 0.5
+    max: 20
+    default: 5
+
+##################
+
+SSP:
+  descr: SSP, used for population, baseline GDP and baseline emissions
+  type: enum
+  values:
+    - SSP1
+    - SSP2
+    - SSP3
+    - SSP4
+    - SSP5
+  default: SSP2
+
+##################
+
+economics:
+  PRTP:
+    descr: Pure rate of time preference
+    type: float
+    min: 0
+    max: 0.2
+    default: 0.015
+
+  elasmu:
+    descr: Elasticity of marginal utility
+    type: float
+    min: 0.1
+    max: 10
+    default: 1.001
+
+  GDP:
+    alpha:
+      descr: Output elasticity of capital
+      type: float
+      min: 0
+      max: 1
+      default: 0.3
+
+    depreciation of capital:
+      descr: Yearly depreciation rate of capital stock
+      type: float
+      min: 0
+      default: 0.05
+
+    savings rate:
+      descr: Fraction of GDP used for investments
+      type: float
+      min: 0
+      max: 1
+      default: 0.21
+
+  MAC:
+    beta:
+      descr: Power factor of the MAC curve
+      type: float
+      min: 0.01
+      max: 10
+      default: 2
+
+    rho:
+      descr: Learning by doing rate (needs more explanation)
+      type: float
+      min: 0.1
+      max: 1
+      default: 0.82
+
+    gamma:
+      descr: Calibration level of the MAC (carbon price for 100% reduction)
+      type: quantity
+      unit: currency_unit/emissionsrate_unit
+      default: 2442 USD2005/tCO2
+
+  damages:
+    percentage reversible:
+      descr: Factor of damages that are reversible
+      type: float
+      min: 0
+      max: 1
+      default: 1
+
+    scale factor:
+      descr: Manual scaling factor to increase or decrease damages
+      type: float
+      default: 1
+
+    ignore damages:
+      descr: Flag to not take into account the damages in the GDP (but damages are calculated)
+      type: bool
+      default: False
+
+    quantile:
+      descr: Damage quantile (Only used for COACCH)
+      type: float
+      min: 0.025
+      max: 0.975
+      default: 0.5
+
+    coacch_slr_withadapt:
+      descr: Flag to use the SLR-with-Adapation damage functions (Only used for COACCH)
+      type: bool
+      default: True
+
+  adaptation:
+    curr_level:
+      descr: When adaptation level is fixed, keep it at this level (Only used for AD-RICE2010)
+      type: float
+      min: 0
+      max: 1
+      default: 0
+
+    fixed:
+      descr: >-
+        Flag to keep adaptation at fixed value (curr_level).
+        (Only used for AD-RICE2010)
+        If false: the adaptation level is endogenously optimised.
+      type: bool
+      default: False
+
+##################
+
+emissions:
+  carbonbudget:
+    descr: >-
+      Value of the carbon budget.
+      Can also be false, then CBA mode is used
+    type: quantity
+    unit: emissions_unit
+    default: 800 GtCO2
+    can_be_false: True
+
+  global min level:
+    descr: >-
+      Limit on the emission level (globally), mostly used for negative emissions.
+      Can also be false, then no limit is imposed
+    type: quantity
+    unit: emissionsrate_unit
+    default: -20 GtCO2/yr
+    can_be_false: True
+
+  regional min level:
+    descr: >-
+      Limit on the emission level (per region), mostly used for negative emissions.
+      Can also be false, then no limit is imposed
+    type: quantity
+    unit: emissionsrate_unit
+    default: -10 GtCO2/yr
+    can_be_false: True
+
+  not positive after budget year:
+    descr: If true, impose net-zero emissions after budget year (2100)
+    type: bool
+    default: True
+
+  baseline carbon intensity:
+    descr: >-
+      If true, use baseline carbon intensity to calculate baseline emissions.
+      If false, the SSP baseline emissions are used, regardless of lower GDP.
+    type: bool
+    default: True
+
+  inertia:
+    global: &inertia_description
+      descr: >-
+        Maximum reduction speed, in % of initial emissions (should be negative)
+        Can also be false, then no inertia limit is imposed
+      type: float
+      max: 0
+      default: False
+      can_be_false: True
+    regional:
+      <<: *inertia_description
+      default: -0.05
+
+##################
+
+temperature:
+  initial:
+    descr: Temperature in initial year of model run (2020 by default).
+    type: quantity
+    unit: temperature_unit
+    default: 1.096224 delta_degC
+
+  TCRE:
+    descr: Transient Climate Response to CO2 Emissions
+    type: quantity
+    unit: (temperature_unit)/(emissions_unit)
+    default: 0.62 delta_degC/(TtCO2)
+
+  target:
+    descr: >-
+      Temperature target in 2100 (and beyond).
+      Can also be false, then no temperature target is imposed
+    type: quantity
+    unit: temperature_unit
+    default: False
+    can_be_false: True
+
+##################
+
+model:
+  damage module:
+    descr: Damage module to be used
+    type: enum
+    values:
+      - COACCH
+      - RICE2010
+      - RICE2012
+    default: COACCH
+
+  objective module:
+    descr: Objective module to be used
+    type: enum
+    values:
+      - utility
+      - globalcosts
+    default: utility
+
+  allow trade:
+    descr: Allow emission trading between regions
+    type: bool
+    default: False
+
+##################
+
+simulation:
+  simulationmode:
+    descr: >-
+      If true, the model is run in simulation mode: then some variables will
+      be imposed exogenously and fixed.
+      If false, `constraint_variables` and `deactivated_constraints` are ignored.
+    type: bool
+    default: False
+
+  constraint_variables:
+    descr: >-
+      Dictionary of variable names with associated path to file containing values for
+      that variable
+    type: dict
+    keys:
+      descr: variable name
+      type: str
+    values:
+      descr: path to output file containing values for this file
+      type: str
+    default:
+
+  deactivated_constraints:
+    descr: List of constraint names to be disabled
+    type: list
+    values:
+      descr: constraint name to be disabled, as used in the model
+      type: str
+    default:
