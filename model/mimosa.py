@@ -137,7 +137,7 @@ class MIMOSA:
     @utils.timer("Model solve")
     def solve(
         self,
-        verbose=False,
+        verbose=True,
         halt_on_ampl_error="no",
         use_neos=False,
         neos_email=None,
@@ -146,7 +146,7 @@ class MIMOSA:
         """Sends the concrete model to a solver.
 
         Args:
-            verbose (bool, optional): Prints intermediate IPOPT results. Defaults to False.
+            verbose (bool, optional): Prints intermediate IPOPT results. Defaults to True.
             halt_on_ampl_error (str, optional): Lets IPOPT stop when invalid values are encountered. Defaults to "no".
             use_neos (bool, optional): Uses the external NEOS server for solving. Defaults to False.
             neos_email (str or None, optional): E-mail address for NEOS server. Defaults to None.
