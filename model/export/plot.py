@@ -6,6 +6,7 @@ Creates a big Plotly figure with each column a region, and these rows:
   Row 4: Global emissions, temperature and sea level rise
 """
 
+import os
 from model.export.utils import Plot
 
 
@@ -142,6 +143,8 @@ def full_plot(m, filename, include_plotlyjs=True, custom_layout=None):
     plot.set_layout()
     plot.fig.update_layout(custom_layout)
 
-    outputfile = "output/plots/{}.html".format(filename)
+    outputdir = "output/plots"
+    os.makedirs(outputdir + "/", exist_ok=True)
+    outputfile = "{}/{}.html".format(outputdir, filename)
     print(f"Plot saved at {outputfile}")
     plot.fig.write_html(outputfile, include_plotlyjs=include_plotlyjs)
