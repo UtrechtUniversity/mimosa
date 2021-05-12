@@ -1,8 +1,12 @@
 SSP: "SSP2"
 
+emissions:
+  carbonbudget: False
+  baseline carbon intensity: False
+
 economics:
-  PRTP: 0.001
-  elasmu: 1.45
+  PRTP: 0.015
+  elasmu: 1.001
   GDP:
     alpha: 0.3
     depreciation of capital: 0.05
@@ -12,7 +16,6 @@ economics:
     rho: 0.82
     gamma: 2442 USD2005/tCO2
   damages:
-    percentage reversible: 1
     scale factor: 1
     ignore damages: False
     quantile: 0.5 # Only used for COACCH
