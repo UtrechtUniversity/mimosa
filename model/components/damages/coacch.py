@@ -53,7 +53,8 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     constraints.append(
         RegionalConstraint(
             lambda m, t, r: m.resid_damages[t, r]
-            == damage_fct(m.temperature[t], m.T0, m, r, is_slr=False),
+            == m.damage_scale_factor
+            * damage_fct(m.temperature[t] - 0.6, m.T0 - 0.6, m, r, is_slr=False),
             "resid_damages",
         )
     )
@@ -73,7 +74,8 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     constraints.append(
         RegionalConstraint(
             lambda m, t, r: m.SLR_damages[t, r]
-            == damage_fct(m.total_SLR[t], None, m, r, is_slr=True),
+            == m.damage_scale_factor
+            * damage_fct(m.total_SLR[t], m.total_SLR[0], m, r, is_slr=True),
             "SLR_damages",
         )
     )
@@ -124,7 +126,6 @@ def functional_form(x, m, r, is_slr=False):
 
 
 def damage_fct(x, x0, m, r, is_slr):
-    # TODO COACCH damage functions are as function of 1980-2005 temperature, not PI
     damage = functional_form(x, m, r, is_slr)
     if x0 is not None:
         damage -= functional_form(x0, m, r, is_slr)
