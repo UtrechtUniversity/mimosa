@@ -2,6 +2,11 @@
 Imports all common modules and extra imports
 """
 
+# Logging
+import logging
+
+logger = logging.getLogger("MIMOSA")
+
 # General imports
 from dataclasses import dataclass
 

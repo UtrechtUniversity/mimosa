@@ -3,6 +3,7 @@ Common functions and utilities
 """
 
 import time
+from model.common import logger
 
 
 def firstk(dictionary):
@@ -16,7 +17,7 @@ def first(dictionary):
     return dictionary[firstk(dictionary)]
 
 
-def timer(name):
+def timer(name, log=False):
     """Decorator which times functions
 
     Arguments:
@@ -28,7 +29,10 @@ def timer(name):
             time1 = time.time()
             result = fct(*args, **kwargs)
             time2 = time.time()
-            print("{} took {:.3g} seconds.".format(name, time2 - time1))
+            message = "{} took {:.3g} seconds.".format(name, time2 - time1)
+            if log:
+                logger.info(message)
+            print(message)
             return result
 
         return wrapper

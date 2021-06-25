@@ -22,6 +22,7 @@ from model.common import (
     regional_params,
     utils,
     units,
+    logger,
 )
 from model.export import full_plot, visualise_ipopt_output, save_output
 from model.abstract_model import create_abstract_model
@@ -134,7 +135,7 @@ class MIMOSA:
                 self.concrete_model
             )
 
-    @utils.timer("Model solve")
+    @utils.timer("Model solve", True)
     def solve(
         self,
         verbose=True,
@@ -177,8 +178,10 @@ class MIMOSA:
 
         self.postprocessing()
 
+        logger.info("Status: {}".format(results.solver.status))
+
         if results.solver.status != SolverStatus.ok:
-            print(
+            logger.error(
                 "Status: {}, termination condition: {}".format(
                     results.solver.status, results.solver.termination_condition
                 )
@@ -186,7 +189,11 @@ class MIMOSA:
             if results.solver.status != SolverStatus.warning:
                 raise SolverException("Solver did not exit with status OK")
 
-        print("Final NPV:", value(self.concrete_model.NPV[self.concrete_model.tf]))
+        logger.info(
+            "Final NPV: {}".format(
+                value(self.concrete_model.NPV[self.concrete_model.tf])
+            )
+        )
 
     @utils.timer("Plotting results")
     def plot(self, filename="result", **kwargs):
