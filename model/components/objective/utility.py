@@ -43,9 +43,7 @@ def get_constraints(m: AbstractModel) -> Tuple[Objective, Sequence[GeneralConstr
             GlobalConstraint(
                 lambda m, t: m.NPV[t]
                 == m.NPV[t - 1]
-                + m.dt
-                * exp(-m.PRTP * (m.year(t) - m.beginyear))
-                * sum(m.L(m.year(t), r) * m.utility[t, r] for r in m.regions)
+                + m.dt * exp(-m.PRTP * (m.year(t) - m.beginyear)) * m.yearly_welfare[t]
                 if t > 0
                 else Constraint.Skip,
                 name="NPV",

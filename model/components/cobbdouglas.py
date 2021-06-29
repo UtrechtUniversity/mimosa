@@ -22,7 +22,6 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     """Economics and Cobb-Douglas equations and constraints
 
     Necessary variables:
-        m.utility
         m.L (equal to m.population)
         m.dk
 
@@ -47,17 +46,15 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     m.alpha = Param()
     m.dk = Param()
     m.sr = Param()
-    m.elasmu = Param()
 
     m.GDP_gross = Var(m.t, m.regions, initialize=lambda m, t, r: m.GDP(m.year(0), r))
     m.GDP_net = Var(m.t, m.regions)
     m.investments = Var(m.t, m.regions)
     m.consumption = Var(m.t, m.regions)
-    m.utility = Var(m.t, m.regions)
 
     m.ignore_damages = Param()
 
-    # Cobb-Douglas, GDP, investments, capital, consumption and utility
+    # Cobb-Douglas, GDP, investments, capital and consumption
     constraints.extend(
         [
             RegionalConstraint(
@@ -86,11 +83,6 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
                 "consumption",
             ),
             RegionalConstraint(
-                lambda m, t, r: m.utility[t, r]
-                == calc_utility(m.consumption[t, r], m.L(m.year(t), r), m.elasmu),
-                "utility",
-            ),
-            RegionalConstraint(
                 lambda m, t, r: (
                     m.capital_stock[t, r]
                     == m.capital_stock[t - 1, r]
@@ -112,6 +104,3 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
 
     return constraints
 
-
-def calc_utility(consumption, population, elasmu):
-    return (soft_min(consumption / population) ** (1 - elasmu) - 1) / (1 - elasmu) - 1

@@ -356,6 +356,14 @@ model:
       - RICE2012
     default: COACCH
 
+  welfare module:
+    descr: Welfare and utility module to be used
+    type: enum
+    values:
+      - inequal_aversion_elasmu
+      - inequal_aversion_zero
+    default: inequal_aversion_elasmu
+
   objective module:
     descr: Objective module to be used
     type: enum

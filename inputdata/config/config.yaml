@@ -20,3 +20,7 @@ economics:
     ignore damages: False
     quantile: 0.5 # Only used for COACCH
     coacch_slr_withadapt: True # Only used for COACCH
+
+model:
+  allow trade: False
+  welfare module: inequal_aversion_elasmu

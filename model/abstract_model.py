@@ -13,6 +13,7 @@ from model.components import (
     damages,
     objective,
     sealevelrise,
+    welfare,
 )
 
 
@@ -21,7 +22,9 @@ from model.components import (
 ######################
 
 
-def create_abstract_model(damage_module: str, objective_module: str) -> AbstractModel:
+def create_abstract_model(
+    damage_module: str, welfare_module: str, objective_module: str
+) -> AbstractModel:
 
     m = AbstractModel()
 
@@ -89,6 +92,14 @@ def create_abstract_model(damage_module: str, objective_module: str) -> Abstract
 
     # Cobb-Douglas and economics
     constraints.extend(cobbdouglas.get_constraints(m))
+
+    # Utility and welfare
+    if welfare_module == "inequal_aversion_elasmu":
+        constraints.extend(welfare.inequal_aversion_elasmu.get_constraints(m))
+    elif welfare_module == "inequal_aversion_zero":
+        constraints.extend(welfare.inequal_aversion_zero.get_constraints(m))
+    else:
+        raise NotImplementedError(f"Welfare module `{welfare_module}` not implemented")
 
     # Objective of optimisation
     if objective_module == "utility":
