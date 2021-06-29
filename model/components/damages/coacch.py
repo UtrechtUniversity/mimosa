@@ -60,7 +60,7 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     )
 
     # SLR damages
-    m.SLR_damages = Var(m.t, m.regions)
+    m.SLR_damages = Var(m.t, m.regions, bounds=(-0.5, 0.7))
 
     m.damage_slr_form = Param(m.regions, within=Any)  # String for functional form
     m.damage_slr_b1 = Param(m.regions)

@@ -13,6 +13,7 @@ from model.common import (
     GlobalConstraint,
     GlobalInitConstraint,
     Constraint,
+    NonNegativeReals,
 )
 
 
@@ -32,22 +33,22 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     """
 
     # Parameters and variables necessary for sea level rise
-    m.slr_thermal = Var(m.t)
+    m.slr_thermal = Var(m.t, within=NonNegativeReals)
     m.slr_thermal_equil = Param()
     m.slr_thermal_init = Param()
     m.slr_thermal_adjust_rate = Param()
 
-    m.slr_cumgsic = Var(m.t)
+    m.slr_cumgsic = Var(m.t, within=NonNegativeReals)
     m.slr_gsic_melt_rate = Param()
     m.slr_gsic_total_ice = Param()
     m.slr_gsic_equil_temp = Param()
 
-    m.slr_cumgis = Var(m.t)
+    m.slr_cumgis = Var(m.t, within=NonNegativeReals)
     m.slr_gis_melt_rate_above_thresh = Param()
     m.slr_gis_init_melt_rate = Param()
     m.slr_gis_init_ice_vol = Param()
 
-    m.total_SLR = Var(m.t)
+    m.total_SLR = Var(m.t, within=NonNegativeReals)
 
     # Constraints relating to SLR
     constraints = [

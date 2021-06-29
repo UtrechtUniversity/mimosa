@@ -83,7 +83,7 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     m.MAC_gamma = Param()
     m.MAC_beta = Param()
     m.MAC_scaling_factor = Param(m.regions)  # Regional scaling of the MAC
-    m.carbonprice = Var(m.t, m.regions, bounds=lambda m: (0, m.MAC_gamma))
+    m.carbonprice = Var(m.t, m.regions, bounds=lambda m: (0, 1.5 * m.MAC_gamma))
     constraints.extend(
         [
             RegionalConstraint(
@@ -133,7 +133,17 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
                 == sum(m.area_under_MAC[t, r] for r in m.regions)
                 if m.allow_trade
                 else Constraint.Skip
-            )
+            ),
+            RegionalConstraint(
+                lambda m, t, r: m.abatement_costs[t, r] <= 1.5 * m.area_under_MAC[t, r]
+                if m.allow_trade
+                else Constraint.Skip
+            ),
+            # RegionalConstraint(
+            #     lambda m, t, r: m.abatement_costs[t, r] >= 0.5 * m.area_under_MAC[t, r]
+            #     if m.allow_trade
+            #     else Constraint.Skip
+            # ),
         ]
     )
 

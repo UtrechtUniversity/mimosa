@@ -4,6 +4,7 @@ Utility and global welfare
 """
 
 from typing import Sequence
+
 from model.common import (
     AbstractModel,
     Param,
@@ -11,7 +12,6 @@ from model.common import (
     GeneralConstraint,
     RegionalConstraint,
     GlobalConstraint,
-    Constraint,
     soft_min,
 )
 
@@ -37,38 +37,26 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     m.elasmu = Param()
     m.inequal_aversion = Param()
 
-    m.utility = Var(m.t, m.regions, initialize=0.1)
+    m.utility = Var(m.t, m.regions, initialize=10)
     m.yearly_welfare = Var(m.t)
 
     constraints.extend(
         [
             RegionalConstraint(
                 lambda m, t, r: m.utility[t, r]
-                == calc_utility(m.consumption[t, r], m.L(m.year(t), r), m.elasmu),
+                == m.consumption[t, r] / m.L(m.year(t), r),
                 "utility",
             ),
             GlobalConstraint(
                 lambda m, t: m.yearly_welfare[t]
                 == sum(m.L(m.year(t), r) for r in m.regions)
-                * (1 / (1 - m.elasmu))
-                * (
-                    soft_min(
-                        sum(m.consumption[t, r] for r in m.regions)
-                        / sum(m.L(m.year(t), r) for r in m.regions),
-                        scale=1,
-                    )
-                    ** (1 - m.elasmu)
-                )
-                - 1,
-                # if t > 0
-                # else Constraint.Skip,
+                * calc_utility(
+                    sum(m.consumption[t, r] for r in m.regions),
+                    sum(m.L(m.year(t), r) for r in m.regions),
+                    m.elasmu,
+                ),
                 "yearly_welfare",
             ),
-            # GlobalConstraint(
-            #     lambda m, t: m.yearly_welfare[t]
-            #     == sum(m.L(m.year(t), r) * m.utility[t, r] for r in m.regions),
-            #     "yearly_welfare",
-            # ),
         ]
     )
 
@@ -76,5 +64,4 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
 
 
 def calc_utility(consumption, population, elasmu):
-    # return (soft_min(consumption / population) ** (1 - elasmu) - 1) / (1 - elasmu) - 1
-    return consumption / population
+    return (soft_min(consumption / population) ** (1 - elasmu) - 1) / (1 - elasmu) - 1
