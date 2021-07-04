@@ -249,6 +249,13 @@ economics:
       type: bool
       default: True
 
+    coacch_combined_slr_nonslr_damages:
+      descr: >-
+        If true, do not model SLR damages separately from non-SLR, but use the
+        combined damage functions (Only used for COACCH)
+      type: bool
+      default: False
+
   adaptation:
     curr_level:
       descr: When adaptation level is fixed, keep it at this level (Only used for AD-RICE2010)
