@@ -140,6 +140,7 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     m.global_min_level = Param()
     m.regional_min_level = Param()
     m.no_pos_emissions_after_budget_year = Param()
+    m.non_increasing_emissions_after_2100 = Param()
     constraints.extend(
         [
             # Carbon budget constraints:
@@ -186,6 +187,14 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
                 if value(m.inertia_regional) is not False and t > 0
                 else Constraint.Skip,
                 name="regional_inertia",
+            ),
+            RegionalConstraint(
+                lambda m, t, r: m.regional_emissions[t, r]
+                - m.regional_emissions[t - 1, r]
+                <= 0
+                if m.year(t - 1) > 2100 and value(m.non_increasing_emissions_after_2100)
+                else Constraint.Skip,
+                name="non_increasing_emissions_after_2100",
             ),
             GlobalConstraint(
                 lambda m, t: m.global_emissions[t] >= m.global_min_level

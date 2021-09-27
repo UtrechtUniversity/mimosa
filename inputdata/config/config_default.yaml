@@ -307,6 +307,11 @@ emissions:
     type: bool
     default: True
 
+  non increasing emissions after 2100:
+    descr: If true, the regional emissions after 2100 are not allowed to climb.
+    type: bool
+    default: True
+
   baseline carbon intensity:
     descr: >-
       If true, use baseline carbon intensity to calculate baseline emissions.

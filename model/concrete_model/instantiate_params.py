@@ -125,6 +125,9 @@ class InstantiatedModel:
             "no_pos_emissions_after_budget_year": V(
                 params["emissions"]["not positive after budget year"]
             ),
+            "non_increasing_emissions_after_2100": V(
+                params["emissions"]["non increasing emissions after 2100"]
+            ),
             "T0": V(quant(params["temperature"]["initial"], "temperature_unit")),
             "temperature_target": V(
                 quant(params["temperature"]["target"], "temperature_unit")
