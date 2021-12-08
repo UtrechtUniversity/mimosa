@@ -22,7 +22,6 @@ from pyomo.environ import (
     Objective,
     Param,
     Var,
-    exp,
     log,
     sqrt,
     tanh,
@@ -50,6 +49,8 @@ from .pyomo_utils import (
     add_constraint,
     is_regional,
     get_indices,
+    atan,
+    exp,
 )
 
 # Other utils

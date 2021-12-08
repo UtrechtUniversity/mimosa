@@ -1,8 +1,25 @@
 import typing
 from abc import ABC, abstractmethod
-from numpy import pi
+import numpy as np
 
-from pyomo.environ import Var, Constraint, atan
+from pyomo.environ import Var, Constraint
+import pyomo.environ
+
+
+def atan(x):
+    name = type(x).__name__
+    if name in ["Series", "DataFrame", "float", "int", "ndarray"]:
+        return np.arctan(x)
+
+    return pyomo.environ.atan(x)
+
+def exp(x):
+    name = type(x).__name__
+    if name in ["Series", "DataFrame", "float", "int", "ndarray"]:
+        return np.exp(x)
+
+    return pyomo.environ.exp(x)
+
 
 ####### Extra functions
 
@@ -19,7 +36,7 @@ def soft_switch(x, scale=1.0):
         scale (float, optional): order of magnitude of expected values. Defaults to 1.0.
     """
     a = scale_to_a(scale)
-    return atan(a * x) / pi + 0.5
+    return atan(a * x) / np.pi + 0.5
 
 
 def soft_min(x, scale=1.0):
@@ -33,7 +50,7 @@ def soft_min(x, scale=1.0):
         approximately x if x > 0 and 0 if x <= 0
     """
     a = scale_to_a(scale)
-    soft_min_value = soft_switch(x, scale) * x + 1 / (a * pi)
+    soft_min_value = soft_switch(x, scale) * x + 1 / (a * np.pi)
     return soft_min_value
 
     # Make sure the final answer is positive. Increases computing time, but reduces errors.

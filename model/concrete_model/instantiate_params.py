@@ -15,6 +15,7 @@ class InstantiatedModel:
         regional_param_store: RegionalParamStore,
         data_store: DataStore,
         quant: units.Quantity,
+        create_concrete_model: bool = True,
     ):
 
         self.abstract_model = abstract_model
@@ -28,7 +29,10 @@ class InstantiatedModel:
         # First, set the data functions in the abstract model
         self.set_data_functions()
 
-        self.concrete_model = self.create_instance()
+        self.instance_data = self.get_param_values()
+
+        if create_concrete_model:
+            self.concrete_model = self.create_instance()
 
     def set_data_functions(self):
         # The data functions need to be changed in the abstract model
@@ -44,8 +48,7 @@ class InstantiatedModel:
         self.abstract_model.TFP = self.data_store.data_object("TFP")
 
     def create_instance(self):
-        instance_data = self.get_param_values()
-        return self.abstract_model.create_instance(instance_data)
+        return self.abstract_model.create_instance(self.instance_data)
 
     def get_param_values(self):
 

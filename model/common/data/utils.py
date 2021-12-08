@@ -32,6 +32,14 @@ def extrapolate(input_values, years, extra_years, meta_info, stabilising_years=5
             0.0, change_rate - change_rate * (t_prev - 2100.0) / stabilising_years
         )
         val = val_prev + change * (t - t_prev)
+
+        # try:
+        #     if meta_info[0] == "emissions":
+        #         val = val_prev * (
+        #             0.98 ** (t - t_prev)
+        #         )  # Reduce 2% per year for emissions after 2100
+        # except IndexError:
+        #     pass
         # if val < 0:
         #     val = 0.1
         #     became_negative = True

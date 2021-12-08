@@ -38,7 +38,9 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     constraints = []
 
     m.regional_emissions = Var(m.t, m.regions)
-    m.baseline = Var(m.t, m.regions)
+    m.baseline = Var(
+        m.t, m.regions, initialize=lambda m, t, r: m.baseline_emissions(m.year(t), r)
+    )
     m.baseline_carbon_intensity = Param()
 
     m.relative_abatement = Var(m.t, m.regions, initialize=0, bounds=(0, 2))
@@ -61,7 +63,18 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
             RegionalConstraint(
                 lambda m, t, r: m.regional_emissions[t, r]
                 == (1 - m.relative_abatement[t, r])
-                * m.baseline_emissions(m.year(t), r),
+                * (
+                    m.baseline[t, r]
+                    if value(m.baseline_carbon_intensity)
+                    else m.baseline_emissions(m.year(t), r)
+                    # Note: this should simply be m.baseline[t,r], but this is numerically less stable
+                    # than m.baseline_emissions(m.year(t), r) whenever baseline intensity
+                    # is used instead of baseline emissions. In fact, m.baseline_emissions(m.year(t), r)
+                    # is just a fixed number, whereas m.baseline[t,r] is a variable depending on
+                    # GDP.
+                )
+                if t > 0
+                else Constraint.Skip,
                 "regional_abatement",
             ),
             RegionalInitConstraint(

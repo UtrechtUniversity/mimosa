@@ -61,10 +61,7 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
             name="SLR_thermal",
         ),
         GlobalInitConstraint(
-            lambda m: m.slr_thermal[0]
-            == m.slr_thermal_init
-            + m.slr_thermal_adjust_rate
-            * (m.T0 * m.slr_thermal_equil - m.slr_thermal_init)
+            lambda m: m.slr_thermal[0] == slr_thermal_expansion_init(m)
         ),
         # GSIC
         GlobalConstraint(
@@ -93,6 +90,13 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     ]
 
     return constraints
+
+
+def slr_thermal_expansion_init(m):
+    """Calculates initial SLR thermal expansion"""
+    return m.slr_thermal_init + m.slr_thermal_adjust_rate * (
+        m.T0 * m.slr_thermal_equil - m.slr_thermal_init
+    )
 
 
 def slr_thermal_expansion(slr_thermal, temperature, m: AbstractModel):
