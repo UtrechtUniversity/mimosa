@@ -24,6 +24,7 @@ from model.common import (
     units,
     logger,
 )
+from model.common.config.parseconfig import check_params
 from model.export import full_plot, visualise_ipopt_output, save_output
 from model.abstract_model import create_abstract_model
 from model.concrete_model.instantiate_params import InstantiatedModel
@@ -49,6 +50,8 @@ class MIMOSA:
     """
 
     def __init__(self, params: dict):
+        # Check if input parameter dictionary is valid
+        params = check_params(params)
         self.params = params
         self.regions = params["regions"]
 
