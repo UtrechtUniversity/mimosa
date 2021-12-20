@@ -229,6 +229,31 @@ economics:
       unit: currency_unit/emissionsrate_unit
       default: 2442 USD2005/tCO2
 
+  abatement costs:
+    allow trade:
+      descr: Allow emission trading between regions
+      type: bool
+      default: False
+
+    min rel payment level:
+      descr: >-
+        Which percentage of the area under the MAC of a region should it pay itself (minimum)?
+        If false: no limt
+      type: float
+      min: 0
+      max: 1
+      default: False
+      can_be_false: True
+
+    max rel payment level:
+      descr: >-
+        Which percentage of the area under the MAC of a region should it pay itself (maximum)?
+        If false: no limit
+      type: float
+      min: 1
+      default: False
+      can_be_false: True
+
   damages:
     percentage reversible:
       descr: Factor of damages that are reversible
@@ -394,11 +419,6 @@ model:
       - utility
       - globalcosts
     default: utility
-
-  allow trade:
-    descr: Allow emission trading between regions
-    type: bool
-    default: False
 
 ##################
 

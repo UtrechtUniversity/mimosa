@@ -166,8 +166,14 @@ class InstantiatedModel:
             "sr": V(params["economics"]["GDP"]["savings rate"]),
             "elasmu": V(params["economics"]["elasmu"]),
             "inequal_aversion": V(params["economics"]["inequal_aversion"]),
+            "allow_trade": V(params["economics"]["abatement costs"]["allow trade"]),
+            "min_rel_payment_level": V(
+                params["economics"]["abatement costs"]["min rel payment level"]
+            ),
+            "max_rel_payment_level": V(
+                params["economics"]["abatement costs"]["max rel payment level"]
+            ),
             "PRTP": V(params["economics"]["PRTP"]),
-            "allow_trade": V(params["model"]["allow trade"]),
         }
 
         instance_data[None].update(parameter_mapping)

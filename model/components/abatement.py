@@ -126,6 +126,9 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
 
     # How are mitigation costs distributed over regions?
     m.allow_trade = Param()
+    m.min_rel_payment_level = Param()
+    m.max_rel_payment_level = Param()
+    # m.paid_abatement_costs = Var(m.t, m.regions, within=NonNegativeReals, initialize=0)
     constraints.extend(
         [
             GlobalConstraint(
@@ -134,16 +137,25 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
                 if m.allow_trade
                 else Constraint.Skip
             ),
-            RegionalConstraint(
-                lambda m, t, r: m.abatement_costs[t, r] <= 1.5 * m.area_under_MAC[t, r]
-                if m.allow_trade
-                else Constraint.Skip
-            ),
             # RegionalConstraint(
-            #     lambda m, t, r: m.abatement_costs[t, r] >= 0.5 * m.area_under_MAC[t, r]
+            #     lambda m, t, r: m.abatement_costs[t, r]
+            #     == m.paid_abatement_costs[t, r]
+            #     + 0.01 * soft_min(m.paid_abatement_costs[t, r] - m.area_under_MAC[t, r])
             #     if m.allow_trade
             #     else Constraint.Skip
             # ),
+            RegionalConstraint(
+                lambda m, t, r: m.abatement_costs[t, r]
+                <= m.max_rel_payment_level * m.area_under_MAC[t, r]
+                if m.allow_trade and value(m.max_rel_payment_level) is not False
+                else Constraint.Skip
+            ),
+            RegionalConstraint(
+                lambda m, t, r: m.abatement_costs[t, r]
+                >= m.min_rel_payment_level * m.area_under_MAC[t, r]
+                if m.allow_trade and value(m.min_rel_payment_level) is not False
+                else Constraint.Skip
+            ),
         ]
     )
 
