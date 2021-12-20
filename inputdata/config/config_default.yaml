@@ -177,6 +177,16 @@ economics:
     max: 10
     default: 1.001
 
+  inequal_aversion:
+    descr: >-
+      Parameter of inequality aversion.
+      Should be between 0 and `elasmu`.
+      Only used when welfare_module='inequal_aversion_general'
+    type: float
+    min: 0.0
+    max: 3
+    default: 0.5
+
   GDP:
     alpha:
       descr: Output elasticity of capital
@@ -374,6 +384,7 @@ model:
     values:
       - inequal_aversion_elasmu
       - inequal_aversion_zero
+      - inequal_aversion_general
     default: inequal_aversion_elasmu
 
   objective module:

@@ -165,6 +165,7 @@ class InstantiatedModel:
             "dk": V(params["economics"]["GDP"]["depreciation of capital"]),
             "sr": V(params["economics"]["GDP"]["savings rate"]),
             "elasmu": V(params["economics"]["elasmu"]),
+            "inequal_aversion": V(params["economics"]["inequal_aversion"]),
             "PRTP": V(params["economics"]["PRTP"]),
             "allow_trade": V(params["model"]["allow trade"]),
         }
