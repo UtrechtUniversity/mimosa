@@ -28,9 +28,9 @@ def save_output(params, m, experiment=None, random_id=False, folder="output"):
 
     rows = []
     for var in all_functions:
-        var_to_row(rows, m, var, True)
+        var_to_row(rows, m, var, True, None)
     for useful_var in all_variables:
-        var_to_row(rows, m, useful_var.var, useful_var.is_regional)
+        var_to_row(rows, m, useful_var.var, useful_var.is_regional, useful_var.unit)
     dataframe = rows_to_dataframe(rows, m)
 
     # add_param_columns(df, params, id, experiment)
@@ -46,7 +46,7 @@ def save_output(params, m, experiment=None, random_id=False, folder="output"):
         json.dump(params, fh)
 
 
-def var_to_row(rows, m, var, is_regional):
+def var_to_row(rows, m, var, is_regional, unit):
     # If var is a list, second element is the name
     if isinstance(var, list):
         name = var[1]
@@ -54,19 +54,21 @@ def var_to_row(rows, m, var, is_regional):
     else:
         name = var.name
 
+    unit = "" if unit is None else unit
+
     # Check if var is a function or a pyomo variable
     if is_regional:
         fct = lambda t, r: (var(m.year(t), r) if callable(var) else value(var[t, r]))
         for r in m.regions:
-            rows.append([name, r] + [fct(t, r) for t in m.t])
+            rows.append([name, r, unit] + [fct(t, r) for t in m.t])
     else:
         fct = lambda t: (var(m.year(t)) if callable(var) else value(var[t]))
-        rows.append([name, "Global"] + [fct(t) for t in m.t])
+        rows.append([name, "Global", unit] + [fct(t) for t in m.t])
 
 
 def rows_to_dataframe(rows, m):
     years = ["{:g}".format(year) for year in m.year(np.array(m.t))]
-    columns = ["Variable", "Region"] + years
+    columns = ["Variable", "Region", "Unit"] + years
     return pd.DataFrame(rows, columns=columns)
 
 

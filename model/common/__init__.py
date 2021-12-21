@@ -30,6 +30,7 @@ from pyomo.environ import (
     minimize,
     NonNegativeReals,
     Any,
+    units as u,
 )
 from pyomo.opt.base.solvers import OptSolver
 
