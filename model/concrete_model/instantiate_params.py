@@ -2,6 +2,7 @@ import numpy as np
 from model.common import AbstractModel, units
 from model.common.data import DataStore
 from model.common.regional_params import RegionalParamStore
+from model.common.units import quant
 
 # Util to create a None-indexed dictionary for scalar components
 # (see https://pyomo.readthedocs.io/en/stable/working_abstractmodels/data/raw_dicts.html)
@@ -14,14 +15,12 @@ class InstantiatedModel:
         abstract_model: AbstractModel,
         regional_param_store: RegionalParamStore,
         data_store: DataStore,
-        quant: units.Quantity,
         create_concrete_model: bool = True,
     ):
 
         self.abstract_model = abstract_model
         self.regional_param_store = regional_param_store
         self.data_store = data_store
-        self.quant = quant
 
         # Get the non-regional params (from config.yaml) from the RegionalParamStore
         self.params = regional_param_store.params
@@ -97,8 +96,6 @@ class InstantiatedModel:
     def _set_instance_data_main(self, instance_data) -> None:
 
         params = self.params
-        quant = self.quant
-
         t_start = params["time"]["start"]
         t_end = params["time"]["end"]
         dt = params["time"]["dt"]

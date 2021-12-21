@@ -43,7 +43,7 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     m.damage_noslr_form = Param(m.regions, within=Any)  # String for functional form
     m.damage_noslr_b1 = Param(m.regions)
     m.damage_noslr_b2 = Param(m.regions)
-    m.damage_noslr_b3 = Param(m.regions)
+    m.damage_noslr_b3 = Param(m.regions, within=Any)  # Can be empty
     # (b2 and b3 are only used for some functional forms)
 
     m.damage_noslr_a = Param(m.regions)
@@ -64,8 +64,12 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
 
     m.damage_slr_form = Param(m.regions, within=Any)  # String for functional form
     m.damage_slr_b1 = Param(m.regions)
-    m.damage_slr_b2 = Param(m.regions)
-    m.damage_slr_b3 = Param(m.regions)
+    m.damage_slr_b2 = Param(
+        m.regions, within=Any
+    )  # within=Any since it can be empty for some functional forms
+    m.damage_slr_b3 = Param(
+        m.regions, within=Any
+    )  # within=Any since it can be empty for some functional forms
     # (b2 and b3 are only used for some functional forms)
 
     m.damage_slr_a = Param(m.regions)

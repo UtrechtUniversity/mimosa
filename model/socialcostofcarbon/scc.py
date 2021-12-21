@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from collections import namedtuple
 
-from model.common import units, regional_params, data
+from model.common import regional_params, data
 from model.concrete_model.instantiate_params import InstantiatedModel
 from model.concrete_model.simulation_mode.set_constraints import _get_interp_data
 from model.components import sealevelrise
@@ -15,25 +15,16 @@ class SCC:
         self.params = params
         self.regions = params["regions"]
 
-        # Create a Quantity object for automatic unit handling
-        self.quant = units.Quantity(self.params)
-
         # Create the regional parameter store
         self.regional_param_store = regional_params.RegionalParamStore(self.params)
 
         # Create the data store
-        self.data_store = data.DataStore(
-            self.params, self.quant, self.regional_param_store
-        )
+        self.data_store = data.DataStore(self.params, self.regional_param_store)
 
         self.data_functions = DataFunctions()
 
         instantiated_model = InstantiatedModel(
-            self.data_functions,
-            self.regional_param_store,
-            self.data_store,
-            self.quant,
-            False,
+            self.data_functions, self.regional_param_store, self.data_store, False,
         )
 
         # From the instantiated model, only the parameter data ("instance_data")

@@ -5,11 +5,15 @@ The custom units are loaded from a text file.
 import os
 from pint import UnitRegistry
 
+from .utils import load_yaml
+
 
 UREG = UnitRegistry()
 UREG.load_definitions(
     os.path.join(os.path.dirname(__file__), "../../inputdata/config", "extra_units.txt")
 )
+
+DEFAULT_UNITS = load_yaml("default_units.yaml")
 
 
 class Quantity:
@@ -22,8 +26,8 @@ class Quantity:
 
     """
 
-    def __init__(self, params):
-        self.params = params
+    def __init__(self):
+        self.default_units = DEFAULT_UNITS
 
     def __call__(self, *args, only_magnitude=True, can_be_false=True):
         """Usage:
@@ -39,14 +43,14 @@ class Quantity:
             return False
 
         # First parse target units with default units
-        target_unit = self._parse_default_units(custom_replace(args[-1]))
+        target_unit = self._parse_default_units(self._custom_replace(args[-1]))
 
         if len(args) == 2:
-            string = custom_replace(str(args[0]))
+            string = self._custom_replace(str(args[0]))
             quantity = UREG.Quantity(string)
         elif len(args) == 3:
             value = args[0]
-            unit = custom_replace(str(args[1]))
+            unit = self._custom_replace(str(args[1]))
             quantity = UREG.Quantity(value, unit)
         else:
             raise Exception("Wrong usage of Quant function")
@@ -57,18 +61,21 @@ class Quantity:
 
     def __repr__(self):
         units = ", ".join(
-            [f"{key}: {value}" for key, value in self.params["default units"].items()]
+            [f"{key}: {value}" for key, value in self.default_units.items()]
         )
         return f"Quantity with units: {units}"
 
     ####### Private functions #######
 
     def _parse_default_units(self, units):
-        for key, value in self.params["default units"].items():
+        for key, value in self.default_units.items():
             # Add brackets () to avoid order of operation problems with compound units
             units = units.replace(key, f"({value})")
         return units
 
+    @staticmethod
+    def _custom_replace(units):
+        return units.replace("US$", "USD")
 
-def custom_replace(units):
-    return units.replace("US$", "USD")
+
+quant = Quantity()
