@@ -1,8 +1,7 @@
 import numpy as np
-from model.common import AbstractModel, units
+from model.common import AbstractModel, quant
 from model.common.data import DataStore
 from model.common.regional_params import RegionalParamStore
-from model.common.units import quant
 
 # Util to create a None-indexed dictionary for scalar components
 # (see https://pyomo.readthedocs.io/en/stable/working_abstractmodels/data/raw_dicts.html)

@@ -28,6 +28,7 @@ class Quantity:
 
     def __init__(self):
         self.default_units = DEFAULT_UNITS
+        self.ureg = UREG
 
     def __call__(self, *args, only_magnitude=True, can_be_false=True):
         """Usage:
