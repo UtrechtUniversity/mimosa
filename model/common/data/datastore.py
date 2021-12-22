@@ -9,8 +9,7 @@ import numpy as np
 import pandas as pd
 from scipy.interpolate import interp1d
 
-from model.common import economics
-from model.common.units import quant
+from model.common import economics, quant
 from .utils import UnitValues, extrapolate
 
 
