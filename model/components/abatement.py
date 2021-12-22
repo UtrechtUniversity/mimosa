@@ -17,7 +17,6 @@ from model.common import (
     log,
     soft_min,
     NonNegativeReals,
-    quant,
 )
 
 
@@ -78,12 +77,8 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     )
 
     # Abatement costs and MAC
-    m.abatement_costs = Var(
-        m.t, m.regions, within=NonNegativeReals, initialize=0,  # units=quant.ureg.m
-    )
-    m.area_under_MAC = Var(
-        m.t, m.regions, within=NonNegativeReals, initialize=0,  # units=quant.ureg.m
-    )
+    m.abatement_costs = Var(m.t, m.regions, within=NonNegativeReals, initialize=0)
+    m.area_under_MAC = Var(m.t, m.regions, within=NonNegativeReals, initialize=0)
     m.rel_abatement_costs = Var(m.t, m.regions, bounds=(0, 0.3))
     m.MAC_gamma = Param()
     m.MAC_beta = Param()
@@ -133,7 +128,7 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     m.allow_trade = Param()
     m.min_rel_payment_level = Param()
     m.max_rel_payment_level = Param()
-    m.extra_abatement_transfers = Var(m.t, m.regions, initialize=0.0)
+    # m.paid_abatement_costs = Var(m.t, m.regions, within=NonNegativeReals, initialize=0)
     constraints.extend(
         [
             GlobalConstraint(
@@ -159,18 +154,6 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
                 lambda m, t, r: m.abatement_costs[t, r]
                 >= m.min_rel_payment_level * m.area_under_MAC[t, r]
                 if m.allow_trade and value(m.min_rel_payment_level) is not False
-                else Constraint.Skip
-            ),
-            RegionalConstraint(
-                lambda m, t, r: m.extra_abatement_transfers[t, r]
-                == soft_min(m.abatement_costs[t, r] - m.area_under_MAC[t, r], scale=0.2)
-                if m.allow_trade
-                else Constraint.Skip
-            ),
-            GlobalConstraint(
-                lambda m, t: sum(m.extra_abatement_transfers[t, r] for r in m.regions)
-                <= 0.135
-                if m.allow_trade and m.year(t) <= 2050
                 else Constraint.Skip
             ),
         ]

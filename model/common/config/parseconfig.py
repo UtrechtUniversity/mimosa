@@ -13,7 +13,7 @@ else:
     from .utils import GeneralParser, PARSER_FACTORY, set_nested, get_nested, flatten
 
 from model.common.utils import load_yaml
-from model.common import quant
+from model.common.units import quant
 
 
 def parse_params(default_yaml, user_yaml, return_parser_tree=False):

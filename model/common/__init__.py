@@ -57,8 +57,6 @@ from .pyomo_utils import (
 # Other utils
 from .utils import first
 
-from .units import quant
-
 # # Datastore
 # from .data import DataStore
 
