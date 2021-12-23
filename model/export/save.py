@@ -54,8 +54,6 @@ def var_to_row(rows, m, var, is_regional, unit):
     else:
         name = var.name
 
-    unit = "" if unit is None else unit
-
     # Check if var is a function or a pyomo variable
     if is_regional:
         fct = lambda t, r: (var(m.year(t), r) if callable(var) else value(var[t, r]))

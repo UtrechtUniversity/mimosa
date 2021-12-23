@@ -1,4 +1,5 @@
 import typing
+import re
 from abc import ABC, abstractmethod
 import numpy as np
 from pyomo.core.base.units_container import PintUnitExtractionVisitor
@@ -168,5 +169,10 @@ def get_indices(var):
 
 
 def get_unit(var):
-    return units.get_units(var)
+    pyomo_unit = units.get_units(var)
+    pyomo_unit_str = str(pyomo_unit) if pyomo_unit is not None else ""
+
+    # Bugfix replace "/a" to "/yr" ("annum" is less clear than year)
+    # Note that we should not replace e.g. "/atm", hence the negative lookahead
+    return re.sub("/a(?![a-zA-Z])", "/yr", pyomo_unit_str)
 
