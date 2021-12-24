@@ -14,6 +14,7 @@ from model.common import (
     soft_max,
     Any,
     exp,
+    quant,
 )
 
 
@@ -34,11 +35,11 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     """
     constraints = []
 
-    m.damage_costs = Var(m.t, m.regions)
+    m.damage_costs = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
     m.damage_scale_factor = Param()
 
     # Damages not related to SLR (dependent on temperature)
-    m.resid_damages = Var(m.t, m.regions)
+    m.resid_damages = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
 
     m.damage_noslr_form = Param(m.regions, within=Any)  # String for functional form
     m.damage_noslr_b1 = Param(m.regions)
@@ -60,7 +61,9 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     )
 
     # SLR damages
-    m.SLR_damages = Var(m.t, m.regions, bounds=(-0.5, 0.7))
+    m.SLR_damages = Var(
+        m.t, m.regions, bounds=(-0.5, 0.7), units=quant.unit("fraction_of_GDP")
+    )
 
     m.damage_slr_form = Param(m.regions, within=Any)  # String for functional form
     m.damage_slr_b1 = Param(m.regions)

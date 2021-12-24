@@ -15,6 +15,7 @@ from model.common import (
     value,
     soft_min,
     economics,
+    quant,
 )
 
 
@@ -35,11 +36,12 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     """
     constraints = []
 
-    m.init_capitalstock_factor = Param(m.regions)
+    m.init_capitalstock_factor = Param(m.regions, units=quant.unit("currency_unit"))
     m.capital_stock = Var(
         m.t,
         m.regions,
         initialize=lambda m, t, r: m.init_capitalstock_factor[r] * m.GDP(m.year(t), r),
+        units=quant.unit("currency_unit"),
     )
 
     # Parameters
@@ -47,10 +49,15 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     m.dk = Param()
     m.sr = Param()
 
-    m.GDP_gross = Var(m.t, m.regions, initialize=lambda m, t, r: m.GDP(m.year(0), r))
-    m.GDP_net = Var(m.t, m.regions)
-    m.investments = Var(m.t, m.regions)
-    m.consumption = Var(m.t, m.regions)
+    m.GDP_gross = Var(
+        m.t,
+        m.regions,
+        initialize=lambda m, t, r: m.GDP(m.year(0), r),
+        units=quant.unit("currency_unit"),
+    )
+    m.GDP_net = Var(m.t, m.regions, units=quant.unit("currency_unit"))
+    m.investments = Var(m.t, m.regions, units=quant.unit("currency_unit"))
+    m.consumption = Var(m.t, m.regions, units=quant.unit("currency_unit"))
 
     m.ignore_damages = Param()
 

@@ -16,3 +16,8 @@ USD2005 = [currency] = usd = USD
 USD2010 = 1.11 USD2005
 
 tCO2 = [CO2emissions]
+
+degC_above_PI = [temperature_above_pre_industrial]
+
+fraction_of_GDP = []
+fraction_of_baseline_emissions = []
