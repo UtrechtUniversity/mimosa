@@ -12,9 +12,11 @@ from model.common import (
     RegionalConstraint,
     value,
     soft_max,
+    soft_min,
     Any,
     exp,
 )
+from model.common.pyomo_utils import RegionalInitConstraint
 
 
 def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
@@ -38,6 +40,7 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     m.damage_scale_factor = Param()
 
     # Damages not related to SLR (dependent on temperature)
+    m.gross_damages = Var(m.t, m.regions)
     m.resid_damages = Var(m.t, m.regions)
 
     m.damage_noslr_form = Param(m.regions, within=Any)  # String for functional form
@@ -52,10 +55,10 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     # the damage quantile
     constraints.append(
         RegionalConstraint(
-            lambda m, t, r: m.resid_damages[t, r]
+            lambda m, t, r: m.gross_damages[t, r]
             == m.damage_scale_factor
             * damage_fct(m.temperature[t] - 0.6, m.T0 - 0.6, m, r, is_slr=False),
-            "resid_damages",
+            "gross_damages",
         )
     )
 
@@ -80,11 +83,34 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
         )
     )
 
+    # Adaptation
+    m.adapt_level = Var(m.t, m.regions, bounds=(0, 1), initialize=0.001)
+    m.adapt_costs = Var(m.t, m.regions, initialize=0)
+    m.adapt_costs_g1 = Param(m.regions)
+    m.adapt_costs_g2 = Param(m.regions)
+    constraints.extend(
+        [
+            RegionalConstraint(
+                lambda m, t, r: m.resid_damages[t, r]
+                == m.gross_damages[t, r] * (1 - m.adapt_level[t, r]),
+                "resid_damages",
+            ),
+            RegionalConstraint(
+                lambda m, t, r: m.adapt_costs[t, r]
+                == adaptation_costs(m.adapt_level[t, r], m, r),
+                "adaptation_costs",
+            ),
+            RegionalInitConstraint(
+                lambda m, r: m.adapt_level[0, r] == 0, "adaptation_level_init"
+            ),
+        ]
+    )
+
     # Total damages are sum of non-SLR and SLR damages
     constraints.append(
         RegionalConstraint(
             lambda m, t, r: m.damage_costs[t, r]
-            == m.resid_damages[t, r] + m.SLR_damages[t, r],
+            == m.resid_damages[t, r] + m.SLR_damages[t, r] + m.adapt_costs[t, r],
             "damage_costs",
         ),
     )
@@ -136,3 +162,10 @@ def damage_fct(x, x0, m, r, is_slr):
 def logistic(x, b1, b2, b3):
     exponent = soft_max(-b3 * x, 10, scale=0.1)  # Avoid exponential overflow
     return b1 / (1 + b2 * exp(exponent)) - b1 / (1 + b2)
+
+
+# Adaptation cost function
+
+
+def adaptation_costs(adapt_level, m, r):
+    return m.adapt_costs_g1[r] * soft_min(adapt_level) ** m.adapt_costs_g2[r]

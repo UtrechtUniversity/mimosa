@@ -278,6 +278,13 @@ class InstantiatedModel:
                 "damage_slr_a": self.regional_param_store.get("COACCH", factor_slr_ad),
             }
 
+            parameter_mapping.update(
+                {
+                    "adapt_costs_g1": self.regional_param_store.get("ADRICE2010", "g1"),
+                    "adapt_costs_g2": self.regional_param_store.get("ADRICE2010", "g2"),
+                }
+            )
+
         instance_data[None].update(parameter_mapping)
 
     # def _instance_data_witch(self) -> dict:
