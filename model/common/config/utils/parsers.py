@@ -90,6 +90,17 @@ class StringParser(GeneralParser):
         return str(value)
 
 
+class StringOrPlainDictParser(GeneralParser):
+    def parse(self, value):
+        if self.check_false(value):
+            return False
+
+        if isinstance(value, dict):
+            return value
+
+        return str(value)
+
+
 class FilepathParser(GeneralParser):
     def parse(self, value):
         if self.check_false(value):
@@ -257,6 +268,7 @@ class ParserFactory:
 
 PARSER_FACTORY = ParserFactory()
 PARSER_FACTORY.register_parser("str", StringParser)
+PARSER_FACTORY.register_parser("str_or_plain_dict", StringOrPlainDictParser)
 PARSER_FACTORY.register_parser("filepath", FilepathParser)
 PARSER_FACTORY.register_parser("bool", BoolParser)
 PARSER_FACTORY.register_parser("int", IntParser)

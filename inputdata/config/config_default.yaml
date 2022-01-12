@@ -409,8 +409,10 @@ simulation:
       descr: variable name
       type: str
     values:
-      descr: path to output file containing values for this file
-      type: str
+      descr: >-
+        path to output file containing values for this file or dictionary with 
+        regions as rows and years as columns. NOTE: a Dataframe is not supported yet.
+      type: str_or_plain_dict
     default:
 
   deactivated_constraints:
