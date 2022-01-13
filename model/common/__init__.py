@@ -30,6 +30,7 @@ from pyomo.environ import (
     minimize,
     NonNegativeReals,
     Any,
+    units as u,
 )
 from pyomo.opt.base.solvers import OptSolver
 
@@ -55,6 +56,8 @@ from .pyomo_utils import (
 
 # Other utils
 from .utils import first
+
+from .units import quant
 
 # # Datastore
 # from .data import DataStore

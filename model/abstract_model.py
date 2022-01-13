@@ -98,6 +98,8 @@ def create_abstract_model(
         constraints.extend(welfare.inequal_aversion_elasmu.get_constraints(m))
     elif welfare_module == "inequal_aversion_zero":
         constraints.extend(welfare.inequal_aversion_zero.get_constraints(m))
+    elif welfare_module == "inequal_aversion_general":
+        constraints.extend(welfare.inequal_aversion_general.get_constraints(m))
     else:
         raise NotImplementedError(f"Welfare module `{welfare_module}` not implemented")
 

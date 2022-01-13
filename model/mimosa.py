@@ -42,7 +42,6 @@ class MIMOSA:
     Attributes:
         params (dict)
         regions (dict): taken from params
-        quant (Quantity): callable object used to parse and convert quantities with units
         abstract_model (AbstractModel): the AbstractModel created using the chosen damage/objective modules
         data_store (DataStore): object used to access regional data from the input database
         m (ConcreteModel): concrete instance of `abstract_model`
@@ -74,7 +73,6 @@ class MIMOSA:
     def create_instance(self) -> ConcreteModel:
         """
         Creates the objects necessary for the concrete model:
-          - Quantity object, for unit handling
           - Regional parameter store
           - Data store
         Using these, it transforms the AbstractModel into a ConcreteModel
@@ -83,20 +81,15 @@ class MIMOSA:
             ConcreteModel: model instantiated with parameter values and data functions
         """
 
-        # Create a Quantity object for automatic unit handling
-        self.quant = units.Quantity(self.params)
-
         # Create the regional parameter store
         self.regional_param_store = regional_params.RegionalParamStore(self.params)
 
         # Create the data store
-        self.data_store = data.DataStore(
-            self.params, self.quant, self.regional_param_store
-        )
+        self.data_store = data.DataStore(self.params, self.regional_param_store)
 
         # Using these help objects, create the instantiated model
         instantiated_model = InstantiatedModel(
-            self.abstract_model, self.regional_param_store, self.data_store, self.quant
+            self.abstract_model, self.regional_param_store, self.data_store
         )
         m = instantiated_model.concrete_model
 

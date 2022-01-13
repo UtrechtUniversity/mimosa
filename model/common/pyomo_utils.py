@@ -1,9 +1,22 @@
 import typing
+import re
 from abc import ABC, abstractmethod
 import numpy as np
+from pyomo.core.base.units_container import PintUnitExtractionVisitor
 
 from pyomo.environ import Var, Constraint
 import pyomo.environ
+
+# Monkey patch to make sure that the unit stays the same after calling a arctan-function.
+# By default, the unit becomes "radian", causing trouble in subsequent unit comparisons.
+# Since we use arctan a lot as a "soft-min/max" function, the unit should stay the same as
+# the input unit
+PintUnitExtractionVisitor.unary_function_method_map[
+    "atan"
+] = PintUnitExtractionVisitor._get_unit_for_single_child
+
+
+from pyomo.environ import units
 
 
 def atan(x):
@@ -12,6 +25,7 @@ def atan(x):
         return np.arctan(x)
 
     return pyomo.environ.atan(x)
+
 
 def exp(x):
     name = type(x).__name__
@@ -125,6 +139,7 @@ class UsefulVar:
 
         self.name = name
         self.is_regional = is_regional(self.var)
+        self.unit = get_unit(self.var)
         self.indices = get_indices(self.var)
 
         self.index_values = {index: list(getattr(m, index)) for index in self.indices}
@@ -151,3 +166,13 @@ def get_indices(var):
     if is_regional(var):
         return [index.name for index in var._implicit_subsets]
     return [var.index_set().name]
+
+
+def get_unit(var):
+    pyomo_unit = units.get_units(var)
+    pyomo_unit_str = str(pyomo_unit) if pyomo_unit is not None else ""
+
+    # Bugfix replace "/a" to "/yr" ("annum" is less clear than year)
+    # Note that we should not replace e.g. "/atm", hence the negative lookahead
+    return re.sub("/a(?![a-zA-Z])", "/yr", pyomo_unit_str)
+

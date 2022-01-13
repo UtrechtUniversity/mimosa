@@ -15,6 +15,7 @@ from model.common import (
     RegionalInitConstraint,
     Constraint,
     value,
+    quant,
 )
 
 
@@ -37,15 +38,24 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     """
     constraints = []
 
-    m.regional_emissions = Var(m.t, m.regions)
+    m.regional_emissions = Var(m.t, m.regions, units=quant.unit("emissionsrate_unit"))
     m.baseline = Var(
-        m.t, m.regions, initialize=lambda m, t, r: m.baseline_emissions(m.year(t), r)
+        m.t,
+        m.regions,
+        initialize=lambda m, t, r: m.baseline_emissions(m.year(t), r),
+        units=quant.unit("emissionsrate_unit"),
     )
     m.baseline_carbon_intensity = Param()
 
-    m.relative_abatement = Var(m.t, m.regions, initialize=0, bounds=(0, 2))
-    m.cumulative_emissions = Var(m.t)
-    m.global_emissions = Var(m.t)
+    m.relative_abatement = Var(
+        m.t,
+        m.regions,
+        initialize=0,
+        bounds=(0, 2),
+        units=quant.unit("fraction_of_baseline_emissions"),
+    )
+    m.cumulative_emissions = Var(m.t, units=quant.unit("emissions_unit"))
+    m.global_emissions = Var(m.t, units=quant.unit("emissionsrate_unit"))
 
     constraints.extend(
         [
@@ -104,8 +114,10 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
         ]
     )
 
-    m.T0 = Param()
-    m.temperature = Var(m.t, initialize=lambda m, t: m.T0)
+    m.T0 = Param(units=quant.unit("degC_above_PI"))
+    m.temperature = Var(
+        m.t, initialize=lambda m, t: m.T0, units=quant.unit("degC_above_PI")
+    )
     m.TCRE = Param()
     m.temperature_target = Param()
     constraints.extend(

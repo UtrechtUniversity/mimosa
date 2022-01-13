@@ -16,6 +16,7 @@ from model.common import (
     soft_min,
     Any,
     exp,
+    quant,
 )
 from model.common.pyomo_utils import RegionalInitConstraint
 
@@ -37,12 +38,12 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     """
     constraints = []
 
-    m.damage_costs = Var(m.t, m.regions)
+    m.damage_costs = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
     m.damage_scale_factor = Param()
 
     # Damages not related to SLR (dependent on temperature)
-    m.gross_damages = Var(m.t, m.regions)
-    m.resid_damages = Var(m.t, m.regions)
+    m.gross_damages = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
+    m.resid_damages = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
 
     m.damage_noslr_form = Param(m.regions, within=Any)  # String for functional form
     m.damage_noslr_b1 = Param(m.regions)
@@ -64,7 +65,9 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     )
 
     # SLR damages
-    m.SLR_damages = Var(m.t, m.regions, bounds=(-0.5, 0.7))
+    m.SLR_damages = Var(
+        m.t, m.regions, bounds=(-0.5, 0.7), units=quant.unit("fraction_of_GDP")
+    )
 
     m.SLR_damages_opt_adapt = Var(m.t, m.regions, bounds=(-0.5, 0.7))
     m.SLR_damages_no_adapt = Var(m.t, m.regions, bounds=(-0.5, 0.7))

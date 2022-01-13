@@ -3,7 +3,6 @@ Parses the config.yaml file and checks for consistency with the default config t
 """
 
 import os
-import yaml
 
 if __name__ == "__main__":
     import sys
@@ -13,19 +12,11 @@ if __name__ == "__main__":
 else:
     from .utils import GeneralParser, PARSER_FACTORY, set_nested, get_nested, flatten
 
-from model.common.units import Quantity
+from model.common.utils import load_yaml
+from model.common import quant
 
 
-def load_yaml(filename):
-    full_filename = os.path.join(
-        os.path.dirname(__file__), "../../../inputdata/config/", filename
-    )
-    with open(full_filename, "r", encoding="utf8") as configfile:
-        output = yaml.safe_load(configfile)
-    return output
-
-
-def parse_params(default_yaml, user_yaml, quant=None, return_parser_tree=False):
+def parse_params(default_yaml, user_yaml, return_parser_tree=False):
 
     parsed_dict = {}
     parser_tree = {}
@@ -76,16 +67,12 @@ def check_obsolete_params(user_yaml, parsed_params, parser_tree):
 
 
 def check_params(input_params):
-    default_units = load_yaml("default_units.yaml")
     default_yaml = load_yaml("config_default.yaml")
 
-    units = parse_params(default_units, input_params)
-    quant = Quantity(units)
     parsed_params, params_parser_tree = parse_params(
-        default_yaml, input_params, quant, return_parser_tree=True
+        default_yaml, input_params, return_parser_tree=True
     )
 
-    parsed_params["default units"] = units["default units"]
     check_obsolete_params(input_params, parsed_params, params_parser_tree)
 
     return parsed_params

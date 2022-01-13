@@ -1,5 +1,5 @@
 import numpy as np
-from model.common import AbstractModel, units
+from model.common import AbstractModel, quant
 from model.common.data import DataStore
 from model.common.regional_params import RegionalParamStore
 
@@ -14,14 +14,12 @@ class InstantiatedModel:
         abstract_model: AbstractModel,
         regional_param_store: RegionalParamStore,
         data_store: DataStore,
-        quant: units.Quantity,
         create_concrete_model: bool = True,
     ):
 
         self.abstract_model = abstract_model
         self.regional_param_store = regional_param_store
         self.data_store = data_store
-        self.quant = quant
 
         # Get the non-regional params (from config.yaml) from the RegionalParamStore
         self.params = regional_param_store.params
@@ -97,8 +95,6 @@ class InstantiatedModel:
     def _set_instance_data_main(self, instance_data) -> None:
 
         params = self.params
-        quant = self.quant
-
         t_start = params["time"]["start"]
         t_end = params["time"]["end"]
         dt = params["time"]["dt"]
@@ -165,8 +161,15 @@ class InstantiatedModel:
             "dk": V(params["economics"]["GDP"]["depreciation of capital"]),
             "sr": V(params["economics"]["GDP"]["savings rate"]),
             "elasmu": V(params["economics"]["elasmu"]),
+            "inequal_aversion": V(params["economics"]["inequal_aversion"]),
+            "allow_trade": V(params["economics"]["abatement costs"]["allow trade"]),
+            "min_rel_payment_level": V(
+                params["economics"]["abatement costs"]["min rel payment level"]
+            ),
+            "max_rel_payment_level": V(
+                params["economics"]["abatement costs"]["max rel payment level"]
+            ),
             "PRTP": V(params["economics"]["PRTP"]),
-            "allow_trade": V(params["model"]["allow trade"]),
         }
 
         instance_data[None].update(parameter_mapping)

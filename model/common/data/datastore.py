@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 from scipy.interpolate import interp1d
 
-from model.common import economics
+from model.common import economics, quant
 from .utils import UnitValues, extrapolate
 
 
@@ -31,9 +31,8 @@ class DataStore:
     databases = {}
     cached_data = {}
 
-    def __init__(self, params, quant, regional_param_store):
+    def __init__(self, params, regional_param_store):
         self.params = params
-        self.quant = quant  # Quantity object for unit conversion
         self._select_database()
         self._create_data_years()
 
@@ -128,7 +127,7 @@ class DataStore:
         years, values, unit = self._get_data_from_database(region, variable)
 
         if to_unit is not None:
-            quantity = self.quant(values, unit, to_unit, only_magnitude=False)
+            quantity = quant(values, unit, to_unit, only_magnitude=False)
             values = quantity.magnitude
             unit = quantity.units
 

@@ -2,7 +2,9 @@
 Common functions and utilities
 """
 
+import os
 import time
+import yaml
 from model.common import logger
 
 
@@ -38,3 +40,12 @@ def timer(name, log=False):
         return wrapper
 
     return decorator
+
+
+def load_yaml(filename):
+    full_filename = os.path.join(
+        os.path.dirname(__file__), "../../inputdata/config/", filename
+    )
+    with open(full_filename, "r", encoding="utf8") as configfile:
+        output = yaml.safe_load(configfile)
+    return output
