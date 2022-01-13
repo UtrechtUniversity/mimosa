@@ -10,6 +10,7 @@ from model.common import (
     Var,
     GeneralConstraint,
     RegionalConstraint,
+    Constraint,
     value,
     soft_max,
     soft_min,
@@ -46,7 +47,7 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     m.damage_noslr_form = Param(m.regions, within=Any)  # String for functional form
     m.damage_noslr_b1 = Param(m.regions)
     m.damage_noslr_b2 = Param(m.regions)
-    m.damage_noslr_b3 = Param(m.regions)
+    m.damage_noslr_b3 = Param(m.regions, within=Any)
     # (b2 and b3 are only used for some functional forms)
 
     m.damage_noslr_a = Param(m.regions)
@@ -65,22 +66,74 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     # SLR damages
     m.SLR_damages = Var(m.t, m.regions, bounds=(-0.5, 0.7))
 
-    m.damage_slr_form = Param(m.regions, within=Any)  # String for functional form
-    m.damage_slr_b1 = Param(m.regions)
-    m.damage_slr_b2 = Param(m.regions)
-    m.damage_slr_b3 = Param(m.regions)
-    # (b2 and b3 are only used for some functional forms)
+    m.SLR_damages_opt_adapt = Var(m.t, m.regions, bounds=(-0.5, 0.7))
+    m.SLR_damages_no_adapt = Var(m.t, m.regions, bounds=(-0.5, 0.7))
+    m.SLR_adapt_param = Param()
+    m.SLR_adapt_level = Var(m.t, m.regions, bounds=(0, 1))
 
-    m.damage_slr_a = Param(m.regions)
+    ## SLR damages are calculated both for optimal adaptation and no adaptation
+    m.damage_slr_form_opt_adapt = Param(
+        m.regions, within=Any
+    )  # String for functional form
+    m.damage_slr_b1_opt_adapt = Param(m.regions)
+    m.damage_slr_b2_opt_adapt = Param(m.regions, within=Any)
+    m.damage_slr_b3_opt_adapt = Param(m.regions, within=Any)
+
+    m.damage_slr_a_opt_adapt = Param(m.regions)
+
+    m.damage_slr_form_no_adapt = Param(
+        m.regions, within=Any
+    )  # String for functional form
+    m.damage_slr_b1_no_adapt = Param(m.regions)
+    m.damage_slr_b2_no_adapt = Param(m.regions, within=Any)
+    m.damage_slr_b3_no_adapt = Param(m.regions, within=Any)
+
+    m.damage_slr_a_no_adapt = Param(m.regions)
 
     # Linear damage function for SLR damages, including adaptation costs
-    constraints.append(
-        RegionalConstraint(
-            lambda m, t, r: m.SLR_damages[t, r]
-            == m.damage_scale_factor
-            * damage_fct(m.total_SLR[t], m.total_SLR[0], m, r, is_slr=True),
-            "SLR_damages",
-        )
+    constraints.extend(
+        [
+            RegionalConstraint(
+                lambda m, t, r: m.SLR_adapt_level[t, r] == m.SLR_adapt_param,
+                "SLR_damages_adapt_level",
+            ),
+            RegionalConstraint(
+                lambda m, t, r: (
+                    m.SLR_damages[t, r]
+                    if value(m.SLR_adapt_param) == 1
+                    else m.SLR_damages_opt_adapt[t, r]
+                )
+                == m.damage_scale_factor
+                * damage_fct(
+                    m.total_SLR[t], m.total_SLR[0], m, r, is_slr=True, slr_adapt=True
+                ),
+                "SLR_damages_opt_adapt",
+            ),
+            RegionalConstraint(
+                lambda m, t, r: (
+                    m.SLR_damages[t, r]
+                    if value(m.SLR_adapt_param) == 0
+                    and value(m.SLR_adapt_param) is not False
+                    else m.SLR_damages_no_adapt[t, r]
+                )
+                == m.damage_scale_factor
+                * damage_fct(
+                    m.total_SLR[t], m.total_SLR[0], m, r, is_slr=True, slr_adapt=False
+                ),
+                "SLR_damages_no_adapt",
+            ),
+            # Interpolate between optimal and no adaptation
+            # (only when SLR_adapt_param > 0 and < 1):
+            RegionalConstraint(
+                lambda m, t, r: m.SLR_damages[t, r]
+                == m.SLR_adapt_level[t, r] * m.SLR_damages_opt_adapt[t, r]
+                + (1 - m.SLR_adapt_level[t, r]) * m.SLR_damages_no_adapt[t, r]
+                if (value(m.SLR_adapt_param) > 0 and value(m.SLR_adapt_param) < 1)
+                or value(m.SLR_adapt_param) is False
+                else Constraint.Skip,
+                "SLR_damages",
+            ),
+        ]
     )
 
     # Adaptation
@@ -126,11 +179,23 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
 # Damage function
 
 
-def functional_form(x, m, r, is_slr=False):
-    if is_slr:
-        form = m.damage_slr_form[r]
-        b1, b2, b3 = m.damage_slr_b1[r], m.damage_slr_b2[r], m.damage_slr_b3[r]
-        a = m.damage_slr_a[r]
+def functional_form(x, m, r, is_slr=False, slr_adapt=False):
+    if is_slr and slr_adapt:
+        form = m.damage_slr_form_opt_adapt[r]
+        b1, b2, b3 = (
+            m.damage_slr_b1_opt_adapt[r],
+            m.damage_slr_b2_opt_adapt[r],
+            m.damage_slr_b3_opt_adapt[r],
+        )
+        a = m.damage_slr_a_opt_adapt[r]
+    elif is_slr and not slr_adapt:
+        form = m.damage_slr_form_no_adapt[r]
+        b1, b2, b3 = (
+            m.damage_slr_b1_no_adapt[r],
+            m.damage_slr_b2_no_adapt[r],
+            m.damage_slr_b3_no_adapt[r],
+        )
+        a = m.damage_slr_a_no_adapt[r]
     else:
         form = m.damage_noslr_form[r]
         b1, b2, b3 = m.damage_noslr_b1[r], m.damage_noslr_b2[r], m.damage_noslr_b3[r]
@@ -151,10 +216,10 @@ def functional_form(x, m, r, is_slr=False):
     raise NotImplementedError
 
 
-def damage_fct(x, x0, m, r, is_slr):
-    damage = functional_form(x, m, r, is_slr)
+def damage_fct(x, x0, m, r, is_slr: bool, slr_adapt: bool = True):
+    damage = functional_form(x, m, r, is_slr, slr_adapt)
     if x0 is not None:
-        damage -= functional_form(x0, m, r, is_slr)
+        damage -= functional_form(x0, m, r, is_slr, slr_adapt)
 
     return damage
 

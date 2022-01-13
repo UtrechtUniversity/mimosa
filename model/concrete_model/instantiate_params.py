@@ -228,13 +228,16 @@ class InstantiatedModel:
         combined_slr_nonslr_damages = self.params["economics"]["damages"][
             "coacch_combined_slr_nonslr_damages"
         ]
-        slr_withadapt = self.params["economics"]["damages"]["coacch_slr_withadapt"]
-        adapt_prfx = "Ad" if slr_withadapt else "NoAd"
-        prfx = f"SLR-{adapt_prfx}"
+        slr_adapt_param = self.params["economics"]["damages"]["coacch_slr_adapt"]
 
         V_region = lambda x: {region: x for region in self.params["regions"]}
 
         if combined_slr_nonslr_damages:
+            adapt_prfx = "Ad" if slr_adapt_param == 1 else "NoAd"
+            if slr_adapt_param not in [0, 1]:
+                raise NotImplementedError(
+                    "COACCH combined damages with adaptation that is not equal to 0 or to 1 is not implemented."
+                )
             parameter_mapping = {
                 # Combined non-SLR and SLR damages are always quadratic
                 "damage_noslr_form": V_region("Robust-Quadratic"),
@@ -247,17 +250,22 @@ class InstantiatedModel:
                 "damage_noslr_b3": V_region(0),
                 "damage_noslr_a": V_region(1),
                 # SLR damages (zero but need to be defined)
-                "damage_slr_form": V_region("Robust-Linear"),
-                "damage_slr_b1": V_region(0),
-                "damage_slr_b2": V_region(0),
-                "damage_slr_b3": V_region(0),
-                "damage_slr_a": V_region(0),
+                "damage_slr_form_opt_adapt": V_region("Robust-Linear"),
+                "damage_slr_form_no_adapt": V_region("Robust-Linear"),
+                "damage_slr_b1_opt_adapt": V_region(0),
+                "damage_slr_b1_no_adapt": V_region(0),
+                "damage_slr_b2_opt_adapt": V_region(0),
+                "damage_slr_b2_no_adapt": V_region(0),
+                "damage_slr_b3_opt_adapt": V_region(0),
+                "damage_slr_b3_no_adapt": V_region(0),
+                "damage_slr_a_opt_adapt": V_region(0),
+                "damage_slr_a_no_adapt": V_region(0),
+                "SLR_adapt_param": V(slr_adapt_param),
             }
 
         else:
 
             factor_noslr = f"NoSLR_a (q={damage_quantile})"
-            factor_slr_ad = f"{prfx}_a (q={damage_quantile})"
 
             parameter_mapping = {
                 # Non-SLR damages:
@@ -268,15 +276,35 @@ class InstantiatedModel:
                 "damage_noslr_b2": self.regional_param_store.get("COACCH", "NoSLR_b2"),
                 "damage_noslr_b3": self.regional_param_store.get("COACCH", "NoSLR_b3"),
                 "damage_noslr_a": self.regional_param_store.get("COACCH", factor_noslr),
-                # SLR damages:
-                "damage_slr_form": self.regional_param_store.get(
-                    "COACCH", f"{prfx}_form"
-                ),
-                "damage_slr_b1": self.regional_param_store.get("COACCH", f"{prfx}_b1"),
-                "damage_slr_b2": self.regional_param_store.get("COACCH", f"{prfx}_b2"),
-                "damage_slr_b3": self.regional_param_store.get("COACCH", f"{prfx}_b3"),
-                "damage_slr_a": self.regional_param_store.get("COACCH", factor_slr_ad),
+                "SLR_adapt_param": V(slr_adapt_param),
             }
+
+            # SLR damages:
+            for slr_adapt in ["opt", "no"]:
+                adapt_prfx = "Ad" if slr_adapt == "opt" else "NoAd"
+                prfx = f"SLR-{adapt_prfx}"
+                factor_slr_ad = f"{prfx}_a (q={damage_quantile})"
+
+                parameter_mapping.update(
+                    {
+                        # First, optimal adaptation damages:
+                        f"damage_slr_form_{slr_adapt}_adapt": self.regional_param_store.get(
+                            "COACCH", f"{prfx}_form"
+                        ),
+                        f"damage_slr_b1_{slr_adapt}_adapt": self.regional_param_store.get(
+                            "COACCH", f"{prfx}_b1"
+                        ),
+                        f"damage_slr_b2_{slr_adapt}_adapt": self.regional_param_store.get(
+                            "COACCH", f"{prfx}_b2"
+                        ),
+                        f"damage_slr_b3_{slr_adapt}_adapt": self.regional_param_store.get(
+                            "COACCH", f"{prfx}_b3"
+                        ),
+                        f"damage_slr_a_{slr_adapt}_adapt": self.regional_param_store.get(
+                            "COACCH", factor_slr_ad
+                        ),
+                    }
+                )
 
             parameter_mapping.update(
                 {

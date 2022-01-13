@@ -244,10 +244,19 @@ economics:
       max: 0.975
       default: 0.5
 
-    coacch_slr_withadapt:
-      descr: Flag to use the SLR-with-Adapation damage functions (Only used for COACCH)
-      type: bool
-      default: True
+    coacch_slr_adapt:
+      descr: >-
+        Factor (between 0 and 1) to interpolate between COACCH SLR-optimal-Adapation
+        damage functions and SLR-no-adaptation damage functions.
+        0: no SLR adaptation. 1: optimal SLR adaptation.
+        Note: it can only be false when the constraint `SLR_damages_adapt_level` has
+        been disabled and a custom value has been specified for the variable `m.SLR_adapt_level[t, r]`
+        in simulation mode.
+      type: float
+      min: 0
+      max: 1
+      default: 1
+      can_be_false: True
 
     coacch_combined_slr_nonslr_damages:
       descr: >-
