@@ -43,7 +43,9 @@ def _get_interp_data(filepath_or_data, data_cache, variable_name):
 
     # 2. Select data
     fixed_data = imported_data[imported_data["Variable"] == variable_name]
-    fixed_data = fixed_data.drop(columns="Variable").set_index("Region")
+    fixed_data = fixed_data.drop(
+        columns=["Variable", "Unit"], errors="ignore"
+    ).set_index("Region")
     interp_data = InterpolatingData(fixed_data)
     return interp_data
 
