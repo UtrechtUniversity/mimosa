@@ -144,6 +144,29 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
         ]
     )
 
+    # Manually set abatement level to zero until a certain year:
+    m.no_abatement_zero_until_year = Param()
+    constraints.extend(
+        [
+            RegionalConstraint(
+                lambda m, t, r: m.relative_abatement[t, r] <= 1e-3
+                if value(m.no_abatement_zero_until_year) is not False
+                and t > 0
+                and m.year(t) < m.no_abatement_zero_until_year
+                else Constraint.Skip,
+                "no_abatement_until_year_upperbound",
+            ),
+            RegionalConstraint(  # Purely here for numerical stability
+                lambda m, t, r: m.relative_abatement[t, r] >= -1e-3
+                if value(m.no_abatement_zero_until_year) is not False
+                and t > 0
+                and m.year(t) < m.no_abatement_zero_until_year
+                else Constraint.Skip,
+                "no_abatement_until_year_lowerbound",
+            ),
+        ]
+    )
+
     # How are mitigation costs distributed over regions?
     m.allow_trade = Param()
     m.min_rel_payment_level = Param()

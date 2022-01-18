@@ -113,6 +113,9 @@ class InstantiatedModel:
                 params["emissions"]["baseline carbon intensity"]
             ),
             "budget": V(quant(params["emissions"]["carbonbudget"], "emissions_unit")),
+            "no_abatement_zero_until_year": V(
+                params["emissions"]["no_abatement_zero_until_year"]
+            ),
             "inertia_regional": V(params["emissions"]["inertia"]["regional"]),
             "inertia_global": V(params["emissions"]["inertia"]["global"]),
             "global_min_level": V(

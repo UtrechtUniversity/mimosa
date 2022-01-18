@@ -376,6 +376,14 @@ emissions:
       <<: *inertia_description
       default: -0.05
 
+  no_abatement_zero_until_year:
+    descr: >-
+      If not false, forces the carbon price to be zero until the given year
+      (last year not included).
+    type: float
+    default: False
+    can_be_false: True
+
 ##################
 
 temperature:

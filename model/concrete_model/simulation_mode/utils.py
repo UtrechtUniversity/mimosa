@@ -33,6 +33,7 @@ class InterpolatingData:
 
     def __init__(self, data):
         # extrapolate
+        self.minyear = float(data.columns[0])
         self.maxyear = float(data.columns[-1])
         self.region_interp_fct = {
             region: self.interp(row) for region, row in data.iterrows()

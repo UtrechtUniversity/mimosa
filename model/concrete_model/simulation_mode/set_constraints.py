@@ -6,6 +6,7 @@ import pandas as pd
 from model.common import (
     RegionalConstraint,
     GlobalConstraint,
+    Constraint,
     is_regional,
     add_constraint,
 )
@@ -70,21 +71,21 @@ def _fixed_data_constraint(m, variable_name, interp_data):
 ############
 
 
-def _extra_regional_constraint(variable_name, interp_data, eps):
+def _extra_regional_constraint(variable_name, interp_data: InterpolatingData, eps):
     return [
         RegionalConstraint(
             lambda m, t, r: getattr(m, variable_name)[t, r]
             - interp_data.get(r, m.year(t))
             <= eps
-            # if m.year(t) <= interp_data.maxyear
-            # else Constraint.Skip
+            if m.year(t) >= interp_data.minyear
+            else Constraint.Skip
         ),
         RegionalConstraint(
             lambda m, t, r: getattr(m, variable_name)[t, r]
             - interp_data.get(r, m.year(t))
             >= -eps
-            # if m.year(t) <= interp_data.maxyear
-            # else Constraint.Skip
+            if m.year(t) >= interp_data.minyear
+            else Constraint.Skip
         ),
     ]
 
@@ -95,14 +96,14 @@ def _extra_global_constraint(variable_name, interp_data: InterpolatingData, eps)
             lambda m, t: getattr(m, variable_name)[t]
             - interp_data.get("Global", m.year(t))
             <= eps
-            # if t > 0  # and m.year(t) <= interp_data.maxyear
-            # else Constraint.Skip
+            if m.year(t) >= interp_data.minyear
+            else Constraint.Skip
         ),
         GlobalConstraint(
             lambda m, t: getattr(m, variable_name)[t]
             - interp_data.get("Global", m.year(t))
             >= -eps
-            # if t > 0  # and m.year(t) <= interp_data.maxyear
-            # else Constraint.Skip
+            if m.year(t) >= interp_data.minyear
+            else Constraint.Skip
         ),
     ]
