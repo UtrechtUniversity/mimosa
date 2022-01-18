@@ -89,7 +89,8 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
             ),
             RegionalInitConstraint(
                 lambda m, r: m.regional_emissions[0, r]
-                == m.baseline_emissions(m.year(0), r)
+                == m.baseline_emissions(m.year(0), r),
+                "init_regional_abatement_zero",
             ),
             # Global emissions (sum from regional emissions)
             GlobalConstraint(
@@ -105,7 +106,8 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
             # Cumulative global emissions
             GlobalConstraint(
                 lambda m, t: m.cumulative_emissions[t]
-                == m.cumulative_emissions[t - 1] + m.dt * m.global_emissions[t]
+                == m.cumulative_emissions[t - 1]
+                + m.dt * 0.5 * (m.global_emissions[t] + m.global_emissions[t - 1])
                 if t > 0
                 else Constraint.Skip,
                 "cumulative_emissions",
@@ -194,7 +196,10 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
                 else Constraint.Skip,
                 name="net_zero_after_2100",
             ),
-            GlobalConstraint(lambda m, t: m.cumulative_emissions[t] >= 0),
+            GlobalConstraint(
+                lambda m, t: m.cumulative_emissions[t] >= 0,
+                "cumulative_emissions_never_below_zero",
+            ),
             # Global and regional inertia constraints:
             GlobalConstraint(
                 lambda m, t: m.global_emissions[t] - m.global_emissions[t - 1]
