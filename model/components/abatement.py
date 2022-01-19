@@ -112,14 +112,7 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
                     if value(m.allow_trade)
                     else m.abatement_costs[t, r]
                 )
-                == AC(
-                    m.relative_abatement[t, r],
-                    m.learning_factor[t],
-                    m.MAC_gamma,
-                    m.MAC_beta,
-                    m.MAC_scaling_factor[r],
-                )
-                * m.baseline[t, r],
+                == AC(m.relative_abatement[t, r], m, t, r) * m.baseline[t, r],
                 "abatement_costs",
             ),
             RegionalConstraint(
@@ -129,13 +122,7 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
             ),
             RegionalConstraint(
                 lambda m, t, r: m.carbonprice[t, r]
-                == MAC(
-                    m.relative_abatement[t, r],
-                    m.learning_factor[t],
-                    m.MAC_gamma,
-                    m.MAC_beta,
-                    m.MAC_scaling_factor[r],
-                ),
+                == MAC(m.relative_abatement[t, r], m, t, r),
                 "carbonprice",
             ),
             RegionalInitConstraint(
@@ -249,9 +236,11 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
 #################
 
 
-def MAC(a, factor, gamma, beta, MAC_scaling_factor):
-    return gamma * factor * MAC_scaling_factor * a ** beta
+def MAC(a, m, t, r):
+    factor = m.learning_factor[t] * m.MAC_scaling_factor[r]
+    return factor * m.MAC_gamma * a ** m.MAC_beta
 
 
-def AC(a, factor, gamma, beta, MAC_scaling_factor):
-    return gamma * factor * MAC_scaling_factor * a ** (beta + 1) / (beta + 1)
+def AC(a, m, t, r):
+    factor = m.learning_factor[t] * m.MAC_scaling_factor[r]
+    return factor * m.MAC_gamma * a ** (m.MAC_beta + 1) / (m.MAC_beta + 1)
