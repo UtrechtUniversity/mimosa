@@ -15,8 +15,6 @@ economics:
     beta: 2
     rho: 0.82
     gamma: 2442 USD2005/tCO2
-  abatement costs:
-    allow trade: False
   damages:
     scale factor: 1
     ignore damages: False

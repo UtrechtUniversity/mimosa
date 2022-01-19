@@ -229,12 +229,7 @@ economics:
       unit: currency_unit/emissionsrate_unit
       default: 2442 USD2005/tCO2
 
-  abatement costs:
-    allow trade:
-      descr: Allow emission trading between regions
-      type: bool
-      default: False
-
+  emission trade:
     min rel payment level:
       descr: >-
         Which percentage of the area under the MAC of a region should it pay itself (minimum)?
@@ -402,6 +397,14 @@ model:
       - RICE2010
       - RICE2012
     default: COACCH
+
+  emissiontrade module:
+    descr: Emission trade module to be used
+    type: enum
+    values:
+      - notrade
+      - globalcostpool
+    default: notrade
 
   welfare module:
     descr: Welfare and utility module to be used

@@ -85,13 +85,6 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
         initialize=0,
         units=quant.unit("currency_unit"),
     )
-    m.area_under_MAC = Var(
-        m.t,
-        m.regions,
-        within=NonNegativeReals,
-        initialize=0,
-        units=quant.unit("currency_unit"),
-    )
     m.rel_abatement_costs = Var(
         m.t, m.regions, bounds=(0, 0.3), units=quant.unit("fraction_of_GDP")
     )
@@ -107,15 +100,6 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     constraints.extend(
         [
             RegionalConstraint(
-                lambda m, t, r: (
-                    m.area_under_MAC[t, r]
-                    if value(m.allow_trade)
-                    else m.abatement_costs[t, r]
-                )
-                == AC(m.relative_abatement[t, r], m, t, r) * m.baseline[t, r],
-                "abatement_costs",
-            ),
-            RegionalConstraint(
                 lambda m, t, r: m.rel_abatement_costs[t, r]
                 == m.abatement_costs[t, r] / m.GDP_gross[t, r],
                 "rel_abatement_costs",
@@ -128,90 +112,6 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
             RegionalInitConstraint(
                 lambda m, r: m.carbonprice[0, r] == 0, "init_carbon_price"
             ),
-        ]
-    )
-
-    # How are mitigation costs distributed over regions?
-    m.allow_trade = Param()
-    m.min_rel_payment_level = Param()
-    m.max_rel_payment_level = Param()
-    m.extra_paid_abatement = Var(
-        m.t,
-        m.regions,
-        initialize=0.0,
-        within=NonNegativeReals,
-        units=quant.unit("currency_unit"),
-    )
-    m.extra_received_abatement = Var(
-        m.t,
-        m.regions,
-        initialize=0.0,
-        within=NonNegativeReals,
-        units=quant.unit("currency_unit"),
-    )
-    constraints.extend(
-        [
-            # GlobalConstraint(
-            #     lambda m, t: sum(m.abatement_costs[t, r] for r in m.regions)
-            #     == sum(m.area_under_MAC[t, r] for r in m.regions)
-            #     if m.allow_trade
-            #     else Constraint.Skip
-            # ),
-            # RegionalConstraint(
-            #     lambda m, t, r: m.abatement_costs[t, r]
-            #     == m.paid_abatement_costs[t, r]
-            #     + 0.01 * soft_min(m.paid_abatement_costs[t, r] - m.area_under_MAC[t, r])
-            #     if m.allow_trade
-            #     else Constraint.Skip
-            # ),
-            RegionalConstraint(
-                lambda m, t, r: m.extra_paid_abatement[t, r]
-                <= (m.max_rel_payment_level - 1)
-                * m.area_under_MAC[t, r]  # TODO change " - 1"
-                if m.allow_trade and value(m.max_rel_payment_level) is not False
-                else Constraint.Skip
-            ),
-            RegionalConstraint(
-                lambda m, t, r: m.extra_received_abatement[t, r]
-                <= (1 - m.min_rel_payment_level)
-                * m.area_under_MAC[t, r]  # TODO change "1 - "
-                if m.allow_trade and value(m.min_rel_payment_level) is not False
-                else Constraint.Skip
-            ),
-            RegionalConstraint(
-                lambda m, t, r: m.abatement_costs[t, r]
-                == m.area_under_MAC[t, r]
-                + m.extra_paid_abatement[t, r]
-                - m.extra_received_abatement[t, r]
-                if m.allow_trade
-                else Constraint.Skip,
-                "abatement_is_real_costs_plus_extra_paid_minus_extra_received",
-            ),
-            GlobalConstraint(
-                lambda m, t: sum(m.extra_paid_abatement[t, r] for r in m.regions)
-                == sum(m.extra_received_abatement[t, r] for r in m.regions)
-                if m.allow_trade
-                else Constraint.Skip,
-                "total_extra_abatement_paid_equals_total_extra_abatement_received",
-            ),
-            # GlobalConstraint(
-            #     lambda m, t: sum(m.extra_paid_abatement[t, r] for r in m.regions) <= 0.1
-            #     if m.allow_trade
-            #     else Constraint.Skip,
-            #     "limit_extra_abatement_transfers",
-            # ),
-            # RegionalConstraint(
-            #     lambda m, t, r: m.extra_abatement_transfers[t, r]
-            #     == soft_min(m.abatement_costs[t, r] - m.area_under_MAC[t, r], scale=0.2)
-            #     if m.allow_trade
-            #     else Constraint.Skip
-            # ),
-            # GlobalConstraint(
-            #     lambda m, t: sum(m.extra_abatement_transfers[t, r] for r in m.regions)
-            #     <= 0.135
-            #     if m.allow_trade and m.year(t) <= 2050
-            #     else Constraint.Skip
-            # ),
         ]
     )
 
