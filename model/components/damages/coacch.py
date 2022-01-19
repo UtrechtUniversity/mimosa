@@ -66,11 +66,11 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
 
     # SLR damages
     m.SLR_damages = Var(
-        m.t, m.regions, bounds=(-0.5, 0.7), units=quant.unit("fraction_of_GDP")
+        m.t, m.regions, bounds=(-0.5, 1), units=quant.unit("fraction_of_GDP")
     )
 
     m.SLR_damages_opt_adapt = Var(m.t, m.regions, bounds=(-0.5, 0.7))
-    m.SLR_damages_no_adapt = Var(m.t, m.regions, bounds=(-0.5, 0.7))
+    m.SLR_damages_no_adapt = Var(m.t, m.regions, bounds=(-0.5, 1))
     m.SLR_adapt_param = Param()
     m.SLR_adapt_level = Var(m.t, m.regions, bounds=(0, 1))
 
@@ -119,9 +119,17 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
                     and value(m.SLR_adapt_param) is not False
                     else m.SLR_damages_no_adapt[t, r]
                 )
-                == m.damage_scale_factor
-                * damage_fct(
-                    m.total_SLR[t], m.total_SLR[0], m, r, is_slr=True, slr_adapt=False
+                == soft_max(
+                    m.damage_scale_factor
+                    * damage_fct(
+                        m.total_SLR[t],
+                        m.total_SLR[0],
+                        m,
+                        r,
+                        is_slr=True,
+                        slr_adapt=False,
+                    ),
+                    1,
                 ),
                 "SLR_damages_no_adapt",
             ),
