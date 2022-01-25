@@ -13,13 +13,10 @@ import pandas as pd
 from model.common import get_all_variables, value
 
 
-def save_output(params, m, experiment=None, random_id=False, folder="output"):
+def save_output(params, m, experiment=None, hash_suffix=True, folder="output"):
 
     # 1. Create a unique identifier
-    if random_id:
-        exp_id = "{:08x}".format(random.getrandbits(32))
-    else:
-        exp_id = hashlib.md5(json.dumps(params).encode()).hexdigest()[:9]
+    settings_hash = hashlib.md5(json.dumps(params).encode()).hexdigest()[:9]
 
     # 2. Save the Pyomo variables and data functions
     all_variables = get_all_variables(m)
@@ -37,7 +34,7 @@ def save_output(params, m, experiment=None, random_id=False, folder="output"):
 
     # 3. Save the CSV file
     os.makedirs(folder + "/", exist_ok=True)
-    filename = f"{exp_id}" if experiment is None else f"{experiment}_{exp_id}"
+    filename = f"{experiment}_{settings_hash}" if hash_suffix else experiment
 
     dataframe.to_csv(f"{folder}/{filename}.csv", float_format="%.6g", index=False)
 
