@@ -117,15 +117,94 @@ class RegionalInitConstraint(GeneralConstraint):
         return Constraint(m.regions, rule=self.rule)
 
 
-def add_constraint(m, constraint, name=None):
+class GeneralCloseToConstraint(GeneralConstraint):
+    def __init__(
+        self,
+        rule_lhs: typing.Callable,
+        rule_rhs: typing.Callable,
+        name: str = None,
+        epsilon: float = 0.005,
+        ignore_if: typing.Callable = None,
+    ):
+        """Creates a constraint of the type:
+            rule_lhs(x) <= (1 + eps) * rule_rhs(x) && rule_lhs(x) >= (1 - eps) * rule_rhs(x)
+        Useful for creating "soft-equality" constraints
+
+        Args:
+            rule_lhs (typing.Callable): function (left-hand side) with parameters m, [t], [r]
+            rule_rhs (typing.Callable): function (right-hand side) with parameters m, [t], [r]
+            name (str, optional): name of the constraint, useful for debugging. Defaults to None.
+            epsilon (float, optional): tolerance for upper/lower bounds. Defaults to 0.005.
+            ignore_if (typing.Callable): function with parameters m that returns True when constraint should be ignored
+        """
+        super().__init__(rule_lhs, [f"{name}_upperbound", f"{name}_lowerbound"])
+
+        self.rule_rhs = rule_rhs
+        self.epsilon = epsilon
+
+        if ignore_if is None:
+            ignore_if = lambda m: False  # Never ignore when ignore_if is None
+        self.ignore_if = ignore_if
+
+
+class GlobalCloseToConstraint(GeneralCloseToConstraint):
+    def to_pyomo_constraint(self, m):
+        eps = self.epsilon
+        rule_lhs = self.rule
+        rule_rhs = self.rule_rhs
+
+        upperbound = (
+            lambda m, t: rule_lhs(m, t) <= (1 + eps) * rule_rhs(m, t)
+            if not self.ignore_if(m)
+            else Constraint.Skip
+        )
+        lowerbound = (
+            lambda m, t: rule_lhs(m, t) >= (1 - eps) * rule_rhs(m, t)
+            if not self.ignore_if(m)
+            else Constraint.Skip
+        )
+        return [
+            Constraint(m.t, rule=upperbound),
+            Constraint(m.t, rule=lowerbound),
+        ]
+
+
+class RegionalCloseToConstraint(GeneralCloseToConstraint):
+    def to_pyomo_constraint(self, m):
+        eps = self.epsilon
+        rule_lhs = self.rule
+        rule_rhs = self.rule_rhs
+
+        upperbound = (
+            lambda m, t, r: rule_lhs(m, t, r) <= (1 + eps) * rule_rhs(m, t, r)
+            if not self.ignore_if(m)
+            else Constraint.Skip
+        )
+        lowerbound = (
+            lambda m, t, r: rule_lhs(m, t, r) >= (1 - eps) * rule_rhs(m, t, r)
+            if not self.ignore_if(m)
+            else Constraint.Skip
+        )
+        return [
+            Constraint(m.t, m.regions, rule=upperbound),
+            Constraint(m.t, m.regions, rule=lowerbound),
+        ]
+
+
+def add_constraint(m, constraints, names=None):
     """Adds a constraint to the model
 
     It first generates a unique name, then adds
     the constraint using this new name
     """
-    n = len(list(m.component_objects()))
-    name = f"constraint_{n}" if name is None else f"constraint_{name}"
-    m.add_component(name, constraint)
+    if not isinstance(constraints, list):
+        constraints = [constraints]
+        names = [names]
+
+    for constraint, name in zip(constraints, names):
+        n = len(list(m.component_objects()))
+        name = f"constraint_{n}" if name is None else f"constraint_{name}"
+        m.add_component(name, constraint)
     return name
 
 
