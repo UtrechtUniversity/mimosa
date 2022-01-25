@@ -16,6 +16,7 @@ from model.common import (
     NonNegativeReals,
     quant,
     value,
+    soft_min,
 )
 
 from model.components.abatement import AC
@@ -46,6 +47,7 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
         units=quant.unit("currency_unit"),
     )
 
+    # The global mitigation cost pool:
     constraints.extend(
         [
             RegionalConstraint(
@@ -53,55 +55,65 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
                 == AC(m.relative_abatement[t, r], m, t, r) * m.baseline[t, r],
                 "abatement_costs",
             ),
+            GlobalConstraint(
+                lambda m, t: sum(m.abatement_costs[t, r] for r in m.regions)
+                == sum(m.area_under_MAC[t, r] for r in m.regions),
+                "sum_abatement_equals_sum_area_under_mac",
+            ),
+        ]
+    )
+
+    ## Extra reporting variables:
+
+    m.paid_for_emission_reductions = Var(
+        m.t, m.regions, units=quant.unit("emissionsrate_unit")
+    )
+    m.global_emission_reduction_per_cost_unit = Var(
+        m.t, units=quant.unit("emissionsrate_unit / currency_unit")
+    )
+    m.import_export_emission_reduction_balance = Var(
+        m.t, m.regions, units=quant.unit("emissionsrate_unit")
+    )
+    m.import_export_mitigation_cost_balance = Var(
+        m.t, m.regions, units=quant.unit("currency_unit")
+    )
+    constraints.extend(
+        [
+            GlobalConstraint(
+                lambda m, t: m.global_emission_reduction_per_cost_unit[t]
+                == sum(m.regional_emission_reduction[t, r] for r in m.regions)
+                / soft_min(sum(m.area_under_MAC[t, r] for r in m.regions))
+                if t > 0
+                else Constraint.Skip,
+                "global_emission_reduction_per_cost_unit",
+            ),
+            RegionalConstraint(
+                lambda m, t, r: m.paid_for_emission_reductions[t, r]
+                == m.abatement_costs[t, r]
+                * m.global_emission_reduction_per_cost_unit[t]
+                if t > 0
+                else Constraint.Skip,
+                "paid_for_emission_reductions",
+            ),
+            # Import export of emission reduction balance: if positive: , if negative:
+            RegionalConstraint(
+                lambda m, t, r: m.import_export_emission_reduction_balance[t, r]
+                == m.paid_for_emission_reductions[t, r]
+                - m.regional_emission_reduction[t, r]
+                if t > 0
+                else Constraint.Skip,
+                "import_export_emission_reduction_balance",
+            ),
+            RegionalConstraint(
+                lambda m, t, r: m.import_export_mitigation_cost_balance[t, r]
+                == m.abatement_costs[t, r] - m.area_under_MAC[t, r],
+                "import_export_mitigation_cost_balance",
+            ),
         ]
     )
 
     # How are mitigation costs distributed over regions?
     m.min_rel_payment_level = Param()
     m.max_rel_payment_level = Param()
-    m.extra_paid_abatement = Var(
-        m.t,
-        m.regions,
-        initialize=0.0,
-        within=NonNegativeReals,
-        units=quant.unit("currency_unit"),
-    )
-    m.extra_received_abatement = Var(
-        m.t,
-        m.regions,
-        initialize=0.0,
-        within=NonNegativeReals,
-        units=quant.unit("currency_unit"),
-    )
-    constraints.extend(
-        [
-            RegionalConstraint(
-                lambda m, t, r: m.extra_paid_abatement[t, r]
-                <= (m.max_rel_payment_level - 1)
-                * m.area_under_MAC[t, r]  # TODO change " - 1"
-                if value(m.max_rel_payment_level) is not False
-                else Constraint.Skip
-            ),
-            RegionalConstraint(
-                lambda m, t, r: m.extra_received_abatement[t, r]
-                <= (1 - m.min_rel_payment_level)
-                * m.area_under_MAC[t, r]  # TODO change "1 - "
-                if value(m.min_rel_payment_level) is not False
-                else Constraint.Skip
-            ),
-            RegionalConstraint(
-                lambda m, t, r: m.abatement_costs[t, r]
-                == m.area_under_MAC[t, r]
-                + m.extra_paid_abatement[t, r]
-                - m.extra_received_abatement[t, r],
-                "abatement_is_real_costs_plus_extra_paid_minus_extra_received",
-            ),
-            GlobalConstraint(
-                lambda m, t: sum(m.extra_paid_abatement[t, r] for r in m.regions)
-                == sum(m.extra_received_abatement[t, r] for r in m.regions),
-                "total_extra_abatement_paid_equals_total_extra_abatement_received",
-            ),
-        ]
-    )
 
     return constraints

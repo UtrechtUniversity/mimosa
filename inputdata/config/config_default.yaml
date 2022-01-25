@@ -364,6 +364,18 @@ emissions:
 
 ##################
 
+burden sharing:
+  regime:
+    descr: Type of burden sharing to be used
+    type: enum
+    values:
+      - noregime
+      - equal_abatement_costs
+      - equal_total_costs
+    default: noregime
+
+##################
+
 temperature:
   initial:
     descr: Temperature in initial year of model run (2020 by default).
@@ -404,6 +416,7 @@ model:
     values:
       - notrade
       - globalcostpool
+      - emissiontrade
     default: notrade
 
   welfare module:

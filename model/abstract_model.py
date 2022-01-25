@@ -7,6 +7,7 @@ Contains all model equations and constraints
 import numpy as np
 from model.common import Param, AbstractModel, Set, add_constraint
 from model.components import (
+    burdensharing,
     emissions,
     abatement,
     emissiontrade,
@@ -99,10 +100,15 @@ def create_abstract_model(
         constraints.extend(emissiontrade.notrade.get_constraints(m))
     elif emissiontrade_module == "globalcostpool":
         constraints.extend(emissiontrade.globalcostpool.get_constraints(m))
+    elif emissiontrade_module == "emissiontrade":
+        constraints.extend(emissiontrade.emissiontrade.get_constraints(m))
     else:
         raise NotImplementedError(
             f"Emission trading module `{emissiontrade_module}` not implemented"
         )
+
+    # Burden sharing regime
+    constraints.extend(burdensharing.get_constraints(m))
 
     # Cobb-Douglas and economics
     constraints.extend(cobbdouglas.get_constraints(m))

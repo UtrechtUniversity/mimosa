@@ -54,6 +54,9 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
         bounds=(0, 2),
         units=quant.unit("fraction_of_baseline_emissions"),
     )
+    m.regional_emission_reduction = Var(
+        m.t, m.regions, units=quant.unit("emissionsrate_unit")
+    )
     m.cumulative_emissions = Var(m.t, units=quant.unit("emissions_unit"))
     m.global_emissions = Var(m.t, units=quant.unit("emissionsrate_unit"))
 
@@ -90,6 +93,11 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
             RegionalInitConstraint(
                 lambda m, r: m.regional_emissions[0, r]
                 == m.baseline_emissions(m.year(0), r)
+            ),
+            RegionalConstraint(
+                lambda m, t, r: m.regional_emission_reduction[t, r]
+                == m.baseline[t, r] - m.regional_emissions[t, r],
+                "regional_emission_reduction",
             ),
             # Global emissions (sum from regional emissions)
             GlobalConstraint(

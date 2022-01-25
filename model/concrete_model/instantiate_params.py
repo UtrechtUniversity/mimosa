@@ -136,6 +136,7 @@ class InstantiatedModel:
             "non_increasing_emissions_after_2100": V(
                 params["emissions"]["non increasing emissions after 2100"]
             ),
+            "burden_sharing_regime": V(params["burden sharing"]["regime"]),
             "T0": V(quant(params["temperature"]["initial"], "temperature_unit")),
             "temperature_target": V(
                 quant(params["temperature"]["target"], "temperature_unit")
