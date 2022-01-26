@@ -117,7 +117,7 @@ class RegionalInitConstraint(GeneralConstraint):
         return Constraint(m.regions, rule=self.rule)
 
 
-class GeneralCloseToConstraint(GeneralConstraint):
+class GeneralSoftEqualityConstraint(GeneralConstraint):
     def __init__(
         self,
         rule_lhs: typing.Callable,
@@ -147,7 +147,7 @@ class GeneralCloseToConstraint(GeneralConstraint):
         self.ignore_if = ignore_if
 
 
-class GlobalCloseToConstraint(GeneralCloseToConstraint):
+class GlobalSoftEqualityConstraint(GeneralSoftEqualityConstraint):
     def to_pyomo_constraint(self, m):
         eps = self.epsilon
         rule_lhs = self.rule
@@ -155,12 +155,12 @@ class GlobalCloseToConstraint(GeneralCloseToConstraint):
 
         upperbound = (
             lambda m, t: rule_lhs(m, t) <= (1 + eps) * rule_rhs(m, t)
-            if not self.ignore_if(m)
+            if not self.ignore_if(m, t)
             else Constraint.Skip
         )
         lowerbound = (
             lambda m, t: rule_lhs(m, t) >= (1 - eps) * rule_rhs(m, t)
-            if not self.ignore_if(m)
+            if not self.ignore_if(m, t)
             else Constraint.Skip
         )
         return [
@@ -169,7 +169,7 @@ class GlobalCloseToConstraint(GeneralCloseToConstraint):
         ]
 
 
-class RegionalCloseToConstraint(GeneralCloseToConstraint):
+class RegionalSoftEqualityConstraint(GeneralSoftEqualityConstraint):
     def to_pyomo_constraint(self, m):
         eps = self.epsilon
         rule_lhs = self.rule
@@ -177,12 +177,12 @@ class RegionalCloseToConstraint(GeneralCloseToConstraint):
 
         upperbound = (
             lambda m, t, r: rule_lhs(m, t, r) <= (1 + eps) * rule_rhs(m, t, r)
-            if not self.ignore_if(m)
+            if not self.ignore_if(m, t, r)
             else Constraint.Skip
         )
         lowerbound = (
             lambda m, t, r: rule_lhs(m, t, r) >= (1 - eps) * rule_rhs(m, t, r)
-            if not self.ignore_if(m)
+            if not self.ignore_if(m, t, r)
             else Constraint.Skip
         )
         return [
