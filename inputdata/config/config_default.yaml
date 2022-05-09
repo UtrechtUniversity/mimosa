@@ -229,6 +229,12 @@ economics:
       unit: currency_unit/emissionsrate_unit
       default: 2442 USD2005/tCO2
 
+    SSP_calibration_factor:
+      descr: Multiplication factor for the MAC to get SSP specific MAC
+      type: float
+      min: 0
+      default: 1
+
   abatement costs:
     allow trade:
       descr: Allow emission trading between regions
@@ -403,6 +409,31 @@ temperature:
     descr: >-
       Temperature target in 2100 (and beyond).
       Can also be false, then no temperature target is imposed
+    type: quantity
+    unit: temperature_unit
+    default: False
+    can_be_false: True
+
+  target_only_upper_limit:
+    descr: >-
+      If True, the temperature target in 2100 is only an upper limit.
+      If False, the target functions as a lower limit as well (with a 
+      relaxation parameter, epsilon)
+    type: bool
+    default: True
+
+  target_also_beyond_2100:
+    descr: >-
+      If True, the temperature target is valid for 2100 and beyond. If False,
+      the target is only for 2100. For beyond 2100, the stabilisation_target is used
+      (if that one is also False, there is no temperature target beyond 2100)
+    type: bool
+    default: True
+
+  stabilisation_target:
+    descr: >-
+      Temperature target beyond 2100. Only used when target_also_beyond_2100 is false.
+      Can also be false, then no temperature target beyond 2100 is imposed
     type: quantity
     unit: temperature_unit
     default: False
