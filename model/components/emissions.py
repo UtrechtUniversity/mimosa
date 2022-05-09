@@ -121,7 +121,6 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
         m.t, initialize=lambda m, t: m.T0, units=quant.unit("degC_above_PI")
     )
     m.TCRE = Param()
-    m.temperature_target = Param()
     constraints.extend(
         [
             GlobalConstraint(
@@ -130,11 +129,66 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
                 "temperature",
             ),
             GlobalInitConstraint(lambda m: m.temperature[0] == m.T0),
+        ]
+    )
+    m.temperature_target = Param()
+    m.temperature_target_only_upper_limit = Param()
+    m.temperature_target_also_beyond_2100 = Param()
+    m.temperature_stabilisation_target = Param()
+
+    eps = 0.002
+
+    def _temperature_target_constraint(m, t):
+        year = m.year(t)
+
+        if year < 2100:
+            return Constraint.Skip
+
+        if year == 2100:
+            if value(m.temperature_target) is False:
+                return Constraint.Skip
+
+            # Check if temperature target for 2100 is only an upper limit
+            if m.temperature_target_only_upper_limit:
+                return m.temperature[t] <= m.temperature_target
+            else:
+                return m.temperature[t] <= (1 + eps) * m.temperature_target
+
+        # Beyond 2100, check which target to use
+        target = (
+            m.temperature_target
+            if m.temperature_target_also_beyond_2100
+            else m.temperature_stabilisation_target
+        )
+        if value(target) is False:
+            return Constraint.Skip
+        return m.temperature[t] <= target
+
+    def _temperature_target_lowerbound(m, t):
+        if m.temperature_target_only_upper_limit or (m.year(t) != 2100 and t != m.t.last()):
+            return Constraint.Skip
+
+        if m.year(t) == 2100:
+            target = m.temperature_target
+        else:
+            target = (
+                m.temperature_target
+                if m.temperature_target_also_beyond_2100
+                else m.temperature_stabilisation_target
+            )
+        return m.temperature[t] >= (1 - eps) * target
+
+    constraints.extend(
+        [
             GlobalConstraint(
-                lambda m, t: m.temperature[t] <= m.temperature_target
-                if (m.year(t) >= 2100 and value(m.temperature_target) is not False)
-                else Constraint.Skip,
-                name="temperature_target",
+                _temperature_target_constraint, name="temperature_targets"
+            ),
+            GlobalConstraint(
+                _temperature_target_lowerbound, name="temperature_targets_lowerbound"
+            ),
+            GlobalInitConstraint(
+                lambda m: m.global_emissions[m.t.last()] <= 0.0,
+                name="final_emissions_zero",
             ),
         ]
     )

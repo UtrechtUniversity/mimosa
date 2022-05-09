@@ -134,6 +134,15 @@ class InstantiatedModel:
             "temperature_target": V(
                 quant(params["temperature"]["target"], "temperature_unit")
             ),
+            "temperature_target_only_upper_limit": V(
+                params["temperature"]["target_only_upper_limit"]
+            ),
+            "temperature_target_also_beyond_2100": V(
+                params["temperature"]["target_also_beyond_2100"]
+            ),
+            "temperature_stabilisation_target": V(
+                quant(params["temperature"]["stabilisation_target"], "temperature_unit")
+            ),
             "TCRE": V(
                 quant(
                     params["temperature"]["TCRE"],
@@ -154,6 +163,7 @@ class InstantiatedModel:
                     params["economics"]["MAC"]["gamma"],
                     "currency_unit/emissionsrate_unit",
                 )
+                * params["economics"]["MAC"]["SSP_calibration_factor"]
             ),
             "MAC_beta": V(params["economics"]["MAC"]["beta"]),
             "MAC_scaling_factor": self.regional_param_store.get("MAC", "kappa"),
