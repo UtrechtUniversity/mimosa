@@ -45,6 +45,10 @@ class InstantiatedModel:
         )
         self.abstract_model.TFP = self.data_store.data_object("TFP")
 
+        self.abstract_model.MAC_time_dependent_calibration_factor = self.data_store.data_object_from_dict(
+            self.params["economics"]["MAC"]["time_dependent_calibration_factor"]
+        )
+
     def create_instance(self):
         return self.abstract_model.create_instance(self.instance_data)
 
@@ -296,10 +300,14 @@ class InstantiatedModel:
             }
 
             # SLR damages:
+            damage_quantile_slr = self.params["economics"]["damages"].get("quantile_slr", False)
+            if damage_quantile_slr is False: # If quantile SLR is False
+                damage_quantile_slr = damage_quantile
+
             for slr_adapt in ["opt", "no"]:
                 adapt_prfx = "Ad" if slr_adapt == "opt" else "NoAd"
                 prfx = f"SLR-{adapt_prfx}"
-                factor_slr_ad = f"{prfx}_a (q={damage_quantile})"
+                factor_slr_ad = f"{prfx}_a (q={damage_quantile_slr})"
 
                 parameter_mapping.update(
                     {

@@ -235,6 +235,26 @@ economics:
       min: 0
       default: 1
 
+    time_dependent_calibration_factor:
+      descr: >-
+        Dictionary of year-value pairs giving time dependent multiplication
+        factor of the SSP2 MAC. Linear interpolation is taken in between keyframes.
+        Used for time-dependent changes between SSPs.
+      type: dict
+      keys:
+        descr: Year
+        type: float
+        min: 1900
+        max: 2200
+      values:
+        descr: >-
+          Multiplication factor for the MAC
+        type: float
+        min: 0
+        max: 10
+      default:
+        2020: 1
+
   abatement costs:
     allow trade:
       descr: Allow emission trading between regions
@@ -284,6 +304,16 @@ economics:
       min: 0.025
       max: 0.975
       default: 0.5
+
+    quantile_slr:
+      descr: >-
+        Damage quantile for SLR only (Only used for COACCH).
+        If False: uses the same as non-SLR quantile
+      type: float
+      min: 0.025
+      max: 0.975
+      can_be_false: True
+      default: False
 
     coacch_slr_adapt:
       descr: >-

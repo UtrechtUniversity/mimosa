@@ -93,7 +93,7 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
         units=quant.unit("currency_unit"),
     )
     m.rel_abatement_costs = Var(
-        m.t, m.regions, bounds=(0, 0.3), units=quant.unit("fraction_of_GDP")
+        m.t, m.regions, bounds=(0, 0.4), units=quant.unit("fraction_of_GDP")
     )
     m.MAC_gamma = Param()
     m.MAC_beta = Param()
@@ -117,7 +117,8 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
                     m.learning_factor[t],
                     m.MAC_gamma,
                     m.MAC_beta,
-                    m.MAC_scaling_factor[r],
+                    m.MAC_scaling_factor[r]
+                    * m.MAC_time_dependent_calibration_factor(m.year(t)),
                 )
                 * m.baseline[t, r],
                 "abatement_costs",
@@ -134,7 +135,8 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
                     m.learning_factor[t],
                     m.MAC_gamma,
                     m.MAC_beta,
-                    m.MAC_scaling_factor[r],
+                    m.MAC_scaling_factor[r]
+                    * m.MAC_time_dependent_calibration_factor(m.year(t)),
                 ),
                 "carbonprice",
             ),

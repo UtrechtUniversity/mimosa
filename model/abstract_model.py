@@ -53,6 +53,7 @@ def create_abstract_model(
     m.TFP = lambda year, region: None
     m.GDP = lambda year, region: None
     m.carbon_intensity = lambda year, region: None
+    m.MAC_time_dependent_calibration_factor = lambda year: None
 
     def baseline_cumulative(year_start, year_end, region):
         years = np.linspace(year_start, year_end, 100)

@@ -155,6 +155,11 @@ class DataStore:
         """
         return lambda year, region: self._interp_data(year, region, variable)
 
+    def data_object_from_dict(self, keyframes: dict) -> Callable[[int], float]:
+        return lambda year: np.interp(
+            year, list(keyframes.keys()), list(keyframes.values())
+        )
+
     def __repr__(self):
         return "DataStore with data values {} calculated on the years {}-{} from input file {} for the regions {} and {}".format(
             list(self._data_values.keys()),
