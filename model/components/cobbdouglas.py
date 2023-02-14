@@ -62,52 +62,102 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     m.ignore_damages = Param()
 
     # Cobb-Douglas, GDP, investments, capital and consumption
-    constraints.extend(
-        [
-            RegionalConstraint(
-                lambda m, t, r: m.GDP_gross[t, r]
-                == economics.calc_GDP(
-                    m.TFP(m.year(t), r),
-                    m.L(m.year(t), r),
-                    soft_min(m.capital_stock[t, r], scale=10),
-                    m.alpha,
-                ),
-                "GDP_gross",
-            ),
-            RegionalConstraint(
-                lambda m, t, r: m.GDP_net[t, r]
-                == m.GDP_gross[t, r]
-                * (1 - (m.damage_costs[t, r] if not value(m.ignore_damages) else 0))
-                - m.abatement_costs[t, r],
-                "GDP_net",
-            ),
-            RegionalConstraint(
-                lambda m, t, r: m.investments[t, r] == m.sr * m.GDP_net[t, r],
-                "investments",
-            ),
-            RegionalConstraint(
-                lambda m, t, r: m.consumption[t, r] == (1 - m.sr) * m.GDP_net[t, r],
-                "consumption",
-            ),
-            RegionalConstraint(
-                lambda m, t, r: (
-                    m.capital_stock[t, r]
-                    == m.capital_stock[t - 1, r]
-                    + m.dt
-                    * economics.calc_dKdt(
-                        m.capital_stock[t, r], m.dk, m.investments[t, r], m.dt
-                    )
-                )
-                if t > 0
-                else Constraint.Skip,
-                "capital_stock",
-            ),
-            RegionalInitConstraint(
-                lambda m, r: m.capital_stock[0, r]
-                == m.init_capitalstock_factor[r] * m.GDP(m.year(0), r)
-            ),
-        ]
+    @m.Constraint(
+        m.t,
+        m.regions,
+        doc="""
+        Documentation of constraint_GDP_gross: something with Cobb-Douglas
+    """,
     )
+    def constraint_GDP_gross(m, t, r):
+        """
+        Calculates the gross GDP using the Cobb-Douglas equation
+        """
+        return m.GDP_gross[t, r] == economics.calc_GDP(
+            m.TFP(m.year(t), r),
+            m.L(m.year(t), r),
+            soft_min(m.capital_stock[t, r], scale=10),
+            m.alpha,
+        )
+
+    @m.Constraint(m.t, m.regions)
+    def constraint_GDP_net(m, t, r):
+        damage_factor = m.damage_costs[t, r] if not value(m.ignore_damages) else 0
+        return (
+            m.GDP_net[t, r]
+            == m.GDP_gross[t, r] * (1 - damage_factor) - m.abatement_costs[t, r]
+        )
+
+    @m.Constraint(m.t, m.regions)
+    def constraint_investments(m, t, r):
+        return m.investments[t, r] == m.sr * m.GDP_net[t, r]
+
+    @m.Constraint(m.t, m.regions)
+    def constraint_consumption(m, t, r):
+        return m.consumption[t, r] == (1 - m.sr) * m.GDP_net[t, r]
+
+    @m.Constraint(m.t, m.regions)
+    def constraint_capital_stock(m, t, r):
+        if t == 0:
+            return Constraint.Skip
+        return m.capital_stock[t, r] == m.capital_stock[
+            t - 1, r
+        ] + m.dt * economics.calc_dKdt(
+            m.capital_stock[t, r], m.dk, m.investments[t, r], m.dt
+        )
+
+    @m.Constraint(m.regions)
+    def constraint_init_cap_stock(m, r):
+        return m.capital_stock[0, r] == m.init_capitalstock_factor[r] * m.GDP(
+            m.year(0), r
+        )
+
+    # constraints.extend(
+    #     [
+    #         RegionalConstraint(
+    #             lambda m, t, r: m.GDP_gross[t, r]
+    #             == economics.calc_GDP(
+    #                 m.TFP(m.year(t), r),
+    #                 m.L(m.year(t), r),
+    #                 soft_min(m.capital_stock[t, r], scale=10),
+    #                 m.alpha,
+    #             ),
+    #             "GDP_gross",
+    #         ),
+    #         RegionalConstraint(
+    #             lambda m, t, r: m.GDP_net[t, r]
+    #             == m.GDP_gross[t, r]
+    #             * (1 - (m.damage_costs[t, r] if not value(m.ignore_damages) else 0))
+    #             - m.abatement_costs[t, r],
+    #             "GDP_net",
+    #         ),
+    #         RegionalConstraint(
+    #             lambda m, t, r: m.investments[t, r] == m.sr * m.GDP_net[t, r],
+    #             "investments",
+    #         ),
+    #         RegionalConstraint(
+    #             lambda m, t, r: m.consumption[t, r] == (1 - m.sr) * m.GDP_net[t, r],
+    #             "consumption",
+    #         ),
+    #         RegionalConstraint(
+    #             lambda m, t, r: (
+    #                 m.capital_stock[t, r]
+    #                 == m.capital_stock[t - 1, r]
+    #                 + m.dt
+    #                 * economics.calc_dKdt(
+    #                     m.capital_stock[t, r], m.dk, m.investments[t, r], m.dt
+    #                 )
+    #             )
+    #             if t > 0
+    #             else Constraint.Skip,
+    #             "capital_stock",
+    #         ),
+    #         RegionalInitConstraint(
+    #             lambda m, r: m.capital_stock[0, r]
+    #             == m.init_capitalstock_factor[r] * m.GDP(m.year(0), r)
+    #         ),
+    #     ]
+    # )
 
     return constraints
 

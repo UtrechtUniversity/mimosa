@@ -12,9 +12,9 @@ economics:
     depreciation of capital: 0.05
     savings rate: 0.21
   MAC:
-    beta: 2
+    beta: 3
     rho: 0.82
-    gamma: 2442 USD2005/tCO2
+    gamma: 2601 USD2005/tCO2
   abatement costs:
     allow trade: False
   damages:

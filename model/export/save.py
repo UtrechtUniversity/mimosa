@@ -16,7 +16,10 @@ from model.common import get_all_variables, value
 def save_output(params, m, experiment=None, hash_suffix=True, folder="output"):
 
     # 1. Create a unique identifier
-    settings_hash = hashlib.md5(json.dumps(params).encode()).hexdigest()[:9]
+    if hash_suffix:
+        settings_hash = hashlib.md5(json.dumps(params).encode()).hexdigest()[:9]
+    else:
+        settings_hash = ""
 
     # 2. Save the Pyomo variables and data functions
     all_variables = get_all_variables(m)
