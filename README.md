@@ -1,6 +1,5 @@
 # MIMOSA: Mathematical Integrated Model for Optimal and Stylised Assessment
 
-Also called KICE (**K**ICE **I**ntegrated model for **C**limate and **E**conomy).
 
 ### General
 
