@@ -114,23 +114,27 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
             ),
             RegionalConstraint(
                 lambda m, t, r: (
-                    m.SLR_damages[t, r]
-                    if value(m.SLR_adapt_param) == 0
-                    and value(m.SLR_adapt_param) is not False
-                    else m.SLR_damages_no_adapt[t, r]
+                    (
+                        m.SLR_damages[t, r]
+                        if value(m.SLR_adapt_param) == 0
+                        and value(m.SLR_adapt_param) is not False
+                        else m.SLR_damages_no_adapt[t, r]
+                    )
+                    == soft_max(
+                        m.damage_scale_factor
+                        * damage_fct(
+                            m.total_SLR[t],
+                            m.total_SLR[0],
+                            m,
+                            r,
+                            is_slr=True,
+                            slr_adapt=False,
+                        ),
+                        1,
+                    )
                 )
-                == soft_max(
-                    m.damage_scale_factor
-                    * damage_fct(
-                        m.total_SLR[t],
-                        m.total_SLR[0],
-                        m,
-                        r,
-                        is_slr=True,
-                        slr_adapt=False,
-                    ),
-                    1,
-                ),
+                if t > 0
+                else Constraint.Skip,
                 "SLR_damages_no_adapt",
             ),
             # Interpolate between optimal and no adaptation
@@ -139,10 +143,16 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
                 lambda m, t, r: m.SLR_damages[t, r]
                 == m.SLR_adapt_level[t, r] * m.SLR_damages_opt_adapt[t, r]
                 + (1 - m.SLR_adapt_level[t, r]) * m.SLR_damages_no_adapt[t, r]
-                if (value(m.SLR_adapt_param) > 0 and value(m.SLR_adapt_param) < 1)
-                or value(m.SLR_adapt_param) is False
+                if (
+                    (value(m.SLR_adapt_param) > 0 and value(m.SLR_adapt_param) < 1)
+                    or value(m.SLR_adapt_param) is False
+                )
+                and t > 0
                 else Constraint.Skip,
                 "SLR_damages",
+            ),
+            RegionalInitConstraint(
+                lambda m, r: m.SLR_damages[0, r] == 0, "SLR_damages_init"
             ),
         ]
     )
