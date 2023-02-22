@@ -38,17 +38,26 @@ def get_constraints(m: AbstractModel) -> Tuple[Objective, Sequence[GeneralConstr
 
     m.NPV = Var(m.t)
     m.PRTP = Param()
+
+    # Extra variable used to extend the objective function if necessary. By default,
+    # this variable is equal to zero
+    m.extra_NPV_objective = Var(m.t)
     constraints.extend(
         [
             GlobalConstraint(
                 lambda m, t: m.NPV[t]
                 == m.NPV[t - 1]
                 + m.dt * exp(-m.PRTP * (m.year(t) - m.beginyear)) * m.yearly_welfare[t]
+                + m.extra_NPV_objective[t]
                 if t > 0
                 else Constraint.Skip,
                 name="NPV",
             ),
             GlobalInitConstraint(lambda m: m.NPV[0] == 0),
+            GlobalConstraint(
+                lambda m, t: m.extra_NPV_objective[t] == 0.0,
+                name="empty_extra_NPV_objective",
+            ),
         ]
     )
 

@@ -24,6 +24,9 @@ def set_constraints_fixed_variables(m, params):
         interp_data = _get_interp_data(filepath_or_data, data_cache, variable_name)
         extra_constraints.extend(_fixed_data_constraint(m, variable_name, interp_data))
 
+    # Extend constraints with "extra_constraints" from input config
+    extra_constraints.extend(params["simulation"]["extra_constraints"])
+
     # Add constraints to concrete model
     for constraint in extra_constraints:
         add_constraint(m, constraint.to_pyomo_constraint(m), constraint.name)

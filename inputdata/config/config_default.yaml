@@ -531,3 +531,10 @@ simulation:
       descr: constraint name to be disabled, as used in the model
       type: str
     default:
+
+  extra_constraints:
+    descr: >-
+      List of extra constraints formulated as lists of GlobalConstraints, RegionalConstraints,
+      GlobalInitConstraints or RegionalInitConstraints
+    type: list
+    default:

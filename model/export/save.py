@@ -16,7 +16,7 @@ def save_output(params, m, experiment=None, hash_suffix=False, folder="output"):
 
     # 1. Create a unique identifier
     if hash_suffix:
-        settings_hash = hashlib.md5(json.dumps(params).encode()).hexdigest()[:9]
+        settings_hash = hashlib.md5(json.dumps(params, default=lambda x: x.__dict__).encode()).hexdigest()[:9]
     else:
         settings_hash = ""
 
@@ -42,7 +42,7 @@ def save_output(params, m, experiment=None, hash_suffix=False, folder="output"):
 
     # 3. Save the param file
     with open(f"{folder}/{filename}.csv.params.json", "w") as fh:
-        json.dump(params, fh)
+        json.dump(params, fh, default=lambda x: x.__dict__)
 
 
 def var_to_row(rows, m, var, is_regional, unit):
