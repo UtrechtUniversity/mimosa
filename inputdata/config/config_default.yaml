@@ -214,7 +214,7 @@ economics:
       type: float
       min: 0.01
       max: 10
-      default: 2
+      default: 3
 
     rho:
       descr: Learning by doing rate (needs more explanation)
@@ -227,7 +227,7 @@ economics:
       descr: Calibration level of the MAC (carbon price for 100% reduction)
       type: quantity
       unit: currency_unit/emissionsrate_unit
-      default: 2442 USD2005/tCO2
+      default: 2601 USD2005/tCO2
 
   abatement costs:
     allow trade:
