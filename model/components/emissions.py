@@ -107,7 +107,7 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
             GlobalConstraint(
                 lambda m, t: m.cumulative_emissions[t]
                 == m.cumulative_emissions[t - 1]
-                + m.dt * 0.5 * (m.global_emissions[t] + m.global_emissions[t - 1])
+                + m.dt * (m.global_emissions[t] + m.global_emissions[t - 1]) / 2
                 if t > 0
                 else Constraint.Skip,
                 "cumulative_emissions",
@@ -165,7 +165,9 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
         return m.temperature[t] <= target
 
     def _temperature_target_lowerbound(m, t):
-        if m.temperature_target_only_upper_limit or (m.year(t) != 2100 and t != m.t.last()):
+        if m.temperature_target_only_upper_limit or (
+            m.year(t) != 2100 and t != m.t.last()
+        ):
             return Constraint.Skip
 
         if m.year(t) == 2100:
