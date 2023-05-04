@@ -163,7 +163,9 @@ class InstantiatedModel:
                 )
             ),
             "MAC_beta": V(params["economics"]["MAC"]["beta"]),
-            "MAC_scaling_factor": self.regional_param_store.get("MAC", "kappa"),
+            "MAC_scaling_factor": self.regional_param_store.get(
+                "MAC", params["economics"]["MAC"]["regional calibration factor"]
+            ),
             "init_capitalstock_factor": self.regional_param_store.get(
                 "economics", "init_capital_factor"
             ),
@@ -174,6 +176,9 @@ class InstantiatedModel:
             "inequal_aversion": V(params["economics"]["inequal_aversion"]),
             "PRTP": V(params["economics"]["PRTP"]),
         }
+
+        if "custom_mapping" in params["simulation"]:
+            parameter_mapping.update(params["simulation"]["custom_mapping"])
 
         instance_data[None].update(parameter_mapping)
 
