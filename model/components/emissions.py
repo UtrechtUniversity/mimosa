@@ -105,7 +105,7 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
             # Cumulative global emissions
             GlobalConstraint(
                 lambda m, t: m.cumulative_emissions[t]
-                == m.cumulative_emissions[t - 1] + m.dt * m.global_emissions[t]
+                == m.cumulative_emissions[t - 1] + m.dt * (m.global_emissions[t] + m.global_emissions[t - 1]) / 2
                 if t > 0
                 else Constraint.Skip,
                 "cumulative_emissions",
