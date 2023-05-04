@@ -5,7 +5,7 @@ Type: no trade
 """
 
 from typing import Sequence
-from model.common import AbstractModel, GeneralConstraint, RegionalConstraint
+from model.common import AbstractModel, GeneralConstraint, RegionalConstraint, Param
 
 from model.components.abatement import AC
 
@@ -26,6 +26,8 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
         )
     """
     constraints = []
+
+    m.import_export_emission_reduction_balance = Param(m.t, m.regions, initialize=0)
 
     constraints.extend(
         [

@@ -81,7 +81,7 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     m.abatement_costs = Var(
         m.t,
         m.regions,
-        within=NonNegativeReals,
+        # within=NonNegativeReals,
         initialize=0,
         units=quant.unit("currency_unit"),
     )
@@ -125,6 +125,36 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
                 / sum(m.GDP_gross[t, r] for r in m.regions),
                 "global_rel_abatement_costs",
             )
+        ]
+    )
+
+    # Calculate average global emission reduction per cost unit
+    # and average cost per unit emission reduction
+
+    m.global_emission_reduction_per_cost_unit = Var(
+        m.t, units=quant.unit("emissionsrate_unit / currency_unit")
+    )
+    m.global_cost_per_emission_reduction_unit = Var(
+        m.t, units=quant.unit("currency_unit / emissionsrate_unit")
+    )
+    constraints.extend(
+        [
+            GlobalConstraint(
+                lambda m, t: m.global_emission_reduction_per_cost_unit[t]
+                == sum(m.regional_emission_reduction[t, r] for r in m.regions)
+                / soft_min(sum(m.abatement_costs[t, r] for r in m.regions))
+                if t > 0
+                else Constraint.Skip,
+                "global_emission_reduction_per_cost_unit",
+            ),
+            GlobalConstraint(
+                lambda m, t: m.global_cost_per_emission_reduction_unit[t]
+                == sum(m.abatement_costs[t, r] for r in m.regions)
+                / soft_min(sum(m.regional_emission_reduction[t, r] for r in m.regions))
+                if t > 0
+                else Constraint.Skip,
+                "global_cost_per_emission_reduction_unit",
+            ),
         ]
     )
 

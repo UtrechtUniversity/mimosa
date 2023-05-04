@@ -68,9 +68,6 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     m.paid_for_emission_reductions = Var(
         m.t, m.regions, units=quant.unit("emissionsrate_unit")
     )
-    m.global_emission_reduction_per_cost_unit = Var(
-        m.t, units=quant.unit("emissionsrate_unit / currency_unit")
-    )
     m.import_export_emission_reduction_balance = Var(
         m.t, m.regions, units=quant.unit("emissionsrate_unit")
     )
@@ -79,14 +76,6 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     )
     constraints.extend(
         [
-            GlobalConstraint(
-                lambda m, t: m.global_emission_reduction_per_cost_unit[t]
-                == sum(m.regional_emission_reduction[t, r] for r in m.regions)
-                / soft_min(sum(m.area_under_MAC[t, r] for r in m.regions))
-                if t > 0
-                else Constraint.Skip,
-                "global_emission_reduction_per_cost_unit",
-            ),
             RegionalConstraint(
                 lambda m, t, r: m.paid_for_emission_reductions[t, r]
                 == m.abatement_costs[t, r]

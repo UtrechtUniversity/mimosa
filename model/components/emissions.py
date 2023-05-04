@@ -102,7 +102,9 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
             # Global emissions (sum from regional emissions)
             GlobalConstraint(
                 lambda m, t: m.global_emissions[t]
-                == sum(m.regional_emissions[t, r] for r in m.regions),
+                == sum(m.regional_emissions[t, r] for r in m.regions)
+                if t > 0
+                else Constraint.Skip,
                 "global_emissions",
             ),
             GlobalInitConstraint(
