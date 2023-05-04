@@ -374,7 +374,7 @@ temperature:
     descr: Temperature in initial year of model run (2020 by default).
     type: quantity
     unit: temperature_unit
-    default: 1.096224 delta_degC
+    default: 1.16 delta_degC
 
   TCRE:
     descr: Transient Climate Response to CO2 Emissions
