@@ -11,6 +11,7 @@ from model.components import (
     emissions,
     abatement,
     emissiontrade,
+    financialtransfer,
     cobbdouglas,
     damages,
     objective,
@@ -27,10 +28,10 @@ from model.components import (
 def create_abstract_model(
     damage_module: str,
     emissiontrade_module: str,
+    financialtransfer_module: str,
     welfare_module: str,
     objective_module: str,
 ) -> AbstractModel:
-
     m = AbstractModel()
 
     ## Constraints
@@ -105,6 +106,16 @@ def create_abstract_model(
     else:
         raise NotImplementedError(
             f"Emission trading module `{emissiontrade_module}` not implemented"
+        )
+
+    # Financial transfer
+    if financialtransfer_module == "notransfer":
+        constraints.extend(financialtransfer.notransfer.get_constraints(m))
+    elif financialtransfer_module == "globaldamagepool":
+        constraints.extend(financialtransfer.globaldamagepool.get_constraints(m))
+    else:
+        raise NotImplementedError(
+            f"Financial transfer module `{financialtransfer_module}` not implemented"
         )
 
     # Burden sharing regime

@@ -65,11 +65,16 @@ class MIMOSA:
         """
         damage_module = self.params["model"]["damage module"]
         emissiontrade_module = self.params["model"]["emissiontrade module"]
+        financialtransfer_module = self.params["model"]["financialtransfer module"]
         welfare_module = self.params["model"]["welfare module"]
         objective_module = self.params["model"]["objective module"]
 
         return create_abstract_model(
-            damage_module, emissiontrade_module, welfare_module, objective_module
+            damage_module,
+            emissiontrade_module,
+            financialtransfer_module,
+            welfare_module,
+            objective_module,
         )
 
     @utils.timer("Concrete model creation")
@@ -168,6 +173,7 @@ class MIMOSA:
             # Solve locally using ipopt
             opt: OptSolver = SolverFactory("ipopt")
             opt.options["halt_on_ampl_error"] = halt_on_ampl_error
+            # opt.options["max_iter"] = 5
             if ipopt_output_file is not None:
                 opt.options["output_file"] = ipopt_output_file
             results = opt.solve(

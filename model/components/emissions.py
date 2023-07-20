@@ -51,7 +51,7 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
         m.t,
         m.regions,
         initialize=0,
-        bounds=(0, 2),
+        bounds=(0, 2.5),
         units=quant.unit("fraction_of_baseline_emissions"),
     )
     m.regional_emission_reduction = Var(
@@ -59,6 +59,8 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     )
     m.cumulative_emissions = Var(m.t, units=quant.unit("emissions_unit"))
     m.global_emissions = Var(m.t, units=quant.unit("emissionsrate_unit"))
+
+    m.cumulative_emissions_trapz = Param()
 
     constraints.extend(
         [
@@ -115,7 +117,12 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
             # Cumulative global emissions
             GlobalConstraint(
                 lambda m, t: m.cumulative_emissions[t]
-                == m.cumulative_emissions[t - 1] + m.dt * (m.global_emissions[t] + m.global_emissions[t - 1]) / 2
+                == m.cumulative_emissions[t - 1]
+                + (
+                    (m.dt * (m.global_emissions[t] + m.global_emissions[t - 1]) / 2)
+                    if value(m.cumulative_emissions_trapz)
+                    else (m.dt * m.global_emissions[t])
+                )
                 if t > 0
                 else Constraint.Skip,
                 "cumulative_emissions",

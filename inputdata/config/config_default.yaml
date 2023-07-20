@@ -267,6 +267,16 @@ economics:
         - kappa_rel_abatement_0.75_2100
       default: kappa_rel_abatement_0.75_2050
 
+    rel_abatement_costs_min_level:
+      descr: >-
+        Minimum level of mitigation costs (rel to GDP). By default, this is 0:
+        no negative abatement costs are allowed. For certain burden sharing regimes,
+        this value can become negative to allow certain (small) financial transfers.
+      type: float
+      min: -2
+      max: 0
+      default: 0
+
   emission trade:
     min rel payment level:
       descr: >-
@@ -400,6 +410,15 @@ emissions:
       <<: *inertia_description
       default: -0.05
 
+  cumulative_emissions_trapz:
+    descr: >-
+      If true, calculate cumulative emissions using trapezoidal interpolation.
+      If false, cum. emissions are simply cum_emissions[t-1] + dt * cum_emissions[t].
+      This is less accurate, but better for numerical stability. For small dt the 
+      approximation is usually still acceptable.
+    type: bool
+    default: True
+
 ##################
 
 burden sharing:
@@ -411,7 +430,18 @@ burden sharing:
       - equal_abatement_costs
       - equal_total_costs
       - per_cap_convergence
+      - per_cap_convergence_fake # Per cap convergence performed in post-processing
     default: noregime
+  percapconv_year:
+    descr: >-
+      Year of convergence to per capita emission allowance 
+      (only used when burden sharing - regime is per_cap_convergence)
+      Can also be false, then always use grandfathering
+    type: float
+    min: 2020
+    max: 2200
+    default: 2050
+    can_be_false: True
 
 ##################
 
@@ -457,6 +487,14 @@ model:
       - globalcostpool
       - emissiontrade
     default: notrade
+
+  financialtransfer module:
+    descr: Financial transfer module to be used
+    type: enum
+    values:
+      - notransfer
+      - globaldamagepool
+    default: notransfer
 
   welfare module:
     descr: Welfare and utility module to be used

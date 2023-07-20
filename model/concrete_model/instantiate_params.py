@@ -16,7 +16,6 @@ class InstantiatedModel:
         data_store: DataStore,
         create_concrete_model: bool = True,
     ):
-
         self.abstract_model = abstract_model
         self.regional_param_store = regional_param_store
         self.data_store = data_store
@@ -49,7 +48,6 @@ class InstantiatedModel:
         return self.abstract_model.create_instance(self.instance_data)
 
     def get_param_values(self):
-
         damage_module = self.params["model"]["damage module"]
         emissiontrade_module = self.params["model"]["emissiontrade module"]
 
@@ -102,7 +100,6 @@ class InstantiatedModel:
     ########################
 
     def _set_instance_data_main(self, instance_data) -> None:
-
         params = self.params
         t_start = params["time"]["start"]
         t_end = params["time"]["end"]
@@ -136,7 +133,11 @@ class InstantiatedModel:
             "non_increasing_emissions_after_2100": V(
                 params["emissions"]["non increasing emissions after 2100"]
             ),
+            "cumulative_emissions_trapz": V(
+                params["emissions"]["cumulative_emissions_trapz"]
+            ),
             "burden_sharing_regime": V(params["burden sharing"]["regime"]),
+            "percapconv_year": V(params["burden sharing"]["percapconv_year"]),
             "T0": V(quant(params["temperature"]["initial"], "temperature_unit")),
             "temperature_target": V(
                 quant(params["temperature"]["target"], "temperature_unit")
@@ -165,6 +166,9 @@ class InstantiatedModel:
             "MAC_beta": V(params["economics"]["MAC"]["beta"]),
             "MAC_scaling_factor": self.regional_param_store.get(
                 "MAC", params["economics"]["MAC"]["regional calibration factor"]
+            ),
+            "rel_abatement_costs_min_level": V(
+                params["economics"]["MAC"]["rel_abatement_costs_min_level"]
             ),
             "init_capitalstock_factor": self.regional_param_store.get(
                 "economics", "init_capital_factor"
@@ -243,7 +247,6 @@ class InstantiatedModel:
         instance_data[None].update(parameter_mapping)
 
     def _set_instance_data_coacch(self, instance_data) -> None:
-
         try:
             damage_quantile = self.params["economics"]["damages"]["quantile"]
         except KeyError:
@@ -279,7 +282,6 @@ class InstantiatedModel:
             }
 
         else:
-
             factor_noslr = f"NoSLR_a (q={damage_quantile})"
             factor_slr_ad = f"{prfx}_a (q={damage_quantile})"
 

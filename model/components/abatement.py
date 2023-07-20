@@ -85,24 +85,28 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
         initialize=0,
         units=quant.unit("currency_unit"),
     )
-    m.rel_abatement_costs = Var(
-        m.t, m.regions, bounds=(0, 0.3), units=quant.unit("fraction_of_GDP")
-    )
+    m.rel_abatement_costs = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
     m.MAC_gamma = Param()
     m.MAC_beta = Param()
     m.MAC_scaling_factor = Param(m.regions)  # Regional scaling of the MAC
     m.carbonprice = Var(
         m.t,
         m.regions,
-        bounds=lambda m: (0, 1.5 * m.MAC_gamma),
+        bounds=lambda m: (0, 2 * m.MAC_gamma),
         units=quant.unit("currency_unit/emissions_unit"),
     )
+    m.rel_abatement_costs_min_level = Param()
     constraints.extend(
         [
             RegionalConstraint(
                 lambda m, t, r: m.rel_abatement_costs[t, r]
                 == m.abatement_costs[t, r] / m.GDP_gross[t, r],
                 "rel_abatement_costs",
+            ),
+            RegionalConstraint(
+                lambda m, t, r: m.rel_abatement_costs[t, r]
+                >= (m.rel_abatement_costs_min_level if t > 0 else 0.0),
+                "rel_abatement_costs_non_negative",
             ),
             RegionalConstraint(
                 lambda m, t, r: m.carbonprice[t, r]
@@ -168,7 +172,7 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
 
 def MAC(a, m, t, r):
     factor = m.learning_factor[t] * m.MAC_scaling_factor[r]
-    return factor * m.MAC_gamma * a ** m.MAC_beta
+    return factor * m.MAC_gamma * a**m.MAC_beta
 
 
 def AC(a, m, t, r):
