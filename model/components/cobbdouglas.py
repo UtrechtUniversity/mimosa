@@ -76,8 +76,13 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
                     m.L(m.year(t), r),
                     soft_min(m.capital_stock[t, r], scale=10),
                     m.alpha,
-                ),
+                )
+                if t > 0
+                else Constraint.Skip,
                 "GDP_gross",
+            ),
+            RegionalInitConstraint(
+                lambda m, r: m.GDP_gross[0, r] == m.GDP(m.year(0), r), "GDP_gross_init"
             ),
             RegionalConstraint(
                 lambda m, t, r: m.GDP_net[t, r]
