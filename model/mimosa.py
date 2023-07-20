@@ -64,10 +64,13 @@ class MIMOSA:
             AbstractModel: model corresponding to the damage/objective module combination
         """
         damage_module = self.params["model"]["damage module"]
+        emissiontrade_module = self.params["model"]["emissiontrade module"]
         welfare_module = self.params["model"]["welfare module"]
         objective_module = self.params["model"]["objective module"]
 
-        return create_abstract_model(damage_module, welfare_module, objective_module)
+        return create_abstract_model(
+            damage_module, emissiontrade_module, welfare_module, objective_module
+        )
 
     @utils.timer("Concrete model creation")
     def create_instance(self) -> ConcreteModel:

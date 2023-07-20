@@ -16,6 +16,7 @@ USD2005 = [currency] = usd = USD
 USD2010 = 1.11 USD2005
 
 tCO2 = [CO2emissions]
+people = [people]
 
 degC_above_PI = [temperature_above_pre_industrial]
 

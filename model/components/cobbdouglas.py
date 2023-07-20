@@ -55,7 +55,12 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
         initialize=lambda m, t, r: m.GDP(m.year(0), r),
         units=quant.unit("currency_unit"),
     )
-    m.GDP_net = Var(m.t, m.regions, units=quant.unit("currency_unit"))
+    m.GDP_net = Var(
+        m.t,
+        m.regions,
+        units=quant.unit("currency_unit"),
+        initialize=lambda m, t, r: m.GDP(m.year(0), r),
+    )
     m.investments = Var(m.t, m.regions, units=quant.unit("currency_unit"))
     m.consumption = Var(m.t, m.regions, units=quant.unit("currency_unit"))
 

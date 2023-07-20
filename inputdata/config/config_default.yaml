@@ -229,12 +229,45 @@ economics:
       unit: currency_unit/emissionsrate_unit
       default: 2601 USD2005/tCO2
 
-  abatement costs:
-    allow trade:
-      descr: Allow emission trading between regions
-      type: bool
-      default: False
+    regional calibration factor:
+      descr: >-
+        Column from mac.csv to be used for the regional MACs. The MACs are calibrated
+        from TIMER SSP2-RCP2.6 MACs at a given year and a given carbon price / abatement level.
+      type: enum
+      values:
+        - kappa_carbonprice_200_2030
+        - kappa_carbonprice_200_2050
+        - kappa_carbonprice_200_2070
+        - kappa_carbonprice_200_2100
+        - kappa_carbonprice_300_2030
+        - kappa_carbonprice_300_2050
+        - kappa_carbonprice_300_2070
+        - kappa_carbonprice_300_2100
+        - kappa_carbonprice_500_2030
+        - kappa_carbonprice_500_2050
+        - kappa_carbonprice_500_2070
+        - kappa_carbonprice_500_2100
+        - kappa_carbonprice_1000_2030
+        - kappa_carbonprice_1000_2050
+        - kappa_carbonprice_1000_2070
+        - kappa_carbonprice_1000_2100
+        - kappa_rel_abatement_0.25_2030
+        - kappa_rel_abatement_0.25_2050
+        - kappa_rel_abatement_0.25_2070
+        - kappa_rel_abatement_0.25_2100
+        - kappa_rel_abatement_0.4_2030
+        - kappa_rel_abatement_0.4_2050
+        - kappa_rel_abatement_0.4_2070
+        - kappa_rel_abatement_0.4_2100
+        - kappa_rel_abatement_0.5_2050
+        - kappa_rel_abatement_0.5_2070
+        - kappa_rel_abatement_0.5_2100
+        - kappa_rel_abatement_0.75_2050
+        - kappa_rel_abatement_0.75_2070
+        - kappa_rel_abatement_0.75_2100
+      default: kappa_rel_abatement_0.75_2050
 
+  emission trade:
     min rel payment level:
       descr: >-
         Which percentage of the area under the MAC of a region should it pay itself (minimum)?
@@ -369,6 +402,19 @@ emissions:
 
 ##################
 
+burden sharing:
+  regime:
+    descr: Type of burden sharing to be used
+    type: enum
+    values:
+      - noregime
+      - equal_abatement_costs
+      - equal_total_costs
+      - per_cap_convergence
+    default: noregime
+
+##################
+
 temperature:
   initial:
     descr: Temperature in initial year of model run (2020 by default).
@@ -402,6 +448,15 @@ model:
       - RICE2010
       - RICE2012
     default: COACCH
+
+  emissiontrade module:
+    descr: Emission trade module to be used
+    type: enum
+    values:
+      - notrade
+      - globalcostpool
+      - emissiontrade
+    default: notrade
 
   welfare module:
     descr: Welfare and utility module to be used
@@ -452,4 +507,9 @@ simulation:
     values:
       descr: constraint name to be disabled, as used in the model
       type: str
+    default:
+
+  custom_mapping:
+    descr: Custom mapping of parameter values or variables
+    type: dict
     default:

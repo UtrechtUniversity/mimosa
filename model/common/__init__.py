@@ -42,6 +42,8 @@ from .pyomo_utils import (
     GlobalInitConstraint,
     RegionalConstraint,
     RegionalInitConstraint,
+    GlobalSoftEqualityConstraint,
+    RegionalSoftEqualityConstraint,
     UsefulVar,
     soft_switch,
     soft_min,

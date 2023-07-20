@@ -51,11 +51,20 @@ class InstantiatedModel:
     def get_param_values(self):
 
         damage_module = self.params["model"]["damage module"]
+        emissiontrade_module = self.params["model"]["emissiontrade module"]
 
         instance_data = {None: {}}
 
         # Main instance data
         self._set_instance_data_main(instance_data)
+
+        ## Emission trade module:
+
+        # Instance data for globalcostpool emission trade module:
+        if emissiontrade_module == "globalcostpool":
+            self._set_instance_data_emissiontrade_globalcostpool(instance_data)
+
+        ## Damage module:
 
         # Instance data for RICE2010 damage/adaptation:
         if damage_module == "RICE2010":
@@ -127,6 +136,7 @@ class InstantiatedModel:
             "non_increasing_emissions_after_2100": V(
                 params["emissions"]["non increasing emissions after 2100"]
             ),
+            "burden_sharing_regime": V(params["burden sharing"]["regime"]),
             "T0": V(quant(params["temperature"]["initial"], "temperature_unit")),
             "temperature_target": V(
                 quant(params["temperature"]["target"], "temperature_unit")
@@ -153,7 +163,9 @@ class InstantiatedModel:
                 )
             ),
             "MAC_beta": V(params["economics"]["MAC"]["beta"]),
-            "MAC_scaling_factor": self.regional_param_store.get("MAC", "kappa"),
+            "MAC_scaling_factor": self.regional_param_store.get(
+                "MAC", params["economics"]["MAC"]["regional calibration factor"]
+            ),
             "init_capitalstock_factor": self.regional_param_store.get(
                 "economics", "init_capital_factor"
             ),
@@ -162,15 +174,11 @@ class InstantiatedModel:
             "sr": V(params["economics"]["GDP"]["savings rate"]),
             "elasmu": V(params["economics"]["elasmu"]),
             "inequal_aversion": V(params["economics"]["inequal_aversion"]),
-            "allow_trade": V(params["economics"]["abatement costs"]["allow trade"]),
-            "min_rel_payment_level": V(
-                params["economics"]["abatement costs"]["min rel payment level"]
-            ),
-            "max_rel_payment_level": V(
-                params["economics"]["abatement costs"]["max rel payment level"]
-            ),
             "PRTP": V(params["economics"]["PRTP"]),
         }
+
+        if "custom_mapping" in params["simulation"]:
+            parameter_mapping.update(params["simulation"]["custom_mapping"])
 
         instance_data[None].update(parameter_mapping)
 
@@ -189,6 +197,19 @@ class InstantiatedModel:
             "slr_gis_melt_rate_above_thresh": V(1.11860082),  # Melt rate above threshol
             "slr_gis_init_melt_rate": V(0.6),  # Initial melt rate
             "slr_gis_init_ice_vol": V(7.3),  # Initial ice volume
+        }
+
+        instance_data[None].update(parameter_mapping)
+
+    def _set_instance_data_emissiontrade_globalcostpool(self, instance_data) -> None:
+        params = self.params
+        parameter_mapping = {
+            "min_rel_payment_level": V(
+                params["economics"]["emission trade"]["min rel payment level"]
+            ),
+            "max_rel_payment_level": V(
+                params["economics"]["emission trade"]["max rel payment level"]
+            ),
         }
 
         instance_data[None].update(parameter_mapping)
