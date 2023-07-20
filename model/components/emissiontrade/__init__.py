@@ -1,4 +1,4 @@
 """
 Imports the different emission trading modules
 """
-from . import notrade, globalcostpool, emissiontrade
+from . import globalcostpool, notrade, emissiontrade

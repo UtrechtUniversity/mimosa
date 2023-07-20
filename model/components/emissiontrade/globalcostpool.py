@@ -15,8 +15,6 @@ from model.common import (
     Constraint,
     NonNegativeReals,
     quant,
-    value,
-    soft_min,
 )
 
 from model.components.abatement import AC

@@ -124,6 +124,7 @@ class GeneralSoftEqualityConstraint(GeneralConstraint):
         rule_rhs: typing.Callable,
         name: str = None,
         epsilon: float = 0.005,
+        absolute_epsilon: float = None,
         ignore_if: typing.Callable = None,
     ):
         """Creates a constraint of the type:
@@ -141,10 +142,17 @@ class GeneralSoftEqualityConstraint(GeneralConstraint):
 
         self.rule_rhs = rule_rhs
         self.epsilon = epsilon
+        self.absolute_epsilon = absolute_epsilon
 
         if ignore_if is None:
             ignore_if = lambda m: False  # Never ignore when ignore_if is None
         self.ignore_if = ignore_if
+
+    def rhs_eps(self, rule_rhs, is_upper: bool, *args):
+        factor = 1 if is_upper else -1
+        if self.absolute_epsilon is not None:
+            return rule_rhs(*args) + factor * self.absolute_epsilon
+        return (1 + factor * self.epsilon) * rule_rhs(*args)
 
 
 class GlobalSoftEqualityConstraint(GeneralSoftEqualityConstraint):
@@ -154,12 +162,12 @@ class GlobalSoftEqualityConstraint(GeneralSoftEqualityConstraint):
         rule_rhs = self.rule_rhs
 
         upperbound = (
-            lambda m, t: rule_lhs(m, t) <= (1 + eps) * rule_rhs(m, t)
+            lambda m, t: rule_lhs(m, t) <= self.rhs_eps(rule_rhs, True, m, t)
             if not self.ignore_if(m, t)
             else Constraint.Skip
         )
         lowerbound = (
-            lambda m, t: rule_lhs(m, t) >= (1 - eps) * rule_rhs(m, t)
+            lambda m, t: rule_lhs(m, t) >= self.rhs_eps(rule_rhs, False, m, t)
             if not self.ignore_if(m, t)
             else Constraint.Skip
         )
@@ -176,12 +184,12 @@ class RegionalSoftEqualityConstraint(GeneralSoftEqualityConstraint):
         rule_rhs = self.rule_rhs
 
         upperbound = (
-            lambda m, t, r: rule_lhs(m, t, r) <= (1 + eps) * rule_rhs(m, t, r)
+            lambda m, t, r: rule_lhs(m, t, r) <= self.rhs_eps(rule_rhs, True, m, t, r)
             if not self.ignore_if(m, t, r)
             else Constraint.Skip
         )
         lowerbound = (
-            lambda m, t, r: rule_lhs(m, t, r) >= (1 - eps) * rule_rhs(m, t, r)
+            lambda m, t, r: rule_lhs(m, t, r) >= self.rhs_eps(rule_rhs, False, m, t, r)
             if not self.ignore_if(m, t, r)
             else Constraint.Skip
         )
@@ -254,4 +262,3 @@ def get_unit(var):
     # Bugfix replace "/a" to "/yr" ("annum" is less clear than year)
     # Note that we should not replace e.g. "/atm", hence the negative lookahead
     return re.sub("/a(?![a-zA-Z])", "/yr", pyomo_unit_str)
-
