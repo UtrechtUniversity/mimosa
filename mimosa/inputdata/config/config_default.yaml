@@ -500,10 +500,10 @@ model:
     descr: Welfare and utility module to be used
     type: enum
     values:
-      - inequal_aversion_elasmu
-      - inequal_aversion_zero
+      - welfare_loss_minimising
+      - cost_minimising
       - inequal_aversion_general
-    default: inequal_aversion_elasmu
+    default: welfare_loss_minimising
 
   objective module:
     descr: Objective module to be used

@@ -125,10 +125,10 @@ def create_abstract_model(
     constraints.extend(cobbdouglas.get_constraints(m))
 
     # Utility and welfare
-    if welfare_module == "inequal_aversion_elasmu":
-        constraints.extend(welfare.inequal_aversion_elasmu.get_constraints(m))
-    elif welfare_module == "inequal_aversion_zero":
-        constraints.extend(welfare.inequal_aversion_zero.get_constraints(m))
+    if welfare_module == "welfare_loss_minimising":
+        constraints.extend(welfare.welfare_loss_minimising.get_constraints(m))
+    elif welfare_module == "cost_minimising":
+        constraints.extend(welfare.cost_minimising.get_constraints(m))
     elif welfare_module == "inequal_aversion_general":
         constraints.extend(welfare.inequal_aversion_general.get_constraints(m))
     else:

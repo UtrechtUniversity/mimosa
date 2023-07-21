@@ -1,6 +1,6 @@
 """
 Imports the different welfare modules
 """
-from . import inequal_aversion_elasmu
-from . import inequal_aversion_zero
+from . import welfare_loss_minimising
+from . import cost_minimising
 from . import inequal_aversion_general
