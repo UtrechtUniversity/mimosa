@@ -1,0 +1,553 @@
+regionstype:
+  descr: Name of the region definition. Used in the mapping of the regional parameters.
+  type: enum
+  values:
+    - IMAGE26
+    - SSP5
+    - World
+  default: IMAGE26
+
+##################
+
+regions:
+  descr: >-
+    Dictionary of all regions with optional dictionaries defining, optionally,
+    manual values for certain parameters for that specific region.
+  type: dict
+  keys:
+    descr: region name
+    type: str
+  values:
+    descr: optional dict to manually override certain regional parameters
+    type: dict
+  default:
+    CAN:
+    USA:
+    MEX:
+    RCAM:
+    BRA:
+    RSAM:
+    NAF:
+    WAF:
+    EAF:
+    SAF:
+    WEU:
+    CEU:
+    TUR:
+    UKR:
+    STAN:
+    RUS:
+    ME:
+    INDIA:
+    KOR:
+    CHN:
+    SEAS:
+    INDO:
+    JAP:
+    OCE:
+    RSAS:
+    RSAF:
+
+##################
+
+input:
+  db_filename:
+    descr: Path to IAMC-formatted CSV file for baseline data
+    type: filepath
+    default: inputdata/data/data_IMAGE_SSP.csv
+    # default_SSP5: ../Databases/SSP_IAM_V2_201811.csv
+
+  baselines:
+    SSP1:
+      scenario:
+        descr: Scenario name of SSP1 baseline
+        type: str
+        default: SSP1-Ref-SPA0-V17
+      model:
+        descr: Model name of SSP1 baseline
+        type: str
+        default: IMAGE
+    SSP2:
+      scenario:
+        descr: Scenario name of SSP2 baseline
+        type: str
+        default: SSP2-Ref-SPA0-V17
+      model:
+        descr: Model name of SSP2 baseline
+        type: str
+        default: IMAGE
+    SSP3:
+      scenario:
+        descr: Scenario name of SSP3 baseline
+        type: str
+        default: SSP3-Ref-SPA0-V17
+      model:
+        descr: Model name of SSP3 baseline
+        type: str
+        default: IMAGE
+    SSP4:
+      scenario:
+        descr: Scenario name of SSP4 baseline
+        type: str
+        default: SSP4-Ref-SPA0-V17
+      model:
+        descr: Model name of SSP4 baseline
+        type: str
+        default: IMAGE
+    SSP5:
+      scenario:
+        descr: Scenario name of SSP5 baseline
+        type: str
+        default: SSP5-Ref-SPA0-V17
+      model:
+        descr: Model name of SSP5 baseline
+        type: str
+        default: IMAGE
+
+  variables:
+    GDP:
+      descr: Variable name for GDP in data file
+      type: enum
+      values:
+        - GDP|PPP
+        - GDP|MER
+      default: GDP|PPP
+
+    emissions:
+      descr: Variable name for emissions variable
+      type: str
+      default: Emissions|CO2
+
+    population:
+      descr: Variable name for population variable
+      type: str
+      default: Population
+
+##################
+
+time:
+  start:
+    descr: Year in which the model starts
+    type: int
+    min: 1900
+    max: 2100
+    default: 2020
+
+  end:
+    descr: Last year of the model run
+    type: int
+    min: 1901
+    max: 2300
+    default: 2150
+
+  dt:
+    descr: Timestep in years
+    type: float
+    min: 0.5
+    max: 20
+    default: 5
+
+##################
+
+SSP:
+  descr: SSP, used for population, baseline GDP and baseline emissions
+  type: enum
+  values:
+    - SSP1
+    - SSP2
+    - SSP3
+    - SSP4
+    - SSP5
+  default: SSP2
+
+##################
+
+economics:
+  PRTP:
+    descr: Pure rate of time preference
+    type: float
+    min: 0
+    max: 0.2
+    default: 0.015
+
+  elasmu:
+    descr: Elasticity of marginal utility
+    type: float
+    min: 0.1
+    max: 10
+    default: 1.001
+
+  inequal_aversion:
+    descr: >-
+      Parameter of inequality aversion.
+      Should be between 0 and `elasmu`.
+      Only used when welfare_module='inequal_aversion_general'
+    type: float
+    min: 0.0
+    max: 3
+    default: 0.5
+
+  GDP:
+    alpha:
+      descr: Output elasticity of capital
+      type: float
+      min: 0
+      max: 1
+      default: 0.3
+
+    depreciation of capital:
+      descr: Yearly depreciation rate of capital stock
+      type: float
+      min: 0
+      default: 0.05
+
+    savings rate:
+      descr: Fraction of GDP used for investments
+      type: float
+      min: 0
+      max: 1
+      default: 0.21
+
+  MAC:
+    beta:
+      descr: Power factor of the MAC curve
+      type: float
+      min: 0.01
+      max: 10
+      default: 3
+
+    rho:
+      descr: Learning by doing rate (needs more explanation)
+      type: float
+      min: 0.1
+      max: 1
+      default: 0.82
+
+    gamma:
+      descr: Calibration level of the MAC (carbon price for 100% reduction)
+      type: quantity
+      unit: currency_unit/emissionsrate_unit
+      default: 2601 USD2005/tCO2
+
+    regional calibration factor:
+      descr: >-
+        Column from mac.csv to be used for the regional MACs. The MACs are calibrated
+        from TIMER SSP2-RCP2.6 MACs at a given year and a given carbon price / abatement level.
+      type: enum
+      values:
+        - kappa_carbonprice_200_2030
+        - kappa_carbonprice_200_2050
+        - kappa_carbonprice_200_2070
+        - kappa_carbonprice_200_2100
+        - kappa_carbonprice_300_2030
+        - kappa_carbonprice_300_2050
+        - kappa_carbonprice_300_2070
+        - kappa_carbonprice_300_2100
+        - kappa_carbonprice_500_2030
+        - kappa_carbonprice_500_2050
+        - kappa_carbonprice_500_2070
+        - kappa_carbonprice_500_2100
+        - kappa_carbonprice_1000_2030
+        - kappa_carbonprice_1000_2050
+        - kappa_carbonprice_1000_2070
+        - kappa_carbonprice_1000_2100
+        - kappa_rel_abatement_0.25_2030
+        - kappa_rel_abatement_0.25_2050
+        - kappa_rel_abatement_0.25_2070
+        - kappa_rel_abatement_0.25_2100
+        - kappa_rel_abatement_0.4_2030
+        - kappa_rel_abatement_0.4_2050
+        - kappa_rel_abatement_0.4_2070
+        - kappa_rel_abatement_0.4_2100
+        - kappa_rel_abatement_0.5_2050
+        - kappa_rel_abatement_0.5_2070
+        - kappa_rel_abatement_0.5_2100
+        - kappa_rel_abatement_0.75_2050
+        - kappa_rel_abatement_0.75_2070
+        - kappa_rel_abatement_0.75_2100
+      default: kappa_rel_abatement_0.75_2050
+
+    rel_abatement_costs_min_level:
+      descr: >-
+        Minimum level of mitigation costs (rel to GDP). By default, this is 0:
+        no negative abatement costs are allowed. For certain burden sharing regimes,
+        this value can become negative to allow certain (small) financial transfers.
+      type: float
+      min: -2
+      max: 0
+      default: 0
+
+  emission trade:
+    min rel payment level:
+      descr: >-
+        Which percentage of the area under the MAC of a region should it pay itself (minimum)?
+        If false: no limt
+      type: float
+      min: 0
+      max: 1
+      default: False
+      can_be_false: True
+
+    max rel payment level:
+      descr: >-
+        Which percentage of the area under the MAC of a region should it pay itself (maximum)?
+        If false: no limit
+      type: float
+      min: 1
+      default: False
+      can_be_false: True
+
+  damages:
+    percentage reversible:
+      descr: Factor of damages that are reversible
+      type: float
+      min: 0
+      max: 1
+      default: 1
+
+    scale factor:
+      descr: Manual scaling factor to increase or decrease damages
+      type: float
+      default: 1
+
+    ignore damages:
+      descr: Flag to not take into account the damages in the GDP (but damages are calculated)
+      type: bool
+      default: False
+
+    quantile:
+      descr: Damage quantile (Only used for COACCH)
+      type: float
+      min: 0.025
+      max: 0.975
+      default: 0.5
+
+    coacch_slr_withadapt:
+      descr: Flag to use the SLR-with-Adapation damage functions (Only used for COACCH)
+      type: bool
+      default: True
+
+    coacch_combined_slr_nonslr_damages:
+      descr: >-
+        If true, do not model SLR damages separately from non-SLR, but use the
+        combined damage functions (Only used for COACCH)
+      type: bool
+      default: False
+
+  adaptation:
+    curr_level:
+      descr: When adaptation level is fixed, keep it at this level (Only used for AD-RICE2010)
+      type: float
+      min: 0
+      max: 1
+      default: 0
+
+    fixed:
+      descr: >-
+        Flag to keep adaptation at fixed value (curr_level).
+        (Only used for AD-RICE2010)
+        If false: the adaptation level is endogenously optimised.
+      type: bool
+      default: False
+
+##################
+
+emissions:
+  carbonbudget:
+    descr: >-
+      Value of the carbon budget.
+      Can also be false, then CBA mode is used
+    type: quantity
+    unit: emissions_unit
+    default: 800 GtCO2
+    can_be_false: True
+
+  global min level:
+    descr: >-
+      Limit on the emission level (globally), mostly used for negative emissions.
+      Can also be false, then no limit is imposed
+    type: quantity
+    unit: emissionsrate_unit
+    default: -20 GtCO2/yr
+    can_be_false: True
+
+  regional min level:
+    descr: >-
+      Limit on the emission level (per region), mostly used for negative emissions.
+      Can also be false, then no limit is imposed
+    type: quantity
+    unit: emissionsrate_unit
+    default: -10 GtCO2/yr
+    can_be_false: True
+
+  not positive after budget year:
+    descr: If true, impose net-zero emissions after budget year (2100)
+    type: bool
+    default: True
+
+  non increasing emissions after 2100:
+    descr: If true, the regional emissions after 2100 are not allowed to climb.
+    type: bool
+    default: True
+
+  baseline carbon intensity:
+    descr: >-
+      If true, use baseline carbon intensity to calculate baseline emissions.
+      If false, the SSP baseline emissions are used, regardless of lower GDP.
+    type: bool
+    default: True
+
+  inertia:
+    global: &inertia_description
+      descr: >-
+        Maximum reduction speed, in % of initial emissions (should be negative)
+        Can also be false, then no inertia limit is imposed
+      type: float
+      max: 0
+      default: False
+      can_be_false: True
+    regional:
+      <<: *inertia_description
+      default: -0.05
+
+  cumulative_emissions_trapz:
+    descr: >-
+      If true, calculate cumulative emissions using trapezoidal interpolation.
+      If false, cum. emissions are simply cum_emissions[t-1] + dt * cum_emissions[t].
+      This is less accurate, but better for numerical stability. For small dt the 
+      approximation is usually still acceptable.
+    type: bool
+    default: True
+
+##################
+
+burden sharing:
+  regime:
+    descr: Type of burden sharing to be used
+    type: enum
+    values:
+      - noregime
+      - equal_abatement_costs
+      - equal_total_costs
+      - per_cap_convergence
+      - per_cap_convergence_fake # Per cap convergence performed in post-processing
+    default: noregime
+  percapconv_year:
+    descr: >-
+      Year of convergence to per capita emission allowance 
+      (only used when burden sharing - regime is per_cap_convergence)
+      Can also be false, then always use grandfathering
+    type: float
+    min: 2020
+    max: 2200
+    default: 2050
+    can_be_false: True
+
+##################
+
+temperature:
+  initial:
+    descr: Temperature in initial year of model run (2020 by default).
+    type: quantity
+    unit: temperature_unit
+    default: 1.16 delta_degC
+
+  TCRE:
+    descr: Transient Climate Response to CO2 Emissions
+    type: quantity
+    unit: (temperature_unit)/(emissions_unit)
+    default: 0.62 delta_degC/(TtCO2)
+
+  target:
+    descr: >-
+      Temperature target in 2100 (and beyond).
+      Can also be false, then no temperature target is imposed
+    type: quantity
+    unit: temperature_unit
+    default: False
+    can_be_false: True
+
+##################
+
+model:
+  damage module:
+    descr: Damage module to be used
+    type: enum
+    values:
+      - COACCH
+      - RICE2010
+      - RICE2012
+    default: COACCH
+
+  emissiontrade module:
+    descr: Emission trade module to be used
+    type: enum
+    values:
+      - notrade
+      - globalcostpool
+      - emissiontrade
+    default: notrade
+
+  financialtransfer module:
+    descr: Financial transfer module to be used
+    type: enum
+    values:
+      - notransfer
+      - globaldamagepool
+    default: notransfer
+
+  welfare module:
+    descr: Welfare and utility module to be used
+    type: enum
+    values:
+      - inequal_aversion_elasmu
+      - inequal_aversion_zero
+      - inequal_aversion_general
+    default: inequal_aversion_elasmu
+
+  objective module:
+    descr: Objective module to be used
+    type: enum
+    values:
+      - utility
+      - globalcosts
+    default: utility
+
+##################
+
+simulation:
+  simulationmode:
+    descr: >-
+      If true, the model is run in simulation mode: then some variables will
+      be imposed exogenously and fixed.
+      If false, `constraint_variables` and `deactivated_constraints` are ignored.
+    type: bool
+    default: False
+
+  constraint_variables:
+    descr: >-
+      Dictionary of variable names with associated path to file containing values for
+      that variable
+    type: dict
+    keys:
+      descr: variable name
+      type: str
+    values:
+      descr: >-
+        path to output file containing values for this file or dictionary with 
+        regions as rows and years as columns. NOTE: a Dataframe is not supported yet.
+      type: str_or_plain_dict
+    default:
+
+  deactivated_constraints:
+    descr: List of constraint names to be disabled
+    type: list
+    values:
+      descr: constraint name to be disabled, as used in the model
+      type: str
+    default:
+
+  custom_mapping:
+    descr: Custom mapping of parameter values or variables
+    type: dict
+    default:
