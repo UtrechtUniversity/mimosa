@@ -88,7 +88,7 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
                 lambda m, t, r: m.GDP_net[t, r]
                 == m.GDP_gross[t, r]
                 * (1 - (m.damage_costs[t, r] if not value(m.ignore_damages) else 0))
-                - m.abatement_costs[t, r]
+                - m.mitigation_costs[t, r]
                 - m.financial_transfer[t, r],
                 "GDP_net",
             ),

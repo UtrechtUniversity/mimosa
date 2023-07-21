@@ -9,11 +9,11 @@ from mimosa.common import Param, AbstractModel, Set, add_constraint
 from mimosa.components import (
     burdensharing,
     emissions,
-    abatement,
     emissiontrade,
     financialtransfer,
     cobbdouglas,
     damages,
+    mitigation,
     objective,
     sealevelrise,
     welfare,
@@ -94,7 +94,7 @@ def create_abstract_model(
         raise NotImplementedError
 
     # Abatement costs
-    constraints.extend(abatement.get_constraints(m))
+    constraints.extend(mitigation.get_constraints(m))
 
     # Emission trading
     if emissiontrade_module == "notrade":

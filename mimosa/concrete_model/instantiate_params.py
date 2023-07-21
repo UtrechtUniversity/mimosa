@@ -167,8 +167,8 @@ class InstantiatedModel:
             "MAC_scaling_factor": self.regional_param_store.get(
                 "MAC", params["economics"]["MAC"]["regional calibration factor"]
             ),
-            "rel_abatement_costs_min_level": V(
-                params["economics"]["MAC"]["rel_abatement_costs_min_level"]
+            "rel_mitigation_costs_min_level": V(
+                params["economics"]["MAC"]["rel_mitigation_costs_min_level"]
             ),
             "init_capitalstock_factor": self.regional_param_store.get(
                 "economics", "init_capital_factor"

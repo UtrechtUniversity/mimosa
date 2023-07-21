@@ -17,7 +17,7 @@ from mimosa.common import (
     sqrt,
 )
 
-from mimosa.components.abatement import AC
+from mimosa.components.mitigation import AC
 
 
 def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
@@ -25,7 +25,7 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     (trading of emissions specification)
 
     Necessary variables:
-        m.abatement_costs (abatement costs as paid for by this region)
+        m.mitigation_costs (abatement costs as paid for by this region)
 
     Returns:
         list of constraints (any of:
@@ -124,10 +124,10 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
                 "relative_abatement",
             ),
             RegionalConstraint(
-                lambda m, t, r: m.abatement_costs[t, r]
+                lambda m, t, r: m.mitigation_costs[t, r]
                 == m.own_emission_reduction_costs[t, r]
                 + 1.02 * m.imported_emission_reduction_costs[t, r],
-                "abatement_costs",
+                "mitigation_costs",
             ),
         ]
     )

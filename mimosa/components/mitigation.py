@@ -1,6 +1,6 @@
 """
 Model equations and constraints:
-Abatement costs
+Mitigation costs
 """
 
 from typing import Sequence
@@ -22,10 +22,10 @@ from mimosa.common import (
 
 
 def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
-    """Abatement cost equations and constraints
+    """Mitigation cost equations and constraints
 
     Necessary variables:
-        m.abatement_costs
+        m.mitigation_costs
 
     Returns:
         list of constraints (any of:
@@ -77,15 +77,15 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
         ]
     )
 
-    # Abatement costs and MAC
-    m.abatement_costs = Var(
+    # Mitigation costs and MAC
+    m.mitigation_costs = Var(
         m.t,
         m.regions,
         # within=NonNegativeReals,
         initialize=0,
         units=quant.unit("currency_unit"),
     )
-    m.rel_abatement_costs = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
+    m.rel_mitigation_costs = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
     m.MAC_gamma = Param()
     m.MAC_beta = Param()
     m.MAC_scaling_factor = Param(m.regions)  # Regional scaling of the MAC
@@ -95,18 +95,18 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
         bounds=lambda m: (0, 2 * m.MAC_gamma),
         units=quant.unit("currency_unit/emissions_unit"),
     )
-    m.rel_abatement_costs_min_level = Param()
+    m.rel_mitigation_costs_min_level = Param()
     constraints.extend(
         [
             RegionalConstraint(
-                lambda m, t, r: m.rel_abatement_costs[t, r]
-                == m.abatement_costs[t, r] / m.GDP_gross[t, r],
-                "rel_abatement_costs",
+                lambda m, t, r: m.rel_mitigation_costs[t, r]
+                == m.mitigation_costs[t, r] / m.GDP_gross[t, r],
+                "rel_mitigation_costs",
             ),
             RegionalConstraint(
-                lambda m, t, r: m.rel_abatement_costs[t, r]
-                >= (m.rel_abatement_costs_min_level if t > 0 else 0.0),
-                "rel_abatement_costs_non_negative",
+                lambda m, t, r: m.rel_mitigation_costs[t, r]
+                >= (m.rel_mitigation_costs_min_level if t > 0 else 0.0),
+                "rel_mitigation_costs_non_negative",
             ),
             RegionalConstraint(
                 lambda m, t, r: m.carbonprice[t, r]
@@ -120,14 +120,14 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     )
 
     # Keep track of relative global costs
-    m.global_rel_abatement_costs = Var(m.t)
+    m.global_rel_mitigation_costs = Var(m.t)
     constraints.extend(
         [
             GlobalConstraint(
-                lambda m, t: m.global_rel_abatement_costs[t]
-                == sum(m.abatement_costs[t, r] for r in m.regions)
+                lambda m, t: m.global_rel_mitigation_costs[t]
+                == sum(m.mitigation_costs[t, r] for r in m.regions)
                 / sum(m.GDP_gross[t, r] for r in m.regions),
-                "global_rel_abatement_costs",
+                "global_rel_mitigation_costs",
             )
         ]
     )
@@ -146,14 +146,14 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
             GlobalConstraint(
                 lambda m, t: m.global_emission_reduction_per_cost_unit[t]
                 == sum(m.regional_emission_reduction[t, r] for r in m.regions)
-                / soft_min(sum(m.abatement_costs[t, r] for r in m.regions))
+                / soft_min(sum(m.mitigation_costs[t, r] for r in m.regions))
                 if t > 0
                 else Constraint.Skip,
                 "global_emission_reduction_per_cost_unit",
             ),
             GlobalConstraint(
                 lambda m, t: m.global_cost_per_emission_reduction_unit[t]
-                == sum(m.abatement_costs[t, r] for r in m.regions)
+                == sum(m.mitigation_costs[t, r] for r in m.regions)
                 / soft_min(sum(m.regional_emission_reduction[t, r] for r in m.regions))
                 if t > 0
                 else Constraint.Skip,
