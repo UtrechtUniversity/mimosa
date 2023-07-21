@@ -1,0 +1,103 @@
+regions:
+  # World:
+  #   initial capital: 190 trillion US$2005/yr
+  #   damages:
+  #     a1: 0
+  #     a2: 0.010038
+  #     a3: 2
+  #   adaptation:
+  #     g1: 0.115
+  #     g2: 3.6
+  R5.2OECD:
+    initial capital: 80000 billion US$2005/yr
+    damages: $regional
+    adaptation: $regional
+  R5.2ASIA:
+    initial capital: 45 trillion US$2005/yr
+    damages: $regional
+    adaptation: $regional
+  R5.2LAM:
+    initial capital: 20 trillion US$2005/yr
+    damages: $regional
+    adaptation: $regional
+  R5.2MAF:
+    initial capital: 20 trillion US$2005/yr
+    damages: $regional
+    adaptation: $regional
+  R5.2REF:
+    initial capital: 10 trillion US$2005/yr
+    damages: $regional
+    adaptation: $regional
+
+input:
+  db_filename: ../Databases/SSP_IAM_V2_201811.csv
+  baselines:
+    SSP1:
+      scenario: SSP1-Baseline
+      model: IMAGE
+    SSP2:
+      scenario: SSP2-Baseline
+      model: MESSAGE-GLOBIOM
+    SSP3:
+      scenario: SSP3-Baseline
+      model: AIM/CGE
+    SSP4:
+      scenario: SSP4-Baseline
+      model: GCAM4
+    SSP5:
+      scenario: SSP5-Baseline
+      model: REMIND-MAGPIE
+
+  variables:
+    GDP: GDP|PPP
+    emissions: Emissions|CO2
+    population: Population
+
+time:
+  start: 2020
+  end: 2125
+  dt: 1
+
+SSP: "SSP2"
+
+economics:
+  PRTP: 0.015
+  elasmu: 1.45
+  GDP:
+    alpha: 0.3
+    depreciation of capital: 0.1
+    savings rate: 0.21
+  MAC:
+    beta: 2
+    rho: 0.82
+    gamma: 2442 USD2005/tCO2
+  damages:
+    percentage reversible: 1
+    scale factor: 1
+    ignore damages: False
+  adaptation:
+    curr_level: 0
+    fixed: False
+
+emissions:
+  carbonbudget: 800 GtCO2 # False or a quantity
+  min level: -20 GtCO2/yr # False or a quantity
+  not positive after budget year: True
+  baseline carbon intensity: True
+  inertia:
+    global: False # False or a number < 0, % of initial emissions
+    regional: -0.05 # False or a number < 0, % of initial emissions
+
+temperature:
+  initial: 1.096224 delta_degC
+  TCRE: 0.62 delta_degC/(TtCO2)
+
+default units:
+  currency_unit: trillion USD2005/yr
+  emissionsrate_unit: emissions_unit/yr
+  emissions_unit: Gt CO2
+  temperature_unit: delta_degC
+  population_unit: billion
+
+model:
+  damage module: RICE2012 # RICE2010, RICE2012 or WITCH
