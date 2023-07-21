@@ -78,12 +78,6 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
         / sum(m.population(m.year(t), s) for s in m.regions),
     )
 
-    m.percapconv_emission_share = Var(
-        m.t, m.regions  # , initialize=_percapconv_share_rule
-    )
-    m.percapconv_import_export_emission_reduction_balance = Var(
-        m.t, m.regions, units=quant.unit("emissionsrate_unit")
-    )
     constraints.extend(
         [
             RegionalSoftEqualityConstraint(
