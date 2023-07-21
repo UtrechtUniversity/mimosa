@@ -1,8 +1,8 @@
-from mimosa.mimosa import MIMOSA
+from mimosa import MIMOSA, load_params
 
-from mimosa.common.config import parseconfig
+params = load_params()
 
-params = parseconfig.load_params()
+# Make changes to the params if needed
 params["emissions"]["carbonbudget"] = False
 
 model1 = MIMOSA(params)

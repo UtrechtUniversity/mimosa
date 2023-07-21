@@ -2,18 +2,11 @@
 Parses the config.yaml file and checks for consistency with the default config template.
 """
 
-import os
-
-if __name__ == "__main__":
-    import sys
-
-    sys.path.append(os.path.join(os.path.dirname(__file__), "../../"))
-    from utils import GeneralParser, PARSER_FACTORY, set_nested, get_nested, flatten
-else:
-    from .utils import GeneralParser, PARSER_FACTORY, set_nested, get_nested, flatten
 
 from mimosa.common.utils import load_yaml
 from mimosa.common import quant
+
+from .utils import PARSER_FACTORY, set_nested, get_nested, flatten
 
 
 def parse_params(default_yaml, user_yaml, return_parser_tree=False):
@@ -80,6 +73,3 @@ def check_params(input_params):
 def load_params(user_yaml_filename="config.yaml"):
     user_yaml = load_yaml(user_yaml_filename)
     return check_params(user_yaml)
-
-
-params = load_params()
