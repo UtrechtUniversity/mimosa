@@ -1,14 +1,8 @@
 numpy
 pandas
 pyomo
-ipopt
-glpk
 pint
-yaml
-time
+pyyaml
 
 # For export:
-plotly
-json
-random
-hashlib
+# plotly
