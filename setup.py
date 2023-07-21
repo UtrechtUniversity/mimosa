@@ -13,6 +13,7 @@ setup(
     license="LICENSE.txt",
     description="MIMOSA: Integrated Assessment Model for Cost-Benefit Analysis",
     long_description=description,
-    install_requires=["numpy", "pandas", "pyomo", "pint", "pyyaml"],
+    long_description_content_type="text/markdown",
+    install_requires=["numpy", "pandas", "pyomo", "pint", "pyyaml", "scipy"],
     include_package_data=True,
 )
