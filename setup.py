@@ -5,7 +5,7 @@ with open("README.md") as fh:
 
 setup(
     name="mimosa",
-    version="0.1.0",
+    version="0.1.2",
     author="Kaj-Ivar van der Wijst",
     author_email="k.i.vanderwijst@gmail.com",
     packages=["mimosa"],

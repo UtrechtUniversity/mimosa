@@ -3,9 +3,13 @@ Plot functions. Not necessary if dashboard is used.
 """
 import numpy as np
 import pandas as pd
-import plotly.express as px
-from plotly.subplots import make_subplots
 from pyomo.environ import value
+
+try:
+    import plotly.express as px
+    from plotly.subplots import make_subplots
+except ModuleNotFoundError:
+    pass
 
 COLORS_PBL = [
     "#00AEEF",
@@ -98,7 +102,6 @@ class Plot:
         )
 
     def add(self, var, is_regional=True, is_fct=False, name=None, row=1, **kwargs):
-
         if not is_fct and name is None:
             name = var.name
         new = name not in self.curr_values
