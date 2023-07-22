@@ -5,7 +5,6 @@ in the ConcreteModel `m`.
 
 import json
 import os
-import random
 import hashlib
 import numpy as np
 import pandas as pd
@@ -13,7 +12,7 @@ import pandas as pd
 from mimosa.common import get_all_variables, value
 
 
-def save_output(params, m, experiment=None, hash_suffix=True, folder="output"):
+def save_output(params, m, experiment=None, hash_suffix=False, folder="output"):
     # 1. Create a unique identifier
     if hash_suffix:
         settings_hash = hashlib.md5(json.dumps(params).encode()).hexdigest()[:9]
