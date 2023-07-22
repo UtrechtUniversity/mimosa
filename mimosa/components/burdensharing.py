@@ -38,9 +38,9 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
 
     constraints.extend(
         [
-            # Total costs: abatement + damage costs should be equal among regions as % GDP
+            # Total costs: mitigation + damage costs should be equal among regions as % GDP
             RegionalSoftEqualityConstraint(
-                lambda m, t, r: m.rel_abatement_costs[t, r]
+                lambda m, t, r: m.rel_mitigation_costs[t, r]
                 + m.damage_costs[t, r]
                 + m.rel_financial_transfer[t, r],
                 lambda m, t, r: m.burden_sharing_common_level[t],
@@ -49,13 +49,13 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
                 != "equal_total_costs"
                 or m.year(t) > 2100,
             ),
-            # Abatement costs: abatement costs should be equal among regions as % GDP
+            # Mitigation costs: mitigation costs should be equal among regions as % GDP
             RegionalSoftEqualityConstraint(
-                lambda m, t, r: m.rel_abatement_costs[t, r],
+                lambda m, t, r: m.rel_mitigation_costs[t, r],
                 lambda m, t, r: m.burden_sharing_common_level[t],
-                "burden_sharing_regime_abatement_costs",
+                "burden_sharing_regime_mitigation_costs",
                 ignore_if=lambda m, t, r: value(m.burden_sharing_regime)
-                != "equal_abatement_costs"
+                != "equal_mitigation_costs"
                 # or m.year(t) > 2125,
             ),
         ]
@@ -78,12 +78,6 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
         / sum(m.population(m.year(t), s) for s in m.regions),
     )
 
-    m.percapconv_emission_share = Var(
-        m.t, m.regions  # , initialize=_percapconv_share_rule
-    )
-    m.percapconv_import_export_emission_reduction_balance = Var(
-        m.t, m.regions, units=quant.unit("emissionsrate_unit")
-    )
     constraints.extend(
         [
             RegionalSoftEqualityConstraint(

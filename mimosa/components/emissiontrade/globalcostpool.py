@@ -17,7 +17,7 @@ from mimosa.common import (
     quant,
 )
 
-from mimosa.components.abatement import AC
+from mimosa.components.mitigation import AC
 
 
 def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
@@ -25,7 +25,7 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     (global cost pool specification)
 
     Necessary variables:
-        m.abatement_costs (abatement costs as paid for by this region)
+        m.mitigation_costs (abatement costs as paid for by this region)
 
     Returns:
         list of constraints (any of:
@@ -51,10 +51,10 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
             RegionalConstraint(
                 lambda m, t, r: m.area_under_MAC[t, r]
                 == AC(m.relative_abatement[t, r], m, t, r) * m.baseline[t, r],
-                "abatement_costs",
+                "mitigation_costs",
             ),
             GlobalConstraint(
-                lambda m, t: sum(m.abatement_costs[t, r] for r in m.regions)
+                lambda m, t: sum(m.mitigation_costs[t, r] for r in m.regions)
                 == sum(m.area_under_MAC[t, r] for r in m.regions),
                 "sum_abatement_equals_sum_area_under_mac",
             ),
@@ -76,7 +76,7 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
         [
             RegionalConstraint(
                 lambda m, t, r: m.paid_for_emission_reductions[t, r]
-                == m.abatement_costs[t, r]
+                == m.mitigation_costs[t, r]
                 * m.global_emission_reduction_per_cost_unit[t]
                 if t > 0
                 else Constraint.Skip,
@@ -93,7 +93,7 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
             ),
             RegionalConstraint(
                 lambda m, t, r: m.import_export_mitigation_cost_balance[t, r]
-                == m.abatement_costs[t, r] - m.area_under_MAC[t, r],
+                == m.mitigation_costs[t, r] - m.area_under_MAC[t, r],
                 "import_export_mitigation_cost_balance",
             ),
         ]

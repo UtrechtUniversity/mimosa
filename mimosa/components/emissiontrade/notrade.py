@@ -7,7 +7,7 @@ Type: no trade
 from typing import Sequence
 from mimosa.common import AbstractModel, GeneralConstraint, RegionalConstraint, Param
 
-from mimosa.components.abatement import AC
+from mimosa.components.mitigation import AC
 
 
 def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
@@ -15,7 +15,7 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     (no-trade specification)
 
     Necessary variables:
-        m.abatement_costs (abatement costs as paid for by this region)
+        m.mitigation_costs (abatement costs as paid for by this region)
 
     Returns:
         list of constraints (any of:
@@ -32,9 +32,9 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     constraints.extend(
         [
             RegionalConstraint(
-                lambda m, t, r: (m.abatement_costs[t, r])
+                lambda m, t, r: (m.mitigation_costs[t, r])
                 == AC(m.relative_abatement[t, r], m, t, r) * m.baseline[t, r],
-                "abatement_costs",
+                "mitigation_costs",
             ),
         ]
     )

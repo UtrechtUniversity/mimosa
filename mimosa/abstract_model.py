@@ -9,11 +9,11 @@ from mimosa.common import Param, AbstractModel, Set, add_constraint
 from mimosa.components import (
     burdensharing,
     emissions,
-    abatement,
     emissiontrade,
     financialtransfer,
     cobbdouglas,
     damages,
+    mitigation,
     objective,
     sealevelrise,
     welfare,
@@ -94,7 +94,7 @@ def create_abstract_model(
         raise NotImplementedError
 
     # Abatement costs
-    constraints.extend(abatement.get_constraints(m))
+    constraints.extend(mitigation.get_constraints(m))
 
     # Emission trading
     if emissiontrade_module == "notrade":
@@ -125,10 +125,10 @@ def create_abstract_model(
     constraints.extend(cobbdouglas.get_constraints(m))
 
     # Utility and welfare
-    if welfare_module == "inequal_aversion_elasmu":
-        constraints.extend(welfare.inequal_aversion_elasmu.get_constraints(m))
-    elif welfare_module == "inequal_aversion_zero":
-        constraints.extend(welfare.inequal_aversion_zero.get_constraints(m))
+    if welfare_module == "welfare_loss_minimising":
+        constraints.extend(welfare.welfare_loss_minimising.get_constraints(m))
+    elif welfare_module == "cost_minimising":
+        constraints.extend(welfare.cost_minimising.get_constraints(m))
     elif welfare_module == "inequal_aversion_general":
         constraints.extend(welfare.inequal_aversion_general.get_constraints(m))
     else:

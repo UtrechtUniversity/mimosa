@@ -39,7 +39,7 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     m.damage_scale_factor = Param()
 
     # Damages not related to SLR (dependent on temperature)
-    m.resid_damages = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
+    m.damage_costs_non_slr = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
 
     m.damage_noslr_form = Param(m.regions, within=Any)  # String for functional form
     m.damage_noslr_b1 = Param(m.regions)
@@ -53,15 +53,15 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     # the damage quantile
     constraints.append(
         RegionalConstraint(
-            lambda m, t, r: m.resid_damages[t, r]
+            lambda m, t, r: m.damage_costs_non_slr[t, r]
             == m.damage_scale_factor
             * damage_fct(m.temperature[t] - 0.6, m.T0 - 0.6, m, r, is_slr=False),
-            "resid_damages",
+            "damage_costs_non_slr",
         )
     )
 
     # SLR damages
-    m.SLR_damages = Var(
+    m.damage_costs_slr = Var(
         m.t, m.regions, bounds=(-0.5, 0.7), units=quant.unit("fraction_of_GDP")
     )
 
@@ -80,10 +80,10 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     # Linear damage function for SLR damages, including adaptation costs
     constraints.append(
         RegionalConstraint(
-            lambda m, t, r: m.SLR_damages[t, r]
+            lambda m, t, r: m.damage_costs_slr[t, r]
             == m.damage_scale_factor
             * damage_fct(m.total_SLR[t], m.total_SLR[0], m, r, is_slr=True),
-            "SLR_damages",
+            "damage_costs_slr",
         )
     )
 
@@ -91,7 +91,7 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     constraints.append(
         RegionalConstraint(
             lambda m, t, r: m.damage_costs[t, r]
-            == m.resid_damages[t, r] + m.SLR_damages[t, r],
+            == m.damage_costs_non_slr[t, r] + m.damage_costs_slr[t, r],
             "damage_costs",
         ),
     )

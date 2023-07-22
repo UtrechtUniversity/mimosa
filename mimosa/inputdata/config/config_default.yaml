@@ -267,7 +267,7 @@ economics:
         - kappa_rel_abatement_0.75_2100
       default: kappa_rel_abatement_0.75_2050
 
-    rel_abatement_costs_min_level:
+    rel_mitigation_costs_min_level:
       descr: >-
         Minimum level of mitigation costs (rel to GDP). By default, this is 0:
         no negative abatement costs are allowed. For certain burden sharing regimes,
@@ -427,7 +427,7 @@ burden sharing:
     type: enum
     values:
       - noregime
-      - equal_abatement_costs
+      - equal_mitigation_costs
       - equal_total_costs
       - per_cap_convergence
       - per_cap_convergence_fake # Per cap convergence performed in post-processing
@@ -500,10 +500,10 @@ model:
     descr: Welfare and utility module to be used
     type: enum
     values:
-      - inequal_aversion_elasmu
-      - inequal_aversion_zero
+      - welfare_loss_minimising
+      - cost_minimising
       - inequal_aversion_general
-    default: inequal_aversion_elasmu
+    default: welfare_loss_minimising
 
   objective module:
     descr: Objective module to be used
