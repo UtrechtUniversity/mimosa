@@ -1,0 +1,208 @@
+Country,Countryname,Region,IMAGE region code,SSP macroregion,Income group num,Income group name
+AGO,Angola,RSAF,26,R5.2MAF,2,Lower middle income
+BEN,Benin,WAF,8,R5.2MAF,1,Low income
+BWA,Botswana,RSAF,26,R5.2MAF,2,Lower middle income
+BFA,Burkina Faso,WAF,8,R5.2MAF,1,Low income
+BDI,Burundi,EAF,9,R5.2MAF,1,Low income
+CMR,Cameroon,WAF,8,R5.2MAF,1,Low income
+CPV,Cape Verde,WAF,8,R5.2MAF,1,Low income
+CAF,Central African Republic,WAF,8,R5.2MAF,1,Low income
+TCD,Chad,WAF,8,R5.2MAF,1,Low income
+COM,Comoros,EAF,9,R5.2MAF,1,Low income
+COG,Congo,WAF,8,R5.2MAF,1,Low income
+COD,Democratic Republic of the Congo,WAF,8,R5.2MAF,1,Low income
+CIV,Côte d`Ivoire,WAF,8,R5.2MAF,1,Low income
+DJI,Djibouti,EAF,9,R5.2MAF,1,Low income
+ERI,Eritrea,EAF,9,R5.2MAF,1,Low income
+ETH,Ethiopia,EAF,9,R5.2MAF,1,Low income
+GAB,Gabon,WAF,8,R5.2MAF,1,Low income
+GMB,Gambia,WAF,8,R5.2MAF,1,Low income
+GHA,Ghana,WAF,8,R5.2MAF,1,Low income
+GIN,Guinea,WAF,8,R5.2MAF,1,Low income
+GNB,Guinea-Bissau,WAF,8,R5.2MAF,1,Low income
+KEN,Kenya,EAF,9,R5.2MAF,1,Low income
+LSO,Lesotho,RSAF,26,R5.2MAF,2,Lower middle income
+LBR,Liberia,WAF,8,R5.2MAF,1,Low income
+MDG,Madagascar,EAF,9,R5.2MAF,1,Low income
+MWI,Malawi,RSAF,26,R5.2MAF,2,Lower middle income
+MLI,Mali,WAF,8,R5.2MAF,1,Low income
+MRT,Mauritania,WAF,8,R5.2MAF,1,Low income
+MUS,Mauritius,EAF,9,R5.2MAF,1,Low income
+MOZ,Mozambique,RSAF,26,R5.2MAF,2,Lower middle income
+NAM,Namibia,RSAF,26,R5.2MAF,2,Lower middle income
+NER,Niger,WAF,8,R5.2MAF,1,Low income
+NGA,Nigeria,WAF,8,R5.2MAF,1,Low income
+REU,Réunion,EAF,9,R5.2MAF,1,Low income
+RWA,Rwanda,EAF,9,R5.2MAF,1,Low income
+SEN,Senegal,WAF,8,R5.2MAF,1,Low income
+SLE,Sierra Leone,WAF,8,R5.2MAF,1,Low income
+SOM,Somalia,EAF,9,R5.2MAF,1,Low income
+SOL,Somalia,EAF,9,R5.2MAF,1,Low income
+ZAF,South Africa,SAF,10,R5.2MAF,3,Upper middle income
+SDN,Sudan,EAF,9,R5.2MAF,1,Low income
+SSD,South Sudan,EAF,9,R5.2MAF,1,Low income
+SWZ,Swaziland,RSAF,26,R5.2MAF,2,Lower middle income
+TZA,United Republic of Tanzania,RSAF,26,R5.2MAF,2,Lower middle income
+TGO,Togo,WAF,8,R5.2MAF,1,Low income
+UGA,Uganda,EAF,9,R5.2MAF,1,Low income
+ZMB,Zambia,RSAF,26,R5.2MAF,2,Lower middle income
+ZWE,Zimbabwe,RSAF,26,R5.2MAF,2,Lower middle income
+KHM,Cambodia,SEAS,21,R5.2ASIA,2,Lower middle income
+CHN,China,CHN,20,R5.2ASIA,4,Upper middle income
+HKG,"China, Hong Kong Special Administrative Region",CHN,20,R5.2ASIA,4,Upper middle income
+PRK,Democratic People`s Republic of Korea,KOR,19,R5.2ASIA,1,High income
+LAO,Lao People`s Democratic Republic,SEAS,21,R5.2ASIA,2,Lower middle income
+MAC,"China, Macao Special Administrative Region",CHN,20,R5.2ASIA,4,Upper middle income
+MNG,Mongolia,CHN,20,R5.2ASIA,4,Upper middle income
+TWN,Taiwan,CHN,20,R5.2ASIA,4,Upper middle income
+VNM,Viet Nam,SEAS,21,R5.2ASIA,2,Lower middle income
+ALB,Albania,CEU,12,R5.2OECD,4,High income
+BIH,Bosnia and Herzegovina,CEU,12,R5.2OECD,4,High income
+BGR,Bulgaria,CEU,12,R5.2OECD,4,High income
+HRV,Croatia,CEU,12,R5.2OECD,4,High income
+CZE,Czech Republic,CEU,12,R5.2OECD,4,High income
+EST,Estonia,CEU,12,R5.2OECD,4,High income
+HUN,Hungary,CEU,12,R5.2OECD,4,High income
+LVA,Latvia,CEU,12,R5.2OECD,4,High income
+LTU,Lithuania,CEU,12,R5.2OECD,4,High income
+MKD,The former Yugoslav Republic of Macedonia,CEU,12,R5.2OECD,4,High income
+MNE,Montenegro,CEU,12,R5.2OECD,4,High income
+POL,Poland,CEU,12,R5.2OECD,4,High income
+SRB,Serbia,CEU,12,R5.2OECD,4,High income
+SVK,Slovakia,CEU,12,R5.2OECD,4,High income
+SVN,Slovenia,CEU,12,R5.2OECD,4,High income
+ARM,Armenia,RUS,16,R5.2REF,3,Upper middle income
+AZE,Azerbaijan,RUS,16,R5.2REF,3,Upper middle income
+BLR,Belarus,UKR,14,R5.2REF,3,Upper middle income
+GEO,Georgia,RUS,16,R5.2REF,3,Upper middle income
+KAZ,Kazakhstan,STAN,15,R5.2REF,2,Lower middle income
+KGZ,Kyrgyzstan,STAN,15,R5.2REF,2,Lower middle income
+MDA,Republic of Moldova,UKR,14,R5.2REF,3,Upper middle income
+RUS,Russian Federation,RUS,16,R5.2REF,3,Upper middle income
+TJK,Tajikistan,STAN,15,R5.2REF,2,Lower middle income
+TKM,Turkmenistan,STAN,15,R5.2REF,2,Lower middle income
+UKR,Ukraine,UKR,14,R5.2REF,3,Upper middle income
+UZB,Uzbekistan,STAN,15,R5.2REF,2,Lower middle income
+ATG,Antigua and Barbuda,RCAM,4,,4,High income
+ARG,Argentina,RSAM,6,R5.2LAM,3,Upper middle income
+BHS,Bahamas,RCAM,4,R5.2LAM,4,High income
+BRB,Barbados,RCAM,4,R5.2LAM,4,High income
+BLZ,Belize,RCAM,4,R5.2LAM,4,High income
+BMU,Bermuda,RCAM,4,,4,High income
+BOL,Bolivia (Plurinational State of),RSAM,6,R5.2LAM,3,Upper middle income
+BRA,Brazil,BRA,5,R5.2LAM,3,Upper middle income
+CHL,Chile,RSAM,6,R5.2LAM,3,Upper middle income
+COL,Colombia,RSAM,6,R5.2LAM,3,Upper middle income
+CRI,Costa Rica,RCAM,4,R5.2LAM,4,High income
+CUB,Cuba,RCAM,4,R5.2LAM,4,High income
+DOM,Dominican Republic,RCAM,4,R5.2LAM,4,High income
+ECU,Ecuador,RSAM,6,R5.2LAM,3,Upper middle income
+SLV,El Salvador,RCAM,4,R5.2LAM,4,High income
+GNQ,Equatorial Guinea,WAF,8,R5.2MAF,1,Low income
+GLP,Guadeloupe,RCAM,4,R5.2LAM,4,High income
+GTM,Guatemala,RCAM,4,R5.2LAM,4,High income
+GUY,Guyana,RSAM,6,R5.2LAM,3,Upper middle income
+HTI,Haiti,RCAM,4,R5.2LAM,4,High income
+HND,Honduras,RCAM,4,R5.2LAM,4,High income
+JAM,Jamaica,RCAM,4,R5.2LAM,4,High income
+MTQ,Martinique,RCAM,4,R5.2LAM,4,High income
+MEX,Mexico,MEX,3,R5.2LAM,3,Upper middle income
+ANT,Netherlands Antilles,RCAM,4,,4,High income
+NIC,Nicaragua,RCAM,4,R5.2LAM,4,High income
+PAN,Panama,RCAM,4,R5.2LAM,4,High income
+PRY,Paraguay,RSAM,6,R5.2LAM,3,Upper middle income
+PER,Peru,RSAM,6,R5.2LAM,3,Upper middle income
+SUR,Suriname,RSAM,6,R5.2LAM,3,Upper middle income
+TTO,Trinidad and Tobago,RCAM,4,R5.2LAM,4,High income
+URY,Uruguay,RSAM,6,R5.2LAM,3,Upper middle income
+VEN,Venezuela (Bolivarian Republic of),RSAM,6,R5.2LAM,3,Upper middle income
+DZA,Algeria,NAF,7,R5.2MAF,2,Lower middle income
+BHR,Bahrain,ME,17,R5.2MAF,4,High income
+EGY,Egypt,NAF,7,R5.2MAF,2,Lower middle income
+IRN,Iran (Islamic Republic of),ME,17,R5.2MAF,4,High income
+IRQ,Iraq,ME,17,R5.2MAF,4,High income
+ISR,Israel,ME,17,R5.2MAF,4,High income
+JOR,Jordan,ME,17,R5.2MAF,4,High income
+KWT,Kuwait,ME,17,R5.2MAF,4,High income
+LBN,Lebanon,ME,17,R5.2MAF,4,High income
+LBY,Libyan Arab Jamahiriya,NAF,7,R5.2MAF,2,Lower middle income
+MAR,Morocco,NAF,7,R5.2MAF,2,Lower middle income
+OMN,Oman,ME,17,R5.2MAF,4,High income
+QAT,Qatar,ME,17,R5.2MAF,4,High income
+SAU,Saudi Arabia,ME,17,R5.2MAF,4,High income
+SYR,Syrian Arab Republic,ME,17,R5.2MAF,4,High income
+TUN,Tunisia,NAF,7,R5.2MAF,2,Lower middle income
+ARE,United Arab Emirates,ME,17,R5.2MAF,4,High income
+ESH,Western Sahara,NAF,7,R5.2MAF,2,Lower middle income
+YEM,Yemen,ME,17,R5.2MAF,4,High income
+ASM,American Samoa,OCE,24,R5.2ASIA,4,High income
+ABW,Aruba,RCAM,4,R5.2LAM,4,High income
+DMA,Dominica,RCAM,4,R5.2LAM,4,High income
+GUF,French Guiana,RSAM,6,R5.2LAM,3,Upper middle income
+GRD,Grenada,RCAM,4,R5.2LAM,4,High income
+KIR,Kiribati,OCE,24,,4,High income
+MYT,Mayotte,RSAF,26,R5.2MAF,2,Lower middle income
+FSM,"Micronesia, Federated States of",OCE,24,R5.2ASIA,4,High income
+PLW,Palau,OCE,24,,4,High income
+KNA,Saint Kitts and Nevis,RCAM,4,,4,High income
+LCA,Saint Lucia,RCAM,4,,4,High income
+VCT,Saint Vincent and the Grenadines,RCAM,4,,4,High income
+STP,Sao Tome and Principe,WAF,8,,1,Low income
+SYC,Seychelles,EAF,9,,1,Low income
+TON,Tonga,OCE,24,,4,High income
+VIR,Virgin Islands (US),RCAM,4,R5.2LAM,4,High income
+CAN,Canada,CAN,1,R5.2OECD,4,High income
+GUM,Guam,SEAS,21,R5.2OECD,2,Lower middle income
+PRI,Puerto Rico,RCAM,4,R5.2LAM,4,High income
+USA,United States of America,USA,2,R5.2OECD,4,High income
+AUS,Australia,OCE,24,R5.2OECD,4,High income
+JPN,Japan,JAP,23,R5.2ASIA,4,High income
+NZL,New Zealand,OCE,24,R5.2OECD,4,High income
+BRN,Brunei Darussalam,SEAS,21,R5.2ASIA,2,Lower middle income
+TLS,Timor-Leste,INDO,22,R5.2ASIA,2,Lower middle income
+FJI,Fiji,OCE,24,R5.2ASIA,4,High income
+PYF,French Polynesia,OCE,24,R5.2ASIA,4,High income
+IDN,Indonesia,INDO,22,R5.2ASIA,2,Lower middle income
+KOR,Republic of Korea,KOR,19,R5.2ASIA,1,High income
+MYS,Malaysia,SEAS,21,R5.2ASIA,2,Lower middle income
+MMR,Myanmar,SEAS,21,R5.2ASIA,2,Lower middle income
+NCL,New Caledonia,OCE,24,R5.2ASIA,4,High income
+PNG,Papua New Guinea,INDO,22,R5.2ASIA,2,Lower middle income
+PHL,Philippines,SEAS,21,R5.2ASIA,2,Lower middle income
+WSM,Samoa,OCE,24,R5.2ASIA,4,High income
+SGP,Singapore,SEAS,21,R5.2ASIA,2,Lower middle income
+SLB,Solomon Islands,OCE,24,R5.2ASIA,4,High income
+THA,Thailand,SEAS,21,R5.2ASIA,2,Lower middle income
+VUT,Vanuatu,OCE,24,R5.2ASIA,4,High income
+AFG,Afghanistan,RSAS,25,R5.2ASIA,2,Lower middle income
+BGD,Bangladesh,RSAS,25,R5.2ASIA,2,Lower middle income
+BTN,Bhutan,RSAS,25,R5.2ASIA,2,Lower middle income
+IND,India,INDIA,18,R5.2ASIA,2,Lower middle income
+MDV,Maldives,RSAS,25,R5.2ASIA,2,Lower middle income
+NPL,Nepal,RSAS,25,R5.2ASIA,2,Lower middle income
+PAK,Pakistan,RSAS,25,R5.2ASIA,2,Lower middle income
+LKA,Sri Lanka,RSAS,25,R5.2ASIA,2,Lower middle income
+AUT,Austria,WEU,11,R5.2OECD,4,High income
+BEL,Belgium,WEU,11,R5.2OECD,4,High income
+CYP,Cyprus,CEU,12,R5.2OECD,4,High income
+DNK,Denmark,WEU,11,R5.2OECD,4,High income
+GRL,Greenland,WEU,11,R5.2OECD,4,High income
+FIN,Finland,WEU,11,R5.2OECD,4,High income
+FRA,France,WEU,11,R5.2OECD,4,High income
+DEU,Germany,WEU,11,R5.2OECD,4,High income
+GRC,Greece,WEU,11,R5.2OECD,4,High income
+ISL,Iceland,WEU,11,R5.2OECD,4,High income
+IRL,Ireland,WEU,11,R5.2OECD,4,High income
+ITA,Italy,WEU,11,R5.2OECD,4,High income
+LUX,Luxembourg,WEU,11,R5.2OECD,4,High income
+MLT,Malta,WEU,11,R5.2OECD,4,High income
+NLD,Netherlands,WEU,11,R5.2OECD,4,High income
+NOR,Norway,WEU,11,R5.2OECD,4,High income
+PRT,Portugal,WEU,11,R5.2OECD,4,High income
+ESP,Spain,WEU,11,R5.2OECD,4,High income
+SWE,Sweden,WEU,11,R5.2OECD,4,High income
+CHE,Switzerland,WEU,11,R5.2OECD,4,High income
+TUR,Turkey,TUR,13,R5.2OECD,3,Upper middle income
+GBR,United Kingdom of Great Britain and Northern Ireland,WEU,11,R5.2OECD,4,High income
+ROU,Romania,CEU,12,R5.2OECD,4,High income
+KOS,Kosovo,CEU,12,R5.2OECD,4,High income
