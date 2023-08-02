@@ -148,7 +148,7 @@ class MIMOSA:
         use_neos=False,
         neos_email=None,
         ipopt_output_file=None,
-    ) -> None:
+    ) -> bool:
         """Sends the concrete model to a solver.
 
         Args:
@@ -160,6 +160,9 @@ class MIMOSA:
 
         Raises:
             SolverException: raised if solver did not exit with status OK
+
+        Returns:
+            bool: True if solver exited with status OK
         """
 
         if use_neos:
@@ -194,12 +197,14 @@ class MIMOSA:
             )
             if results.solver.status != SolverStatus.warning:
                 raise SolverException("Solver did not exit with status OK")
+            return False
 
         logger.info(
             "Final NPV: {}".format(
                 value(self.concrete_model.NPV[self.concrete_model.tf])
             )
         )
+        return True
 
     @utils.timer("Plotting results")
     def plot(self, filename="result", **kwargs):
