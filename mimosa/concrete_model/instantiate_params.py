@@ -167,6 +167,9 @@ class InstantiatedModel:
             "MAC_scaling_factor": self.regional_param_store.get(
                 "MAC", params["economics"]["MAC"]["regional calibration factor"]
             ),
+            "impose_global_carbon_price": V(
+                params["economics"]["MAC"]["impose_global_carbon_price"]
+            ),
             "rel_abatement_costs_min_level": V(
                 params["economics"]["MAC"]["rel_abatement_costs_min_level"]
             ),

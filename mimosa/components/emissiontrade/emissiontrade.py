@@ -49,6 +49,7 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     )
 
     m.global_carbonprice = Var(m.t)
+    m.impose_global_carbon_price = Param()
 
     # The global mitigation cost pool:
     constraints.extend(
@@ -66,6 +67,14 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
                 )
                 / sum(m.population(m.year(t), r) for r in m.regions),
                 "global_carbonprice",
+            ),
+            RegionalSoftEqualityConstraint(
+                lambda m, t, r: m.carbonprice[t, r],
+                lambda m, t, r: m.global_carbonprice[t],
+                "carbonprice_equals_global_carbonprice",
+                epsilon=0.1,
+                ignore_if=lambda m, t, r: m.year(t) <= 2020
+                or not value(m.impose_global_carbon_price),
             ),
         ]
     )

@@ -229,6 +229,13 @@ economics:
       unit: currency_unit/emissionsrate_unit
       default: 2601 USD2005/tCO2
 
+    impose_global_carbon_price:
+      descr: >-
+        Global carbon price to be used for the MACs.
+        Can also be false, then no global carbon price is imposed
+      type: bool
+      default: False
+
     regional calibration factor:
       descr: >-
         Column from mac.csv to be used for the regional MACs. The MACs are calibrated
