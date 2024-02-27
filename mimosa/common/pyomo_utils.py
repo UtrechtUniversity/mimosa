@@ -11,9 +11,9 @@ import pyomo.environ
 # By default, the unit becomes "radian", causing trouble in subsequent unit comparisons.
 # Since we use arctan a lot as a "soft-min/max" function, the unit should stay the same as
 # the input unit
-PintUnitExtractionVisitor.unary_function_method_map[
-    "atan"
-] = PintUnitExtractionVisitor._get_unit_for_single_child
+PintUnitExtractionVisitor.unary_function_method_map["atan"] = (
+    PintUnitExtractionVisitor._get_unit_for_single_child
+)
 
 
 from pyomo.environ import units
@@ -161,13 +161,13 @@ class GlobalSoftEqualityConstraint(GeneralSoftEqualityConstraint):
         rule_lhs = self.rule
         rule_rhs = self.rule_rhs
 
-        upperbound = (
-            lambda m, t: rule_lhs(m, t) <= self.rhs_eps(rule_rhs, True, m, t)
+        upperbound = lambda m, t: (
+            rule_lhs(m, t) <= self.rhs_eps(rule_rhs, True, m, t)
             if not self.ignore_if(m, t)
             else Constraint.Skip
         )
-        lowerbound = (
-            lambda m, t: rule_lhs(m, t) >= self.rhs_eps(rule_rhs, False, m, t)
+        lowerbound = lambda m, t: (
+            rule_lhs(m, t) >= self.rhs_eps(rule_rhs, False, m, t)
             if not self.ignore_if(m, t)
             else Constraint.Skip
         )
@@ -183,13 +183,13 @@ class RegionalSoftEqualityConstraint(GeneralSoftEqualityConstraint):
         rule_lhs = self.rule
         rule_rhs = self.rule_rhs
 
-        upperbound = (
-            lambda m, t, r: rule_lhs(m, t, r) <= self.rhs_eps(rule_rhs, True, m, t, r)
+        upperbound = lambda m, t, r: (
+            rule_lhs(m, t, r) <= self.rhs_eps(rule_rhs, True, m, t, r)
             if not self.ignore_if(m, t, r)
             else Constraint.Skip
         )
-        lowerbound = (
-            lambda m, t, r: rule_lhs(m, t, r) >= self.rhs_eps(rule_rhs, False, m, t, r)
+        lowerbound = lambda m, t, r: (
+            rule_lhs(m, t, r) >= self.rhs_eps(rule_rhs, False, m, t, r)
             if not self.ignore_if(m, t, r)
             else Constraint.Skip
         )
@@ -244,15 +244,11 @@ def is_regional(var):
     """Returns true if the Pyomo variable `var` is regional, false if it is global"""
     # While there is no explicit Pyomo way to obtain the indices, we can use
     # this private property to check if variable has multiple indices
-    if var._implicit_subsets is None:
-        return False
-    return True
+    return var.index_set().dimen > 1
 
 
 def get_indices(var):
-    if is_regional(var):
-        return [index.name for index in var._implicit_subsets]
-    return [var.index_set().name]
+    return [index.local_name for index in var.index_set().subsets()]
 
 
 def get_unit(var):
