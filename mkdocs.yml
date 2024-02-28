@@ -2,12 +2,37 @@ site_name: MIMOSA documentation
 
 theme:
   name: material
+  palette:
+    primary: light green
+  favicon: assets/circle_logo.svg
+  logo: assets/circle_logo.svg
 
 plugins:
-  - mkdocstrings
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            show_root_toc_entry: false
+
+markdown_extensions:
+  - pymdownx.arithmatex:
+      generic: true
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://polyfill.io/v3/polyfill.min.js?features=es6
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+
+watch:
+  - mimosa
 
 nav:
   - Home: index.md
   - Running MIMOSA: usage.md
   - Parameter reference: parameters.md
-  - Model structure: structure.md
+  - Model structure:
+      - Economics: economics.md
+      - Emission trade: emissiontrade.md
