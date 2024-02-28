@@ -3,6 +3,8 @@
 # Visual Studio Code
 .vscode/
 
+.DS_Store
+
 # Debug files
 output/*
 AD-RICE/*
