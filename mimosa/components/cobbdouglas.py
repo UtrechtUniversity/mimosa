@@ -20,19 +20,50 @@ from mimosa.common import (
 
 
 def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
-    """Economics and Cobb-Douglas equations and constraints
+    """
+    # Economic module and production function
 
-    Necessary variables:
-        m.L (equal to m.population)
-        m.dk
+    ## Gross and net GDP
 
-    Returns:
-        list of constraints (any of:
-           - GlobalConstraint
-           - GlobalInitConstraint
-           - RegionalConstraint
-           - RegionalInitConstraint
-        )
+    The core of the model is the economic module, detailing how GDP, investments and
+    consumptions vary over time. We use a traditional Cobb-Douglas production function. This means
+    that the gross GDP is calculated by:
+
+    :::mimosa.common.economics.calc_GDP
+
+    The net GDP is then calculated by subtracting the damages and
+    mitigation costs from the gross GDP. *(Note that in MIMOSA, the damages are expressed as a fraction of the gross GDP,
+    whereas the mitigation costs are expressed in absolute terms.)*
+
+    $$ \\text{GDP}_{\\text{net}} = \\text{GDP}_{\\text{gross}} \\cdot (1 - \\text{damage costs}) - \\text{mitigation costs}$$
+
+    ## Investments and consumption
+
+    This net GDP is then split in a part of investments ($I_t$) and a part of consumption ($C_t$), according to a fixed savings rate ($\\text{sr}$):
+
+    $$ I_t = \\text{sr} \\cdot \\text{GDP}_{\\text{net}}, $$
+
+    $$ C_t = (1 - \\text{sr}) \\cdot \\text{GDP}_{\\text{net}}. $$
+
+    ## Capital stock
+
+    The capital stock $K_t$ grows over time according to the investments and the depreciation of the capital stock:
+
+    $$ K_t = K_{t-1} + \\Delta t \\cdot \\frac{\\partial K_t}{\\partial t}, $$
+
+    with the change in capital stock calculated by:
+
+    :::mimosa.common.economics.calc_dKdt
+
+    Since this only gives the change in capital stock, we need to add the initial capital stock to get the actual capital stock.
+    This is calculated as a region-dependent multiple of the initial GDP:
+
+    $$ K_{t=0} = \\text{init_capitalstock_factor} \\cdot \\text{GDP}_{t=0}. $$
+
+    ??? info "Todo"
+        Add a graph of the initial capital stock factors.
+
+
     """
     constraints = []
 
@@ -70,15 +101,17 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     constraints.extend(
         [
             RegionalConstraint(
-                lambda m, t, r: m.GDP_gross[t, r]
-                == economics.calc_GDP(
-                    m.TFP(m.year(t), r),
-                    m.L(m.year(t), r),
-                    soft_min(m.capital_stock[t, r], scale=10),
-                    m.alpha,
-                )
-                if t > 0
-                else Constraint.Skip,
+                lambda m, t, r: (
+                    m.GDP_gross[t, r]
+                    == economics.calc_GDP(
+                        m.TFP(m.year(t), r),
+                        m.L(m.year(t), r),
+                        soft_min(m.capital_stock[t, r], scale=10),
+                        m.alpha,
+                    )
+                    if t > 0
+                    else Constraint.Skip
+                ),
                 "GDP_gross",
             ),
             RegionalInitConstraint(
@@ -102,15 +135,17 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
             ),
             RegionalConstraint(
                 lambda m, t, r: (
-                    m.capital_stock[t, r]
-                    == m.capital_stock[t - 1, r]
-                    + m.dt
-                    * economics.calc_dKdt(
-                        m.capital_stock[t, r], m.dk, m.investments[t, r], m.dt
+                    (
+                        m.capital_stock[t, r]
+                        == m.capital_stock[t - 1, r]
+                        + m.dt
+                        * economics.calc_dKdt(
+                            m.capital_stock[t, r], m.dk, m.investments[t, r], m.dt
+                        )
                     )
-                )
-                if t > 0
-                else Constraint.Skip,
+                    if t > 0
+                    else Constraint.Skip
+                ),
                 "capital_stock",
             ),
             RegionalInitConstraint(
