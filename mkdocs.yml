@@ -1,0 +1,13 @@
+site_name: MIMOSA documentation
+
+theme:
+  name: material
+
+plugins:
+  - mkdocstrings
+
+nav:
+  - Home: index.md
+  - Running MIMOSA: usage.md
+  - Parameter reference: parameters.md
+  - Model structure: structure.md
