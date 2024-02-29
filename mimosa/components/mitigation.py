@@ -40,7 +40,7 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     ### Technological learning
 
     # Learning by doing
-    m.LBD_rate = Param()
+    m.LBD_rate = Param(doc="::economics.MAC.rho")
     m.log_LBD_rate = Param(initialize=log(m.LBD_rate) / log(2))
     m.LBD_scaling = Param()
     m.LBD_factor = Var(m.t)  # , bounds=(0,1), initialize=1)
@@ -86,8 +86,8 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
         units=quant.unit("currency_unit"),
     )
     m.rel_mitigation_costs = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
-    m.MAC_gamma = Param()
-    m.MAC_beta = Param()
+    m.MAC_gamma = Param(doc="::economics.MAC.gamma")
+    m.MAC_beta = Param(doc="::economics.MAC.beta")
     m.MAC_scaling_factor = Param(m.regions)  # Regional scaling of the MAC
     m.carbonprice = Var(
         m.t,
@@ -95,7 +95,9 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
         bounds=lambda m: (0, 2 * m.MAC_gamma),
         units=quant.unit("currency_unit/emissions_unit"),
     )
-    m.rel_mitigation_costs_min_level = Param()
+    m.rel_mitigation_costs_min_level = Param(
+        doc="::economics.MAC.rel_mitigation_costs_min_level"
+    )
     constraints.extend(
         [
             RegionalConstraint(
@@ -144,19 +146,25 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     constraints.extend(
         [
             GlobalConstraint(
-                lambda m, t: m.global_emission_reduction_per_cost_unit[t]
-                == sum(m.regional_emission_reduction[t, r] for r in m.regions)
-                / soft_min(sum(m.mitigation_costs[t, r] for r in m.regions))
-                if t > 0
-                else Constraint.Skip,
+                lambda m, t: (
+                    m.global_emission_reduction_per_cost_unit[t]
+                    == sum(m.regional_emission_reduction[t, r] for r in m.regions)
+                    / soft_min(sum(m.mitigation_costs[t, r] for r in m.regions))
+                    if t > 0
+                    else Constraint.Skip
+                ),
                 "global_emission_reduction_per_cost_unit",
             ),
             GlobalConstraint(
-                lambda m, t: m.global_cost_per_emission_reduction_unit[t]
-                == sum(m.mitigation_costs[t, r] for r in m.regions)
-                / soft_min(sum(m.regional_emission_reduction[t, r] for r in m.regions))
-                if t > 0
-                else Constraint.Skip,
+                lambda m, t: (
+                    m.global_cost_per_emission_reduction_unit[t]
+                    == sum(m.mitigation_costs[t, r] for r in m.regions)
+                    / soft_min(
+                        sum(m.regional_emission_reduction[t, r] for r in m.regions)
+                    )
+                    if t > 0
+                    else Constraint.Skip
+                ),
                 "global_cost_per_emission_reduction_unit",
             ),
         ]

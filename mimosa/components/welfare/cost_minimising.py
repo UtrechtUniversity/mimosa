@@ -34,8 +34,8 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     constraints = []
 
     # Parameters
-    m.elasmu = Param()
-    m.inequal_aversion = Param()
+    m.elasmu = Param(doc="::economics.elasmu")
+    m.inequal_aversion = Param(doc="::economics.inequal_aversion")
 
     m.utility = Var(m.t, m.regions, initialize=10)
     m.yearly_welfare = Var(m.t)

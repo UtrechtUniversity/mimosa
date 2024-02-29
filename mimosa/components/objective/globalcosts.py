@@ -38,20 +38,24 @@ def get_constraints(m: AbstractModel) -> Tuple[Objective, Sequence[GeneralConstr
     constraints = []
 
     m.NPV = Var(m.t)
-    m.PRTP = Param()
+    m.PRTP = Param(doc="::economics.PRTP")
     constraints.extend(
         [
             GlobalConstraint(
-                lambda m, t: m.NPV[t]
-                == m.NPV[t - 1]
-                + m.dt
-                * exp(-m.PRTP * (m.year(t) - m.beginyear))
-                * (
-                    sum(m.mitigation_costs[t, r] for r in m.regions)
-                    + sum(m.damage_costs[t, r] * m.GDP_gross[t, r] for r in m.regions)
-                )
-                if t > 0
-                else Constraint.Skip,
+                lambda m, t: (
+                    m.NPV[t]
+                    == m.NPV[t - 1]
+                    + m.dt
+                    * exp(-m.PRTP * (m.year(t) - m.beginyear))
+                    * (
+                        sum(m.mitigation_costs[t, r] for r in m.regions)
+                        + sum(
+                            m.damage_costs[t, r] * m.GDP_gross[t, r] for r in m.regions
+                        )
+                    )
+                    if t > 0
+                    else Constraint.Skip
+                ),
                 name="NPV",
             ),
             GlobalInitConstraint(lambda m: m.NPV[0] == 0),

@@ -133,31 +133,16 @@ class InstantiatedModel:
             "regions": V(params["regions"].keys()),
             "burden_sharing_regime": V(params["burden sharing"]["regime"]),
             "percapconv_year": V(params["burden sharing"]["percapconv_year"]),
-            "LBD_rate": V(params["economics"]["MAC"]["rho"]),
             "LBD_scaling": V(quant("40 GtCO2", "emissions_unit")),
             "LOT_rate": V(0),
             "damage_scale_factor": V(params["economics"]["damages"]["scale factor"]),
             "fixed_adaptation": V(params["economics"]["adaptation"]["fixed"]),
-            "ignore_damages": V(params["economics"]["damages"]["ignore damages"]),
-            "MAC_gamma": V(
-                quant(
-                    params["economics"]["MAC"]["gamma"],
-                    "currency_unit/emissionsrate_unit",
-                )
-            ),
-            "MAC_beta": V(params["economics"]["MAC"]["beta"]),
             "MAC_scaling_factor": self.regional_param_store.get(
                 "MAC", params["economics"]["MAC"]["regional calibration factor"]
-            ),
-            "rel_mitigation_costs_min_level": V(
-                params["economics"]["MAC"]["rel_mitigation_costs_min_level"]
             ),
             "init_capitalstock_factor": self.regional_param_store.get(
                 "economics", "init_capital_factor"
             ),
-            "elasmu": V(params["economics"]["elasmu"]),
-            "inequal_aversion": V(params["economics"]["inequal_aversion"]),
-            "PRTP": V(params["economics"]["PRTP"]),
         }
 
         parameter_mapping.update(parameter_mapping_manual)

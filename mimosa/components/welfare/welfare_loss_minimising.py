@@ -33,7 +33,7 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     constraints = []
 
     # Parameters
-    m.elasmu = Param()
+    m.elasmu = Param(doc="::economics.elasmu")
 
     m.utility = Var(m.t, m.regions, initialize=0.1)
     m.yearly_welfare = Var(m.t)
