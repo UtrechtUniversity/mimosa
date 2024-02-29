@@ -1,7 +1,8 @@
 import numpy as np
-from mimosa.common import AbstractModel, quant
+from mimosa.common import AbstractModel, quant, Param
 from mimosa.common.data import DataStore
 from mimosa.common.regional_params import RegionalParamStore
+from mimosa.common.config.parseconfig import get_nested
 
 # Util to create a None-indexed dictionary for scalar components
 # (see https://pyomo.readthedocs.io/en/stable/working_abstractmodels/data/raw_dicts.html)
@@ -35,9 +36,9 @@ class InstantiatedModel:
         # The data functions need to be changed in the abstract model
         # before initialization.
         self.abstract_model.baseline_emissions = self.data_store.data_object("baseline")
-        self.abstract_model.population = (
-            self.abstract_model.L
-        ) = self.data_store.data_object("population")
+        self.abstract_model.population = self.abstract_model.L = (
+            self.data_store.data_object("population")
+        )
         self.abstract_model.GDP = self.data_store.data_object("GDP")
         self.abstract_model.carbon_intensity = self.data_store.data_object(
             "carbon_intensity"
@@ -108,7 +109,15 @@ class InstantiatedModel:
         self.abstract_model.year = lambda t: t_start + t * dt
         year2100 = int((2100 - t_start) / dt)
 
-        parameter_mapping = {
+        parameter_mapping = {}
+
+        # Attempt to set parameter values automatically from their doc value
+        for parameter in self.abstract_model.component_objects(Param):
+            if str(parameter.doc).startswith("::"):
+                keys = parameter.doc.split("::")[1].split(".")
+                parameter_mapping[parameter.name] = V(get_nested(params, keys))
+
+        parameter_mapping_manual = {
             "beginyear": V(t_start),
             "dt": V(dt),
             "tf": V(num_years - 1),
@@ -173,13 +182,15 @@ class InstantiatedModel:
             "init_capitalstock_factor": self.regional_param_store.get(
                 "economics", "init_capital_factor"
             ),
-            "alpha": V(params["economics"]["GDP"]["alpha"]),
-            "dk": V(params["economics"]["GDP"]["depreciation of capital"]),
-            "sr": V(params["economics"]["GDP"]["savings rate"]),
+            # "alpha": V(params["economics"]["GDP"]["alpha"]),
+            # "dk": V(params["economics"]["GDP"]["depreciation of capital"]),
+            # "sr": V(params["economics"]["GDP"]["savings rate"]),
             "elasmu": V(params["economics"]["elasmu"]),
             "inequal_aversion": V(params["economics"]["inequal_aversion"]),
             "PRTP": V(params["economics"]["PRTP"]),
         }
+
+        parameter_mapping.update(parameter_mapping_manual)
 
         if "custom_mapping" in params["simulation"]:
             parameter_mapping.update(params["simulation"]["custom_mapping"])
