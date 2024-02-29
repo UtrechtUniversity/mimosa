@@ -37,7 +37,8 @@ nav:
   - Home: index.md
   - Installing and running MIMOSA: usage.md
   - Model components:
-      - Economics: economics.md
+      - Economics: components/economics.md
+      - Emissions: components/emissions.md
   - Parameter reference: parameters.md
   - Extending MIMOSA: extending_mimosa.md
   - Model code: "https://github.com/kvanderwijst/MIMOSA"
