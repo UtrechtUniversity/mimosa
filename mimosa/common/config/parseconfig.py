@@ -2,7 +2,6 @@
 Parses the config.yaml file and checks for consistency with the default config template.
 """
 
-
 from mimosa.common.utils import load_yaml
 from mimosa.common import quant
 
@@ -58,7 +57,7 @@ def check_obsolete_params(user_yaml, parsed_params, parser_tree):
         raise RuntimeWarning("Some config parameters are obsolete.")
 
 
-def check_params(input_params):
+def check_params(input_params, return_parser_tree=False):
     default_yaml = load_yaml("config_default.yaml")
 
     parsed_params, params_parser_tree = parse_params(
@@ -67,6 +66,8 @@ def check_params(input_params):
 
     check_obsolete_params(input_params, parsed_params, params_parser_tree)
 
+    if return_parser_tree:
+        return parsed_params, params_parser_tree
     return parsed_params
 
 

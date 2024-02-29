@@ -70,6 +70,9 @@ class GeneralParser(ABC):
             return True
         return False
 
+    def to_string(self):
+        return f"{self.descr}. Type: {self.type}. Default: {self.default}.{' Can also be false.' if self.can_be_false else ''}"
+
     def __repr__(self):
         return f"{self.__class__}: ({self.descr}). Default: {self.default}"
 
@@ -148,6 +151,9 @@ class NumParser(GeneralParser):
             )
         return parsed_value
 
+    def to_string(self):
+        return f"{super().to_string()} Min: {self.min}. Max: {self.max}."
+
 
 class FloatParser(NumParser):
     @property
@@ -173,6 +179,9 @@ class EnumParser(GeneralParser):
             self.error(f"Value {value} not in allowed values {self.allowed_values}")
         return value
 
+    def to_string(self):
+        return f"{super().to_string()} Allowed values: {self.allowed_values}."
+
 
 class QuantityParser(GeneralParser):
     def __init__(self, node, quant: Quantity, *args, **kwargs):
@@ -194,6 +203,9 @@ class QuantityParser(GeneralParser):
         ):
             self.error(f"Cannot parse quantity `{value}` to unit `{self.unit}`")
         return value  # Returns the string, unit will be really converted when instantiating the model
+
+    def to_string(self):
+        return f"{super().to_string()} Unit: {self.unit}."
 
 
 class ListParser(GeneralParser):

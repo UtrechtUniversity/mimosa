@@ -29,6 +29,9 @@ extra_javascript:
 watch:
   - mimosa
 
+hooks:
+  - mkdocs_hooks.py
+
 nav:
   - Home: index.md
   - Running MIMOSA: usage.md
