@@ -132,12 +132,12 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
         ]
     )
 
-    m.T0 = Param(units=quant.unit("degC_above_PI"))
+    m.T0 = Param(units=quant.unit("degC_above_PI"), doc="::temperature.initial")
     m.temperature = Var(
         m.t, initialize=lambda m, t: m.T0, units=quant.unit("degC_above_PI")
     )
-    m.TCRE = Param()
-    m.temperature_target = Param()
+    m.TCRE = Param(doc="::temperature.TCRE")
+    m.temperature_target = Param(doc="::temperature.target")
     constraints.extend(
         [
             GlobalConstraint(
@@ -157,7 +157,7 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
         ]
     )
 
-    m.perc_reversible_damages = Param()
+    m.perc_reversible_damages = Param(doc="::economics.damages.percentage reversible")
 
     # m.overshoot = Var(m.t, initialize=0)
     # m.overshootdot = DerivativeVar(m.overshoot, wrt=m.t)
@@ -179,13 +179,17 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
 
     # Emission constraints
 
-    m.budget = Param()
-    m.inertia_global = Param()
-    m.inertia_regional = Param()
-    m.global_min_level = Param()
-    m.regional_min_level = Param()
-    m.no_pos_emissions_after_budget_year = Param()
-    m.non_increasing_emissions_after_2100 = Param()
+    m.budget = Param(doc="::emissions.carbonbudget")
+    m.inertia_global = Param(doc="::emissions.inertia.global")
+    m.inertia_regional = Param(doc="::emissions.inertia.regional")
+    m.global_min_level = Param(doc="::emissions.global min level")
+    m.regional_min_level = Param(doc="::emissions.regional min level")
+    m.no_pos_emissions_after_budget_year = Param(
+        doc="::emissions.not positive after budget year"
+    )
+    m.non_increasing_emissions_after_2100 = Param(
+        doc="::emissions.non increasing emissions after 2100"
+    )
     constraints.extend(
         [
             # Carbon budget constraints:

@@ -23,6 +23,7 @@ class InstantiatedModel:
 
         # Get the non-regional params (from config.yaml) from the RegionalParamStore
         self.params = regional_param_store.params
+        self.param_parser_tree = regional_param_store.param_parser_tree
 
         # First, set the data functions in the abstract model
         self.set_data_functions()
@@ -115,7 +116,13 @@ class InstantiatedModel:
         for parameter in self.abstract_model.component_objects(Param):
             if str(parameter.doc).startswith("::"):
                 keys = parameter.doc.split("::")[1].split(".")
-                parameter_mapping[parameter.name] = V(get_nested(params, keys))
+                print(keys)
+                value = get_nested(params, keys)
+                # Check type of parameter
+                parser = get_nested(self.param_parser_tree, keys)
+                if parser.type == "quantity":
+                    value = quant(value, parser.unit)
+                parameter_mapping[parameter.name] = V(value)
 
         parameter_mapping_manual = {
             "beginyear": V(t_start),
@@ -124,47 +131,13 @@ class InstantiatedModel:
             "t": V(range(num_years)),
             "year2100": V(year2100),
             "regions": V(params["regions"].keys()),
-            "baseline_carbon_intensity": V(
-                params["emissions"]["baseline carbon intensity"]
-            ),
-            "budget": V(quant(params["emissions"]["carbonbudget"], "emissions_unit")),
-            "inertia_regional": V(params["emissions"]["inertia"]["regional"]),
-            "inertia_global": V(params["emissions"]["inertia"]["global"]),
-            "global_min_level": V(
-                quant(params["emissions"]["global min level"], "emissionsrate_unit")
-            ),
-            "regional_min_level": V(
-                quant(params["emissions"]["regional min level"], "emissionsrate_unit")
-            ),
-            "no_pos_emissions_after_budget_year": V(
-                params["emissions"]["not positive after budget year"]
-            ),
-            "non_increasing_emissions_after_2100": V(
-                params["emissions"]["non increasing emissions after 2100"]
-            ),
-            "cumulative_emissions_trapz": V(
-                params["emissions"]["cumulative_emissions_trapz"]
-            ),
             "burden_sharing_regime": V(params["burden sharing"]["regime"]),
             "percapconv_year": V(params["burden sharing"]["percapconv_year"]),
-            "T0": V(quant(params["temperature"]["initial"], "temperature_unit")),
-            "temperature_target": V(
-                quant(params["temperature"]["target"], "temperature_unit")
-            ),
-            "TCRE": V(
-                quant(
-                    params["temperature"]["TCRE"],
-                    "(temperature_unit)/(emissions_unit)",
-                )
-            ),
             "LBD_rate": V(params["economics"]["MAC"]["rho"]),
             "LBD_scaling": V(quant("40 GtCO2", "emissions_unit")),
             "LOT_rate": V(0),
             "damage_scale_factor": V(params["economics"]["damages"]["scale factor"]),
             "fixed_adaptation": V(params["economics"]["adaptation"]["fixed"]),
-            "perc_reversible_damages": V(
-                params["economics"]["damages"]["percentage reversible"]
-            ),
             "ignore_damages": V(params["economics"]["damages"]["ignore damages"]),
             "MAC_gamma": V(
                 quant(
@@ -182,9 +155,6 @@ class InstantiatedModel:
             "init_capitalstock_factor": self.regional_param_store.get(
                 "economics", "init_capital_factor"
             ),
-            # "alpha": V(params["economics"]["GDP"]["alpha"]),
-            # "dk": V(params["economics"]["GDP"]["depreciation of capital"]),
-            # "sr": V(params["economics"]["GDP"]["savings rate"]),
             "elasmu": V(params["economics"]["elasmu"]),
             "inequal_aversion": V(params["economics"]["inequal_aversion"]),
             "PRTP": V(params["economics"]["PRTP"]),

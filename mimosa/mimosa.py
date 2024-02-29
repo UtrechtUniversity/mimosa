@@ -50,8 +50,9 @@ class MIMOSA:
 
     def __init__(self, params: dict):
         # Check if input parameter dictionary is valid
-        params = check_params(params)
+        params, parser_tree = check_params(params, True)
         self.params = params
+        self.param_parser_tree = parser_tree
         self.regions = params["regions"]
 
         self.abstract_model = self.get_abstract_model()
@@ -90,7 +91,9 @@ class MIMOSA:
         """
 
         # Create the regional parameter store
-        self.regional_param_store = regional_params.RegionalParamStore(self.params)
+        self.regional_param_store = regional_params.RegionalParamStore(
+            self.params, self.param_parser_tree
+        )
 
         # Create the data store
         self.data_store = data.DataStore(self.params, self.regional_param_store)
