@@ -103,7 +103,7 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     m.investments = Var(m.t, m.regions, units=quant.unit("currency_unit"))
     m.consumption = Var(m.t, m.regions, units=quant.unit("currency_unit"))
 
-    m.ignore_damages = Param()
+    m.ignore_damages = Param(doc="::economics.damages.ignore damages")
 
     # Cobb-Douglas, GDP, investments, capital and consumption
     constraints.extend(

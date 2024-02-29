@@ -13,6 +13,8 @@ plugins:
         python:
           options:
             show_root_toc_entry: false
+  - search
+  - open-in-new-tab
 
 markdown_extensions:
   - pymdownx.arithmatex:
@@ -22,7 +24,6 @@ markdown_extensions:
   - pymdownx.superfences
 
 extra_javascript:
-  - javascripts/mathjax.js
   - https://polyfill.io/v3/polyfill.min.js?features=es6
   - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
 
@@ -34,8 +35,9 @@ hooks:
 
 nav:
   - Home: index.md
-  - Running MIMOSA: usage.md
-  - Parameter reference: parameters.md
-  - Model structure:
+  - Installing and running MIMOSA: usage.md
+  - Model components:
       - Economics: economics.md
-      - Emission trade: emissiontrade.md
+  - Parameter reference: parameters.md
+  - Extending MIMOSA: extending_mimosa.md
+  - Model code: "https://github.com/kvanderwijst/MIMOSA"

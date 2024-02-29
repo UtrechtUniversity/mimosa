@@ -44,7 +44,7 @@ def get_TFP(
 
 def calc_dKdt(K, dk, I, dt):
     """
-    $$ \\frac{\\partial K_{t,r}}{\\partial t} = \\frac{1}{\Delta t} \\cdot ((1 - dk)^{\\Delta t}  - 1) \\cdot K_{t,r} + I_{t,r}.$$
+    $$ \\frac{\\partial K_{t,r}}{\\partial t} = \\frac{1}{\\Delta t} \\cdot ((1 - dk)^{\\Delta t}  - 1) \\cdot K_{t,r} + I_{t,r}.$$
     """
     return ((1 - dk) ** dt - 1) / dt * K + I
 

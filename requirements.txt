@@ -4,5 +4,12 @@ pyomo
 pint
 pyyaml
 
+# For documentation:
+# mkdocs
+# mkdocs-open-in-new-tab
+# mkdocs-material
+# mkdocstrings
+
+
 # For export:
 # plotly
