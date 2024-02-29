@@ -35,21 +35,21 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     mitigation costs from the gross GDP. *(Note that in MIMOSA, the damages are expressed as a fraction of the gross GDP,
     whereas the mitigation costs are expressed in absolute terms.)*
 
-    $$ \\text{GDP}_{\\text{net}} = \\text{GDP}_{\\text{gross}} \\cdot (1 - \\text{damage costs}) - \\text{mitigation costs}$$
+    $$ \\text{GDP}_{\\text{net},t,r} = \\text{GDP}_{\\text{gross},t,r} \\cdot (1 - \\text{damage costs}_{t,r}) - \\text{mitigation costs}_{t,r}$$
 
     ## Investments and consumption
 
     This net GDP is then split in a part of investments ($I_t$) and a part of consumption ($C_t$), according to a fixed savings rate ($\\text{sr}$):
 
-    $$ I_t = \\text{sr} \\cdot \\text{GDP}_{\\text{net}}, $$
+    $$ I_{t,r} = \\text{sr} \\cdot \\text{GDP}_{\\text{net},t,r}, $$
 
-    $$ C_t = (1 - \\text{sr}) \\cdot \\text{GDP}_{\\text{net}}. $$
+    $$ C_{t,r} = (1 - \\text{sr}) \\cdot \\text{GDP}_{\\text{net},t,r}. $$
 
     ## Capital stock
 
     The capital stock $K_t$ grows over time according to the investments and the depreciation of the capital stock:
 
-    $$ K_t = K_{t-1} + \\Delta t \\cdot \\frac{\\partial K_t}{\\partial t}, $$
+    $$ K_{t,r} = K_{t-1,r} + \\Delta t \\cdot \\frac{\\partial K_{t,r}}{\\partial t}, $$
 
     with the change in capital stock calculated by:
 
@@ -58,10 +58,18 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     Since this only gives the change in capital stock, we need to add the initial capital stock to get the actual capital stock.
     This is calculated as a region-dependent multiple of the initial GDP:
 
-    $$ K_{t=0} = \\text{init_capitalstock_factor} \\cdot \\text{GDP}_{t=0}. $$
+    $$ K_{t=0,r} = \\text{init_capitalstock_factor}_r \\cdot \\text{GDP}_{t=0,r}. $$
 
     ??? info "Todo"
         Add a graph of the initial capital stock factors.
+
+    ## Parameters defined in this module
+    - param::init_capitalstock_factor
+    - param::alpha
+    - param::dk
+    - param::sr
+    - param::ignore_damages
+
 
 
     """
@@ -76,9 +84,9 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     )
 
     # Parameters
-    m.alpha = Param()
-    m.dk = Param()
-    m.sr = Param()
+    m.alpha = Param(doc="::economics.GDP.alpha")
+    m.dk = Param(doc="::economics.GDP.depreciation of capital")
+    m.sr = Param(doc="::economics.GDP.savings rate")
 
     m.GDP_gross = Var(
         m.t,

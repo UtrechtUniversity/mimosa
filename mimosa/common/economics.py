@@ -44,15 +44,15 @@ def get_TFP(
 
 def calc_dKdt(K, dk, I, dt):
     """
-    $$ \\frac{\\partial K_t}{\\partial t} = \\frac{1}{\Delta t} \\cdot ((1 - dk)^{\\Delta t}  - 1) \\cdot K_t + I_t.$$
+    $$ \\frac{\\partial K_{t,r}}{\\partial t} = \\frac{1}{\Delta t} \\cdot ((1 - dk)^{\\Delta t}  - 1) \\cdot K_{t,r} + I_{t,r}.$$
     """
     return ((1 - dk) ** dt - 1) / dt * K + I
 
 
 def calc_GDP(TFP, L, K, alpha):
     """
-    $$ \\text{GDP}_{\\text{gross}} = \\text{TFP} \\cdot L^{1-\\alpha} \\cdot K^{\\alpha}, $$
-    with $\\text{TFP}$ the total factor productivity, (exogenously calibrated from the baseline SSP scenarios)
+    $$ \\text{GDP}_{\\text{gross},t,r} = \\text{TFP}\\_{t,r} \\cdot L^{1-\\alpha}\\_{t,r} \\cdot K^{\\alpha}\\_{t,r}, $$
+    with $\\text{TFP}$ the total factor productivity (exogenously calibrated from the baseline SSP scenarios)
     $L$ the labor (represented by the total population), $K$ the capital stock and $\\alpha$ the share of capital in the production function.
 
     """
