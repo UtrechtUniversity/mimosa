@@ -35,6 +35,7 @@ plugins:
         python:
           options:
             show_root_toc_entry: false
+          paths: [src]
   - search
   - open-in-new-tab
 
