@@ -3,12 +3,14 @@ pandas
 pyomo
 pint
 pyyaml
+scipy
 
 # For documentation:
 # mkdocs
 # mkdocs-open-in-new-tab
 # mkdocs-material
 # mkdocstrings
+# mkdocstrings_handlers
 
 
 # For export:
