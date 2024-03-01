@@ -355,11 +355,12 @@ economics:
 emissions:
   carbonbudget:
     descr: >-
-      Value of the carbon budget.
-      Can also be false, then CBA mode is used
+      Value of the carbon budget. Example: "800 GtCO2" (the unit is important).
+      If set to False, no carbon budget is imposed: this is cost-benefit mode.
+      Default: False.
     type: quantity
     unit: emissions_unit
-    default: 800 GtCO2
+    default: False
     can_be_false: True
 
   global min level:

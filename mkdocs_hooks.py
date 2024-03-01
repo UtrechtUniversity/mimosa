@@ -13,6 +13,11 @@ params, parser_tree = check_params({}, return_parser_tree=True)
 model = MIMOSA(params).concrete_model
 
 
+def on_page_markdown(markdown, **kwargs):
+    # Build the parameter reference
+    return markdown
+
+
 def on_page_content(html, **kwargs):
     pattern = re.compile(r"param::[a-zA-Z0-9_]+")
     for match in re.findall(pattern, html):

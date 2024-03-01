@@ -1,11 +1,33 @@
 site_name: MIMOSA documentation
 
+nav:
+  - Home: index.md
+  - Model components:
+      - Economics: components/economics.md
+      - Emissions: components/emissions.md
+  - Parameter reference: parameters.md
+  - Installing MIMOSA: installation.md
+  - Running MIMOSA: run.md
+  - Extending MIMOSA: extending_mimosa.md
+  - Model code: "https://github.com/kvanderwijst/MIMOSA"
+
+repo_url: https://github.com/kvanderwijst/MIMOSA
+
 theme:
   name: material
   palette:
     primary: light green
   favicon: assets/circle_logo.svg
   logo: assets/circle_logo.svg
+  features:
+    - content.code.copy
+    - content.code.annotate
+
+watch:
+  - mimosa
+
+hooks:
+  - mkdocs_hooks.py
 
 plugins:
   - mkdocstrings:
@@ -22,23 +44,18 @@ markdown_extensions:
   - admonition
   - pymdownx.details
   - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.tabbed:
+      alternate_style: true
+      slugify: !!python/object/apply:pymdownx.slugs.slugify
+        kwds:
+          case: lower
 
 extra_javascript:
   - https://polyfill.io/v3/polyfill.min.js?features=es6
   - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
-
-watch:
-  - mimosa
-
-hooks:
-  - mkdocs_hooks.py
-
-nav:
-  - Home: index.md
-  - Installing and running MIMOSA: usage.md
-  - Model components:
-      - Economics: components/economics.md
-      - Emissions: components/emissions.md
-  - Parameter reference: parameters.md
-  - Extending MIMOSA: extending_mimosa.md
-  - Model code: "https://github.com/kvanderwijst/MIMOSA"
