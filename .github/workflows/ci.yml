@@ -25,5 +25,5 @@ jobs:
           path: .cache
           restore-keys: |
             mkdocs-material-
-      - run: pip install mkdocs-material mkdocs-open-in-new-tab mkdocstrings pyomo pint pyyaml pandas numpy
+      - run: pip install mkdocs-material mkdocs-open-in-new-tab mkdocstrings pyomo pint pyyaml pandas numpy scipy
       - run: mkdocs gh-deploy --force
