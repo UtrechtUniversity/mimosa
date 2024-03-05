@@ -16,7 +16,27 @@ repo_url: https://github.com/kvanderwijst/MIMOSA
 theme:
   name: material
   palette:
-    primary: light green
+    # Palette toggle for automatic mode
+    - media: "(prefers-color-scheme)"
+      toggle:
+        icon: material/brightness-auto
+        name: Switch to light mode
+
+    # Palette toggle for light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: light green
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+
+    # Palette toggle for dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: black
+      toggle:
+        icon: material/brightness-4
+        name: Switch to system preference
   favicon: assets/circle_logo.svg
   logo: assets/circle_logo.svg
   features:
@@ -43,6 +63,8 @@ markdown_extensions:
   - pymdownx.arithmatex:
       generic: true
   - admonition
+  - attr_list
+  - md_in_html
   - pymdownx.details
   - pymdownx.superfences
   - pymdownx.highlight:
