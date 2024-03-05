@@ -60,16 +60,23 @@
   
     
     
+      
     
     
     
-    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="light-green" data-md-color-accent="indigo">
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
   
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
+      
+        
+        <a href="#time_1" class="md-skip">
+          Skip to content
+        </a>
       
     </div>
     <div data-md-component="announce">
@@ -110,7 +117,43 @@
     </div>
     
       
+        <form class="md-header__option" data-md-component="palette">
+  
     
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m14.3 16-.7-2h-3.2l-.7 2H7.8L11 7h2l3.2 9h-1.9M20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69m-9.15 3.96h2.3L12 9l-1.15 3.65Z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="light-green" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69Z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="indigo"  aria-label="Switch to system preference"  type="radio" name="__palette" id="__palette_2">
+    
+      <label class="md-header__button md-icon" title="Switch to system preference" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12c0-2.42-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69Z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
     
     
     
@@ -329,6 +372,17 @@
       
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Parameter reference
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -338,6 +392,236 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#time_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      time
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#economics_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      economics
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="economics">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#economics-gdp" class="md-nav__link">
+    <span class="md-ellipsis">
+      GDP
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#economics-mac" class="md-nav__link">
+    <span class="md-ellipsis">
+      MAC
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#economics-emission-trade" class="md-nav__link">
+    <span class="md-ellipsis">
+      emission trade
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#economics-damages" class="md-nav__link">
+    <span class="md-ellipsis">
+      damages
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#economics-adaptation" class="md-nav__link">
+    <span class="md-ellipsis">
+      adaptation
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#emissions_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      emissions
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="emissions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#emissions-inertia" class="md-nav__link">
+    <span class="md-ellipsis">
+      inertia
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#burden-sharing" class="md-nav__link">
+    <span class="md-ellipsis">
+      burden sharing
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#temperature_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      temperature
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#model_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      model
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#input_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      input
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="input">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#input-baselines" class="md-nav__link">
+    <span class="md-ellipsis">
+      baselines
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="baselines">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#input-baselines-ssp1" class="md-nav__link">
+    <span class="md-ellipsis">
+      SSP1
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#input-baselines-ssp2" class="md-nav__link">
+    <span class="md-ellipsis">
+      SSP2
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#input-baselines-ssp3" class="md-nav__link">
+    <span class="md-ellipsis">
+      SSP3
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#input-baselines-ssp4" class="md-nav__link">
+    <span class="md-ellipsis">
+      SSP4
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#input-baselines-ssp5" class="md-nav__link">
+    <span class="md-ellipsis">
+      SSP5
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#input-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      variables
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#simulation_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      simulation
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -441,6 +725,227 @@
   
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#time_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      time
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#economics_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      economics
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="economics">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#economics-gdp" class="md-nav__link">
+    <span class="md-ellipsis">
+      GDP
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#economics-mac" class="md-nav__link">
+    <span class="md-ellipsis">
+      MAC
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#economics-emission-trade" class="md-nav__link">
+    <span class="md-ellipsis">
+      emission trade
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#economics-damages" class="md-nav__link">
+    <span class="md-ellipsis">
+      damages
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#economics-adaptation" class="md-nav__link">
+    <span class="md-ellipsis">
+      adaptation
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#emissions_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      emissions
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="emissions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#emissions-inertia" class="md-nav__link">
+    <span class="md-ellipsis">
+      inertia
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#burden-sharing" class="md-nav__link">
+    <span class="md-ellipsis">
+      burden sharing
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#temperature_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      temperature
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#model_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      model
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#input_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      input
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="input">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#input-baselines" class="md-nav__link">
+    <span class="md-ellipsis">
+      baselines
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="baselines">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#input-baselines-ssp1" class="md-nav__link">
+    <span class="md-ellipsis">
+      SSP1
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#input-baselines-ssp2" class="md-nav__link">
+    <span class="md-ellipsis">
+      SSP2
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#input-baselines-ssp3" class="md-nav__link">
+    <span class="md-ellipsis">
+      SSP3
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#input-baselines-ssp4" class="md-nav__link">
+    <span class="md-ellipsis">
+      SSP4
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#input-baselines-ssp5" class="md-nav__link">
+    <span class="md-ellipsis">
+      SSP5
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#input-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      variables
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#simulation_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      simulation
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -459,7 +964,1456 @@
 
   <h1>Parameter reference</h1>
 
-
+<p><link rel="stylesheet" href="/assets/extra.css"></p>
+<div class="param_group" id="time">
+<h2 id="time_1">time</h2>
+<div class="param_content">
+<details class="note">
+<summary>start</summary>
+<p>Year in which the model starts</p>
+<ul>
+<li>
+<p>Type: int</p>
+</li>
+<li>
+<p>Default: 2020</p>
+</li>
+<li>
+<p>Can be false: False</p>
+</li>
+<li>
+<p>Min: 1900</p>
+</li>
+<li>
+<p>Max: 2100</p>
+</li>
+</ul>
+<p>Usage: </p>
+<p><code>params["time"]["start"] = 2020</code></p>
+</details>
+<details class="note">
+<summary>end</summary>
+<p>Last year of the model run</p>
+<ul>
+<li>
+<p>Type: int</p>
+</li>
+<li>
+<p>Default: 2150</p>
+</li>
+<li>
+<p>Can be false: False</p>
+</li>
+<li>
+<p>Min: 1901</p>
+</li>
+<li>
+<p>Max: 2300</p>
+</li>
+</ul>
+<p>Usage: </p>
+<p><code>params["time"]["end"] = 2150</code></p>
+</details>
+<details class="note">
+<summary>dt</summary>
+<p>Timestep in years</p>
+<ul>
+<li>
+<p>Type: float</p>
+</li>
+<li>
+<p>Default: 5</p>
+</li>
+<li>
+<p>Can be false: False</p>
+</li>
+<li>
+<p>Min: 0.5</p>
+</li>
+<li>
+<p>Max: 20</p>
+</li>
+</ul>
+<p>Usage: </p>
+<p><code>params["time"]["dt"] = 5</code></p>
+</details>
+</div>
+</div>
+<details class="note">
+<summary>SSP</summary>
+<p>SSP, used for population, baseline GDP and baseline emissions</p>
+<ul>
+<li>
+<p>Type: enum</p>
+</li>
+<li>
+<p>Default: SSP2</p>
+</li>
+<li>
+<p>Can be false: False</p>
+</li>
+<li>
+<p>Allowed values:</p>
+<ul>
+<li>SSP1</li>
+<li>SSP2</li>
+<li>SSP3</li>
+<li>SSP4</li>
+<li>SSP5</li>
+</ul>
+</li>
+</ul>
+<p>Usage: </p>
+<p><code>params["SSP"] = "SSP2"</code></p>
+</details>
+<div class="param_group" id="economics">
+<h2 id="economics_1">economics</h2>
+<div class="param_content">
+<details class="note">
+<summary>PRTP</summary>
+<p>Pure rate of time preference</p>
+<ul>
+<li>
+<p>Type: float</p>
+</li>
+<li>
+<p>Default: 0.015</p>
+</li>
+<li>
+<p>Can be false: False</p>
+</li>
+<li>
+<p>Min: 0</p>
+</li>
+<li>
+<p>Max: 0.2</p>
+</li>
+</ul>
+<p>Usage: </p>
+<p><code>params["economics"]["PRTP"] = 0.015</code></p>
+</details>
+<details class="note">
+<summary>elasmu</summary>
+<p>Elasticity of marginal utility</p>
+<ul>
+<li>
+<p>Type: float</p>
+</li>
+<li>
+<p>Default: 1.001</p>
+</li>
+<li>
+<p>Can be false: False</p>
+</li>
+<li>
+<p>Min: 0.1</p>
+</li>
+<li>
+<p>Max: 10</p>
+</li>
+</ul>
+<p>Usage: </p>
+<p><code>params["economics"]["elasmu"] = 1.001</code></p>
+</details>
+<details class="note">
+<summary>inequal_aversion</summary>
+<p>Parameter of inequality aversion. Should be between 0 and <code>elasmu</code>. Only used when welfare_module='inequal_aversion_general'</p>
+<ul>
+<li>
+<p>Type: float</p>
+</li>
+<li>
+<p>Default: 0.5</p>
+</li>
+<li>
+<p>Can be false: False</p>
+</li>
+<li>
+<p>Min: 0.0</p>
+</li>
+<li>
+<p>Max: 3</p>
+</li>
+</ul>
+<p>Usage: </p>
+<p><code>params["economics"]["inequal_aversion"] = 0.5</code></p>
+</details>
+<div class="param_group" id="GDP">
+<h3 id="economics-gdp"><span class="param_group_breadcrumbs">economics &gt; </span>GDP</h3>
+<div class="param_content">
+<details class="note">
+<summary>alpha</summary>
+<p>Output elasticity of capital</p>
+<ul>
+<li>
+<p>Type: float</p>
+</li>
+<li>
+<p>Default: 0.3</p>
+</li>
+<li>
+<p>Can be false: False</p>
+</li>
+<li>
+<p>Min: 0</p>
+</li>
+<li>
+<p>Max: 1</p>
+</li>
+</ul>
+<p>Usage: </p>
+<p><code>params["economics"]["GDP"]["alpha"] = 0.3</code></p>
+</details>
+<details class="note">
+<summary>depreciation of capital</summary>
+<p>Yearly depreciation rate of capital stock</p>
+<ul>
+<li>
+<p>Type: float</p>
+</li>
+<li>
+<p>Default: 0.05</p>
+</li>
+<li>
+<p>Can be false: False</p>
+</li>
+<li>
+<p>Min: 0</p>
+</li>
+<li>
+<p>Max: inf</p>
+</li>
+</ul>
+<p>Usage: </p>
+<p><code>params["economics"]["GDP"]["depreciation of capital"] = 0.05</code></p>
+</details>
+<details class="note">
+<summary>savings rate</summary>
+<p>Fraction of GDP used for investments</p>
+<ul>
+<li>
+<p>Type: float</p>
+</li>
+<li>
+<p>Default: 0.21</p>
+</li>
+<li>
+<p>Can be false: False</p>
+</li>
+<li>
+<p>Min: 0</p>
+</li>
+<li>
+<p>Max: 1</p>
+</li>
+</ul>
+<p>Usage: </p>
+<p><code>params["economics"]["GDP"]["savings rate"] = 0.21</code></p>
+</details>
+</div>
+</div>
+<div class="param_group" id="MAC">
+<h3 id="economics-mac"><span class="param_group_breadcrumbs">economics &gt; </span>MAC</h3>
+<div class="param_content">
+<details class="note">
+<summary>beta</summary>
+<p>Power factor of the MAC curve</p>
+<ul>
+<li>
+<p>Type: float</p>
+</li>
+<li>
+<p>Default: 3</p>
+</li>
+<li>
+<p>Can be false: False</p>
+</li>
+<li>
+<p>Min: 0.01</p>
+</li>
+<li>
+<p>Max: 10</p>
+</li>
+</ul>
+<p>Usage: </p>
+<p><code>params["economics"]["MAC"]["beta"] = 3</code></p>
+</details>
+<details class="note">
+<summary>rho</summary>
+<p>Learning by doing rate (needs more explanation)</p>
+<ul>
+<li>
+<p>Type: float</p>
+</li>
+<li>
+<p>Default: 0.82</p>
+</li>
+<li>
+<p>Can be false: False</p>
+</li>
+<li>
+<p>Min: 0.1</p>
+</li>
+<li>
+<p>Max: 1</p>
+</li>
+</ul>
+<p>Usage: </p>
+<p><code>params["economics"]["MAC"]["rho"] = 0.82</code></p>
+</details>
+<details class="note">
+<summary>gamma</summary>
+<p>Calibration level of the MAC (carbon price for 100% reduction)</p>
+<ul>
+<li>
+<p>Type: quantity</p>
+</li>
+<li>
+<p>Default: 2601 USD2005/tCO2</p>
+</li>
+<li>
+<p>Can be false: False</p>
+</li>
+<li>
+<p>Unit: currency_unit/emissionsrate_unit</p>
+</li>
+</ul>
+<p>Usage: </p>
+<p><code>params["economics"]["MAC"]["gamma"] = "2601 USD2005/tCO2"</code></p>
+</details>
+<details class="note">
+<summary>regional calibration factor</summary>
+<p>Column from mac.csv to be used for the regional MACs. The MACs are calibrated from TIMER SSP2-RCP2.6 MACs at a given year and a given carbon price / abatement level.</p>
+<ul>
+<li>
+<p>Type: enum</p>
+</li>
+<li>
+<p>Default: kappa_rel_abatement_0.75_2050</p>
+</li>
+<li>
+<p>Can be false: False</p>
+</li>
+<li>
+<p>Allowed values:</p>
+<ul>
+<li>kappa_carbonprice_200_2030</li>
+<li>kappa_carbonprice_200_2050</li>
+<li>kappa_carbonprice_200_2070</li>
+<li>kappa_carbonprice_200_2100</li>
+<li>kappa_carbonprice_300_2030</li>
+<li>kappa_carbonprice_300_2050</li>
+<li>kappa_carbonprice_300_2070</li>
+<li>kappa_carbonprice_300_2100</li>
+<li>kappa_carbonprice_500_2030</li>
+<li>kappa_carbonprice_500_2050</li>
+<li>kappa_carbonprice_500_2070</li>
+<li>kappa_carbonprice_500_2100</li>
+<li>kappa_carbonprice_1000_2030</li>
+<li>kappa_carbonprice_1000_2050</li>
+<li>kappa_carbonprice_1000_2070</li>
+<li>kappa_carbonprice_1000_2100</li>
+<li>kappa_rel_abatement_0.25_2030</li>
+<li>kappa_rel_abatement_0.25_2050</li>
+<li>kappa_rel_abatement_0.25_2070</li>
+<li>kappa_rel_abatement_0.25_2100</li>
+<li>kappa_rel_abatement_0.4_2030</li>
+<li>kappa_rel_abatement_0.4_2050</li>
+<li>kappa_rel_abatement_0.4_2070</li>
+<li>kappa_rel_abatement_0.4_2100</li>
+<li>kappa_rel_abatement_0.5_2050</li>
+<li>kappa_rel_abatement_0.5_2070</li>
+<li>kappa_rel_abatement_0.5_2100</li>
+<li>kappa_rel_abatement_0.75_2050</li>
+<li>kappa_rel_abatement_0.75_2070</li>
+<li>kappa_rel_abatement_0.75_2100</li>
+</ul>
+</li>
+</ul>
+<p>Usage: </p>
+<p><code>params["economics"]["MAC"]["regional calibration factor"] = "kappa_rel_abatement_0.75_2050"</code></p>
+</details>
+<details class="note">
+<summary>rel_mitigation_costs_min_level</summary>
+<p>Minimum level of mitigation costs (rel to GDP). By default, this is 0: no negative abatement costs are allowed. For certain burden sharing regimes, this value can become negative to allow certain (small) financial transfers.</p>
+<ul>
+<li>
+<p>Type: float</p>
+</li>
+<li>
+<p>Default: 0</p>
+</li>
+<li>
+<p>Can be false: False</p>
+</li>
+<li>
+<p>Min: -2</p>
+</li>
+<li>
+<p>Max: 0</p>
+</li>
+</ul>
+<p>Usage: </p>
+<p><code>params["economics"]["MAC"]["rel_mitigation_costs_min_level"] = 0</code></p>
+</details>
+</div>
+</div>
+<div class="param_group" id="emission trade">
+<h3 id="economics-emission-trade"><span class="param_group_breadcrumbs">economics &gt; </span>emission trade</h3>
+<div class="param_content">
+<details class="note">
+<summary>min rel payment level</summary>
+<p>Which percentage of the area under the MAC of a region should it pay itself (minimum)? If false: no limt</p>
+<ul>
+<li>
+<p>Type: float</p>
+</li>
+<li>
+<p>Default: False</p>
+</li>
+<li>
+<p>Can be false: True</p>
+</li>
+<li>
+<p>Min: 0</p>
+</li>
+<li>
+<p>Max: 1</p>
+</li>
+</ul>
+<p>Usage: </p>
+<p><code>params["economics"]["emission trade"]["min rel payment level"] = False</code></p>
+</details>
+<details class="note">
+<summary>max rel payment level</summary>
+<p>Which percentage of the area under the MAC of a region should it pay itself (maximum)? If false: no limit</p>
+<ul>
+<li>
+<p>Type: float</p>
+</li>
+<li>
+<p>Default: False</p>
+</li>
+<li>
+<p>Can be false: True</p>
+</li>
+<li>
+<p>Min: 1</p>
+</li>
+<li>
+<p>Max: inf</p>
+</li>
+</ul>
+<p>Usage: </p>
+<p><code>params["economics"]["emission trade"]["max rel payment level"] = False</code></p>
+</details>
+</div>
+</div>
+<div class="param_group" id="damages">
+<h3 id="economics-damages"><span class="param_group_breadcrumbs">economics &gt; </span>damages</h3>
+<div class="param_content">
+<details class="note">
+<summary>percentage reversible</summary>
+<p>Factor of damages that are reversible</p>
+<ul>
+<li>
+<p>Type: float</p>
+</li>
+<li>
+<p>Default: 1</p>
+</li>
+<li>
+<p>Can be false: False</p>
+</li>
+<li>
+<p>Min: 0</p>
+</li>
+<li>
+<p>Max: 1</p>
+</li>
+</ul>
+<p>Usage: </p>
+<p><code>params["economics"]["damages"]["percentage reversible"] = 1</code></p>
+</details>
+<details class="note">
+<summary>scale factor</summary>
+<p>Manual scaling factor to increase or decrease damages</p>
+<ul>
+<li>
+<p>Type: float</p>
+</li>
+<li>
+<p>Default: 1</p>
+</li>
+<li>
+<p>Can be false: False</p>
+</li>
+<li>
+<p>Min: -inf</p>
+</li>
+<li>
+<p>Max: inf</p>
+</li>
+</ul>
+<p>Usage: </p>
+<p><code>params["economics"]["damages"]["scale factor"] = 1</code></p>
+</details>
+<details class="note">
+<summary>ignore damages</summary>
+<p>Flag to not take into account the damages in the GDP (but damages are calculated)</p>
+<ul>
+<li>
+<p>Type: bool</p>
+</li>
+<li>
+<p>Default: False</p>
+</li>
+<li>
+<p>Can be false: False</p>
+</li>
+</ul>
+<p>Usage: </p>
+<p><code>params["economics"]["damages"]["ignore damages"] = False</code></p>
+</details>
+<details class="note">
+<summary>quantile</summary>
+<p>Damage quantile (Only used for COACCH)</p>
+<ul>
+<li>
+<p>Type: float</p>
+</li>
+<li>
+<p>Default: 0.5</p>
+</li>
+<li>
+<p>Can be false: False</p>
+</li>
+<li>
+<p>Min: 0.025</p>
+</li>
+<li>
+<p>Max: 0.975</p>
+</li>
+</ul>
+<p>Usage: </p>
+<p><code>params["economics"]["damages"]["quantile"] = 0.5</code></p>
+</details>
+<details class="note">
+<summary>coacch_slr_withadapt</summary>
+<p>Flag to use the SLR-with-Adapation damage functions (Only used for COACCH)</p>
+<ul>
+<li>
+<p>Type: bool</p>
+</li>
+<li>
+<p>Default: True</p>
+</li>
+<li>
+<p>Can be false: False</p>
+</li>
+</ul>
+<p>Usage: </p>
+<p><code>params["economics"]["damages"]["coacch_slr_withadapt"] = True</code></p>
+</details>
+<details class="note">
+<summary>coacch_combined_slr_nonslr_damages</summary>
+<p>If true, do not model SLR damages separately from non-SLR, but use the combined damage functions (Only used for COACCH)</p>
+<ul>
+<li>
+<p>Type: bool</p>
+</li>
+<li>
+<p>Default: False</p>
+</li>
+<li>
+<p>Can be false: False</p>
+</li>
+</ul>
+<p>Usage: </p>
+<p><code>params["economics"]["damages"]["coacch_combined_slr_nonslr_damages"] = False</code></p>
+</details>
+</div>
+</div>
+<div class="param_group" id="adaptation">
+<h3 id="economics-adaptation"><span class="param_group_breadcrumbs">economics &gt; </span>adaptation</h3>
+<div class="param_content">
+<details class="note">
+<summary>curr_level</summary>
+<p>When adaptation level is fixed, keep it at this level (Only used for AD-RICE2010)</p>
+<ul>
+<li>
+<p>Type: float</p>
+</li>
+<li>
+<p>Default: 0</p>
+</li>
+<li>
+<p>Can be false: False</p>
+</li>
+<li>
+<p>Min: 0</p>
+</li>
+<li>
+<p>Max: 1</p>
+</li>
+</ul>
+<p>Usage: </p>
+<p><code>params["economics"]["adaptation"]["curr_level"] = 0</code></p>
+</details>
+<details class="note">
+<summary>fixed</summary>
+<p>Flag to keep adaptation at fixed value (curr_level). (Only used for AD-RICE2010) If false: the adaptation level is endogenously optimised.</p>
+<ul>
+<li>
+<p>Type: bool</p>
+</li>
+<li>
+<p>Default: False</p>
+</li>
+<li>
+<p>Can be false: False</p>
+</li>
+</ul>
+<p>Usage: </p>
+<p><code>params["economics"]["adaptation"]["fixed"] = False</code></p>
+</details>
+</div>
+</div>
+</div>
+</div>
+<div class="param_group" id="emissions">
+<h2 id="emissions_1">emissions</h2>
+<div class="param_content">
+<details class="note">
+<summary>carbonbudget</summary>
+<p>Value of the carbon budget. Example: "800 GtCO2" (the unit is important). If set to False, no carbon budget is imposed: this is cost-benefit mode. Default: False.</p>
+<ul>
+<li>
+<p>Type: quantity</p>
+</li>
+<li>
+<p>Default: False</p>
+</li>
+<li>
+<p>Can be false: True</p>
+</li>
+<li>
+<p>Unit: emissions_unit</p>
+</li>
+</ul>
+<p>Usage: </p>
+<p><code>params["emissions"]["carbonbudget"] = False</code></p>
+</details>
+<details class="note">
+<summary>global min level</summary>
+<p>Limit on the emission level (globally), mostly used for negative emissions. Can also be false, then no limit is imposed</p>
+<ul>
+<li>
+<p>Type: quantity</p>
+</li>
+<li>
+<p>Default: -20 GtCO2/yr</p>
+</li>
+<li>
+<p>Can be false: True</p>
+</li>
+<li>
+<p>Unit: emissionsrate_unit</p>
+</li>
+</ul>
+<p>Usage: </p>
+<p><code>params["emissions"]["global min level"] = "-20 GtCO2/yr"</code></p>
+</details>
+<details class="note">
+<summary>regional min level</summary>
+<p>Limit on the emission level (per region), mostly used for negative emissions. Can also be false, then no limit is imposed</p>
+<ul>
+<li>
+<p>Type: quantity</p>
+</li>
+<li>
+<p>Default: -10 GtCO2/yr</p>
+</li>
+<li>
+<p>Can be false: True</p>
+</li>
+<li>
+<p>Unit: emissionsrate_unit</p>
+</li>
+</ul>
+<p>Usage: </p>
+<p><code>params["emissions"]["regional min level"] = "-10 GtCO2/yr"</code></p>
+</details>
+<details class="note">
+<summary>not positive after budget year</summary>
+<p>If true, impose net-zero emissions after budget year (2100)</p>
+<ul>
+<li>
+<p>Type: bool</p>
+</li>
+<li>
+<p>Default: True</p>
+</li>
+<li>
+<p>Can be false: False</p>
+</li>
+</ul>
+<p>Usage: </p>
+<p><code>params["emissions"]["not positive after budget year"] = True</code></p>
+</details>
+<details class="note">
+<summary>non increasing emissions after 2100</summary>
+<p>If true, the regional emissions after 2100 are not allowed to climb.</p>
+<ul>
+<li>
+<p>Type: bool</p>
+</li>
+<li>
+<p>Default: True</p>
+</li>
+<li>
+<p>Can be false: False</p>
+</li>
+</ul>
+<p>Usage: </p>
+<p><code>params["emissions"]["non increasing emissions after 2100"] = True</code></p>
+</details>
+<details class="note">
+<summary>baseline carbon intensity</summary>
+<p>If true, use baseline carbon intensity to calculate baseline emissions. If false, the SSP baseline emissions are used, regardless of lower GDP.</p>
+<ul>
+<li>
+<p>Type: bool</p>
+</li>
+<li>
+<p>Default: True</p>
+</li>
+<li>
+<p>Can be false: False</p>
+</li>
+</ul>
+<p>Usage: </p>
+<p><code>params["emissions"]["baseline carbon intensity"] = True</code></p>
+</details>
+<div class="param_group" id="inertia">
+<h3 id="emissions-inertia"><span class="param_group_breadcrumbs">emissions &gt; </span>inertia</h3>
+<div class="param_content">
+<details class="note">
+<summary>global</summary>
+<p>Maximum reduction speed, in % of initial emissions (should be negative) Can also be false, then no inertia limit is imposed</p>
+<ul>
+<li>
+<p>Type: float</p>
+</li>
+<li>
+<p>Default: False</p>
+</li>
+<li>
+<p>Can be false: True</p>
+</li>
+<li>
+<p>Min: -inf</p>
+</li>
+<li>
+<p>Max: 0</p>
+</li>
+</ul>
+<p>Usage: </p>
+<p><code>params["emissions"]["inertia"]["global"] = False</code></p>
+</details>
+<details class="note">
+<summary>regional</summary>
+<p>Maximum reduction speed, in % of initial emissions (should be negative) Can also be false, then no inertia limit is imposed</p>
+<ul>
+<li>
+<p>Type: float</p>
+</li>
+<li>
+<p>Default: -0.05</p>
+</li>
+<li>
+<p>Can be false: True</p>
+</li>
+<li>
+<p>Min: -inf</p>
+</li>
+<li>
+<p>Max: 0</p>
+</li>
+</ul>
+<p>Usage: </p>
+<p><code>params["emissions"]["inertia"]["regional"] = -0.05</code></p>
+</details>
+</div>
+</div>
+<details class="note">
+<summary>cumulative_emissions_trapz</summary>
+<p>If true, calculate cumulative emissions using trapezoidal interpolation. If false, cum. emissions are simply cum_emissions[t-1] + dt * cum_emissions[t]. This is less accurate, but better for numerical stability. For small dt the  approximation is usually still acceptable.</p>
+<ul>
+<li>
+<p>Type: bool</p>
+</li>
+<li>
+<p>Default: True</p>
+</li>
+<li>
+<p>Can be false: False</p>
+</li>
+</ul>
+<p>Usage: </p>
+<p><code>params["emissions"]["cumulative_emissions_trapz"] = True</code></p>
+</details>
+</div>
+</div>
+<div class="param_group" id="burden sharing">
+<h2 id="burden-sharing">burden sharing</h2>
+<div class="param_content">
+<details class="note">
+<summary>regime</summary>
+<p>Type of burden sharing to be used</p>
+<ul>
+<li>
+<p>Type: enum</p>
+</li>
+<li>
+<p>Default: noregime</p>
+</li>
+<li>
+<p>Can be false: False</p>
+</li>
+<li>
+<p>Allowed values:</p>
+<ul>
+<li>noregime</li>
+<li>equal_mitigation_costs</li>
+<li>equal_total_costs</li>
+<li>per_cap_convergence</li>
+<li>per_cap_convergence_fake</li>
+</ul>
+</li>
+</ul>
+<p>Usage: </p>
+<p><code>params["burden sharing"]["regime"] = "noregime"</code></p>
+</details>
+<details class="note">
+<summary>percapconv_year</summary>
+<p>Year of convergence to per capita emission allowance  (only used when burden sharing - regime is per_cap_convergence) Can also be false, then always use grandfathering</p>
+<ul>
+<li>
+<p>Type: float</p>
+</li>
+<li>
+<p>Default: 2050</p>
+</li>
+<li>
+<p>Can be false: True</p>
+</li>
+<li>
+<p>Min: 2020</p>
+</li>
+<li>
+<p>Max: 2200</p>
+</li>
+</ul>
+<p>Usage: </p>
+<p><code>params["burden sharing"]["percapconv_year"] = 2050</code></p>
+</details>
+</div>
+</div>
+<div class="param_group" id="temperature">
+<h2 id="temperature_1">temperature</h2>
+<div class="param_content">
+<details class="note">
+<summary>initial</summary>
+<p>Temperature in initial year of model run (2020 by default).</p>
+<ul>
+<li>
+<p>Type: quantity</p>
+</li>
+<li>
+<p>Default: 1.16 delta_degC</p>
+</li>
+<li>
+<p>Can be false: False</p>
+</li>
+<li>
+<p>Unit: temperature_unit</p>
+</li>
+</ul>
+<p>Usage: </p>
+<p><code>params["temperature"]["initial"] = "1.16 delta_degC"</code></p>
+</details>
+<details class="note">
+<summary>TCRE</summary>
+<p>Transient Climate Response to CO2 Emissions</p>
+<ul>
+<li>
+<p>Type: quantity</p>
+</li>
+<li>
+<p>Default: 0.62 delta_degC/(TtCO2)</p>
+</li>
+<li>
+<p>Can be false: False</p>
+</li>
+<li>
+<p>Unit: (temperature_unit)/(emissions_unit)</p>
+</li>
+</ul>
+<p>Usage: </p>
+<p><code>params["temperature"]["TCRE"] = "0.62 delta_degC/(TtCO2)"</code></p>
+</details>
+<details class="note">
+<summary>target</summary>
+<p>Temperature target in 2100 (and beyond). Can also be false, then no temperature target is imposed</p>
+<ul>
+<li>
+<p>Type: quantity</p>
+</li>
+<li>
+<p>Default: False</p>
+</li>
+<li>
+<p>Can be false: True</p>
+</li>
+<li>
+<p>Unit: temperature_unit</p>
+</li>
+</ul>
+<p>Usage: </p>
+<p><code>params["temperature"]["target"] = False</code></p>
+</details>
+</div>
+</div>
+<div class="param_group" id="model">
+<h2 id="model_1">model</h2>
+<div class="param_content">
+<details class="note">
+<summary>damage module</summary>
+<p>Damage module to be used</p>
+<ul>
+<li>
+<p>Type: enum</p>
+</li>
+<li>
+<p>Default: COACCH</p>
+</li>
+<li>
+<p>Can be false: False</p>
+</li>
+<li>
+<p>Allowed values:</p>
+<ul>
+<li>COACCH</li>
+<li>RICE2010</li>
+<li>RICE2012</li>
+</ul>
+</li>
+</ul>
+<p>Usage: </p>
+<p><code>params["model"]["damage module"] = "COACCH"</code></p>
+</details>
+<details class="note">
+<summary>emissiontrade module</summary>
+<p>Emission trade module to be used</p>
+<ul>
+<li>
+<p>Type: enum</p>
+</li>
+<li>
+<p>Default: notrade</p>
+</li>
+<li>
+<p>Can be false: False</p>
+</li>
+<li>
+<p>Allowed values:</p>
+<ul>
+<li>notrade</li>
+<li>globalcostpool</li>
+<li>emissiontrade</li>
+</ul>
+</li>
+</ul>
+<p>Usage: </p>
+<p><code>params["model"]["emissiontrade module"] = "notrade"</code></p>
+</details>
+<details class="note">
+<summary>financialtransfer module</summary>
+<p>Financial transfer module to be used</p>
+<ul>
+<li>
+<p>Type: enum</p>
+</li>
+<li>
+<p>Default: notransfer</p>
+</li>
+<li>
+<p>Can be false: False</p>
+</li>
+<li>
+<p>Allowed values:</p>
+<ul>
+<li>notransfer</li>
+<li>globaldamagepool</li>
+</ul>
+</li>
+</ul>
+<p>Usage: </p>
+<p><code>params["model"]["financialtransfer module"] = "notransfer"</code></p>
+</details>
+<details class="note">
+<summary>welfare module</summary>
+<p>Welfare and utility module to be used</p>
+<ul>
+<li>
+<p>Type: enum</p>
+</li>
+<li>
+<p>Default: welfare_loss_minimising</p>
+</li>
+<li>
+<p>Can be false: False</p>
+</li>
+<li>
+<p>Allowed values:</p>
+<ul>
+<li>welfare_loss_minimising</li>
+<li>cost_minimising</li>
+<li>inequal_aversion_general</li>
+</ul>
+</li>
+</ul>
+<p>Usage: </p>
+<p><code>params["model"]["welfare module"] = "welfare_loss_minimising"</code></p>
+</details>
+<details class="note">
+<summary>objective module</summary>
+<p>Objective module to be used</p>
+<ul>
+<li>
+<p>Type: enum</p>
+</li>
+<li>
+<p>Default: utility</p>
+</li>
+<li>
+<p>Can be false: False</p>
+</li>
+<li>
+<p>Allowed values:</p>
+<ul>
+<li>utility</li>
+<li>globalcosts</li>
+</ul>
+</li>
+</ul>
+<p>Usage: </p>
+<p><code>params["model"]["objective module"] = "utility"</code></p>
+</details>
+</div>
+</div>
+<details class="note">
+<summary>regionstype</summary>
+<p>Name of the region definition. Used in the mapping of the regional parameters.</p>
+<ul>
+<li>
+<p>Type: enum</p>
+</li>
+<li>
+<p>Default: IMAGE26</p>
+</li>
+<li>
+<p>Can be false: False</p>
+</li>
+<li>
+<p>Allowed values:</p>
+<ul>
+<li>IMAGE26</li>
+<li>SSP5</li>
+<li>World</li>
+</ul>
+</li>
+</ul>
+<p>Usage: </p>
+<p><code>params["regionstype"] = "IMAGE26"</code></p>
+</details>
+<details class="note">
+<summary>regions</summary>
+<p>Dictionary of all regions with optional dictionaries defining, optionally, manual values for certain parameters for that specific region.</p>
+<ul>
+<li>
+<p>Type: dict</p>
+</li>
+<li>
+<p>Default: {'CAN': None, 'USA': None, 'MEX': None, 'RCAM': None, 'BRA': None, 'RSAM': None, 'NAF': None, 'WAF': None, 'EAF': None, 'SAF': None, 'WEU': None, 'CEU': None, 'TUR': None, 'UKR': None, 'STAN': None, 'RUS': None, 'ME': None, 'INDIA': None, 'KOR': None, 'CHN': None, 'SEAS': None, 'INDO': None, 'JAP': None, 'OCE': None, 'RSAS': None, 'RSAF': None}</p>
+</li>
+<li>
+<p>Can be false: False</p>
+</li>
+</ul>
+<p>Usage: </p>
+<p><code>params["regions"] = {'CAN': None, 'USA': None, 'MEX': None, 'RCAM': None, 'BRA': None, 'RSAM': None, 'NAF': None, 'WAF': None, 'EAF': None, 'SAF': None, 'WEU': None, 'CEU': None, 'TUR': None, 'UKR': None, 'STAN': None, 'RUS': None, 'ME': None, 'INDIA': None, 'KOR': None, 'CHN': None, 'SEAS': None, 'INDO': None, 'JAP': None, 'OCE': None, 'RSAS': None, 'RSAF': None}</code></p>
+</details>
+<div class="param_group" id="input">
+<h2 id="input_1">input</h2>
+<div class="param_content">
+<details class="note">
+<summary>db_filename</summary>
+<p>Path to IAMC-formatted CSV file for baseline data</p>
+<ul>
+<li>
+<p>Type: filepath</p>
+</li>
+<li>
+<p>Default: inputdata/data/data_IMAGE_SSP.csv</p>
+</li>
+<li>
+<p>Can be false: False</p>
+</li>
+</ul>
+<p>Usage: </p>
+<p><code>params["input"]["db_filename"] = "inputdata/data/data_IMAGE_SSP.csv"</code></p>
+</details>
+<div class="param_group" id="baselines">
+<h3 id="input-baselines"><span class="param_group_breadcrumbs">input &gt; </span>baselines</h3>
+<div class="param_content">
+<div class="param_group" id="SSP1">
+<h4 id="input-baselines-ssp1"><span class="param_group_breadcrumbs">input &gt; baselines &gt; </span>SSP1</h4>
+<div class="param_content">
+<details class="note">
+<summary>scenario</summary>
+<p>Scenario name of SSP1 baseline</p>
+<ul>
+<li>
+<p>Type: str</p>
+</li>
+<li>
+<p>Default: SSP1-Ref-SPA0-V17</p>
+</li>
+<li>
+<p>Can be false: False</p>
+</li>
+</ul>
+<p>Usage: </p>
+<p><code>params["input"]["baselines"]["SSP1"]["scenario"] = "SSP1-Ref-SPA0-V17"</code></p>
+</details>
+<details class="note">
+<summary>model</summary>
+<p>Model name of SSP1 baseline</p>
+<ul>
+<li>
+<p>Type: str</p>
+</li>
+<li>
+<p>Default: IMAGE</p>
+</li>
+<li>
+<p>Can be false: False</p>
+</li>
+</ul>
+<p>Usage: </p>
+<p><code>params["input"]["baselines"]["SSP1"]["model"] = "IMAGE"</code></p>
+</details>
+</div>
+</div>
+<div class="param_group" id="SSP2">
+<h4 id="input-baselines-ssp2"><span class="param_group_breadcrumbs">input &gt; baselines &gt; </span>SSP2</h4>
+<div class="param_content">
+<details class="note">
+<summary>scenario</summary>
+<p>Scenario name of SSP2 baseline</p>
+<ul>
+<li>
+<p>Type: str</p>
+</li>
+<li>
+<p>Default: SSP2-Ref-SPA0-V17</p>
+</li>
+<li>
+<p>Can be false: False</p>
+</li>
+</ul>
+<p>Usage: </p>
+<p><code>params["input"]["baselines"]["SSP2"]["scenario"] = "SSP2-Ref-SPA0-V17"</code></p>
+</details>
+<details class="note">
+<summary>model</summary>
+<p>Model name of SSP2 baseline</p>
+<ul>
+<li>
+<p>Type: str</p>
+</li>
+<li>
+<p>Default: IMAGE</p>
+</li>
+<li>
+<p>Can be false: False</p>
+</li>
+</ul>
+<p>Usage: </p>
+<p><code>params["input"]["baselines"]["SSP2"]["model"] = "IMAGE"</code></p>
+</details>
+</div>
+</div>
+<div class="param_group" id="SSP3">
+<h4 id="input-baselines-ssp3"><span class="param_group_breadcrumbs">input &gt; baselines &gt; </span>SSP3</h4>
+<div class="param_content">
+<details class="note">
+<summary>scenario</summary>
+<p>Scenario name of SSP3 baseline</p>
+<ul>
+<li>
+<p>Type: str</p>
+</li>
+<li>
+<p>Default: SSP3-Ref-SPA0-V17</p>
+</li>
+<li>
+<p>Can be false: False</p>
+</li>
+</ul>
+<p>Usage: </p>
+<p><code>params["input"]["baselines"]["SSP3"]["scenario"] = "SSP3-Ref-SPA0-V17"</code></p>
+</details>
+<details class="note">
+<summary>model</summary>
+<p>Model name of SSP3 baseline</p>
+<ul>
+<li>
+<p>Type: str</p>
+</li>
+<li>
+<p>Default: IMAGE</p>
+</li>
+<li>
+<p>Can be false: False</p>
+</li>
+</ul>
+<p>Usage: </p>
+<p><code>params["input"]["baselines"]["SSP3"]["model"] = "IMAGE"</code></p>
+</details>
+</div>
+</div>
+<div class="param_group" id="SSP4">
+<h4 id="input-baselines-ssp4"><span class="param_group_breadcrumbs">input &gt; baselines &gt; </span>SSP4</h4>
+<div class="param_content">
+<details class="note">
+<summary>scenario</summary>
+<p>Scenario name of SSP4 baseline</p>
+<ul>
+<li>
+<p>Type: str</p>
+</li>
+<li>
+<p>Default: SSP4-Ref-SPA0-V17</p>
+</li>
+<li>
+<p>Can be false: False</p>
+</li>
+</ul>
+<p>Usage: </p>
+<p><code>params["input"]["baselines"]["SSP4"]["scenario"] = "SSP4-Ref-SPA0-V17"</code></p>
+</details>
+<details class="note">
+<summary>model</summary>
+<p>Model name of SSP4 baseline</p>
+<ul>
+<li>
+<p>Type: str</p>
+</li>
+<li>
+<p>Default: IMAGE</p>
+</li>
+<li>
+<p>Can be false: False</p>
+</li>
+</ul>
+<p>Usage: </p>
+<p><code>params["input"]["baselines"]["SSP4"]["model"] = "IMAGE"</code></p>
+</details>
+</div>
+</div>
+<div class="param_group" id="SSP5">
+<h4 id="input-baselines-ssp5"><span class="param_group_breadcrumbs">input &gt; baselines &gt; </span>SSP5</h4>
+<div class="param_content">
+<details class="note">
+<summary>scenario</summary>
+<p>Scenario name of SSP5 baseline</p>
+<ul>
+<li>
+<p>Type: str</p>
+</li>
+<li>
+<p>Default: SSP5-Ref-SPA0-V17</p>
+</li>
+<li>
+<p>Can be false: False</p>
+</li>
+</ul>
+<p>Usage: </p>
+<p><code>params["input"]["baselines"]["SSP5"]["scenario"] = "SSP5-Ref-SPA0-V17"</code></p>
+</details>
+<details class="note">
+<summary>model</summary>
+<p>Model name of SSP5 baseline</p>
+<ul>
+<li>
+<p>Type: str</p>
+</li>
+<li>
+<p>Default: IMAGE</p>
+</li>
+<li>
+<p>Can be false: False</p>
+</li>
+</ul>
+<p>Usage: </p>
+<p><code>params["input"]["baselines"]["SSP5"]["model"] = "IMAGE"</code></p>
+</details>
+</div>
+</div>
+</div>
+</div>
+<div class="param_group" id="variables">
+<h3 id="input-variables"><span class="param_group_breadcrumbs">input &gt; </span>variables</h3>
+<div class="param_content">
+<details class="note">
+<summary>GDP</summary>
+<p>Variable name for GDP in data file</p>
+<ul>
+<li>
+<p>Type: enum</p>
+</li>
+<li>
+<p>Default: GDP|PPP</p>
+</li>
+<li>
+<p>Can be false: False</p>
+</li>
+<li>
+<p>Allowed values:</p>
+<ul>
+<li>GDP|PPP</li>
+<li>GDP|MER</li>
+</ul>
+</li>
+</ul>
+<p>Usage: </p>
+<p><code>params["input"]["variables"]["GDP"] = "GDP|PPP"</code></p>
+</details>
+<details class="note">
+<summary>emissions</summary>
+<p>Variable name for emissions variable</p>
+<ul>
+<li>
+<p>Type: str</p>
+</li>
+<li>
+<p>Default: Emissions|CO2</p>
+</li>
+<li>
+<p>Can be false: False</p>
+</li>
+</ul>
+<p>Usage: </p>
+<p><code>params["input"]["variables"]["emissions"] = "Emissions|CO2"</code></p>
+</details>
+<details class="note">
+<summary>population</summary>
+<p>Variable name for population variable</p>
+<ul>
+<li>
+<p>Type: str</p>
+</li>
+<li>
+<p>Default: Population</p>
+</li>
+<li>
+<p>Can be false: False</p>
+</li>
+</ul>
+<p>Usage: </p>
+<p><code>params["input"]["variables"]["population"] = "Population"</code></p>
+</details>
+</div>
+</div>
+</div>
+</div>
+<div class="param_group" id="simulation">
+<h2 id="simulation_1">simulation</h2>
+<div class="param_content">
+<details class="note">
+<summary>simulationmode</summary>
+<p>If true, the model is run in simulation mode: then some variables will be imposed exogenously and fixed. If false, <code>constraint_variables</code> and <code>deactivated_constraints</code> are ignored.</p>
+<ul>
+<li>
+<p>Type: bool</p>
+</li>
+<li>
+<p>Default: False</p>
+</li>
+<li>
+<p>Can be false: False</p>
+</li>
+</ul>
+<p>Usage: </p>
+<p><code>params["simulation"]["simulationmode"] = False</code></p>
+</details>
+<details class="note">
+<summary>constraint_variables</summary>
+<p>Dictionary of variable names with associated path to file containing values for that variable</p>
+<ul>
+<li>
+<p>Type: dict</p>
+</li>
+<li>
+<p>Default: None</p>
+</li>
+<li>
+<p>Can be false: False</p>
+</li>
+</ul>
+<p>Usage: </p>
+<p><code>params["simulation"]["constraint_variables"] = None</code></p>
+</details>
+<details class="note">
+<summary>deactivated_constraints</summary>
+<p>List of constraint names to be disabled</p>
+<ul>
+<li>
+<p>Type: list</p>
+</li>
+<li>
+<p>Default: None</p>
+</li>
+<li>
+<p>Can be false: False</p>
+</li>
+</ul>
+<p>Usage: </p>
+<p><code>params["simulation"]["deactivated_constraints"] = None</code></p>
+</details>
+<details class="note">
+<summary>custom_mapping</summary>
+<p>Custom mapping of parameter values or variables</p>
+<ul>
+<li>
+<p>Type: dict</p>
+</li>
+<li>
+<p>Default: None</p>
+</li>
+<li>
+<p>Can be false: False</p>
+</li>
+</ul>
+<p>Usage: </p>
+<p><code>params["simulation"]["custom_mapping"] = None</code></p>
+</details>
+</div>
+</div>
+<p></div></div></p>
 
 
 

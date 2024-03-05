@@ -1,0 +1,8 @@
+.param_group .param_content {
+    padding-left: 30px;
+    border-left: 3px solid #f0f0f0;
+}
+
+.param_group .param_group_breadcrumbs {
+    color: #CCC;
+}
