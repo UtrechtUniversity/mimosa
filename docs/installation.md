@@ -47,3 +47,4 @@ Since MIMOSA is an optimisation model, an optimisation engine needs to be specif
     model1.save("run1")
     ```
 
+[Next: Running MIMOSA :octicons-arrow-right-24:](run.md){.md-button}
