@@ -7,7 +7,7 @@ nav:
       - Components:
           - Economics: components/economics.md
           - Welfare: components/welfare.md
-          - Emissions: components/emissions.md
+          - Emissions and temperature: components/emissions.md
   - Parameter reference: parameters.md
   - Installing MIMOSA: installation.md
   - Running MIMOSA: run.md

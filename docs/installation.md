@@ -1,9 +1,11 @@
 # Installing MIMOSA
 
-MIMOSA can be installed using `pip`:
+MIMOSA is written in Python, can be installed using `pip`:
 ```bash
 pip install mimosa
 ```
+
+If you don't have Python installed yet, we highly recommend to use [Anaconda](https://www.anaconda.com/download) to install python. 
 
 ## Installing the optimisation engine IPOPT
 

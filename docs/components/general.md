@@ -19,7 +19,7 @@ The MIMOSA model consists of several sub-modules, called model components. Each 
 
     [:octicons-arrow-right-24: Read more](welfare.md){.md-button}
 
--   #### :octicons-cloud-16: Emissions
+-   #### :octicons-cloud-16: Emissions and temperature
 
     ---
 

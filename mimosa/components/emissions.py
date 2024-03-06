@@ -21,16 +21,33 @@ from mimosa.common import (
 
 def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     """
-    # Emissions and temperature
 
-    TODO
+    # Regional, global, baseline and mitigated emissions
+    :::mimosa.components.emissions._get_emissions_constraints
 
+    # Temperature
+    :::mimosa.components.emissions._get_temperature_constraints
+
+    # Carbon budget, inertia and other restrictions
+    :::mimosa.components.emissions._get_inertia_and_budget_constraints
+
+    """
+    constraints = (
+        _get_emissions_constraints(m)
+        + _get_temperature_constraints(m)
+        + _get_inertia_and_budget_constraints(m)
+    )
+
+    return constraints
+
+
+def _get_emissions_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
+    """
     ## Parameters defined in this module
     - param::baseline_carbon_intensity
     - param::cumulative_emissions_trapz
-
-
     """
+
     constraints = []
 
     m.regional_emissions = Var(m.t, m.regions, units=quant.unit("emissionsrate_unit"))
@@ -134,6 +151,39 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
         ]
     )
 
+    m.emission_relative_cumulative = Var(m.t, initialize=1)
+    constraints.extend(
+        [
+            GlobalConstraint(
+                lambda m, t: (
+                    (
+                        m.emission_relative_cumulative[t]
+                        == m.cumulative_emissions[t]
+                        / m.baseline_cumulative_global(m, m.year(0), m.year(t))
+                    )
+                    if t > 0
+                    else Constraint.Skip
+                ),
+                name="relative_cumulative_emissions",
+            ),
+            GlobalInitConstraint(lambda m: m.emission_relative_cumulative[0] == 1),
+        ]
+    )
+
+    return constraints
+
+
+def _get_temperature_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
+    """
+
+    ## Parameters defined in this module
+    - param::T0
+    - param::TCRE
+    - param::temperature_target
+    """
+
+    constraints = []
+
     m.T0 = Param(units=quant.unit("degC_above_PI"), doc="::temperature.initial")
     m.temperature = Var(
         m.t, initialize=lambda m, t: m.T0, units=quant.unit("degC_above_PI")
@@ -179,7 +229,26 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
 
     # global_constraints_init.extend([lambda m: m.overshoot[0] == 0])
 
-    # Emission constraints
+    return constraints
+
+
+def _get_inertia_and_budget_constraints(
+    m: AbstractModel,
+) -> Sequence[GeneralConstraint]:
+    """
+
+    ## Parameters defined in this module
+    - param::budget
+    - param::inertia_global
+    - param::inertia_regional
+    - param::global_min_level
+    - param::regional_min_level
+    - param::no_pos_emissions_after_budget_year
+    - param::non_increasing_emissions_after_2100
+
+    """
+
+    constraints = []
 
     m.budget = Param(doc="::emissions.carbonbudget")
     m.inertia_global = Param(doc="::emissions.inertia.global")
@@ -271,25 +340,6 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
                 ),
                 "regional_min_level",
             ),
-        ]
-    )
-
-    m.emission_relative_cumulative = Var(m.t, initialize=1)
-    constraints.extend(
-        [
-            GlobalConstraint(
-                lambda m, t: (
-                    (
-                        m.emission_relative_cumulative[t]
-                        == m.cumulative_emissions[t]
-                        / m.baseline_cumulative_global(m, m.year(0), m.year(t))
-                    )
-                    if t > 0
-                    else Constraint.Skip
-                ),
-                name="relative_cumulative_emissions",
-            ),
-            GlobalInitConstraint(lambda m: m.emission_relative_cumulative[0] == 1),
         ]
     )
 
