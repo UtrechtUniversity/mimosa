@@ -677,6 +677,17 @@
 </span></code></pre></div>
 However, this sometimes fails on Windows. To fix it, go to <a href="https://www.coin-or.org/download/binary/Ipopt/">https://www.coin-or.org/download/binary/Ipopt/</a> and download the latest win64-version. Unzip the files. A subfolder <code>bin</code> should contain the file <code>ipopt.exe</code>. The next step is to add this folder to your PATH environment:
 Windows &gt; Edit the system environment variables &gt; Environment variables... &gt; Select "Path" and click Edit... &gt; Click New and browse to the folder you just unzipped. Make sure to select the <code>bin</code> subfolder as this folder contains the file <code>ipopt.exe</code>.</p>
+<details class="info">
+<summary>More detailed steps on how to install IPOPT on Windows</summary>
+<ol>
+<li>Once you've downloaded the zip file of the latest win64-version on the coin website (currently <code>Ipopt-3.11.1-win64-intel13.1.zip</code>),
+unzip this file to folder of your choice. In the unzipped folder, there should be a <code>bin</code> folder.</li>
+<li>The next step is to tell Windows to look for IPOPT in this <code>bin</code> directory. This is achieved by adding the relevant folder to the <em>environment path</em> of Windows. Click on Start (or press the <span class="keys"><kbd class="key-windows">Win</kbd></span> key), type <code>environment</code> and press <span class="keys"><kbd class="key-enter">Enter</kbd></span>. This should open the dialog <code>Edit the system environment variables</code>.</li>
+<li>Click on <code>Environment variables</code>, select <code>Path</code> and click edit.<br/><br/><img alt="" src="../assets/fig/install01.png"/><br/><br/></li>
+<li>Here, you can add the folder with the IPOPT bin folder. Click on New and add the folder you unzipped IPOPT in, making sure to select the sub-folder <code>bin</code>:<br/><br/><img alt="" src="../assets/fig/install02.png"/><br/><br/></li>
+<li>You can test if everything works by opening an Anaconda Prompt and typing <code>ipopt</code>. It should show something like this:<br/><br/><img alt="" src="../assets/fig/install03.png"/><br/><br/></li>
+</ol>
+</details>
 <p>Once IPOPT is installed, MIMOSA can be ran without NEOS:
 <div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a href="#__codelineno-3-1" id="__codelineno-3-1" name="__codelineno-3-1"></a><span class="kn">from</span> <span class="nn">mimosa</span> <span class="kn">import</span> <span class="n">MIMOSA</span><span class="p">,</span> <span class="n">load_params</span>
 </span><span id="__span-3-2"><a href="#__codelineno-3-2" id="__codelineno-3-2" name="__codelineno-3-2"></a>
