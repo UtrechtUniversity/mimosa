@@ -23,6 +23,8 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     """
     # Emissions and temperature
 
+    TODO
+
     ## Parameters defined in this module
     - param::baseline_carbon_intensity
     - param::cumulative_emissions_trapz
