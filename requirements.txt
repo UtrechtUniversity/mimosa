@@ -11,6 +11,7 @@ scipy
 # mkdocs-material
 # mkdocstrings
 # mkdocstrings_handlers
+# mkdocs-plotly-plugin
 
 
 # For export:

@@ -68,14 +68,18 @@ def _print_param(tree, mainkey, breadcrumbs, indent=""):
     extra_str += tree.to_markdown(indent + "    ") + "\n\n"
 
     # Add usage example
-    extra_str += f"{indent}    Usage: \n\n"
+    extra_str += f"{indent}    Example usage: \n\n"
     _usage_keys = [f'["{key}"]' for key in breadcrumbs]
     _usage_default_val = tree.default
     if isinstance(tree.default, str):
         _usage_default_val = f'"{tree.default}"'
-    extra_str += (
-        f"{indent}    `params{''.join(_usage_keys)} = {_usage_default_val}`\n\n"
-    )
+    extra_str += f"""
+{indent}    ```python hl_lines="2"
+{indent}    params = load_params()
+{indent}    params{''.join(_usage_keys)} = {_usage_default_val}
+{indent}    model = MIMOSA(params)
+{indent}    ```
+"""
     return extra_str
 
 

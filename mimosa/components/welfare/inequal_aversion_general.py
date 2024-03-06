@@ -17,19 +17,15 @@ from mimosa.common import (
 
 
 def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
-    """Utility and welfare equations
+    """
+    <h3>General inequality aversion</h3>
 
-    Necessary variables:
-        m.utility
-        m.welfare
+    TODO
 
-    Returns:
-        list of constraints (any of:
-           - GlobalConstraint
-           - GlobalInitConstraint
-           - RegionalConstraint
-           - RegionalInitConstraint
-        )
+    <h3>Parameters defined in this module</h3>
+    - param::elasmu
+    - param::inequal_aversion
+
     """
     constraints = []
 

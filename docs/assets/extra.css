@@ -6,3 +6,15 @@
 .param_group .param_group_breadcrumbs {
     color: #CCC;
 }
+
+[data-md-color-scheme="slate"] {
+    .param_group {
+        .param_content {
+            border-left-color: #555;
+        }
+
+        .param_group_breadcrumbs {
+            color: #666;
+        }
+    }
+}

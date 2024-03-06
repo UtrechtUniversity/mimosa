@@ -60,8 +60,10 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
 
     $$ K_{t=0,r} = \\text{init_capitalstock_factor}_r \\cdot \\text{GDP}_{t=0,r}. $$
 
-    ??? info "Todo"
-        Add a graph of the initial capital stock factors.
+    The initial capital stock factor is a calibration factor to obtain the initial capital stock. TODO: Source (IMF)
+    ``` plotly
+    {"file_path": "./assets/plots/init_capital_factor.json"}
+    ```
 
     ## Parameters defined in this module
     - param::init_capitalstock_factor
