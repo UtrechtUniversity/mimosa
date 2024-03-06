@@ -65,6 +65,7 @@ def recursive_param_print(tree, mainkey, breadcrumbs, full_str, level=0):
 def _print_param(tree, mainkey, breadcrumbs, indent=""):
     # Print characteristics of parameter
     extra_str = f'{indent}??? note "{mainkey}"\n'
+    extra_str += f'{indent}    <span id="{".".join(breadcrumbs)}" class="param_anchor"> </span>\n'
     extra_str += tree.to_markdown(indent + "    ") + "\n\n"
 
     # Add usage example
@@ -92,7 +93,7 @@ def on_page_content(html, **kwargs):
             if param.doc:
                 keys = param.doc.split("::")[1].split(".")
                 doc = get_nested(parser_tree, keys).to_string()
-                formatted_text = f"<code>{param_name}</code>: {doc}"
+                formatted_text = f"<a href='../../parameters/#{param.doc.split('::')[1]}'><code>{param_name}</code></a>: {doc}"
             else:
                 formatted_text = f"<code>{param_name}</code>"
             html = html.replace(match, formatted_text)
