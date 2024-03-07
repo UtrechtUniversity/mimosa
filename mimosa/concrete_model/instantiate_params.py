@@ -116,7 +116,6 @@ class InstantiatedModel:
         for parameter in self.abstract_model.component_objects(Param):
             if str(parameter.doc).startswith("::"):
                 keys = parameter.doc.split("::")[1].split(".")
-                print(keys)
                 value = get_nested(params, keys)
                 # Check type of parameter
                 parser = get_nested(self.param_parser_tree, keys)

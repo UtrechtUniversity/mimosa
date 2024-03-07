@@ -12,6 +12,7 @@ scipy
 # mkdocstrings
 # mkdocstrings_handlers
 # mkdocs-plotly-plugin
+# mkdocs-table-reader-plugin
 
 
 # For export:

@@ -8,6 +8,7 @@ nav:
           - Economics: components/economics.md
           - Welfare: components/welfare.md
           - Emissions and temperature: components/emissions.md
+      - Region definitions: components/regions.md
   - Parameter reference: parameters.md
   - Installing MIMOSA: installation.md
   - Running MIMOSA: run.md
@@ -63,6 +64,7 @@ plugins:
             show_root_toc_entry: false
           paths: [src]
   - search
+  - table-reader
   - open-in-new-tab
   - plotly:
       template_default: assets/plots/template.json

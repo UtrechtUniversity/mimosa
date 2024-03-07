@@ -23,6 +23,21 @@ model1.save("run1") # (4)!
 
 ### Reading the output
 
+Once the script above has finished running, it has produced two output files in the folder `output`: `run1.csv` and `run1.csv.params.json`. The latter is simply a JSON file with all the input parameter used for this particular run (for reproducibility). The former is a CSV file that contains all the output data. Every variable in MIMOSA is saved in this value in a format similar to [IAMC data format](https://pyam-iamc.readthedocs.io/en/stable/data.html):
+
+:fontawesome-solid-file-csv: `output/run1.csv`
+
+{{ read_csv("docs/assets/data/run_cba.csv", nrows=3) }}
+|... | ... |
+
+These output files can be easily imported for plotting software (like using [Plotly](https://plotly.com/python/) in Python). An easier way, however, to quickly visualise and compare MIMOSA outputs, is by using the MIMOSA Dashboard. After opening the online Dashboard, simply drag and drop all output files to the drag-and-drop input to visualise one or multiple MIMOSA output files. Also include the parameter files to directly see the difference in input parameters.
+
+> **Note:** the MIMOSA Dashboard can sometimes take up to a few minutes to start, as it goes to sleep after 30 minutes of inactivity (restriction of the free plan of the hosting website).
+
+[Open the MIMOSA Dashboard :octicons-arrow-right-24:](https://dashboard-mimosa.onrender.com/){.md-button}
+
+
+
 ### Changing parameters
 The default parameters from `load_params()` are given as a nested dictionary. Every item of this dictionary can be changed. Note that only the values can be changed, it is not possible to add or substract parameters to this dictionary (without [Extending MIMOSA](extending_mimosa.md)).
 
@@ -43,6 +58,22 @@ model1.save("run_example1")
 
 1.   Change the parameter of emissions > carbonbudget to the string "500 GtCO2"
 
-#### Example 2: 
+#### Example 2: high damages, high TCRE, low discounting
+Multiple parameters can also be changed at the same time. In this example, the high end of the [damages](parameters.md#economics.damages.quantile) and of the [climate sensitivity (TCRE)](parameters.md#temperature.TCRE) are used, combined with the low end of the [discount rate (PRTP)](parameters.md#economics.PRTP).
+
+``` python hl_lines="4 5 6 7 8"
+from mimosa import MIMOSA, load_params
+
+params = load_params()
+
+params["economics"]["damages"]["quantile"] = 0.95
+params["temperature"]["TCRE"] = "0.82 delta_degC/(TtCO2)"
+params["economics"]["PRTP"] = 0.001
+
+model2 = MIMOSA(params)
+model2.solve()
+
+model2.save("run_example2")
+```
 
 ### Doing multiple runs

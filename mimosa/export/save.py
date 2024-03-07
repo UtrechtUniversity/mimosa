@@ -22,13 +22,15 @@ def save_output(params, m, experiment=None, hash_suffix=False, folder="output"):
     # 2. Save the Pyomo variables and data functions
     all_variables = get_all_variables(m)
 
-    all_functions = [[m.population, "population"]]
+    all_functions = [
+        [[m.population, "population"], "billion people"]
+    ]  # TODO: unit of population should be automatically detected
 
     rows = []
-    for var in all_functions:
-        var_to_row(rows, m, var, True, None)
     for useful_var in all_variables:
         var_to_row(rows, m, useful_var.var, useful_var.is_regional, useful_var.unit)
+    for var, unit in all_functions:
+        var_to_row(rows, m, var, True, unit)
     dataframe = rows_to_dataframe(rows, m)
 
     # add_param_columns(df, params, id, experiment)
