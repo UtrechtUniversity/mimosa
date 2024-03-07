@@ -442,6 +442,27 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../components/regions/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Region definitions
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -579,9 +600,9 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#example-2" class="md-nav__link">
+  <a href="#example-2-high-damages-high-tcre-low-discounting" class="md-nav__link">
     <span class="md-ellipsis">
-      Example 2:
+      Example 2: high damages, high TCRE, low discounting
     </span>
   </a>
   
@@ -713,9 +734,9 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#example-2" class="md-nav__link">
+  <a href="#example-2-high-damages-high-tcre-low-discounting" class="md-nav__link">
     <span class="md-ellipsis">
-      Example 2:
+      Example 2: high damages, high TCRE, low discounting
     </span>
   </a>
   
@@ -774,6 +795,179 @@ With this code, the default parameter values are used (see <a href="../parameter
 <li>Export the output to the file output/run1.csv</li>
 </ol>
 <h3 id="reading-the-output">Reading the output</h3>
+<p>Once the script above has finished running, it has produced two output files in the folder <code>output</code>: <code>run1.csv</code> and <code>run1.csv.params.json</code>. The latter is simply a JSON file with all the input parameter used for this particular run (for reproducibility). The former is a CSV file that contains all the output data. Every variable in MIMOSA is saved in this value in a format similar to <a href="https://pyam-iamc.readthedocs.io/en/stable/data.html">IAMC data format</a>:</p>
+<p><span class="twemoji"><svg viewbox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M0 64C0 28.7 28.7 0 64 0h160v128c0 17.7 14.3 32 32 32h128v144H176c-35.3 0-64 28.7-64 64v144H64c-35.3 0-64-28.7-64-64V64zm384 64H256V0l128 128zM200 352h16c22.1 0 40 17.9 40 40v8c0 8.8-7.2 16-16 16s-16-7.2-16-16v-8c0-4.4-3.6-8-8-8h-16c-4.4 0-8 3.6-8 8v80c0 4.4 3.6 8 8 8h16c4.4 0 8-3.6 8-8v-8c0-8.8 7.2-16 16-16s16 7.2 16 16v8c0 22.1-17.9 40-40 40h-16c-22.1 0-40-17.9-40-40v-80c0-22.1 17.9-40 40-40zm133.1 0H368c8.8 0 16 7.2 16 16s-7.2 16-16 16h-34.9c-7.2 0-13.1 5.9-13.1 13.1 0 5.2 3 9.9 7.8 12l37.4 16.6c16.3 7.2 26.8 23.4 26.8 41.2 0 24.9-20.2 45.1-45.1 45.1H304c-8.8 0-16-7.2-16-16s7.2-16 16-16h42.9c7.2 0 13.1-5.9 13.1-13.1 0-5.2-3-9.9-7.8-12l-37.4-16.6c-16.3-7.2-26.8-23.4-26.8-41.2 0-24.9 20.2-45.1 45.1-45.1zm98.9 0c8.8 0 16 7.2 16 16v31.6c0 23 5.5 45.6 16 66 10.5-20.3 16-42.9 16-66V368c0-8.8 7.2-16 16-16s16 7.2 16 16v31.6c0 34.7-10.3 68.7-29.6 97.6l-5.1 7.7c-3 4.5-8 7.1-13.3 7.1s-10.3-2.7-13.3-7.1l-5.1-7.7c-19.3-28.9-29.6-62.9-29.6-97.6V368c0-8.8 7.2-16 16-16z"></path></svg></span> <code>output/run1.csv</code></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Variable</th>
+<th style="text-align: left;">Region</th>
+<th style="text-align: left;">Unit</th>
+<th style="text-align: right;">2020</th>
+<th style="text-align: right;">2025</th>
+<th style="text-align: right;">2030</th>
+<th style="text-align: right;">2035</th>
+<th style="text-align: right;">2040</th>
+<th style="text-align: right;">2045</th>
+<th style="text-align: right;">2050</th>
+<th style="text-align: right;">2055</th>
+<th style="text-align: right;">2060</th>
+<th style="text-align: right;">2065</th>
+<th style="text-align: right;">2070</th>
+<th style="text-align: right;">2075</th>
+<th style="text-align: right;">2080</th>
+<th style="text-align: right;">2085</th>
+<th style="text-align: right;">2090</th>
+<th style="text-align: right;">2095</th>
+<th style="text-align: right;">2100</th>
+<th style="text-align: right;">2105</th>
+<th style="text-align: right;">2110</th>
+<th style="text-align: right;">2115</th>
+<th style="text-align: right;">2120</th>
+<th style="text-align: right;">2125</th>
+<th style="text-align: right;">2130</th>
+<th style="text-align: right;">2135</th>
+<th style="text-align: right;">2140</th>
+<th style="text-align: right;">2145</th>
+<th style="text-align: right;">2150</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">regional_emissions</td>
+<td style="text-align: left;">CAN</td>
+<td style="text-align: left;">GtCO2/yr</td>
+<td style="text-align: right;">0.511577</td>
+<td style="text-align: right;">0.383683</td>
+<td style="text-align: right;">0.255789</td>
+<td style="text-align: right;">0.155544</td>
+<td style="text-align: right;">0.136527</td>
+<td style="text-align: right;">0.113384</td>
+<td style="text-align: right;">0.0944834</td>
+<td style="text-align: right;">0.0845257</td>
+<td style="text-align: right;">0.077836</td>
+<td style="text-align: right;">0.0694752</td>
+<td style="text-align: right;">0.0588413</td>
+<td style="text-align: right;">0.0469933</td>
+<td style="text-align: right;">0.0359533</td>
+<td style="text-align: right;">0.0269266</td>
+<td style="text-align: right;">0.0199594</td>
+<td style="text-align: right;">0.014565</td>
+<td style="text-align: right;">0.0104499</td>
+<td style="text-align: right;">0.0517489</td>
+<td style="text-align: right;">0.0517486</td>
+<td style="text-align: right;">0.0517485</td>
+<td style="text-align: right;">0.0517484</td>
+<td style="text-align: right;">0.0517483</td>
+<td style="text-align: right;">0.0517482</td>
+<td style="text-align: right;">0.0517481</td>
+<td style="text-align: right;">0.051748</td>
+<td style="text-align: right;">0.0517478</td>
+<td style="text-align: right;">0.0517476</td>
+</tr>
+<tr>
+<td style="text-align: left;">regional_emissions</td>
+<td style="text-align: left;">USA</td>
+<td style="text-align: left;">GtCO2/yr</td>
+<td style="text-align: right;">5.39382</td>
+<td style="text-align: right;">4.04537</td>
+<td style="text-align: right;">2.69691</td>
+<td style="text-align: right;">1.34846</td>
+<td style="text-align: right;">0.789513</td>
+<td style="text-align: right;">0.649695</td>
+<td style="text-align: right;">0.531854</td>
+<td style="text-align: right;">0.430432</td>
+<td style="text-align: right;">0.341586</td>
+<td style="text-align: right;">0.262853</td>
+<td style="text-align: right;">0.195861</td>
+<td style="text-align: right;">0.142273</td>
+<td style="text-align: right;">0.101621</td>
+<td style="text-align: right;">0.072636</td>
+<td style="text-align: right;">0.0549502</td>
+<td style="text-align: right;">0.0495887</td>
+<td style="text-align: right;">0.0582421</td>
+<td style="text-align: right;">0.534749</td>
+<td style="text-align: right;">0.534749</td>
+<td style="text-align: right;">0.534749</td>
+<td style="text-align: right;">0.534749</td>
+<td style="text-align: right;">0.534749</td>
+<td style="text-align: right;">0.534749</td>
+<td style="text-align: right;">0.534749</td>
+<td style="text-align: right;">0.534749</td>
+<td style="text-align: right;">0.534748</td>
+<td style="text-align: right;">0.534748</td>
+</tr>
+<tr>
+<td style="text-align: left;">regional_emissions</td>
+<td style="text-align: left;">MEX</td>
+<td style="text-align: left;">GtCO2/yr</td>
+<td style="text-align: right;">0.572878</td>
+<td style="text-align: right;">0.429658</td>
+<td style="text-align: right;">0.286439</td>
+<td style="text-align: right;">0.250682</td>
+<td style="text-align: right;">0.235195</td>
+<td style="text-align: right;">0.210891</td>
+<td style="text-align: right;">0.184067</td>
+<td style="text-align: right;">0.159748</td>
+<td style="text-align: right;">0.137097</td>
+<td style="text-align: right;">0.114491</td>
+<td style="text-align: right;">0.0904155</td>
+<td style="text-align: right;">0.0650686</td>
+<td style="text-align: right;">0.0402638</td>
+<td style="text-align: right;">0.0171455</td>
+<td style="text-align: right;">-0.00403092</td>
+<td style="text-align: right;">-0.0236268</td>
+<td style="text-align: right;">-0.0413935</td>
+<td style="text-align: right;">6.53385e-05</td>
+<td style="text-align: right;">6.49712e-05</td>
+<td style="text-align: right;">6.47857e-05</td>
+<td style="text-align: right;">6.46547e-05</td>
+<td style="text-align: right;">6.45457e-05</td>
+<td style="text-align: right;">6.4444e-05</td>
+<td style="text-align: right;">6.4339e-05</td>
+<td style="text-align: right;">6.42181e-05</td>
+<td style="text-align: right;">6.40555e-05</td>
+<td style="text-align: right;">6.37559e-05</td>
+</tr>
+<tr>
+<td style="text-align: left;">...</td>
+<td style="text-align: left;">...</td>
+<td style="text-align: left;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+</tr>
+</tbody>
+</table>
+<p>These output files can be easily imported for plotting software (like using <a href="https://plotly.com/python/">Plotly</a> in Python). An easier way, however, to quickly visualise and compare MIMOSA outputs, is by using the MIMOSA Dashboard. After opening the online Dashboard, simply drag and drop all output files to the drag-and-drop input to visualise one or multiple MIMOSA output files. Also include the parameter files to directly see the difference in input parameters.</p>
+<blockquote>
+<p><strong>Note:</strong> the MIMOSA Dashboard can sometimes take up to a few minutes to start, as it goes to sleep after 30 minutes of inactivity (restriction of the free plan of the hosting website).</p>
+</blockquote>
+<p><a class="md-button" href="https://dashboard-mimosa.onrender.com/">Open the MIMOSA Dashboard <span class="twemoji"><svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M13.22 19.03a.75.75 0 0 1 0-1.06L18.19 13H3.75a.75.75 0 0 1 0-1.5h14.44l-4.97-4.97a.749.749 0 0 1 .326-1.275.749.749 0 0 1 .734.215l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"></path></svg></span></a></p>
 <h3 id="changing-parameters">Changing parameters</h3>
 <p>The default parameters from <code>load_params()</code> are given as a nested dictionary. Every item of this dictionary can be changed. Note that only the values can be changed, it is not possible to add or substract parameters to this dictionary (without <a href="../extending_mimosa/">Extending MIMOSA</a>).</p>
 <h4 id="example-1-carbon-budget">Example 1: carbon budget</h4>
@@ -791,7 +985,21 @@ With this code, the default parameter values are used (see <a href="../parameter
 <ol>
 <li>Change the parameter of emissions &gt; carbonbudget to the string "500 GtCO2"</li>
 </ol>
-<h4 id="example-2">Example 2:</h4>
+<h4 id="example-2-high-damages-high-tcre-low-discounting">Example 2: high damages, high TCRE, low discounting</h4>
+<p>Multiple parameters can also be changed at the same time. In this example, the high end of the <a href="../parameters/#economics.damages.quantile">damages</a> and of the <a href="../parameters/#temperature.TCRE">climate sensitivity (TCRE)</a> are used, combined with the low end of the <a href="../parameters/#economics.PRTP">discount rate (PRTP)</a>.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a href="#__codelineno-2-1" id="__codelineno-2-1" name="__codelineno-2-1"></a><span class="kn">from</span> <span class="nn">mimosa</span> <span class="kn">import</span> <span class="n">MIMOSA</span><span class="p">,</span> <span class="n">load_params</span>
+</span><span id="__span-2-2"><a href="#__codelineno-2-2" id="__codelineno-2-2" name="__codelineno-2-2"></a>
+</span><span id="__span-2-3"><a href="#__codelineno-2-3" id="__codelineno-2-3" name="__codelineno-2-3"></a><span class="n">params</span> <span class="o">=</span> <span class="n">load_params</span><span class="p">()</span>
+</span><span id="__span-2-4"><a href="#__codelineno-2-4" id="__codelineno-2-4" name="__codelineno-2-4"></a><span class="hll">
+</span></span><span id="__span-2-5"><a href="#__codelineno-2-5" id="__codelineno-2-5" name="__codelineno-2-5"></a><span class="hll"><span class="n">params</span><span class="p">[</span><span class="s2">"economics"</span><span class="p">][</span><span class="s2">"damages"</span><span class="p">][</span><span class="s2">"quantile"</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.95</span>
+</span></span><span id="__span-2-6"><a href="#__codelineno-2-6" id="__codelineno-2-6" name="__codelineno-2-6"></a><span class="hll"><span class="n">params</span><span class="p">[</span><span class="s2">"temperature"</span><span class="p">][</span><span class="s2">"TCRE"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"0.82 delta_degC/(TtCO2)"</span>
+</span></span><span id="__span-2-7"><a href="#__codelineno-2-7" id="__codelineno-2-7" name="__codelineno-2-7"></a><span class="hll"><span class="n">params</span><span class="p">[</span><span class="s2">"economics"</span><span class="p">][</span><span class="s2">"PRTP"</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.001</span>
+</span></span><span id="__span-2-8"><a href="#__codelineno-2-8" id="__codelineno-2-8" name="__codelineno-2-8"></a><span class="hll">
+</span></span><span id="__span-2-9"><a href="#__codelineno-2-9" id="__codelineno-2-9" name="__codelineno-2-9"></a><span class="n">model2</span> <span class="o">=</span> <span class="n">MIMOSA</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+</span><span id="__span-2-10"><a href="#__codelineno-2-10" id="__codelineno-2-10" name="__codelineno-2-10"></a><span class="n">model2</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span>
+</span><span id="__span-2-11"><a href="#__codelineno-2-11" id="__codelineno-2-11" name="__codelineno-2-11"></a>
+</span><span id="__span-2-12"><a href="#__codelineno-2-12" id="__codelineno-2-12" name="__codelineno-2-12"></a><span class="n">model2</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s2">"run_example2"</span><span class="p">)</span>
+</span></code></pre></div>
 <h3 id="doing-multiple-runs">Doing multiple runs</h3>
 
 
