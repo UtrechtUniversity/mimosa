@@ -1,6 +1,9 @@
 import os
 import sys
+import json
 import numpy as np
+import pandas as pd
+import plotly.express as px
 from plotly.subplots import make_subplots
 
 sys.path.insert(
@@ -72,3 +75,35 @@ fig_init_capital_factor.update_yaxes(
     title="Initial capital stock factor<br>(factor of GDP)"
 ).update_layout(height=300)
 fig_init_capital_factor.write_json("docs/assets/plots/init_capital_factor.json")
+
+
+## Regional definitions and map:
+
+with open("mimosa/inputdata/regions/IMAGE26_regions.json") as fh:
+    regions = json.load(fh)
+
+image_regions = list(params["regions"].keys())
+region_df = (
+    pd.Series(dict(zip(image_regions, image_regions)), name="i")
+    .to_frame()
+    .reset_index()
+    .rename(columns={"index": "region"})
+)
+fig_regions = px.choropleth(
+    region_df,
+    geojson=regions,
+    color="region",
+    locations="region",
+    labels="region",
+    color_discrete_sequence=px.colors.qualitative.Bold,
+)
+fig_regions.update_geos(
+    projection_type="natural earth",
+    visible=False,
+    showframe=True,
+    framecolor="#AAA",
+    showland=True,
+    landcolor="#F5F5F5",
+).update_layout(showlegend=False, height=350, margin={"l": 0, "r": 0, "t": 0, "b": 0})
+
+fig_regions.write_json("docs/assets/plots/image_regions.json")

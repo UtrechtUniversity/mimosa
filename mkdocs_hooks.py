@@ -64,7 +64,7 @@ def recursive_param_print(tree, mainkey, breadcrumbs, full_str, level=0):
 
 def _print_param(tree, mainkey, breadcrumbs, indent=""):
     # Print characteristics of parameter
-    extra_str = f'{indent}??? note "{mainkey}"\n'
+    extra_str = f'{indent}??? parameter "{mainkey}"\n'
     extra_str += f'{indent}    <span id="{".".join(breadcrumbs)}" class="param_anchor"> </span>\n'
     extra_str += tree.to_markdown(indent + "    ") + "\n\n"
 
