@@ -8,11 +8,11 @@ with open("LICENSE") as fh:
 
 setup(
     name="mimosa",
-    version="0.1.4",
+    version="0.1.5",
     author="Kaj-Ivar van der Wijst",
     author_email="k.i.vanderwijst@gmail.com",
     packages=["mimosa"],
-    url="https://github.com/kvanderwijst/MIMOSA",
+    url="https://kvanderwijst.github.io/MIMOSA/",
     license=license_txt,
     description="MIMOSA: Integrated Assessment Model for Cost-Benefit Analysis",
     long_description=description,
