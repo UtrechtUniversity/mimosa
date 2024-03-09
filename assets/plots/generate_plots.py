@@ -107,3 +107,42 @@ fig_regions.update_geos(
 ).update_layout(showlegend=False, height=350, margin={"l": 0, "r": 0, "t": 0, "b": 0})
 
 fig_regions.write_json("docs/assets/plots/image_regions.json")
+
+
+## Baseline emissions
+data = pd.read_csv("mimosa/inputdata/data/data_IMAGE_SSP_harmonised_2020.csv")
+data_emissions = (
+    data.drop(columns=["Model", "Unit"])
+    .set_index(["Scenario", "Region", "Variable"])
+    .rename_axis("Year", axis=1)
+    .stack()
+)
+data_emissions = data_emissions.unstack("Variable").reset_index().astype({"Year": int})
+data_emissions["Emissions|CO2"] /= 1000
+data_emissions["Scenario"] = data_emissions["Scenario"].str.split("-").str[0]
+
+fig_baseline_emissions = px.line(
+    data_emissions[data_emissions["Year"] >= 2020],
+    x="Year",
+    y="Emissions|CO2",
+    facet_col="Region",
+    facet_col_wrap=13,
+    facet_col_spacing=0.005,
+    color="Scenario",
+    width=1200,
+).update_layout(
+    legend={"orientation": "h", "y": -1.05, "x": 0.5, "xanchor": "center"},
+    margin={"r": 30, "t": 30, "l": 50},
+)
+(
+    fig_baseline_emissions.update_xaxes(title=None, range=[2021, 2100])
+    .update_yaxes(autorange=True)
+    .update_yaxes(
+        col=1, title="CO<sub>2</sub> emissions (GtCO<sub>2</sub>/yr)", title_standoff=0
+    )
+)
+
+fig_baseline_emissions.for_each_annotation(
+    lambda a: a.update(text=a.text.split("=")[-1])
+)
+fig_baseline_emissions.write_json("docs/assets/plots/baseline_emissions.json")
