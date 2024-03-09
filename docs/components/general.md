@@ -35,7 +35,7 @@ The MIMOSA model consists of several sub-modules, called model components. Each 
 
     Mitigation costs and Marginal Abatement Cost curve
 
-    [:octicons-arrow-right-24: Read more](#){.md-button}
+    [:octicons-arrow-right-24: Read more](mitigation.md){.md-button}
   
 -   #### :material-waves-arrow-up: Sea-level rise
 

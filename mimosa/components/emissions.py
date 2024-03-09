@@ -22,14 +22,17 @@ from mimosa.common import (
 def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     """
 
-    # Regional, global, baseline and mitigated emissions
-    :::mimosa.components.emissions._get_emissions_constraints
+    === ":octicons-cloud-24: Baseline and mitigated emissions"
 
-    # Temperature
-    :::mimosa.components.emissions._get_temperature_constraints
+        :::mimosa.components.emissions._get_emissions_constraints
 
-    # Carbon budget, inertia and other restrictions
-    :::mimosa.components.emissions._get_inertia_and_budget_constraints
+    === ":fontawesome-solid-temperature-half: Temperature"
+
+        :::mimosa.components.emissions._get_temperature_constraints
+
+    === ":fontawesome-solid-chart-pie: Carbon budget, inertia and other restrictions"
+
+        :::mimosa.components.emissions._get_inertia_and_budget_constraints
 
     """
     constraints = (
@@ -43,9 +46,79 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
 
 def _get_emissions_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     """
+    ## Baseline emissions
+
+    In MIMOSA, emissions are represented by CO<sub>2</sub> emissions only[^1]. The emissions are calculated
+    relative to baseline emissions: emissions that would occur in the absence of any climate policy.
+
+    There are two ways to calculate baseline emissions: either directly imported exogenously from
+    the SSP scenarios, or calculated from the baseline carbon intensity from the SSPs. The latter
+    accounts for the fact that in the absence of climate policy, baseline emissions would go down if
+    the GDP goes down, and vice versa. This can be chosen with the parameter [`baseline_carbon_intensity`](../parameters.md#emissions.baseline carbon intensity).
+    If this parameter is set to true, baseline emissions are calculated as:
+
+    $$
+    \\text{baseline emissions}_{t,r} = \\text{baseline carbon intensity}_{t,r} \\cdot \\text{GDP}_{\\text{net}, t,r}
+    $$
+
+    ??? info "Baseline emissions values"
+
+        <div style="overflow: scroll;" markdown>
+        ``` plotly
+        {"file_path": "./assets/plots/baseline_emissions.json"}
+        ```
+        </div>
+
+    ## Emission reductions
+    To calculate the actual emissions per region, the baseline emissions are reduced by a relative
+    abatement factor, which in term is determined by the Marginal Abatement Cost curve and the carbon price
+    (see [Mitigation](mitigation.md)). The regional emissions are then calculated as:
+
+    $$
+    \\text{regional emissions}_{t,r} = (1 - \\text{relative abatement}_{t,r}) \\cdot \\text{baseline emissions}_{t,r}
+    $$
+
+    In the first period, reductions are assumed to be zero:
+
+    $$
+    \\text{regional emissions}_{0,r} = \\text{baseline emissions}_{0,r}.
+    $$
+
+    ## Global and cumulative emissions
+
+    The regional emissions are aggregated to global emissions:
+
+    $$
+    \\text{global emissions}_{t} = \\sum_r \\text{regional emissions}_{t,r},
+    $$
+
+    which are used to calculate the cumulative emissions. There are two ways to calculate them:
+    using trapezoidal integration or by simply adding up all the years. The former is more accurate,
+    while the latter is numerically more stable. This is chosen with the parameter [`cumulative_emissions_trapz`](../parameters.md#emissions.cumulative_emissions_trapz).
+
+    === "Trapezoidal integration `default`"
+
+        $$
+        \\begin{aligned}
+        \\text{cumulative emissions}_{t} & = \\text{cumulative emissions}_{t-1} \\\\ 
+        & + \\frac{\\Delta t}{2} \\cdot (\\text{global emissions}_{t} + \\text{global emissions}_{t-1}) ,\\text{for } t > 0.
+        \\end{aligned}
+        $$
+
+    === "Simple sum"
+
+        $$
+        \\text{cumulative emissions}_{t} = \\text{cumulative emissions}_{t-1} + \\Delta t \\cdot \\text{global emissions}_{t}
+        $$
+
+
     ## Parameters defined in this module
     - param::baseline_carbon_intensity
     - param::cumulative_emissions_trapz
+
+    [^1]: The effect of other greenhouse gases is implicitly accounted for in the TCRE which
+        translates cumulative CO<sub>2</sub> emissions into temperature change. This assumes a linear
+        relation between CO<sub>2</sub> emissions and other greenhouse gases.
     """
 
     constraints = []
