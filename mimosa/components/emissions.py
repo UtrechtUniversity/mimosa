@@ -249,6 +249,54 @@ def _get_emissions_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
 def _get_temperature_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     """
 
+    The global temperature change is calculated as a linear function of cumulative emissions, with a slope
+    given by the Transient Climate Response to CO<sub>2</sub> Emissions (TCRE):
+
+    $$
+    \\text{temperature}_{t} = T_0 + \\text{TCRE} \\cdot \\text{cumulative emissions}_{t},
+    $$
+
+    where [$T_0$](../parameters.md#temperature.initial) is the initial temperature at the start of the run (by default in 2020),
+    and the [TCRE](../parameters.md#temperature.TCRE) is the Transient Climate Response to CO<sub>2</sub> Emissions. The TCRE
+    is calibrated on the IPCC AR5 or AR6 reports (the median value of the TCRE is the same in the AR5
+    and AR6 calibration), but the distribution is different.
+
+    TODO (refer Dietz et al.)
+
+    ??? info "Calibration of the TCRE"
+
+        The TCRE is calibrated on the IPCC AR5 and AR6 reports, both using the linear relation shown in the SPM figure of the WG1 report:
+
+        === "Calibrated on IPCC AR5"
+
+            <div style="overflow: scroll;" markdown>
+            ``` plotly
+            {"file_path": "./assets/plots/ar5_tcre.json"}
+            ```
+            </div>
+            Source: [IPCC AR5 WG1 Figure SPM.10](https://www.ipcc.ch/report/ar5/wg1/summary-for-policymakers/figspm-10/)
+
+        === "Calibrated on IPCC AR6"
+
+            <div style="overflow: scroll;" markdown>
+            ``` plotly
+            {"file_path": "./assets/plots/ar6_tcre.json"}
+            ```
+            </div>
+
+            Source: [IPCC AR6 WG1 Figure SPM.10](https://www.ipcc.ch/report/ar6/wg1/figures/summary-for-policymakers/figure-spm-10)
+
+    ## Temperature target
+    The usual way to specify a policy target in MIMOSA is using carbon budgets. However, it is also possible to
+    specify a temperature target. This is done by setting the parameter [`temperature_target`](../parameters.md#temperature.target).
+    This is an upper bound on the temperature: if the cost-optimal temperature is below this value, this constraint is not binding.
+
+    If this parameter is set, the following constraint is active:
+
+    $$
+    \\text{temperature}_{t} \\leq \\text{temperature target}
+    $$
+
     ## Parameters defined in this module
     - param::T0
     - param::TCRE
