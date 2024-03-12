@@ -78,6 +78,29 @@ model2.save("run_example2")
 
 ### Doing multiple runs
 
+Often, MIMOSA needs to be run with multiple values of the same parameter (multiple carbon budgets, multiple discount rates, etc.).
+While it is possible to simply run the file multiple times, it is much easier to run MIMOSA multiple times directly in the Python script
+through regular Python loops:
+
+
+``` python hl_lines="3 7 12"
+from mimosa import MIMOSA, load_params
+
+for budget in ["500 GtCO2", "700 GtCO2", "1000 GtCO2"]:
+
+     params = load_params()
+
+     params["emissions"]["carbonbudget"] = budget
+
+     model3 = MIMOSA(params)
+     model3.solve()
+
+     model3.save(f"run_example3_{budget}") # (1)!
+```
+
+1. Don't forget to save each file to a different name, otherwise they will be overwritten at each iteration of the loop.
+
+
 ### Advanced: logging
 
 The solve status (optimal, impossible, etc), model solve time and the final maximised value can be logged to an external log file (along with the warnings or errors from the code). This can be very useful when doing many runs overnight. In this code example, the log is written to the file `mainlog.log`:
@@ -102,6 +125,10 @@ params = load_params()
 params["emissions"]["carbonbudget"] = False
 
 model1 = MIMOSA(params)
-model1.solve(verbose=False)
+model1.solve(verbose=False) # (1)!
 model1.save("run1")
 ```
+
+1. By setting `verbose=False`, the IPOPT output is not printed.
+     If you're doing many runs, this is probably useful. The termination status of IPOPT is
+     logged to the log file anyway.
