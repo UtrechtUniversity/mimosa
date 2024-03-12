@@ -75,20 +75,24 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     constraints.extend(
         [
             RegionalConstraint(
-                lambda m, t, r: m.paid_for_emission_reductions[t, r]
-                == m.mitigation_costs[t, r]
-                * m.global_emission_reduction_per_cost_unit[t]
-                if t > 0
-                else Constraint.Skip,
+                lambda m, t, r: (
+                    m.paid_for_emission_reductions[t, r]
+                    == m.mitigation_costs[t, r]
+                    * m.global_emission_reduction_per_cost_unit[t]
+                    if t > 0
+                    else Constraint.Skip
+                ),
                 "paid_for_emission_reductions",
             ),
             # Import export of emission reduction balance: if positive: , if negative:
             RegionalConstraint(
-                lambda m, t, r: m.import_export_emission_reduction_balance[t, r]
-                == m.paid_for_emission_reductions[t, r]
-                - m.regional_emission_reduction[t, r]
-                if t > 0
-                else Constraint.Skip,
+                lambda m, t, r: (
+                    m.import_export_emission_reduction_balance[t, r]
+                    == m.paid_for_emission_reductions[t, r]
+                    - m.regional_emission_reduction[t, r]
+                    if t > 0
+                    else Constraint.Skip
+                ),
                 "import_export_emission_reduction_balance",
             ),
             RegionalConstraint(
@@ -100,7 +104,11 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     )
 
     # How are mitigation costs distributed over regions?
-    m.min_rel_payment_level = Param()
-    m.max_rel_payment_level = Param()
+    m.min_rel_payment_level = Param(
+        doc="::economics.emission trade.min rel payment level"
+    )
+    m.max_rel_payment_level = Param(
+        doc="::economics.emission trade.max rel payment level"
+    )
 
     return constraints

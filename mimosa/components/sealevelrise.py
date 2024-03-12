@@ -35,19 +35,23 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
 
     # Parameters and variables necessary for sea level rise
     m.slr_thermal = Var(m.t, within=NonNegativeReals, units=quant.unit("m"))
-    m.slr_thermal_equil = Param()
-    m.slr_thermal_init = Param()
-    m.slr_thermal_adjust_rate = Param()
+    m.slr_thermal_equil = Param(initialize=0.5)  # Equilibrium
+    m.slr_thermal_init = Param(
+        initialize=0.0920666936642
+    )  # Initial SLR due to thermal expansion
+    m.slr_thermal_adjust_rate = Param(initialize=0.024076141150722)  # Adjustment rate
 
     m.slr_cumgsic = Var(m.t, within=NonNegativeReals, units=quant.unit("m"))
-    m.slr_gsic_melt_rate = Param()
-    m.slr_gsic_total_ice = Param()
-    m.slr_gsic_equil_temp = Param()
+    m.slr_gsic_melt_rate = Param(initialize=0.0008)  # Melt rate
+    m.slr_gsic_total_ice = Param(initialize=0.26)  # Total ice
+    m.slr_gsic_equil_temp = Param(initialize=-1)  # Equilibrium temperature
 
     m.slr_cumgis = Var(m.t, within=NonNegativeReals, units=quant.unit("m"))
-    m.slr_gis_melt_rate_above_thresh = Param()
-    m.slr_gis_init_melt_rate = Param()
-    m.slr_gis_init_ice_vol = Param()
+    m.slr_gis_melt_rate_above_thresh = Param(
+        initialize=1.11860082
+    )  # Melt rate above threshold
+    m.slr_gis_init_melt_rate = Param(initialize=0.6)  # Initial melt rate
+    m.slr_gis_init_ice_vol = Param(initialize=7.3)  # Initial ice volume
 
     m.total_SLR = Var(m.t, within=NonNegativeReals, units=quant.unit("m"))
 
@@ -55,10 +59,12 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     constraints = [
         # Thermal expansion
         GlobalConstraint(
-            lambda m, t: m.slr_thermal[t]
-            == slr_thermal_expansion(m.slr_thermal[t - 1], m.temperature[t - 1], m)
-            if t > 0
-            else Constraint.Skip,
+            lambda m, t: (
+                m.slr_thermal[t]
+                == slr_thermal_expansion(m.slr_thermal[t - 1], m.temperature[t - 1], m)
+                if t > 0
+                else Constraint.Skip
+            ),
             name="SLR_thermal",
         ),
         GlobalInitConstraint(
@@ -66,19 +72,22 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
         ),
         # GSIC
         GlobalConstraint(
-            lambda m, t: m.slr_cumgsic[t]
-            == slr_gsic(m.slr_cumgsic[t - 1], m.temperature[t - 1], m)
-            if t > 0
-            else Constraint.Skip,
+            lambda m, t: (
+                m.slr_cumgsic[t]
+                == slr_gsic(m.slr_cumgsic[t - 1], m.temperature[t - 1], m)
+                if t > 0
+                else Constraint.Skip
+            ),
             name="SLR_GSIC",
         ),
         GlobalInitConstraint(lambda m: m.slr_cumgsic[0] == 0.015),
         # GIS
         GlobalConstraint(
-            lambda m, t: m.slr_cumgis[t]
-            == slr_gis(m.slr_cumgis[t - 1], m.temperature[t - 1], m)
-            if t > 0
-            else Constraint.Skip,
+            lambda m, t: (
+                m.slr_cumgis[t] == slr_gis(m.slr_cumgis[t - 1], m.temperature[t - 1], m)
+                if t > 0
+                else Constraint.Skip
+            ),
             name="SLR_GIS",
         ),
         GlobalInitConstraint(lambda m: m.slr_cumgis[0] == 0.006),

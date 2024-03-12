@@ -77,7 +77,11 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     """
     constraints = []
 
-    m.init_capitalstock_factor = Param(m.regions, units=quant.unit("currency_unit"))
+    m.init_capitalstock_factor = Param(
+        m.regions,
+        units=quant.unit("currency_unit"),
+        doc="regional::economics.init_capital_factor",
+    )
     m.capital_stock = Var(
         m.t,
         m.regions,

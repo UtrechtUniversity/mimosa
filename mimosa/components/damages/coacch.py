@@ -36,18 +36,25 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     constraints = []
 
     m.damage_costs = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
-    m.damage_scale_factor = Param()
+    m.damage_scale_factor = Param(doc="::economics.damages.scale factor")
 
     # Damages not related to SLR (dependent on temperature)
     m.damage_costs_non_slr = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
 
-    m.damage_noslr_form = Param(m.regions, within=Any)  # String for functional form
-    m.damage_noslr_b1 = Param(m.regions)
-    m.damage_noslr_b2 = Param(m.regions)
-    m.damage_noslr_b3 = Param(m.regions, within=Any)  # Can be empty
+    m.damage_noslr_form = Param(
+        m.regions, within=Any, doc="regional::COACCH.NoSLR_form"
+    )  # String for functional form
+    m.damage_noslr_b1 = Param(m.regions, doc="regional::COACCH.NoSLR_b1")
+    m.damage_noslr_b2 = Param(m.regions, doc="regional::COACCH.NoSLR_b2")
+    m.damage_noslr_b3 = Param(
+        m.regions, within=Any, doc="regional::COACCH.NoSLR_b3"
+    )  # Can be empty
     # (b2 and b3 are only used for some functional forms)
 
-    m.damage_noslr_a = Param(m.regions)
+    m.damage_noslr_a = Param(
+        m.regions,
+        doc=lambda params: f'regional::COACCH.NoSLR_a (q={params["economics"]["damages"]["quantile"]})',
+    )
 
     # Quadratic damage function for non-SLR damages. Factor `a` represents
     # the damage quantile
@@ -65,17 +72,38 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
         m.t, m.regions, bounds=(-0.5, 0.7), units=quant.unit("fraction_of_GDP")
     )
 
-    m.damage_slr_form = Param(m.regions, within=Any)  # String for functional form
-    m.damage_slr_b1 = Param(m.regions)
+    def slr_param_name(params, name):
+        """Returns the parameter name regional::COACCH.SLR... depending on if adaptation is included or not."""
+        slr_with_adapt = params["economics"]["damages"]["coacch_slr_withadapt"]
+        return f'regional::COACCH.SLR-{"Ad" if slr_with_adapt else "NoAd"}_{name}'
+
+    m.damage_slr_form = Param(
+        m.regions,
+        within=Any,
+        doc=lambda params: slr_param_name(params, "form"),
+    )  # String for functional form
+    m.damage_slr_b1 = Param(
+        m.regions,
+        doc=lambda params: slr_param_name(params, "b1"),
+    )
     m.damage_slr_b2 = Param(
-        m.regions, within=Any
+        m.regions,
+        within=Any,
+        doc=lambda params: slr_param_name(params, "b2"),
     )  # within=Any since it can be empty for some functional forms
     m.damage_slr_b3 = Param(
-        m.regions, within=Any
+        m.regions,
+        within=Any,
+        doc=lambda params: slr_param_name(params, "b3"),
     )  # within=Any since it can be empty for some functional forms
     # (b2 and b3 are only used for some functional forms)
 
-    m.damage_slr_a = Param(m.regions)
+    m.damage_slr_a = Param(
+        m.regions,
+        doc=lambda params: slr_param_name(
+            params, f'a (q={params["economics"]["damages"]["quantile"]})'
+        ),
+    )
 
     # Linear damage function for SLR damages, including adaptation costs
     constraints.append(

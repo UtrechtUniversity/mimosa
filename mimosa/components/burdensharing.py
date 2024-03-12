@@ -31,7 +31,7 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     """
     constraints = []
 
-    m.burden_sharing_regime = Param(within=Any)
+    m.burden_sharing_regime = Param(within=Any, doc="::burden sharing.regime")
 
     ## Burden sharing scheme:
     m.burden_sharing_common_level = Var(m.t, units=quant.unit("fraction_of_GDP"))
@@ -55,7 +55,7 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
                 lambda m, t, r: m.burden_sharing_common_level[t],
                 "burden_sharing_regime_mitigation_costs",
                 ignore_if=lambda m, t, r: value(m.burden_sharing_regime)
-                != "equal_mitigation_costs"
+                != "equal_mitigation_costs",
                 # or m.year(t) > 2125,
             ),
         ]
@@ -70,7 +70,7 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
         initialize=lambda m, r: m.baseline_emissions(m.year(0), r)
         / sum(m.baseline_emissions(m.year(0), s) for s in m.regions),
     )
-    m.percapconv_year = Param(initialize=2050)
+    m.percapconv_year = Param(initialize=2050, doc="::burden sharing.percapconv_year")
     m.percapconv_share_pop = Param(
         m.t,
         m.regions,

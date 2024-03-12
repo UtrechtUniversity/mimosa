@@ -42,12 +42,12 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     m.adapt_costs = Var(m.t, m.regions)
     m.adapt_level = Var(m.t, m.regions, bounds=(0, 1))
 
-    m.damage_a1 = Param(m.regions)
-    m.damage_a2 = Param(m.regions)
-    m.damage_a3 = Param(m.regions)
+    m.damage_a1 = Param(m.regions, doc="regional::ADRICE2010.a1")
+    m.damage_a2 = Param(m.regions, doc="regional::ADRICE2010.a2")
+    m.damage_a3 = Param(m.regions, doc="regional::ADRICE2010.a3")
     m.damage_scale_factor = Param()
-    m.adapt_g1 = Param(m.regions)
-    m.adapt_g2 = Param(m.regions)
+    m.adapt_g1 = Param(m.regions, doc="regional::ADRICE2010.g1")
+    m.adapt_g2 = Param(m.regions, doc="regional::ADRICE2010.g2")
     m.adapt_curr_level = Param()
     m.fixed_adaptation = Param()
 

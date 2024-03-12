@@ -51,18 +51,11 @@ class InstantiatedModel:
 
     def get_param_values(self):
         damage_module = self.params["model"]["damage module"]
-        emissiontrade_module = self.params["model"]["emissiontrade module"]
 
         instance_data = {None: {}}
 
-        # Main instance data
+        ## Main instance data
         self._set_instance_data_main(instance_data)
-
-        ## Emission trade module:
-
-        # Instance data for globalcostpool emission trade module:
-        if emissiontrade_module == "globalcostpool":
-            self._set_instance_data_emissiontrade_globalcostpool(instance_data)
 
         ## Damage module:
 
@@ -70,12 +63,10 @@ class InstantiatedModel:
         if damage_module == "RICE2010":
             self._set_instance_data_rice2010(instance_data)
 
-        # Instance data for RICE2012 damage/adaptation:
-        if damage_module == "RICE2012":
-            self._set_instance_data_rice2012(instance_data)
-
         # Instance data for COACCH damages:
         if damage_module == "COACCH":
+            # Only used if combined damage function is used,
+            # otherwise, the parameter values are set dynamically
             self._set_instance_data_coacch(instance_data)
 
         # For WITCH damage/adaption:
@@ -114,14 +105,34 @@ class InstantiatedModel:
 
         # Attempt to set parameter values automatically from their doc value
         for parameter in self.abstract_model.component_objects(Param):
-            if str(parameter.doc).startswith("::"):
-                keys = parameter.doc.split("::")[1].split(".")
+            # First check if the parameter is callable: in this case,
+            # the parameter doc is a function that returns the parameter doc string.
+            # This is used for dynamic parameter values (depending on other parameters).
+            # If this is the case, give `params` to the function.
+
+            if callable(parameter.doc):
+                parameter_doc_str = parameter.doc(params)
+            else:
+                parameter_doc_str = str(parameter.doc)
+
+            ### Normal parameter, get directly from parameter dictionary
+            if parameter_doc_str.startswith("::"):
+                keys = parameter_doc_str.split("::")[1].split(".")
                 value = get_nested(params, keys)
                 # Check type of parameter
                 parser = get_nested(self.param_parser_tree, keys)
                 if parser.type == "quantity":
                     value = quant(value, parser.unit)
                 parameter_mapping[parameter.name] = V(value)
+
+            ### Regional parameter, get from regional parameter store
+            if parameter_doc_str.startswith("regional::"):
+                param_category, param_name = parameter_doc_str.split("::")[1].split(
+                    ".", 1
+                )
+                parameter_mapping[parameter.name] = self.regional_param_store.get(
+                    param_category, param_name
+                )
 
         parameter_mapping_manual = {
             "beginyear": V(t_start),
@@ -130,18 +141,9 @@ class InstantiatedModel:
             "t": V(range(num_years)),
             "year2100": V(year2100),
             "regions": V(params["regions"].keys()),
-            "burden_sharing_regime": V(params["burden sharing"]["regime"]),
-            "percapconv_year": V(params["burden sharing"]["percapconv_year"]),
             "LBD_scaling": V(quant("40 GtCO2", "emissions_unit")),
             "LOT_rate": V(0),
-            "damage_scale_factor": V(params["economics"]["damages"]["scale factor"]),
             "fixed_adaptation": V(params["economics"]["adaptation"]["fixed"]),
-            "MAC_scaling_factor": self.regional_param_store.get(
-                "MAC", params["economics"]["MAC"]["regional calibration factor"]
-            ),
-            "init_capitalstock_factor": self.regional_param_store.get(
-                "economics", "init_capital_factor"
-            ),
         }
 
         parameter_mapping.update(parameter_mapping_manual)
@@ -151,62 +153,10 @@ class InstantiatedModel:
 
         instance_data[None].update(parameter_mapping)
 
-        # Set sea level rise parameters
-        self._set_instance_data_slr(instance_data)
-
-    def _set_instance_data_slr(self, instance_data) -> None:
-        parameter_mapping = {
-            # Sea level rise:
-            "slr_thermal_equil": V(0.5),  # Equilibrium
-            "slr_thermal_init": V(0.0920666936642),  # Initial condition
-            "slr_thermal_adjust_rate": V(0.024076141150722),  # Adjustment rate
-            "slr_gsic_melt_rate": V(0.0008),  # Melt rate
-            "slr_gsic_total_ice": V(0.26),  # Total ice
-            "slr_gsic_equil_temp": V(-1),  # Equil temp
-            "slr_gis_melt_rate_above_thresh": V(1.11860082),  # Melt rate above threshol
-            "slr_gis_init_melt_rate": V(0.6),  # Initial melt rate
-            "slr_gis_init_ice_vol": V(7.3),  # Initial ice volume
-        }
-
-        instance_data[None].update(parameter_mapping)
-
-    def _set_instance_data_emissiontrade_globalcostpool(self, instance_data) -> None:
-        params = self.params
-        parameter_mapping = {
-            "min_rel_payment_level": V(
-                params["economics"]["emission trade"]["min rel payment level"]
-            ),
-            "max_rel_payment_level": V(
-                params["economics"]["emission trade"]["max rel payment level"]
-            ),
-        }
-
-        instance_data[None].update(parameter_mapping)
-
     def _set_instance_data_rice2010(self, instance_data) -> None:
         params = self.params
         parameter_mapping = {
             "adapt_curr_level": V(params["economics"]["adaptation"]["curr_level"]),
-            "damage_a1": self.regional_param_store.get("ADRICE2010", "a1"),
-            "damage_a2": self.regional_param_store.get("ADRICE2010", "a2"),
-            "damage_a3": self.regional_param_store.get("ADRICE2010", "a3"),
-            "adapt_g1": self.regional_param_store.get("ADRICE2010", "g1"),
-            "adapt_g2": self.regional_param_store.get("ADRICE2010", "g2"),
-        }
-
-        instance_data[None].update(parameter_mapping)
-
-    def _set_instance_data_rice2012(self, instance_data) -> None:
-        parameter_mapping = {
-            "damage_a1": self.regional_param_store.get("ADRICE2012", "a1"),
-            "damage_a2": self.regional_param_store.get("ADRICE2012", "a2"),
-            "damage_a3": self.regional_param_store.get("ADRICE2012", "a3"),
-            "adap1": self.regional_param_store.get("ADRICE2012", "nu1"),
-            "adap2": self.regional_param_store.get("ADRICE2012", "nu2"),
-            "adap3": self.regional_param_store.get("ADRICE2012", "nu3"),
-            "adapt_rho": V(0.5),
-            "SLRdam1": self.regional_param_store.get("ADRICE2012", "slrdam1"),
-            "SLRdam2": self.regional_param_store.get("ADRICE2012", "slrdam2"),
         }
 
         instance_data[None].update(parameter_mapping)
@@ -222,7 +172,6 @@ class InstantiatedModel:
         ]
         slr_withadapt = self.params["economics"]["damages"]["coacch_slr_withadapt"]
         adapt_prfx = "Ad" if slr_withadapt else "NoAd"
-        prfx = f"SLR-{adapt_prfx}"
 
         V_region = lambda x: {region: x for region in self.params["regions"]}
 
@@ -247,26 +196,9 @@ class InstantiatedModel:
             }
 
         else:
-            factor_noslr = f"NoSLR_a (q={damage_quantile})"
-            factor_slr_ad = f"{prfx}_a (q={damage_quantile})"
 
             parameter_mapping = {
-                # Non-SLR damages:
-                "damage_noslr_form": self.regional_param_store.get(
-                    "COACCH", "NoSLR_form"
-                ),
-                "damage_noslr_b1": self.regional_param_store.get("COACCH", "NoSLR_b1"),
-                "damage_noslr_b2": self.regional_param_store.get("COACCH", "NoSLR_b2"),
-                "damage_noslr_b3": self.regional_param_store.get("COACCH", "NoSLR_b3"),
-                "damage_noslr_a": self.regional_param_store.get("COACCH", factor_noslr),
                 # SLR damages:
-                "damage_slr_form": self.regional_param_store.get(
-                    "COACCH", f"{prfx}_form"
-                ),
-                "damage_slr_b1": self.regional_param_store.get("COACCH", f"{prfx}_b1"),
-                "damage_slr_b2": self.regional_param_store.get("COACCH", f"{prfx}_b2"),
-                "damage_slr_b3": self.regional_param_store.get("COACCH", f"{prfx}_b3"),
-                "damage_slr_a": self.regional_param_store.get("COACCH", factor_slr_ad),
             }
 
         instance_data[None].update(parameter_mapping)

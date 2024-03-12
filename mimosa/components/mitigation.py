@@ -88,7 +88,10 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     m.rel_mitigation_costs = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
     m.MAC_gamma = Param(doc="::economics.MAC.gamma")
     m.MAC_beta = Param(doc="::economics.MAC.beta")
-    m.MAC_scaling_factor = Param(m.regions)  # Regional scaling of the MAC
+    m.MAC_scaling_factor = Param(
+        m.regions,
+        doc=lambda params: f'regional::MAC.{params["economics"]["MAC"]["regional calibration factor"]}',
+    )  # Regional scaling of the MAC
     m.carbonprice = Var(
         m.t,
         m.regions,

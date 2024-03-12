@@ -38,26 +38,26 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     m.gross_damages = Var(m.t, m.regions)
     m.resid_damages = Var(m.t, m.regions)
 
-    m.damage_a1 = Param(m.regions)
-    m.damage_a2 = Param(m.regions)
-    m.damage_a3 = Param(m.regions)
+    m.damage_a1 = Param(m.regions, doc="regional::ADRICE2012.a1")
+    m.damage_a2 = Param(m.regions, doc="regional::ADRICE2012.a2")
+    m.damage_a3 = Param(m.regions, doc="regional::ADRICE2012.a3")
     m.damage_scale_factor = Param()
 
     m.adapt_level = Var(m.t, m.regions, within=NonNegativeReals)
     m.adapt_costs = Var(m.t, m.regions)
     m.adapt_FAD = Var(m.t, m.regions, bounds=(0, 0.15), initialize=0)
     m.adapt_IAD = Var(m.t, m.regions, bounds=(0, 0.15), initialize=0)
-    m.adap1 = Param(m.regions)
-    m.adap2 = Param(m.regions)
-    m.adap3 = Param(m.regions)
-    m.adapt_rho = Param()
+    m.adap1 = Param(m.regions, doc="regional::ADRICE2012.nu1")
+    m.adap2 = Param(m.regions, doc="regional::ADRICE2012.nu2")
+    m.adap3 = Param(m.regions, doc="regional::ADRICE2012.nu3")
+    m.adapt_rho = Param(initialize=0.5)
     m.fixed_adaptation = Param()
 
     m.adapt_SAD = Var(m.t, m.regions, initialize=0.01, within=NonNegativeReals)
 
     # SLR damages
-    m.SLRdam1 = Param(m.regions)
-    m.SLRdam2 = Param(m.regions)
+    m.SLRdam1 = Param(m.regions, doc="regional::ADRICE2012.slrdam1")
+    m.SLRdam2 = Param(m.regions, doc="regional::ADRICE2012.slrdam2")
     m.SLR_damages = Var(m.t, m.regions)
 
     constraints.extend(
@@ -91,10 +91,12 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
                 "resid_damages",
             ),
             RegionalConstraint(
-                lambda m, t, r: m.adapt_SAD[t, r]
-                == (1 - m.dk) ** m.dt * m.adapt_SAD[t - 1, r] + m.adapt_IAD[t, r]
-                if t > 0
-                else Constraint.Skip,
+                lambda m, t, r: (
+                    m.adapt_SAD[t, r]
+                    == (1 - m.dk) ** m.dt * m.adapt_SAD[t - 1, r] + m.adapt_IAD[t, r]
+                    if t > 0
+                    else Constraint.Skip
+                ),
                 "adapt_SAD",
             ),
             RegionalInitConstraint(lambda m, r: m.adapt_SAD[0, r] == 0),
@@ -102,18 +104,20 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
             RegionalInitConstraint(lambda m, r: m.adapt_FAD[0, r] == 0),
             RegionalConstraint(
                 lambda m, t, r: (
-                    m.adapt_level[t, r]
-                    == m.adap1[r]
-                    * (
-                        m.adap2[r]
-                        * soft_min(m.adapt_FAD[t, r], scale=0.005) ** m.adapt_rho
-                        + (1 - m.adap2[r])
-                        * soft_min(m.adapt_SAD[t, r], scale=0.005) ** m.adapt_rho
+                    (
+                        m.adapt_level[t, r]
+                        == m.adap1[r]
+                        * (
+                            m.adap2[r]
+                            * soft_min(m.adapt_FAD[t, r], scale=0.005) ** m.adapt_rho
+                            + (1 - m.adap2[r])
+                            * soft_min(m.adapt_SAD[t, r], scale=0.005) ** m.adapt_rho
+                        )
+                        ** (m.adap3[r] / m.adapt_rho)
                     )
-                    ** (m.adap3[r] / m.adapt_rho)
-                )
-                if t > 0
-                else (m.adapt_level[t, r] == 0),
+                    if t > 0
+                    else (m.adapt_level[t, r] == 0)
+                ),
                 name="adapt_level",
             ),
             RegionalConstraint(
