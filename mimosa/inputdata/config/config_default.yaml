@@ -396,6 +396,57 @@ regionstype:
     - World
   default: IMAGE26
 
+regionsmappings:
+  descr: >-
+    List of region types and their conversion tables. Only used for regional parameters,
+    not for aggregating or disaggregating variables or other output.
+  type: list
+  values:
+    descr: >-
+      Dictionary with keys `regionstype1`, `regionstype2` and `conversiontable`.
+    type: dict
+  default:
+    - regionstype1: IMAGE26
+      regionstype2: COACCH
+      conversiontable: inputdata/regions/IMAGE26_COACCH.csv
+    - regionstype1: IMAGE26
+      regionstype2: ADRICE2010
+      conversiontable: inputdata/regions/IMAGE26_ADRICE2010.csv
+    - regionstype1: IMAGE26
+      regionstype2: ADRICE2012
+      conversiontable: inputdata/regions/IMAGE26_ADRICE2012.csv
+
+regional_parameter_files:
+  descr: >-
+    Dictionary of regional parameter files. If the regionstype of the file is different
+    from the regionstype of the model, the file is converted using the `regionsmappings`
+    parameter.
+  type: dict
+  keys:
+    descr: >-
+      Names of the parameter category (e.g. 'MAC', 'damage', 'adaptation', etc.) used when
+      assigning the values to the regional parameters.
+    type: str
+  values:
+    descr: Dictionary with keys `filename` and `regionstype`
+    type: dict
+  default:
+    economics:
+      filename: inputdata/params/economics.csv
+      regionstype: IMAGE26
+    MAC:
+      filename: inputdata/params/mac.csv
+      regionstype: IMAGE26
+    COACCH:
+      filename: inputdata/params/COACCH.csv
+      regionstype: COACCH
+    ADRICE2010:
+      filename: inputdata/params/ADRICE2010.csv
+      regionstype: ADRICE2010
+    ADRICE2012:
+      filename: inputdata/params/ADRICE2012.csv
+      regionstype: ADRICE2012
+
 ##################
 
 regions:

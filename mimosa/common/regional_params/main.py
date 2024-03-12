@@ -19,6 +19,7 @@ These regional values are:
 """
 
 from .regional_param_container import RegionalParamContainer
+from .region_mappers import RegionMapper
 
 
 ###########################
@@ -55,19 +56,16 @@ class RegionalParamStore:
 
         regiontype_output = params["regionstype"]
 
-        self.categories = {
-            "economics": RegionalParamContainer(
-                "economics.csv", "IMAGE26", regiontype_output
-            ),
-            "MAC": RegionalParamContainer("mac.csv", "IMAGE26", regiontype_output),
-            "ADRICE2010": RegionalParamContainer(
-                "ADRICE2010.csv", "ADRICE2010", regiontype_output
-            ),
-            "ADRICE2012": RegionalParamContainer(
-                "ADRICE2012.csv", "ADRICE2012", regiontype_output
-            ),
-            "COACCH": RegionalParamContainer("COACCH.csv", "COACCH", regiontype_output),
-        }
+        self.region_mappers = self._create_region_mappers(params)
+
+        self.categories = {}
+        for category, category_info in params["regional_parameter_files"].items():
+            self.categories[category] = RegionalParamContainer(
+                category_info["filename"],
+                category_info["regionstype"],
+                regiontype_output,
+                self.region_mappers,
+            )
 
     def get(self, category, paramname):
         return {
@@ -83,3 +81,16 @@ class RegionalParamStore:
             value = self.categories[category].get(paramname, region)
 
         return value
+
+    def _create_region_mappers(self, params):
+        region_mappers = {}
+        for config_region_mapping in params["regionsmappings"]:
+            regionstype1 = config_region_mapping["regionstype1"]
+            regionstype2 = config_region_mapping["regionstype2"]
+            conversiontable = config_region_mapping["conversiontable"]
+
+            mapper = RegionMapper(regionstype1, regionstype2, conversiontable)
+            region_mappers[(regionstype1, regionstype2)] = mapper
+            region_mappers[(regionstype2, regionstype1)] = mapper
+
+        return region_mappers

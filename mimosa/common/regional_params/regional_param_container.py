@@ -3,14 +3,12 @@
 import os
 import pandas as pd
 
-from .region_mappers import REGION_MAPPERS
-
 
 class RegionalParamContainer:
-    def __init__(self, filename, regiontype_input, regiontype_output):
+    def __init__(self, filename, regiontype_input, regiontype_output, region_mappers):
         full_filename = os.path.join(
             os.path.dirname(__file__),
-            "../../inputdata/params",
+            "../../",
             filename,
         )
         data_raw = pd.read_csv(full_filename)
@@ -20,11 +18,11 @@ class RegionalParamContainer:
         else:
             # Transform the input regional definition to required output regional definitions
             try:
-                region_mapper = REGION_MAPPERS[(regiontype_input, regiontype_output)]
-            except KeyError:
+                region_mapper = region_mappers[(regiontype_input, regiontype_output)]
+            except KeyError as exc:
                 raise KeyError(
                     f"Region mapper missing between {regiontype_input} and {regiontype_output}"
-                )
+                ) from exc
 
             self.data = region_mapper.map_regions(
                 data_raw, regiontype_input, regiontype_output

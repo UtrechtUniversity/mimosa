@@ -4,7 +4,6 @@ Currently, only `mean` is used. In future versions, this will be extended
 and automatic region mapping will be used by transforming to country level first."""
 
 import os
-import typing
 import pandas as pd
 
 
@@ -17,7 +16,7 @@ class RegionMapper:
     def __init__(self, regiontype1, regiontype2, mapping_file):
         full_filename = os.path.join(
             os.path.dirname(__file__),
-            "../../inputdata/regions",
+            "../../",
             mapping_file,
         )
         # Read region mapping
@@ -60,19 +59,3 @@ class RegionMapper:
         )
 
         return data_grouped
-
-
-REGION_MAPPERS: typing.Dict[tuple, RegionMapper] = {}
-
-
-def register_region_mappers(regiontype1, regiontype2, mapping_file):
-    mapper = RegionMapper(regiontype1, regiontype2, mapping_file)
-
-    # Save for both regiontype1 to regiontype2 and vice versa
-    REGION_MAPPERS[(regiontype1, regiontype2)] = mapper
-    REGION_MAPPERS[(regiontype2, regiontype1)] = mapper
-
-
-register_region_mappers("IMAGE26", "ADRICE2010", "IMAGE26_ADRICE2010.csv")
-register_region_mappers("IMAGE26", "ADRICE2012", "IMAGE26_ADRICE2012.csv")
-register_region_mappers("IMAGE26", "COACCH", "IMAGE26_COACCH.csv")
