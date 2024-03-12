@@ -90,12 +90,13 @@ def on_page_content(html, **kwargs):
         param_name = match.split("param::")[1]
         try:
             param = getattr(model, param_name)
-            if param.doc:
-                keys = param.doc.split("::")[1].split(".")
-                doc = get_nested(parser_tree, keys).to_string()
-                formatted_text = f"<a href='../../parameters/#{param.doc.split('::')[1]}'><code>{param_name}</code></a>: {doc}"
-            else:
-                formatted_text = f"<code>{param_name}</code>"
+            formatted_text = f"<code>{param_name}</code>"
+            if isinstance(param.doc, str):
+                if param.doc.startswith("::"):
+                    # Ignore the regional parameters for now
+                    keys = param.doc.split("::")[1].split(".")
+                    doc = get_nested(parser_tree, keys).to_string()
+                    formatted_text = f"<a href='../../parameters/#{param.doc.split('::')[1]}'><code>{param_name}</code></a>: {doc}"
             html = html.replace(match, formatted_text)
 
         except AttributeError:
