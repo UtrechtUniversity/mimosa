@@ -250,22 +250,31 @@ def _get_temperature_constraints(m: AbstractModel) -> Sequence[GeneralConstraint
     """
 
     The global temperature change is calculated as a linear function of cumulative emissions, with a slope
-    given by the Transient Climate Response to CO<sub>2</sub> Emissions (TCRE):
+    given by the Transient Climate Response to CO<sub>2</sub> Emissions (TCRE), following [Dietz et al.] who
+    showed that this performed better than the default two-box DICE climate module.
 
     $$
     \\text{temperature}_{t} = T_0 + \\text{TCRE} \\cdot \\text{cumulative emissions}_{t},
     $$
 
     where [$T_0$](../parameters.md#temperature.initial) is the initial temperature at the start of the run (by default in 2020),
-    and the [TCRE](../parameters.md#temperature.TCRE) is the Transient Climate Response to CO<sub>2</sub> Emissions. The TCRE
+    and the [TCRE](../parameters.md#temperature.TCRE) is the Transient Climate Response to CO<sub>2</sub> Emissions.
+
+    The initial temperature is set to 1.16°C in 2020 by default, following [Visser et al.]. The TCRE
     is calibrated on the IPCC AR5 or AR6 reports (the median value of the TCRE is the same in the AR5
     and AR6 calibration), but the distribution is different.
 
-    TODO (refer Dietz et al.)
-
     ??? info "Calibration of the TCRE"
 
-        The TCRE is calibrated on the IPCC AR5 and AR6 reports, both using the linear relation shown in the SPM figure of the WG1 report:
+        The TCRE is calibrated on the IPCC AR5 and AR6 reports, both using the linear relation shown in the SPM figure of the WG1 report.
+        The default value of the TCRE is 0.62°C per 1000 GtCO<sub>2</sub> (median value of the AR5 and AR6 calibration). The 5th and 95th percentiles
+        differ between the two calibrations, with the AR5 calibration having a wider distribution:
+
+        | Percentile | AR5 TCRE <br><span style="font-weight: normal">(°C per TtCO<sub>2</sub>)</span> | AR6 TCRE <br><span style="font-weight: normal">(°C per TtCO<sub>2</sub>)</span> |
+        |------------|----------|----------|
+        | 5th        | 0.42     | 0.42     |
+        | 50th       | 0.62     | 0.62 `default` |
+        | 95th       | 0.82     | 0.75     |
 
         === "Calibrated on IPCC AR5"
 
