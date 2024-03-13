@@ -366,6 +366,20 @@ def _get_inertia_and_budget_constraints(
     m: AbstractModel,
 ) -> Sequence[GeneralConstraint]:
     """
+    MIMOSA allows several types of constraints on emissions: a global carbon budget, inertia constraints,
+    limits on net negative emissions and constraints on emissions after 2100.
+
+    ## Carbon budget
+
+    By default, the carbon budget is set to `False`, which means that MIMOSA runs in CBA mode without carbon budget.
+    If a carbon budget is defined using the parameter [`carbonbudget`](../parameters.md#emissions.carbonbudget), the following constraint is active:
+
+    $$
+    \\text{cumulative emissions}_{t} - \\text{budget} \\leq 0,
+    $$
+
+    for $t \\geq 2100$. Note that the [`carbonbudget`](../parameters.md#emissions.carbonbudget) parameter unit should be in GtCO<sub>2</sub> (or TtCO<sub>2</sub> or MtCO<sub>2</sub>).
+
 
     ## Parameters defined in this module
     - param::budget
