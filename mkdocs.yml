@@ -13,9 +13,9 @@ nav:
   - Installing MIMOSA: installation.md
   - Running MIMOSA: run.md
   - Extending MIMOSA: extending_mimosa.md
-  - Model code: "https://github.com/kvanderwijst/MIMOSA"
+  - Model code: "https://github.com/UtrechtUniversity/mimosa"
 
-repo_url: https://github.com/kvanderwijst/MIMOSA
+repo_url: https://github.com/UtrechtUniversity/mimosa
 
 theme:
   name: material
