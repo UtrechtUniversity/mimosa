@@ -8,6 +8,7 @@ nav:
           - Economics: components/economics.md
           - Welfare: components/welfare.md
           - Emissions and temperature: components/emissions.md
+          - Mitigation: components/mitigation.md
       - Region definitions: components/regions.md
   - Parameter reference: parameters.md
   - Installing MIMOSA: installation.md

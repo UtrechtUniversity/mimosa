@@ -378,7 +378,44 @@ def _get_inertia_and_budget_constraints(
     \\text{cumulative emissions}_{t} - \\text{budget} \\leq 0,
     $$
 
-    for $t \\geq 2100$. Note that the [`carbonbudget`](../parameters.md#emissions.carbonbudget) parameter unit should be in GtCO<sub>2</sub> (or TtCO<sub>2</sub> or MtCO<sub>2</sub>).
+    for $t \\geq 2100$. Note that the [`carbonbudget`](../parameters.md#emissions.carbonbudget) parameter unit should be
+    in GtCO<sub>2</sub> (or TtCO<sub>2</sub> or MtCO<sub>2</sub>).
+
+    ## Inertia
+
+    In MIMOSA, there is a limit on how fast emissions can be reduced. This constraint is called inertia, and represents the
+    technological, social, political and economic difficulties of quickly reducing emissions. It is implemented as a hard limit
+    on the speed of emission reductions. The parameters [`inertia_global`](../parameters.md#emissions.inertia.global) and
+    [`inertia_regional`](../parameters.md#emissions.inertia.regional) are defined as percentages of baseline emissions in the
+    initial year. If baseline emissions in a region are 10 GtCO<sub>2</sub>/yr in the initial year, and the global inertia is 5%,
+    then the global emissions cannot be reduced by more than 0.5 GtCO<sub>2</sub>/yr throughout the whole run. This way, the parameter
+    is independent of the size of the region.
+
+    === "Global inertia"
+
+
+        $$
+        \\text{global emissions}_{t} - \\text{global emissions}_{t-1} \\geq \\Delta t \\cdot \\text{inertia_global} \\cdot \\text{scaling factor},
+        $$
+
+        with the scaling factor the global baseline emissions in the starting year:
+
+        $$
+        \\text{scaling factor} = \\left( \\sum_r \\text{baseline emissions}_{t=0,r}\\right)
+        $$
+
+        By default, the [`inertia_global`](../parameters.md#emissions.inertia.global) is set to `False`, such that there is no global inertia
+        constraint. The only inertia constraint happens regionally by default.
+
+    === "Regional inertia"
+
+        $$
+        \\text{regional emissions}_{t,r} - \\text{regional emissions}_{t-1,r} \\geq \\Delta t \\cdot \\text{inertia_regional} \\cdot \\text{baseline emissions}_{t=0,r}.
+        $$
+
+        By default, the [`inertia_regional`](../parameters.md#emissions.inertia.regional) parameter is active, such that regional emissions cannot be reduced by more than 5% of the initial baseline emissions per year. This is
+        based on maximum reduction speeds of the scenarios in the scenario explorer for 1.5°C pathways underpinning the IPCC Special Report on Global Warming
+        of 1.5°C (<https://data.ene.iiasa.ac.at/iamc-1.5c-explorer>) (ref https://www.frontiersin.org/articles/10.3389/fclim.2021.785577/full)
 
 
     ## Parameters defined in this module
