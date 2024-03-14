@@ -2,6 +2,9 @@
 
 MIMOSA is a recent simple IAM based on FAIR, with 26 regions covering the whole world. It is a relatively simple Cost-Benefit IAM but still covers the relevant technological and socio-economic dynamics. Temperature is a linear function of cumulative CO2 emissions. MIMOSA uses the DICE sea-level rise module. The mitigation costs, population, initial capital stock and baseline GDP and CO2 emissions are regional. The direct regional mitigation costs are calculated as area under the Marginal Abatement Cost (MAC) curve, and have been calibrated to the IPCC AR6 WGIII database.
 
+## Documentation and usage:
+Please refer to the extensive model documentation on <https://utrechtuniversity.github.io/mimosa/>.
+
 ### General
 
 The model is written in the Python optimisation package [Pyomo](https://www.pyomo.org/). It is mainly an `AbstractModel`
@@ -9,36 +12,13 @@ The model is written in the Python optimisation package [Pyomo](https://www.pyom
 transformed into a `ConcreteModel` by putting all the parameter values in it. This `ConcreteModel` is sent to the solver
 ([IPOPT](https://coin-or.github.io/Ipopt/), an open-source large-scale nonlinear optimisation suite).
 
-### Structure
-
-* [Abstract model](mimosa/model/abstract_model.py)
-  * [Emission module](mimosa/model/components/emissions.py)
-  * [Sea level rise module](mimosa/model/components/sealevelrise.py)
-  * Damage and adaptation module
-    * [COACCH](mimosa/model/components/damages/coacch.py)
-    * Adaptation not yet implemented
-  * [Abatement module](mimosa/model/components/abatement.py)
-  * [Burden sharing module](mimosa/model/components/burdensharing.py)
-  * Emission trading module
-    * [Global cost pool](mimosa/model/components/emissiontrade/globalcostpool.py)
-    * [No trade](mimosa/model/components/emissiontrade/notrade.py)
-  * [Cobb-Douglas and economics module](mimosa/model/components/cobbdouglas.py)
-  * Objective module
-    * [Maximise utility](mimosa/model/components/objective/utility.py)
-    * [Minimise global costs](mimosa/model/components/objective/globalcosts.py)
-  * Welfare function module
-    * [Global cost-minimising](mimosa/model/components/welfare/inequal_aversion_zero.py)
-    * [Regional welfare loss-minimising](mimosa/model/components/welfare/inequal_aversion_elasmu.py)
-* [Concrete model](mimosa/model/concrete_model/instantiate_params.py)
-  * [Simulation mode](mimosa/model/concrete_model/simulation_mode/main.py) (when emission/temperature paths are imposed exogenously)
-
 <br>
 <br>
 
 ![](https://media.springernature.com/full/springer-static/image/art%3A10.1038%2Fs41467-021-22826-5/MediaObjects/41467_2021_22826_Fig1_HTML.png)
 *Schematic overview of the MIMOSA model. From [[1]](#1).*
   
-## Installing and running MIMOSA
+### Installing and running MIMOSA
 
 MIMOSA can be installed using `pip`:
 ```bash
@@ -82,10 +62,10 @@ model1.solve()  # No NEOS required
 model1.save("run1")
 ```
 
-## How to cite
+### How to cite
 When using MIMOSA, please cite [[1]](#1) (global version) and [[2]](#2) (regional version).
 
-## References
+### References
 <a id="1">[1]</a> 
 van der Wijst, KI., Hof, A.F. & van Vuuren, D.P. On the optimality of 2°C targets and a decomposition of uncertainty. *Nature Communications* **12**, 2575 (2021). https://doi.org/10.1038/s41467-021-22826-5
 
