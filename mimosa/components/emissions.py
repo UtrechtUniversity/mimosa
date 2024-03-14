@@ -418,6 +418,45 @@ def _get_inertia_and_budget_constraints(
         of 1.5°C (<https://data.ene.iiasa.ac.at/iamc-1.5c-explorer>) (ref https://www.frontiersin.org/articles/10.3389/fclim.2021.785577/full)
 
 
+    ## Minimum emission levels (limits to net-negative emissions)
+
+    Since the Marginal Abatement Cost curve is a continuous function with no upper bound, reductions can theoretically be without bound.
+    To still address the difficulties associated with CDR technologies, a limit on (net) negative emissions can be imposed. These difficulties
+    can be of economic (e.g., land becoming increasingly scarce or increased dependence on very expensive storage sites) and socio-political
+    (concerns about biodiversity and food security) nature (TODO ref Hotelling-Hof-Wijst paper and Fuss et al.). By the default, the global emissions
+    are limited to -20 GtCO<sub>2</sub>/yr, and regionally to -10 GtCO<sub>2</sub>:
+
+    $$
+    \\text{global emissions}_t \\geq \\text{global min level},
+    $$
+
+    $$
+    \\text{regional emissions}_t \\geq \\text{regional min level}.
+    $$
+
+    Note that currently, the regional emission level is the same for every region, but this could be easily changed if needed (see
+    [Extending MIMOSA](../extending_mimosa.md)).
+
+    ## Constraints on emissions after 2100
+
+    In CBA mode, it can be useful to run MIMOSA until 2150 instead of 2100, to avoid end-of-horizon effects. One way to mitigate
+    this effect is to impose a constraint on the growth of emissions after 2100. By default, emissions are not allowed to grow after 2100:
+
+    $$
+    \\text{regional emissions}_{t,r} - \\text{regional emissions}_{t-1,r} \\leq 0, \\text{if } t - 1 > 2100,
+    $$
+
+    if the parameter [`non_increasing_emissions_after_2100`](../parameters.md#emissions.non increasing emissions after 2100) is set to `True`.
+
+    When a carbon budget is imposed, it is also possible to impose a net-zero emissions constraint after the budget year (2100):
+
+    $$
+    \\text{global emissions}_{t} \\leq 0, \\text{if } t \\geq 2100,
+    $$
+    if the parameter [`no_pos_emissions_after_budget_year`](../parameters.md#emissions.not positive after budget year) is set to `True`,
+    **and** if a carbon budget is specified. Otherwise, this constraint is ignored.
+
+
     ## Parameters defined in this module
     - param::budget
     - param::inertia_global
@@ -436,11 +475,11 @@ def _get_inertia_and_budget_constraints(
     m.inertia_regional = Param(doc="::emissions.inertia.regional")
     m.global_min_level = Param(doc="::emissions.global min level")
     m.regional_min_level = Param(doc="::emissions.regional min level")
-    m.no_pos_emissions_after_budget_year = Param(
-        doc="::emissions.not positive after budget year"
-    )
     m.non_increasing_emissions_after_2100 = Param(
         doc="::emissions.non increasing emissions after 2100"
+    )
+    m.no_pos_emissions_after_budget_year = Param(
+        doc="::emissions.not positive after budget year"
     )
     constraints.extend(
         [
@@ -461,18 +500,6 @@ def _get_inertia_and_budget_constraints(
                     else Constraint.Skip
                 ),
                 name="carbon_budget",
-            ),
-            GlobalConstraint(
-                lambda m, t: (
-                    m.global_emissions[t] <= 0
-                    if (
-                        m.year(t) >= 2100
-                        and value(m.no_pos_emissions_after_budget_year) is True
-                        and value(m.budget) is not False
-                    )
-                    else Constraint.Skip
-                ),
-                name="net_zero_after_2100",
             ),
             GlobalConstraint(lambda m, t: m.cumulative_emissions[t] >= 0),
             # Global and regional inertia constraints:
@@ -496,15 +523,6 @@ def _get_inertia_and_budget_constraints(
                 ),
                 name="regional_inertia",
             ),
-            RegionalConstraint(
-                lambda m, t, r: (
-                    m.regional_emissions[t, r] - m.regional_emissions[t - 1, r] <= 0
-                    if m.year(t - 1) > 2100
-                    and value(m.non_increasing_emissions_after_2100)
-                    else Constraint.Skip
-                ),
-                name="non_increasing_emissions_after_2100",
-            ),
             GlobalConstraint(
                 lambda m, t: (
                     m.global_emissions[t] >= m.global_min_level
@@ -520,6 +538,27 @@ def _get_inertia_and_budget_constraints(
                     else Constraint.Skip
                 ),
                 "regional_min_level",
+            ),
+            RegionalConstraint(
+                lambda m, t, r: (
+                    m.regional_emissions[t, r] - m.regional_emissions[t - 1, r] <= 0
+                    if m.year(t - 1) > 2100
+                    and value(m.non_increasing_emissions_after_2100)
+                    else Constraint.Skip
+                ),
+                name="non_increasing_emissions_after_2100",
+            ),
+            GlobalConstraint(
+                lambda m, t: (
+                    m.global_emissions[t] <= 0
+                    if (
+                        m.year(t) >= 2100
+                        and value(m.no_pos_emissions_after_budget_year) is True
+                        and value(m.budget) is not False
+                    )
+                    else Constraint.Skip
+                ),
+                name="net_zero_after_2100",
             ),
         ]
     )
