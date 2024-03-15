@@ -13,7 +13,11 @@ nav:
   - Parameter reference: parameters.md
   - Installing MIMOSA: installation.md
   - Running MIMOSA: run.md
-  - Extending MIMOSA: extending_mimosa.md
+  - Extending MIMOSA:
+      - Getting started: extending/general.md
+      - 1. Variables and constraints: extending/variables_constraints.md
+      - 2. Parameters: extending/parameters.md
+      - 3. New components: extending/components.md
   - Model code: "https://github.com/UtrechtUniversity/mimosa"
 
 repo_url: https://github.com/UtrechtUniversity/mimosa
@@ -67,6 +71,7 @@ plugins:
           paths: [src]
   - search
   - table-reader
+  - macros
   - open-in-new-tab
   - plotly:
       template_default: assets/plots/template.json

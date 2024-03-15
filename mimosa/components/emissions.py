@@ -435,7 +435,7 @@ def _get_inertia_and_budget_constraints(
     $$
 
     Note that currently, the regional emission level is the same for every region, but this could be easily changed if needed (see
-    [Extending MIMOSA](../extending_mimosa.md)).
+    [Extending MIMOSA](../extending/general.md)).
 
     ## Constraints on emissions after 2100
 

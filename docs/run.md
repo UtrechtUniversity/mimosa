@@ -39,7 +39,7 @@ These output files can be easily imported for plotting software (like using [Plo
 
 
 ### Changing parameters
-The default parameters from `load_params()` are given as a nested dictionary. Every item of this dictionary can be changed. Note that only the values can be changed, it is not possible to add or substract parameters to this dictionary (without [Extending MIMOSA](extending_mimosa.md)).
+The default parameters from `load_params()` are given as a nested dictionary. Every item of this dictionary can be changed. Note that only the values can be changed, it is not possible to add or substract parameters to this dictionary (without [Extending MIMOSA](extending/general.md)).
 
 #### Example 1: carbon budget
 
