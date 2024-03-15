@@ -84,36 +84,42 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     constraints.extend(
         [
             GlobalConstraint(
-                lambda m, t: sum(m.abatement_costs[t, r] for r in m.regions)
+                lambda m, t: sum(m.mitigation_costs[t, r] for r in m.regions)
                 == sum(m.area_under_MAC[t, r] for r in m.regions),
-                "sum_abatement_equals_sum_area_under_mac",
+                "sum_mitigation_equals_sum_area_under_mac",
             ),
             RegionalConstraint(
-                lambda m, t, r: m.abatement_costs[t, r]
-                == m.area_under_MAC[t, r]
-                + m.import_export_mitigation_cost_balance[t, r]
-                if t > 0
-                else Constraint.Skip,
-                "abatement_costs_equals_area_under_mac_plus_import_export_mitigation_cost_balance",
+                lambda m, t, r: (
+                    m.mitigation_costs[t, r]
+                    == m.area_under_MAC[t, r]
+                    + m.import_export_mitigation_cost_balance[t, r]
+                    if t > 0
+                    else Constraint.Skip
+                ),
+                "mitigation_costs_equals_area_under_mac_plus_import_export_mitigation_cost_balance",
             ),
             # Constraint: from import/export mitigation costs to import/export of emissions using the global carbon price
             RegionalConstraint(
-                lambda m, t, r: m.import_export_emission_reduction_balance[t, r]
-                == m.import_export_mitigation_cost_balance[t, r]
-                / soft_min(m.global_carbonprice[t])
-                if t > 0
-                else Constraint.Skip,
+                lambda m, t, r: (
+                    m.import_export_emission_reduction_balance[t, r]
+                    == m.import_export_mitigation_cost_balance[t, r]
+                    / soft_min(m.global_carbonprice[t])
+                    if t > 0
+                    else Constraint.Skip
+                ),
                 "import_export_emission_reduction_balance",
             ),
             # Constraint: paid for emission reductions
             RegionalConstraint(
-                lambda m, t, r: m.paid_for_emission_reductions[t, r]
-                == (
-                    m.regional_emission_reduction[t, r]
-                    + m.import_export_emission_reduction_balance[t, r]
-                )
-                if t > 0
-                else Constraint.Skip,
+                lambda m, t, r: (
+                    m.paid_for_emission_reductions[t, r]
+                    == (
+                        m.regional_emission_reduction[t, r]
+                        + m.import_export_emission_reduction_balance[t, r]
+                    )
+                    if t > 0
+                    else Constraint.Skip
+                ),
                 "paid_for_emission_reductions",
             ),
         ]

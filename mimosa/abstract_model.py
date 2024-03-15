@@ -7,7 +7,7 @@ Contains all model equations and constraints
 import numpy as np
 from mimosa.common import Param, AbstractModel, Set, add_constraint
 from mimosa.components import (
-    burdensharing,
+    effortsharing,
     emissions,
     emissiontrade,
     financialtransfer,
@@ -131,8 +131,8 @@ def create_abstract_model(
             f"Financial transfer module `{financialtransfer_module}` not implemented"
         )
 
-    # Burden sharing regime
-    constraints.extend(burdensharing.get_constraints(m))
+    # Effort sharing regime
+    constraints.extend(effortsharing.get_constraints(m))
 
     # Cobb-Douglas and economics
     constraints.extend(cobbdouglas.get_constraints(m))

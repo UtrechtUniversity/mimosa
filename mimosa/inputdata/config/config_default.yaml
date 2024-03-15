@@ -295,9 +295,9 @@ emissions:
 
 ##################
 
-burden sharing:
+effort sharing:
   regime:
-    descr: Type of burden sharing to be used
+    descr: Type of effort sharing to be used
     type: enum
     values:
       - noregime
@@ -309,7 +309,7 @@ burden sharing:
   percapconv_year:
     descr: >-
       Year of convergence to per capita emission allowance 
-      (only used when burden sharing - regime is per_cap_convergence)
+      (only used when effort sharing - regime is per_cap_convergence)
       Can also be false, then always use grandfathering
     type: float
     min: 2020
@@ -432,19 +432,19 @@ regional_parameter_files:
     type: dict
   default:
     economics:
-      filename: inputdata/params/economics.csv
+      filename: inputdata/regionalparams/economics.csv
       regionstype: IMAGE26
     MAC:
-      filename: inputdata/params/mac.csv
+      filename: inputdata/regionalparams/mac.csv
       regionstype: IMAGE26
     COACCH:
-      filename: inputdata/params/COACCH.csv
+      filename: inputdata/regionalparams/COACCH.csv
       regionstype: COACCH
     ADRICE2010:
-      filename: inputdata/params/ADRICE2010.csv
+      filename: inputdata/regionalparams/ADRICE2010.csv
       regionstype: ADRICE2010
     ADRICE2012:
-      filename: inputdata/params/ADRICE2012.csv
+      filename: inputdata/regionalparams/ADRICE2012.csv
       regionstype: ADRICE2012
 
 ##################
