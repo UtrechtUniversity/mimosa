@@ -71,6 +71,9 @@ def check_params(input_params, return_parser_tree=False):
     return parsed_params
 
 
-def load_params(user_yaml_filename="config.yaml"):
-    user_yaml = load_yaml(user_yaml_filename)
+def load_params(user_yaml_filename=None):
+    if user_yaml_filename is None:
+        user_yaml = {}
+    else:
+        user_yaml = load_yaml(user_yaml_filename)
     return check_params(user_yaml)
