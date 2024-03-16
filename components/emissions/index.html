@@ -237,12 +237,50 @@
   </span>
 </a>
 </li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="../../extending_mimosa/">
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_6" type="checkbox"/>
+<label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
 <span class="md-ellipsis">
     Extending MIMOSA
   </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_6_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_6">
+<span class="md-nav__icon md-icon"></span>
+            Extending MIMOSA
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../extending/general/">
+<span class="md-ellipsis">
+    Getting started
+  </span>
 </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../extending/variables_constraints/">
+<span class="md-ellipsis">
+    1. Variables and constraints
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../extending/parameters/">
+<span class="md-ellipsis">
+    2. Parameters
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../extending/components/">
+<span class="md-ellipsis">
+    3. New components
+  </span>
+</a>
+</li>
+</ul>
+</nav>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="https://github.com/UtrechtUniversity/mimosa">
@@ -1114,7 +1152,7 @@ are limited to -20 GtCO<sub>2</sub>/yr, and regionally to -10 GtCO<sub>2</sub>:<
 \text{regional emissions}_t \geq \text{regional min level}.
 \]</div>
 <p>Note that currently, the regional emission level is the same for every region, but this could be easily changed if needed (see
-<a href="../../extending_mimosa/">Extending MIMOSA</a>).</p>
+<a href="../../extending/general/">Extending MIMOSA</a>).</p>
 <h3 id="mimosa.components.emissions._get_inertia_and_budget_constraints--constraints-on-emissions-after-2100">Constraints on emissions after 2100</h3>
 <p>In CBA mode, it can be useful to run MIMOSA until 2150 instead of 2100, to avoid end-of-horizon effects. One way to mitigate
 this effect is to impose a constraint on the growth of emissions after 2100. By default, emissions are not allowed to grow after 2100:</p>
@@ -1414,7 +1452,7 @@ if the parameter <a href="../../parameters/#emissions.not positive after budget 
 </span><span id="__span-0-435"><a id="__codelineno-0-435" name="__codelineno-0-435"></a><span class="sd">    $$</span>
 </span><span id="__span-0-436"><a id="__codelineno-0-436" name="__codelineno-0-436"></a>
 </span><span id="__span-0-437"><a id="__codelineno-0-437" name="__codelineno-0-437"></a><span class="sd">    Note that currently, the regional emission level is the same for every region, but this could be easily changed if needed (see</span>
-</span><span id="__span-0-438"><a id="__codelineno-0-438" name="__codelineno-0-438"></a><span class="sd">    [Extending MIMOSA](../extending_mimosa.md)).</span>
+</span><span id="__span-0-438"><a id="__codelineno-0-438" name="__codelineno-0-438"></a><span class="sd">    [Extending MIMOSA](../extending/general.md)).</span>
 </span><span id="__span-0-439"><a id="__codelineno-0-439" name="__codelineno-0-439"></a>
 </span><span id="__span-0-440"><a id="__codelineno-0-440" name="__codelineno-0-440"></a><span class="sd">    ## Constraints on emissions after 2100</span>
 </span><span id="__span-0-441"><a id="__codelineno-0-441" name="__codelineno-0-441"></a>

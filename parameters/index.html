@@ -633,9 +633,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#burden-sharing" class="md-nav__link">
+  <a href="#effort-sharing" class="md-nav__link">
     <span class="md-ellipsis">
-      burden sharing
+      effort sharing
     </span>
   </a>
   
@@ -806,16 +806,124 @@
   
   
   
-    <li class="md-nav__item">
-      <a href="../extending_mimosa/" class="md-nav__link">
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
         
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
   
   <span class="md-ellipsis">
     Extending MIMOSA
   </span>
   
 
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            Extending MIMOSA
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../extending/general/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Getting started
+  </span>
+  
+
       </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../extending/variables_constraints/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    1. Variables and constraints
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../extending/parameters/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    2. Parameters
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../extending/components/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    3. New components
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
     </li>
   
 
@@ -958,9 +1066,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#burden-sharing" class="md-nav__link">
+  <a href="#effort-sharing" class="md-nav__link">
     <span class="md-ellipsis">
-      burden sharing
+      effort sharing
     </span>
   </a>
   
@@ -2033,13 +2141,13 @@
 </details>
 </div>
 </div>
-<div class="param_group" id="burden sharing">
-<h2 id="burden-sharing">burden sharing</h2>
+<div class="param_group" id="effort sharing">
+<h2 id="effort-sharing">effort sharing</h2>
 <div class="param_content">
 <details class="parameter">
 <summary>regime</summary>
-<p><span class="param_anchor" id="burden sharing.regime"> </span></p>
-<p>Type of burden sharing to be used</p>
+<p><span class="param_anchor" id="effort sharing.regime"> </span></p>
+<p>Type of effort sharing to be used</p>
 <ul>
 <li>
 <p>Type: enum</p>
@@ -2063,14 +2171,14 @@
 </ul>
 <p>Example usage: </p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-34-1"><a href="#__codelineno-34-1" id="__codelineno-34-1" name="__codelineno-34-1"></a><span class="n">params</span> <span class="o">=</span> <span class="n">load_params</span><span class="p">()</span>
-</span><span id="__span-34-2"><a href="#__codelineno-34-2" id="__codelineno-34-2" name="__codelineno-34-2"></a><span class="hll"><span class="n">params</span><span class="p">[</span><span class="s2">"burden sharing"</span><span class="p">][</span><span class="s2">"regime"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"noregime"</span>
+</span><span id="__span-34-2"><a href="#__codelineno-34-2" id="__codelineno-34-2" name="__codelineno-34-2"></a><span class="hll"><span class="n">params</span><span class="p">[</span><span class="s2">"effort sharing"</span><span class="p">][</span><span class="s2">"regime"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"noregime"</span>
 </span></span><span id="__span-34-3"><a href="#__codelineno-34-3" id="__codelineno-34-3" name="__codelineno-34-3"></a><span class="n">model</span> <span class="o">=</span> <span class="n">MIMOSA</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
 </span></code></pre></div>
 </details>
 <details class="parameter">
 <summary>percapconv_year</summary>
-<p><span class="param_anchor" id="burden sharing.percapconv_year"> </span></p>
-<p>Year of convergence to per capita emission allowance  (only used when burden sharing - regime is per_cap_convergence) Can also be false, then always use grandfathering</p>
+<p><span class="param_anchor" id="effort sharing.percapconv_year"> </span></p>
+<p>Year of convergence to per capita emission allowance  (only used when effort sharing - regime is per_cap_convergence) Can also be false, then always use grandfathering</p>
 <ul>
 <li>
 <p>Type: float</p>
@@ -2090,7 +2198,7 @@
 </ul>
 <p>Example usage: </p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-35-1"><a href="#__codelineno-35-1" id="__codelineno-35-1" name="__codelineno-35-1"></a><span class="n">params</span> <span class="o">=</span> <span class="n">load_params</span><span class="p">()</span>
-</span><span id="__span-35-2"><a href="#__codelineno-35-2" id="__codelineno-35-2" name="__codelineno-35-2"></a><span class="hll"><span class="n">params</span><span class="p">[</span><span class="s2">"burden sharing"</span><span class="p">][</span><span class="s2">"percapconv_year"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2050</span>
+</span><span id="__span-35-2"><a href="#__codelineno-35-2" id="__codelineno-35-2" name="__codelineno-35-2"></a><span class="hll"><span class="n">params</span><span class="p">[</span><span class="s2">"effort sharing"</span><span class="p">][</span><span class="s2">"percapconv_year"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2050</span>
 </span></span><span id="__span-35-3"><a href="#__codelineno-35-3" id="__codelineno-35-3" name="__codelineno-35-3"></a><span class="n">model</span> <span class="o">=</span> <span class="n">MIMOSA</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
 </span></code></pre></div>
 </details>
@@ -2380,7 +2488,7 @@
 <p>Type: dict</p>
 </li>
 <li>
-<p>Default: {'economics': {'filename': 'inputdata/params/economics.csv', 'regionstype': 'IMAGE26'}, 'MAC': {'filename': 'inputdata/params/mac.csv', 'regionstype': 'IMAGE26'}, 'COACCH': {'filename': 'inputdata/params/COACCH.csv', 'regionstype': 'COACCH'}, 'ADRICE2010': {'filename': 'inputdata/params/ADRICE2010.csv', 'regionstype': 'ADRICE2010'}, 'ADRICE2012': {'filename': 'inputdata/params/ADRICE2012.csv', 'regionstype': 'ADRICE2012'}}</p>
+<p>Default: {'economics': {'filename': 'inputdata/regionalparams/economics.csv', 'regionstype': 'IMAGE26'}, 'MAC': {'filename': 'inputdata/regionalparams/mac.csv', 'regionstype': 'IMAGE26'}, 'COACCH': {'filename': 'inputdata/regionalparams/COACCH.csv', 'regionstype': 'COACCH'}, 'ADRICE2010': {'filename': 'inputdata/regionalparams/ADRICE2010.csv', 'regionstype': 'ADRICE2010'}, 'ADRICE2012': {'filename': 'inputdata/regionalparams/ADRICE2012.csv', 'regionstype': 'ADRICE2012'}}</p>
 </li>
 <li>
 <p>Can be false: False</p>
@@ -2388,7 +2496,7 @@
 </ul>
 <p>Example usage: </p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-46-1"><a href="#__codelineno-46-1" id="__codelineno-46-1" name="__codelineno-46-1"></a><span class="n">params</span> <span class="o">=</span> <span class="n">load_params</span><span class="p">()</span>
-</span><span id="__span-46-2"><a href="#__codelineno-46-2" id="__codelineno-46-2" name="__codelineno-46-2"></a><span class="hll"><span class="n">params</span><span class="p">[</span><span class="s2">"regional_parameter_files"</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'economics'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'filename'</span><span class="p">:</span> <span class="s1">'inputdata/params/economics.csv'</span><span class="p">,</span> <span class="s1">'regionstype'</span><span class="p">:</span> <span class="s1">'IMAGE26'</span><span class="p">},</span> <span class="s1">'MAC'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'filename'</span><span class="p">:</span> <span class="s1">'inputdata/params/mac.csv'</span><span class="p">,</span> <span class="s1">'regionstype'</span><span class="p">:</span> <span class="s1">'IMAGE26'</span><span class="p">},</span> <span class="s1">'COACCH'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'filename'</span><span class="p">:</span> <span class="s1">'inputdata/params/COACCH.csv'</span><span class="p">,</span> <span class="s1">'regionstype'</span><span class="p">:</span> <span class="s1">'COACCH'</span><span class="p">},</span> <span class="s1">'ADRICE2010'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'filename'</span><span class="p">:</span> <span class="s1">'inputdata/params/ADRICE2010.csv'</span><span class="p">,</span> <span class="s1">'regionstype'</span><span class="p">:</span> <span class="s1">'ADRICE2010'</span><span class="p">},</span> <span class="s1">'ADRICE2012'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'filename'</span><span class="p">:</span> <span class="s1">'inputdata/params/ADRICE2012.csv'</span><span class="p">,</span> <span class="s1">'regionstype'</span><span class="p">:</span> <span class="s1">'ADRICE2012'</span><span class="p">}}</span>
+</span><span id="__span-46-2"><a href="#__codelineno-46-2" id="__codelineno-46-2" name="__codelineno-46-2"></a><span class="hll"><span class="n">params</span><span class="p">[</span><span class="s2">"regional_parameter_files"</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'economics'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'filename'</span><span class="p">:</span> <span class="s1">'inputdata/regionalparams/economics.csv'</span><span class="p">,</span> <span class="s1">'regionstype'</span><span class="p">:</span> <span class="s1">'IMAGE26'</span><span class="p">},</span> <span class="s1">'MAC'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'filename'</span><span class="p">:</span> <span class="s1">'inputdata/regionalparams/mac.csv'</span><span class="p">,</span> <span class="s1">'regionstype'</span><span class="p">:</span> <span class="s1">'IMAGE26'</span><span class="p">},</span> <span class="s1">'COACCH'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'filename'</span><span class="p">:</span> <span class="s1">'inputdata/regionalparams/COACCH.csv'</span><span class="p">,</span> <span class="s1">'regionstype'</span><span class="p">:</span> <span class="s1">'COACCH'</span><span class="p">},</span> <span class="s1">'ADRICE2010'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'filename'</span><span class="p">:</span> <span class="s1">'inputdata/regionalparams/ADRICE2010.csv'</span><span class="p">,</span> <span class="s1">'regionstype'</span><span class="p">:</span> <span class="s1">'ADRICE2010'</span><span class="p">},</span> <span class="s1">'ADRICE2012'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'filename'</span><span class="p">:</span> <span class="s1">'inputdata/regionalparams/ADRICE2012.csv'</span><span class="p">,</span> <span class="s1">'regionstype'</span><span class="p">:</span> <span class="s1">'ADRICE2012'</span><span class="p">}}</span>
 </span></span><span id="__span-46-3"><a href="#__codelineno-46-3" id="__codelineno-46-3" name="__codelineno-46-3"></a><span class="n">model</span> <span class="o">=</span> <span class="n">MIMOSA</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
 </span></code></pre></div>
 </details>
