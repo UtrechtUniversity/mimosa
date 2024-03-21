@@ -63,18 +63,30 @@ fig_utility.update_xaxes(title="Per capita consumption")
 fig_utility.update_yaxes(title="Utility")
 fig_utility.write_json("docs/assets/plots/utility_fct.json")
 
-## Regional initial capital stock factor
+## Create regional parameter plots
 
-fig_init_capital_factor = make_subplots()
-init_capital_factor = model.regional_param_store.get("economics", "init_capital_factor")
-fig_init_capital_factor.add_bar(
-    x=list(init_capital_factor.keys()),
-    y=list(init_capital_factor.values()),
-)
-fig_init_capital_factor.update_yaxes(
-    title="Initial capital stock factor<br>(factor of GDP)"
-).update_layout(height=300)
-fig_init_capital_factor.write_json("docs/assets/plots/init_capital_factor.json")
+for param_category, param_name, y_title in [
+    (
+        "economics",
+        "init_capital_factor",
+        "Initial capital stock factor<br>(factor of GDP)",
+    ),
+    (
+        "MAC",
+        "kappa_rel_abatement_0.75_2050",
+        "Regional MAC scaling factor<br>(factor of global MAC)",
+    ),
+]:
+    fig_init_capital_factor = make_subplots()
+    init_capital_factor = model.regional_param_store.get(param_category, param_name)
+    fig_init_capital_factor.add_bar(
+        x=list(init_capital_factor.keys()),
+        y=list(init_capital_factor.values()),
+    )
+    fig_init_capital_factor.update_yaxes(title=y_title).update_layout(height=300)
+    fig_init_capital_factor.write_json(
+        f"docs/assets/plots/{param_category}_{param_name}.json"
+    )
 
 
 ## Regional definitions and map:

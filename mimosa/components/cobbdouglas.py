@@ -62,7 +62,7 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
 
     The initial capital stock factor is a calibration factor to obtain the initial capital stock. TODO: Source (IMF)
     ``` plotly
-    {"file_path": "./assets/plots/init_capital_factor.json"}
+    {"file_path": "./assets/plots/economics_init_capital_factor.json"}
     ```
 
     ## Parameters defined in this module

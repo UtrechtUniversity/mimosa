@@ -81,16 +81,18 @@ def soft_max(x, maxval, scale=1.0):
 
 
 class GeneralConstraint(ABC):
-    def __init__(self, rule: typing.Callable, name: str = None):
+    def __init__(self, rule: typing.Callable, name: str = None, doc: str = None):
         """Adds a constraint to the Pyomo mimosa.
 
         Args:
             rule (typing.Callable): function with parameters m, [t], [r]
             name (str, optional): name of the constraint, useful for debugging. Defaults to None.
+            doc (str, optional): documentation of the constraint. Defaults to None.
         """
 
         self.name = name
         self.rule = rule
+        self.doc = doc
 
     @abstractmethod
     def to_pyomo_constraint(self, m):
@@ -99,22 +101,22 @@ class GeneralConstraint(ABC):
 
 class GlobalConstraint(GeneralConstraint):
     def to_pyomo_constraint(self, m):
-        return Constraint(m.t, rule=self.rule)
+        return Constraint(m.t, rule=self.rule, doc=self.doc)
 
 
 class GlobalInitConstraint(GeneralConstraint):
     def to_pyomo_constraint(self, m):
-        return Constraint(rule=self.rule)
+        return Constraint(rule=self.rule, doc=self.doc)
 
 
 class RegionalConstraint(GeneralConstraint):
     def to_pyomo_constraint(self, m):
-        return Constraint(m.t, m.regions, rule=self.rule)
+        return Constraint(m.t, m.regions, rule=self.rule, doc=self.doc)
 
 
 class RegionalInitConstraint(GeneralConstraint):
     def to_pyomo_constraint(self, m):
-        return Constraint(m.regions, rule=self.rule)
+        return Constraint(m.regions, rule=self.rule, doc=self.doc)
 
 
 class GeneralSoftEqualityConstraint(GeneralConstraint):
@@ -209,6 +211,7 @@ def add_constraint(m, constraints, names=None):
         constraints = [constraints]
         names = [names]
 
+    name = None
     for constraint, name in zip(constraints, names):
         n = len(list(m.component_objects()))
         name = f"constraint_{n}" if name is None else f"constraint_{name}"

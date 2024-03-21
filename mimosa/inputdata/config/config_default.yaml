@@ -495,7 +495,6 @@ input:
     descr: Path to IAMC-formatted CSV file for baseline data
     type: filepath
     default: inputdata/data/data_IMAGE_SSP.csv
-    # default_SSP5: ../Databases/SSP_IAM_V2_201811.csv
 
   baselines:
     SSP1:

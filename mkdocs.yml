@@ -15,9 +15,9 @@ nav:
   - Running MIMOSA: run.md
   - Extending MIMOSA:
       - Getting started: extending/general.md
-      - 1. Variables and constraints: extending/variables_constraints.md
-      - 2. Parameters: extending/parameters.md
-      - 3. New components: extending/components.md
+      - New components: extending/components.md
+      - Variables and constraints: extending/variables_constraints.md
+      - Parameters: extending/parameters.md
   - Model code: "https://github.com/UtrechtUniversity/mimosa"
 
 repo_url: https://github.com/UtrechtUniversity/mimosa
