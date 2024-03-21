@@ -315,23 +315,23 @@
 </a>
 </li>
 <li class="md-nav__item">
+<a class="md-nav__link" href="../../extending/components/">
+<span class="md-ellipsis">
+    New components
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
 <a class="md-nav__link" href="../../extending/variables_constraints/">
 <span class="md-ellipsis">
-    1. Variables and constraints
+    Variables and constraints
   </span>
 </a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="../../extending/parameters/">
 <span class="md-ellipsis">
-    2. Parameters
-  </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="../../extending/components/">
-<span class="md-ellipsis">
-    3. New components
+    Parameters
   </span>
 </a>
 </li>
@@ -472,7 +472,7 @@ whereas the mitigation costs are expressed in absolute terms.)</em></p>
 This is calculated as a region-dependent multiple of the initial GDP:</p>
 <div class="arithmatex">\[ K_{t=0,r} = \text{init_capitalstock_factor}_r \cdot \text{GDP}_{t=0,r}. \]</div>
 <p>The initial capital stock factor is a calibration factor to obtain the initial capital stock. TODO: Source (IMF)
-<div class="mkdocs-plotly" data-jsonpath="../../assets/plots/init_capital_factor.json"></div></p>
+<div class="mkdocs-plotly" data-jsonpath="../../assets/plots/economics_init_capital_factor.json"></div></p>
 <h3 id="mimosa.components.cobbdouglas.get_constraints--parameters-defined-in-this-module">Parameters defined in this module</h3>
 <ul>
 <li><code>init_capitalstock_factor</code></li>
@@ -633,19 +633,7 @@ This is calculated as a region-dependent multiple of the initial GDP:</p>
 <span class="normal"><a href="#__codelineno-0-169">169</a></span>
 <span class="normal"><a href="#__codelineno-0-170">170</a></span>
 <span class="normal"><a href="#__codelineno-0-171">171</a></span>
-<span class="normal"><a href="#__codelineno-0-172">172</a></span>
-<span class="normal"><a href="#__codelineno-0-173">173</a></span>
-<span class="normal"><a href="#__codelineno-0-174">174</a></span>
-<span class="normal"><a href="#__codelineno-0-175">175</a></span>
-<span class="normal"><a href="#__codelineno-0-176">176</a></span>
-<span class="normal"><a href="#__codelineno-0-177">177</a></span>
-<span class="normal"><a href="#__codelineno-0-178">178</a></span>
-<span class="normal"><a href="#__codelineno-0-179">179</a></span>
-<span class="normal"><a href="#__codelineno-0-180">180</a></span>
-<span class="normal"><a href="#__codelineno-0-181">181</a></span>
-<span class="normal"><a href="#__codelineno-0-182">182</a></span>
-<span class="normal"><a href="#__codelineno-0-183">183</a></span>
-<span class="normal"><a href="#__codelineno-0-184">184</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-22"><a id="__codelineno-0-22" name="__codelineno-0-22"></a><span class="k">def</span> <span class="nf">get_constraints</span><span class="p">(</span><span class="n">m</span><span class="p">:</span> <span class="n">AbstractModel</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">GeneralConstraint</span><span class="p">]:</span>
+<span class="normal"><a href="#__codelineno-0-172">172</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-22"><a id="__codelineno-0-22" name="__codelineno-0-22"></a><span class="k">def</span> <span class="nf">get_constraints</span><span class="p">(</span><span class="n">m</span><span class="p">:</span> <span class="n">AbstractModel</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">GeneralConstraint</span><span class="p">]:</span>
 </span><span id="__span-0-23"><a id="__codelineno-0-23" name="__codelineno-0-23"></a><span class="w">    </span><span class="sd">"""</span>
 </span><span id="__span-0-24"><a id="__codelineno-0-24" name="__codelineno-0-24"></a><span class="sd">    # Economic module and production function</span>
 </span><span id="__span-0-25"><a id="__codelineno-0-25" name="__codelineno-0-25"></a>
@@ -688,7 +676,7 @@ This is calculated as a region-dependent multiple of the initial GDP:</p>
 </span><span id="__span-0-62"><a id="__codelineno-0-62" name="__codelineno-0-62"></a>
 </span><span id="__span-0-63"><a id="__codelineno-0-63" name="__codelineno-0-63"></a><span class="sd">    The initial capital stock factor is a calibration factor to obtain the initial capital stock. TODO: Source (IMF)</span>
 </span><span id="__span-0-64"><a id="__codelineno-0-64" name="__codelineno-0-64"></a><span class="sd">    ``` plotly</span>
-</span><span id="__span-0-65"><a id="__codelineno-0-65" name="__codelineno-0-65"></a><span class="sd">    {"file_path": "./assets/plots/init_capital_factor.json"}</span>
+</span><span id="__span-0-65"><a id="__codelineno-0-65" name="__codelineno-0-65"></a><span class="sd">    {"file_path": "./assets/plots/economics_init_capital_factor.json"}</span>
 </span><span id="__span-0-66"><a id="__codelineno-0-66" name="__codelineno-0-66"></a><span class="sd">    ```</span>
 </span><span id="__span-0-67"><a id="__codelineno-0-67" name="__codelineno-0-67"></a>
 </span><span id="__span-0-68"><a id="__codelineno-0-68" name="__codelineno-0-68"></a><span class="sd">    ## Parameters defined in this module</span>
@@ -795,19 +783,7 @@ This is calculated as a region-dependent multiple of the initial GDP:</p>
 </span><span id="__span-0-169"><a id="__codelineno-0-169" name="__codelineno-0-169"></a>        <span class="p">]</span>
 </span><span id="__span-0-170"><a id="__codelineno-0-170" name="__codelineno-0-170"></a>    <span class="p">)</span>
 </span><span id="__span-0-171"><a id="__codelineno-0-171" name="__codelineno-0-171"></a>
-</span><span id="__span-0-172"><a id="__codelineno-0-172" name="__codelineno-0-172"></a>    <span class="n">m</span><span class="o">.</span><span class="n">carbon_gdp_intensity</span> <span class="o">=</span> <span class="n">Var</span><span class="p">(</span>
-</span><span id="__span-0-173"><a id="__codelineno-0-173" name="__codelineno-0-173"></a>        <span class="n">m</span><span class="o">.</span><span class="n">t</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">regions</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="n">quant</span><span class="o">.</span><span class="n">unit</span><span class="p">(</span><span class="s2">"emissionsrate_unit / currency_unit"</span><span class="p">)</span>
-</span><span id="__span-0-174"><a id="__codelineno-0-174" name="__codelineno-0-174"></a>    <span class="p">)</span>
-</span><span id="__span-0-175"><a id="__codelineno-0-175" name="__codelineno-0-175"></a>
-</span><span id="__span-0-176"><a id="__codelineno-0-176" name="__codelineno-0-176"></a>    <span class="n">constraints</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-</span><span id="__span-0-177"><a id="__codelineno-0-177" name="__codelineno-0-177"></a>        <span class="n">RegionalConstraint</span><span class="p">(</span>
-</span><span id="__span-0-178"><a id="__codelineno-0-178" name="__codelineno-0-178"></a>            <span class="k">lambda</span> <span class="n">m</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">r</span><span class="p">:</span> <span class="n">m</span><span class="o">.</span><span class="n">carbon_gdp_intensity</span><span class="p">[</span><span class="n">t</span><span class="p">,</span> <span class="n">r</span><span class="p">]</span>
-</span><span id="__span-0-179"><a id="__codelineno-0-179" name="__codelineno-0-179"></a>            <span class="o">==</span> <span class="n">m</span><span class="o">.</span><span class="n">regional_emissions</span><span class="p">[</span><span class="n">t</span><span class="p">,</span> <span class="n">r</span><span class="p">]</span> <span class="o">/</span> <span class="n">m</span><span class="o">.</span><span class="n">GDP_net</span><span class="p">[</span><span class="n">t</span><span class="p">,</span> <span class="n">r</span><span class="p">],</span>
-</span><span id="__span-0-180"><a id="__codelineno-0-180" name="__codelineno-0-180"></a>            <span class="s2">"carbon_gdp_intensity"</span><span class="p">,</span>
-</span><span id="__span-0-181"><a id="__codelineno-0-181" name="__codelineno-0-181"></a>        <span class="p">)</span>
-</span><span id="__span-0-182"><a id="__codelineno-0-182" name="__codelineno-0-182"></a>    <span class="p">)</span>
-</span><span id="__span-0-183"><a id="__codelineno-0-183" name="__codelineno-0-183"></a>
-</span><span id="__span-0-184"><a id="__codelineno-0-184" name="__codelineno-0-184"></a>    <span class="k">return</span> <span class="n">constraints</span>
+</span><span id="__span-0-172"><a id="__codelineno-0-172" name="__codelineno-0-172"></a>    <span class="k">return</span> <span class="n">constraints</span>
 </span></code></pre></div></td></tr></table></div>
 </details>
 </div>
