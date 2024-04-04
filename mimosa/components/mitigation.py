@@ -131,7 +131,7 @@ def _get_mac_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
 
 
     ## Mitigation costs
-
+    [todo]
 
 
     ## Parameters defined in this module

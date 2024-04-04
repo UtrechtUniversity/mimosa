@@ -33,7 +33,7 @@ The MIMOSA model consists of several sub-modules, called model components. Each 
 
     ---
 
-    Mitigation costs and Marginal Abatement Cost curve
+    Mitigation costs, Marginal Abatement Cost curve and technological learning
 
     [:octicons-arrow-right-24: Read more](mitigation.md){.md-button}
   
