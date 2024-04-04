@@ -55,7 +55,16 @@
     
     
     
-  </head>
+   <link href="assets/stylesheets/glightbox.min.css" rel="stylesheet"/><style>
+    html.glightbox-open { overflow: initial; height: 100%; }
+    .gslide-title { margin-top: 0px; user-select: text; }
+    .gslide-desc { color: #666; user-select: text; }
+    .gslide-image img { background: white; }
+    .gscrollbar-fixer { padding-right: 15px; }
+    .gdesc-inner { font-size: 0.75rem; }
+    body[data-md-color-scheme="slate"] .gdesc-inner { background: var(--md-default-bg-color);}
+    body[data-md-color-scheme="slate"] .gslide-title { color: var(--md-default-fg-color);}
+    body[data-md-color-scheme="slate"] .gslide-desc { color: var(--md-default-fg-color);}</style> <script src="assets/javascripts/glightbox.min.js"></script></head>
   
   
     
@@ -835,7 +844,7 @@
   
 
 
-<p><img alt="image" src="assets/logo.svg"/></p>
+<p><a class="glightbox" href="assets/logo.svg" data-type="image" data-width="auto" data-height="auto" data-desc-position="bottom"><img alt="image" src="assets/logo.svg"/></a></p>
 <h1 id="mimosa-mathematical-integrated-model-for-optimal-and-stylised-assessment">MIMOSA: Mathematical Integrated Model for Optimal and Stylised Assessment</h1>
 <details class="warning" open="open">
 <summary>Warning</summary>
@@ -850,7 +859,7 @@
 (object containing all the variables, parameters and constraints, without the actual data values), which is then
 transformed into a <code>ConcreteModel</code> by putting all the parameter values in it. This <code>ConcreteModel</code> is sent to the solver
 (<a href="https://coin-or.github.io/Ipopt/">IPOPT</a>, an open-source large-scale nonlinear optimisation suite).</p>
-<p><img alt="" src="https://media.springernature.com/full/springer-static/image/art%3A10.1038%2Fs41467-021-22826-5/MediaObjects/41467_2021_22826_Fig1_HTML.png"/>
+<p><a class="glightbox" href="https://media.springernature.com/full/springer-static/image/art%3A10.1038%2Fs41467-021-22826-5/MediaObjects/41467_2021_22826_Fig1_HTML.png" data-type="image" data-width="auto" data-height="auto" data-desc-position="bottom"><img alt="" src="https://media.springernature.com/full/springer-static/image/art%3A10.1038%2Fs41467-021-22826-5/MediaObjects/41467_2021_22826_Fig1_HTML.png"/></a>
 <em>Schematic overview of the MIMOSA model. From <a href="#1">[1]</a>.</em></p>
 <h2 id="how-to-cite">How to cite</h2>
 <p>When using MIMOSA, please cite <a href="#1">[1]</a> (global version) and <a href="#2">[2]</a> (regional version).</p>
@@ -947,5 +956,5 @@ van der Wijst, KI., Bosello, F., Dasgupta, S. <em>et al</em>. New damage curves 
         <script src="js/open_in_new_tab.js"></script>
       
     
-  </body>
+  <script>document$.subscribe(() => {const lightbox = GLightbox({"touchNavigation": true, "loop": false, "zoomable": true, "draggable": true, "openEffect": "zoom", "closeEffect": "zoom", "slideEffect": "slide"});})</script></body>
 </html>
