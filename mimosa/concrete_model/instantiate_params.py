@@ -141,8 +141,6 @@ class InstantiatedModel:
             "t": V(range(num_years)),
             "year2100": V(year2100),
             "regions": V(params["regions"].keys()),
-            "LBD_scaling": V(quant("40 GtCO2", "emissions_unit")),
-            "LOT_rate": V(0),
             "fixed_adaptation": V(params["economics"]["adaptation"]["fixed"]),
         }
 

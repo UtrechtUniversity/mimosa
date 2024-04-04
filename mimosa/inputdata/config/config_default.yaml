@@ -89,18 +89,37 @@ economics:
       max: 10
       default: 3
 
-    rho:
-      descr: Learning by doing rate (needs more explanation)
-      type: float
-      min: 0.1
-      max: 1
-      default: 0.82
-
     gamma:
       descr: Calibration level of the MAC (carbon price for 100% reduction)
       type: quantity
       unit: currency_unit/emissionsrate_unit
       default: 2601 USD2005/tCO2
+
+    LBD_rate:
+      descr: >-
+        Learning by doing rate: reduction in marginal mitigation costs for doubling cumulative
+        mitigation capacity. Empirical studies show values between 0.65 (high learning) and 0.95 (low learning)
+      type: float
+      min: 0.1
+      max: 1
+      default: 0.82
+
+    LBD_scaling:
+      descr: >-
+        Scaling factor for learning by doing to transform the units of cumulative mitigation
+        in relative terms (compared to baseline emissions in t=0). Only used for calibration,
+        and should not be used to change the amount of LBD (for this, use the economics > MAC > rho parameter)
+      type: quantity
+      unit: emissions_unit
+      default: 40 GtCO2
+
+    LOT_rate:
+      descr: >-
+        Learning rate of exogenous learning (learning over time). By default, there is no exogenous learning
+        assumed, as all the technological learning happens endogenously (learning by doing).
+      type: float
+      min: 0
+      default: 0
 
     regional calibration factor:
       descr: >-

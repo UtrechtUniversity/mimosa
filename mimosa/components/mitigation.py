@@ -45,9 +45,92 @@ def _get_mac_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
 
     The carbon price required to reach a certain level of emission reduction is quantified by a Marginal Abatement
     Cost curve (MAC curve) and gives instantaneous reductions (emission reductions in a given year) relative to the
-    baseline emissions. The MAC curve is defined by the following equation:
+    baseline emissions. First, a global MAC curve is defined, which is then scaled for every region to give the regional
+    MAC curve.
+
+    ### Global MAC curve
+
+    The global MAC curve is defined as function of the relative mitigation $a$ (percentage reduction of emissions compared
+    to baseline emissions) and a time-dependent learning factor:
+
+    $$
+    \\text{MAC}_t(a) = \\left( \\gamma \\cdot a^{\\beta}\\right) \\cdot \\text{learning factor}_t.
+    $$
+
+    The parameters $\\gamma$ ([`MAC_gamma`](../parameters.md#economics.MAC.gamma)) and $\\beta$ ([`MAC_beta`](../parameters.md#economics.MAC.beta))
+    are calibrated using the IPCC AR6 WG3 report. The learning factor depends on learning by doing and learning over time
+    (see the tab "Technological learning").
+
+    ??? info "Calibrating the MAC using the IPCC AR6 WG3 report"
+
+        ### Step 1: calibration data source: IPCC AR6
+
+        Specifically, Figure 3.34c from the WGIII full report has been used to calibrate the MAC,
+        as it gives discounted consumption losses from mitigation as function of cumulative CO2 emissions.
+        However, for this use, the figure has been slightly recreated as function of cumulative CO2 emsisions
+        from 2020 to 2100, instead of cumulative CO2 emissions from 2020 to the year of net-zero, to give a more
+        accurate representation of mitigation costs for scenarios that reach net zero. The resulting mitigation costs
+        are:
+
+
+        All costs are calculated as the NPV of GDP losses (as compared to the corresponding baseline GDP path for each
+        scenario) with a fixed social discount rate of 3%/year, as used in the original IPCC AR6 figure.
+
+        ### Step 2: fitting a function to the data
+
+        The next step is to fit a function through the cloud of points. We assume that the MAC is a power function
+        (of a certain power $\\beta$). This means that the abatement costs, being the integral of the MAC
+        (area under the MAC) follows a function of power $\\beta+1$. We obtain the best fit (highest r-squared)
+        with a power of $\\beta=3$, so a cubic MAC. We then perform an Ordinary Least Square regression of the function
+        $a \\cdot x^4$ (a power function of $\\beta+1=4$) and obtain the best fit shown as solid black line in figure 1:
+
+        ![Mitigation costs as GDP loss in the AR6 database](../assets/fig/calibration_ar6_mitig_costs.jpg)
+
+        Source of underlying GDP losses: [IPCC AR6 WG3 Figure 3.34](https://www.ipcc.ch/report/ar6/wg3/chapter/chapter-3/#figure-3-34)
+
+        ### Step 3: calibrating MIMOSA to the fitted function
+
+        The final step is to calibrate the MAC used in MIMOSA to the OLS fit. In MIMOSA, this means calibrating the
+        parameter $\\gamma$. When using
+
+        $$\\gamma = 2601 \\text{ \\$/tCO}_2,$$
+
+        the MIMOSA costs align best with the OLS fit through the AR6 points (see the diamond points in the previous figure).
+
+
+    ### Regional MAC curve
+
+    The regional MAC curve is obtained by scaling the global MAC curve by a regional scaling factor, and links the
+    regional carbon price to the regional relative mitigation $a_{t,r}$:
+
+    $$
+    \\begin{align}
+    \\text{carbon price}_{t,r} &= \\text{regional scaling factor}_{r} \\cdot \\text{MAC}_t(a_{t,r})\\\\
+    &= \\text{regional scaling factor}_{r} \\cdot \\left( \\gamma \\cdot a_{t,r}^{\\beta}\\right) \\cdot \\text{learning factor}_t.
+    \\end{align}
+    $$
+
+    The initial carbon price at time $t=0$ is set to zero:
+
+    $$
+    \\text{carbon price}_{0,r} = 0.
+    $$
 
     :::mimosa.components.mitigation.MAC
+    The regional scaling factor transforms the global MAC into a regional MAC:
+
+
+    ``` plotly
+    {"file_path": "./assets/plots/MAC_kappa_rel_abatement_0.75_2050.json"}
+    ```
+
+    The values of this regional scaling factor are calibrated using SSP2 MAC curves from the TIMER model (the energy
+    submodule of IMAGE). By comparing the carbon price per region required to reach 75% CO<sub>2</sub> reduction in 2050 compared to baseline,
+    relative to the world average, we obtain a scaling factor for the MAC.
+
+
+
+    ## Mitigation costs
 
 
 
@@ -88,6 +171,14 @@ def _get_mac_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     constraints.extend(
         [
             RegionalConstraint(
+                lambda m, t, r: m.carbonprice[t, r]
+                == MAC(m.relative_abatement[t, r], m, t, r),
+                "carbonprice",
+            ),
+            RegionalInitConstraint(
+                lambda m, r: m.carbonprice[0, r] == 0, "init_carbon_price"
+            ),
+            RegionalConstraint(
                 lambda m, t, r: m.rel_mitigation_costs[t, r]
                 == m.mitigation_costs[t, r] / m.GDP_gross[t, r],
                 "rel_mitigation_costs",
@@ -97,14 +188,6 @@ def _get_mac_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
                 lambda m, t, r: m.rel_mitigation_costs[t, r]
                 >= (m.rel_mitigation_costs_min_level if t > 0 else 0.0),
                 "rel_mitigation_costs_non_negative",
-            ),
-            RegionalConstraint(
-                lambda m, t, r: m.carbonprice[t, r]
-                == MAC(m.relative_abatement[t, r], m, t, r),
-                "carbonprice",
-            ),
-            RegionalInitConstraint(
-                lambda m, r: m.carbonprice[0, r] == 0, "init_carbon_price"
             ),
         ]
     )
@@ -163,9 +246,51 @@ def _get_mac_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
 
 def _get_learning_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     """
+
+    In MIMOSA, there are two ways in which the price of mitigation policy can be reduced over time:
+    through learning by doing and learning over time. The learning factor is the product of these two factors.
+
     ## Learning by doing
 
+    Learning by doing (endogenous technological learning) is a process where the cost of a technology decreases as more of it is produced. Here,
+    the more mitigation has been done in the previous time steps, the cheaper the marginal abatement costs (MAC) become.
+
+    The learning by doing factor is defined as:
+
+    $$
+    \\text{LBD factor}_t = \\left( \\xi \\cdot \\text{cumulative mitigation}_t + 1 \\right)^{\\log_2(\\rho)},
+    $$
+
+    with $\\rho$ ([`LBD_rate`](../parameters.md#economics.MAC.LBD_rate)) the progress ratio (i.e., the reduction in
+    costs for doubling cumulative mitigation capacity) representing empirical studies of endogenous technological
+    learning (see <https://www.frontiersin.org/articles/10.3389/fclim.2021.785577/full>).
+
+    $\\xi$ ([`LBD_scaling`](../parameters.md#economics.MAC.LBD_scaling)) is a scaling factor
+    to transform the units of cumulative mitigation in relative terms (compared to baseline emissions in $t=0$).
+
+    The cumulative mitigation is equal to:
+
+    $$
+    \\text{cumulative mitigation}_t = \\text{baseline cum. emissions}_t - \\text{cum. emissions}_t.
+    $$
+
+
     ## Learning over time
+
+    Learning over time (exogenous technological learning) is a process where the cost of technology descreases over time,
+    even if no mitigation has been done yet. The learning over time factor is defined as:
+
+    $$
+    \\text{LOT factor}_t = \\frac{1}{(1 + \\lambda)^t},
+    $$
+
+    with $\\lambda$ ([`LOT_rate`](../parameters.md#economics.MAC.LOT_rate)) the learning rate. By default, the learning over time
+    rate is zero, so no learning over time is assumed.
+
+    ## Parameters defined in this module
+    - param::LBD_rate
+    - param::LBD_scaling
+    - param::LOT_rate
 
     """
     constraints = []
@@ -173,9 +298,9 @@ def _get_learning_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     ### Technological learning
 
     # Learning by doing
-    m.LBD_rate = Param(doc="::economics.MAC.rho")
+    m.LBD_rate = Param(doc="::economics.MAC.LBD_rate")
     m.log_LBD_rate = Param(initialize=log(m.LBD_rate) / log(2))
-    m.LBD_scaling = Param()
+    m.LBD_scaling = Param(doc="::economics.MAC.LBD_scaling")
     m.LBD_factor = Var(m.t)  # , bounds=(0,1), initialize=1)
     constraints.append(
         GlobalConstraint(
@@ -194,7 +319,7 @@ def _get_learning_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     )
 
     # Learning over time and total learning factor
-    m.LOT_rate = Param()
+    m.LOT_rate = Param(doc="::economics.MAC.LOT_rate")
     m.LOT_factor = Var(m.t)
     m.learning_factor = Var(m.t)
     constraints.extend(
@@ -219,27 +344,6 @@ def _get_learning_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
 
 
 def MAC(a, m, t, r):
-    """
-    $$
-    \\text{carbon price}_{t,r} = \\text{factor}_{t,r} \\cdot \\gamma \\cdot \\left(\\text{rel. mitigation}_{t,r}\\right)^{\\beta},
-    $$
-
-    where the MAC is scaled by the following time and region dependent factor:
-    $$
-    \\text{factor}_{t,r} = \\text{learning factor}_t \\cdot \\text{regional scaling factor}_r
-    $$
-
-    The regional scaling factor transforms the global MAC into a regional MAC:
-
-
-    ``` plotly
-    {"file_path": "./assets/plots/MAC_kappa_rel_abatement_0.75_2050.json"}
-    ```
-
-    The values of this regional scaling factor are calibrated using SSP2 MAC curves from the TIMER model (the energy
-    submodule of IMAGE). By comparing the carbon price per region required to reach 75% CO<sub>2</sub> reduction in 2050 compared to baseline,
-    relative to the world average, we obtain a scaling factor for the MAC.
-    """
     factor = m.learning_factor[t] * m.MAC_scaling_factor[r]
     return factor * m.MAC_gamma * a**m.MAC_beta
 

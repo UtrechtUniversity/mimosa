@@ -75,6 +75,7 @@ plugins:
   - open-in-new-tab
   - plotly:
       template_default: assets/plots/template.json
+  - glightbox
 
 markdown_extensions:
   - pymdownx.arithmatex:
