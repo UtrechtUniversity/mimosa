@@ -200,28 +200,3 @@ class InstantiatedModel:
             }
 
         instance_data[None].update(parameter_mapping)
-
-    # def _instance_data_witch(self) -> dict:
-    #     return {
-    #         "damage_omega1_pos": self.data_store.get_regional("damages", "omega1_pos"),
-    #         "damage_omega1_neg": self.data_store.get_regional("damages", "omega1_neg"),
-    #         "damage_omega2_pos": self.data_store.get_regional("damages", "omega2_pos"),
-    #         "damage_omega2_neg": self.data_store.get_regional("damages", "omega2_neg"),
-    #         "damage_omega3_pos": self.data_store.get_regional("damages", "omega3_pos"),
-    #         "damage_omega3_neg": self.data_store.get_regional("damages", "omega3_neg"),
-    #         "damage_omega4_pos": self.data_store.get_regional("damages", "omega4_pos"),
-    #         "damage_omega4_neg": self.data_store.get_regional("damages", "omega4_neg"),
-    #         "adapt_omega_eff_ada": self.data_store.get_regional(
-    #             "adaptation", "omega_eff_ada"
-    #         ),
-    #         "adapt_omega_act": self.data_store.get_regional("adaptation", "omega_act"),
-    #         "adapt_omega_eff_act": self.data_store.get_regional(
-    #             "adaptation", "omega_eff_act"
-    #         ),
-    #         "adapt_omega_rada": self.data_store.get_regional(
-    #             "adaptation", "omega_rada"
-    #         ),
-    #         "adapt_rho_ada": self.data_store.get_regional("adaptation", "rho_ada"),
-    #         "adapt_rho_act": self.data_store.get_regional("adaptation", "rho_act"),
-    #         "adapt_eps": self.data_store.get_regional("adaptation", "eps"),
-    #     }
