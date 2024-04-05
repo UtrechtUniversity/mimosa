@@ -18,7 +18,8 @@ transformed into a `ConcreteModel` by putting all the parameter values in it. Th
 ([IPOPT](https://coin-or.github.io/Ipopt/), an open-source large-scale nonlinear optimisation suite).
 
 
-![](https://media.springernature.com/full/springer-static/image/art%3A10.1038%2Fs41467-021-22826-5/MediaObjects/41467_2021_22826_Fig1_HTML.png)
+![](assets/fig/mimosa_overview_dark.png#only-dark)
+![](assets/fig/mimosa_overview.png#only-light)
 *Schematic overview of the MIMOSA model. From [[1]](#1).*
 
 
