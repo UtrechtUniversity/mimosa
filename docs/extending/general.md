@@ -53,7 +53,13 @@ This model will always be referred to as `m`.
     4.  Example of a basic model run. Place your run files here, such that the mimosa package from this folder is used,
         and not a version previously installed through `pip install mimosa`.
 
-    The files you are most likely to edit are highlighted. The different components discussed in the
+    The different components discussed in the
     [Model documentation](../components/general.md) pages are defined in the Python files in the folder
     [`mimosa/components`]({{config.repo_url}}/tree/master/mimosa/components). All these modules are tied
     together in the file [`mimosa/abstract_model.py`]({{config.repo_url}}/blob/master/mimosa/abstract_model.py).
+
+Typically, when extending MIMOSA, the following steps can be followed:
+
+1. [Create a new component](components.md) (`optional`, only necessary if the extension is a new module)
+2. [Add new variables and constraints to the model](variables_constraints.md)
+3. [Add new parameters and data to the model](parameters.md)
