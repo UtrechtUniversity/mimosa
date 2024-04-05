@@ -464,6 +464,27 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../components/sealevelrise/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Sea-level rise
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -869,11 +890,17 @@ this object is created:</p>
 <li>Example of a basic model run. Place your run files here, such that the mimosa package from this folder is used,
     and not a version previously installed through <code>pip install mimosa</code>.</li>
 </ol>
-<p>The files you are most likely to edit are highlighted. The different components discussed in the
+<p>The different components discussed in the
 <a href="../../components/general/">Model documentation</a> pages are defined in the Python files in the folder
 <a href="https://github.com/UtrechtUniversity/mimosa/tree/master/mimosa/components"><code>mimosa/components</code></a>. All these modules are tied
 together in the file <a href="https://github.com/UtrechtUniversity/mimosa/blob/master/mimosa/abstract_model.py"><code>mimosa/abstract_model.py</code></a>.</p>
 </details>
+<p>Typically, when extending MIMOSA, the following steps can be followed:</p>
+<ol>
+<li><a href="../components/">Create a new component</a> (<code>optional</code>, only necessary if the extension is a new module)</li>
+<li><a href="../variables_constraints/">Add new variables and constraints to the model</a></li>
+<li><a href="../parameters/">Add new parameters and data to the model</a></li>
+</ol>
 
 
 
