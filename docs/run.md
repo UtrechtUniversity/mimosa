@@ -32,8 +32,6 @@ Once the script above has finished running, it has produced two output files in 
 
 These output files can be easily imported for plotting software (like using [Plotly](https://plotly.com/python/) in Python). An easier way, however, to quickly visualise and compare MIMOSA outputs, is by using the MIMOSA Dashboard. After opening the online Dashboard, simply drag and drop all output files to the drag-and-drop input to visualise one or multiple MIMOSA output files. Also include the parameter files to directly see the difference in input parameters.
 
-> **Note:** the MIMOSA Dashboard can sometimes take up to a few minutes to start, as it goes to sleep after 30 minutes of inactivity (restriction of the free plan of the hosting website).
-
 [Open the MIMOSA Dashboard :octicons-arrow-right-24:](https://dashboard-mimosa.onrender.com/){.md-button}
 
 
