@@ -20,7 +20,7 @@ transformed into a `ConcreteModel` by putting all the parameter values in it. Th
 
 ![](assets/fig/mimosa_overview_dark.png#only-dark)
 ![](assets/fig/mimosa_overview.png#only-light)
-*Schematic overview of the MIMOSA model. From [[1]](#1).*
+*Schematic overview of the MIMOSA model. Adapted from [[1]](#1).*
 
 
 ## How to cite

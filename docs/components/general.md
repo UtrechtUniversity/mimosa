@@ -51,7 +51,7 @@ The MIMOSA model consists of several sub-modules, called model components. Each 
 
     Temperature related damages and sea-level rise related damages
 
-    [:octicons-arrow-right-24: Read more](#){.md-button}
+    [:octicons-arrow-right-24: Read more](damages.md){.md-button}
 
 
 -   #### :fontawesome-solid-people-carry-box: Effort-sharing
