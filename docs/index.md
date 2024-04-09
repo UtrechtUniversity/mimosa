@@ -1,7 +1,9 @@
 ![image](assets/logo.svg)
 # MIMOSA: Mathematical Integrated Model for Optimal and Stylised Assessment
+
 ???+ warning
     This documentation is still under construction and will be updated regularly.
+
 
 MIMOSA is a recent simple IAM based on FAIR, with 26 regions covering the whole world. It is a relatively simple Cost-Benefit IAM but still covers the relevant technological and socio-economic dynamics. Temperature is a linear function of cumulative CO2 emissions. MIMOSA uses the DICE sea-level rise module. The mitigation costs, population, initial capital stock and baseline GDP and CO2 emissions are regional. The direct regional mitigation costs are calculated as area under the Marginal Abatement Cost (MAC) curve, and have been calibrated to the IPCC AR6 WGIII database.
 
@@ -9,6 +11,12 @@ MIMOSA is a recent simple IAM based on FAIR, with 26 regions covering the whole 
 [Documentation :octicons-arrow-right-24:](components/general.md){.md-button}
 [Installation :octicons-arrow-right-24:](installation.md){.md-button}
 [Running :octicons-arrow-right-24:](run.md){.md-button}
+
+[<img src="assets/logos/UU_logo_2021_EN_RGB.png#only-light" width="40%">](https://www.uu.nl/en/research/copernicus-institute-of-sustainable-development)
+[<img src="assets/logos/UU_logo_2021_EN_RGB_diap.png#only-dark" width="40%">](https://www.uu.nl/en/research/copernicus-institute-of-sustainable-development)
+[<img src="assets/logos/IMAGE.png" width="40%">](https://www.pbl.nl/en/image/home)
+
+MIMOSA is being developed at the [Copernicus Institute of Sustainable Development](https://www.uu.nl/en/research/copernicus-institute-of-sustainable-development) at Utrecht University, and is part of the [IMAGE modelling framework](https://www.pbl.nl/en/image/home).
 
 ### General
 
