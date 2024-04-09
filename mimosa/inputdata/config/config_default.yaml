@@ -368,8 +368,7 @@ model:
     type: enum
     values:
       - COACCH
-      - RICE2010
-      - RICE2012
+      - nodamage
     default: COACCH
 
   emissiontrade module:

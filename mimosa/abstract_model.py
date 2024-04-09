@@ -93,13 +93,7 @@ def create_abstract_model(
     constraints.extend(sealevelrise.get_constraints(m))
 
     # Damage costs
-    if damage_module == "RICE2010":
-        constraints.extend(damages.ad_rice2010.get_constraints(m))
-    elif damage_module == "WITCH":
-        constraints.extend(damages.ad_witch.get_constraints(m))
-    elif damage_module == "RICE2012":
-        constraints.extend(damages.ad_rice2012.get_constraints(m))
-    elif damage_module == "COACCH":
+    if damage_module == "COACCH":
         constraints.extend(damages.coacch.get_constraints(m))
     elif damage_module == "nodamage":
         constraints.extend(damages.nodamage.get_constraints(m))
