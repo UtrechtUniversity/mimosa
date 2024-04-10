@@ -3,6 +3,33 @@
 Climate impacts in MIMOSA are calculated using the [COACCH](https://www.coacch.eu/) damage functions, developed in 2023
 (see [van der Wijst et al., 2023](https://doi.org/10.1038/s41558-023-01636-1)).
 
+## Regional damage functions
+
+
+=== "Non-SLR damages"
+
+    <div style="overflow: scroll;" markdown>
+    ``` plotly
+    {"file_path": "./assets/plots/coacch_all_curves_noslr.json"}
+    ```
+    </div>
+
+=== "SLR damages (optimal adaptation)"
+
+    <div style="overflow: scroll;" markdown>
+    ``` plotly
+    {"file_path": "./assets/plots/coacch_all_curves_slr_ad.json"}
+    ```
+    </div>
+
+=== "SLR damages (no adaptation)"
+
+    <div style="overflow: scroll;" markdown>
+    ``` plotly
+    {"file_path": "./assets/plots/coacch_all_curves_slr_noad.json"}
+    ```
+    </div>
+
 ## Impact sectors used in the damage functions
 
 | Climate change impact area | Model source | Variable used in CGE |
