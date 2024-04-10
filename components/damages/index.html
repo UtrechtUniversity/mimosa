@@ -1,63 +1,24 @@
 
-<!doctype html>
-<html lang="en" class="no-js">
-  <head>
-    
-      <meta charset="utf-8">
-      <meta name="viewport" content="width=device-width,initial-scale=1">
-      
-      
-      
-      
-        <link rel="prev" href="../sealevelrise/">
-      
-      
-        <link rel="next" href="../regions/">
-      
-      
-      <link rel="icon" href="../../assets/circle_logo.svg">
-      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.11">
-    
-    
-      
-        <title>Damages - MIMOSA documentation</title>
-      
-    
-    
-      <link rel="stylesheet" href="../../assets/stylesheets/main.7e359304.min.css">
-      
-        
-        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
-      
-      
+<!DOCTYPE html>
 
-
-    
-    
-      
-    
-    
-      
-        
-        
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
-        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
-      
-    
-    
-      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
-    
-      <link rel="stylesheet" href="../../assets/extra.css">
-    
-    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
-    
-      
-
-    
-    
-    
-   <link href="../../assets/stylesheets/glightbox.min.css" rel="stylesheet"/><style>
+<html class="no-js" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<link href="../sealevelrise/" rel="prev"/>
+<link href="../regions/" rel="next"/>
+<link href="../../assets/circle_logo.svg" rel="icon"/>
+<meta content="mkdocs-1.5.3, mkdocs-material-9.5.11" name="generator"/>
+<title>Damages - MIMOSA documentation</title>
+<link href="../../assets/stylesheets/main.7e359304.min.css" rel="stylesheet"/>
+<link href="../../assets/stylesheets/palette.06af60db.min.css" rel="stylesheet"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&amp;display=fallback" rel="stylesheet"/>
+<style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+<link href="../../assets/_mkdocstrings.css" rel="stylesheet"/>
+<link href="../../assets/extra.css" rel="stylesheet"/>
+<script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script> <link href="../../assets/stylesheets/glightbox.min.css" rel="stylesheet"/><style>
     html.glightbox-open { overflow: initial; height: 100%; }
     .gslide-title { margin-top: 0px; user-select: text; }
     .gslide-desc { color: #666; user-select: text; }
@@ -67,790 +28,380 @@
     body[data-md-color-scheme="slate"] .gdesc-inner { background: var(--md-default-bg-color);}
     body[data-md-color-scheme="slate"] .gslide-title { color: var(--md-default-fg-color);}
     body[data-md-color-scheme="slate"] .gslide-desc { color: var(--md-default-fg-color);}</style> <script src="../../assets/javascripts/glightbox.min.js"></script></head>
-  
-  
-    
-    
-      
-    
-    
-    
-    
-    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
-  
-    
-    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
-    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
-    <label class="md-overlay" for="__drawer"></label>
-    <div data-md-component="skip">
-      
-        
-        <a href="#impact-sectors-used-in-the-damage-functions" class="md-skip">
+<body data-md-color-accent="indigo" data-md-color-primary="indigo" data-md-color-scheme="default" dir="ltr">
+<input autocomplete="off" class="md-toggle" data-md-toggle="drawer" id="__drawer" type="checkbox"/>
+<input autocomplete="off" class="md-toggle" data-md-toggle="search" id="__search" type="checkbox"/>
+<label class="md-overlay" for="__drawer"></label>
+<div data-md-component="skip">
+<a class="md-skip" href="#regional-damage-functions">
           Skip to content
         </a>
-      
-    </div>
-    <div data-md-component="announce">
-      
-    </div>
-    
-    
-      
-
-  
-
+</div>
+<div data-md-component="announce">
+</div>
 <header class="md-header md-header--shadow" data-md-component="header">
-  <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../.." title="MIMOSA documentation" class="md-header__button md-logo" aria-label="MIMOSA documentation" data-md-component="logo">
-      
-  <img src="../../assets/circle_logo.svg" alt="logo">
-
-    </a>
-    <label class="md-header__button md-icon" for="__drawer">
-      
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
-    </label>
-    <div class="md-header__title" data-md-component="header-title">
-      <div class="md-header__ellipsis">
-        <div class="md-header__topic">
-          <span class="md-ellipsis">
+<nav aria-label="Header" class="md-header__inner md-grid">
+<a aria-label="MIMOSA documentation" class="md-header__button md-logo" data-md-component="logo" href="../.." title="MIMOSA documentation">
+<img alt="logo" src="../../assets/circle_logo.svg"/>
+</a>
+<label class="md-header__button md-icon" for="__drawer">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"></path></svg>
+</label>
+<div class="md-header__title" data-md-component="header-title">
+<div class="md-header__ellipsis">
+<div class="md-header__topic">
+<span class="md-ellipsis">
             MIMOSA documentation
           </span>
-        </div>
-        <div class="md-header__topic" data-md-component="header-topic">
-          <span class="md-ellipsis">
+</div>
+<div class="md-header__topic" data-md-component="header-topic">
+<span class="md-ellipsis">
             
               Damages
             
           </span>
-        </div>
-      </div>
-    </div>
-    
-      
-        <form class="md-header__option" data-md-component="palette">
-  
-    
-    
-    
-    <input class="md-option" data-md-color-media="(prefers-color-scheme)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
-    
-      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m14.3 16-.7-2h-3.2l-.7 2H7.8L11 7h2l3.2 9h-1.9M20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69m-9.15 3.96h2.3L12 9l-1.15 3.65Z"/></svg>
-      </label>
-    
-  
-    
-    
-    
-    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
-    
-      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69Z"/></svg>
-      </label>
-    
-  
-    
-    
-    
-    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="indigo"  aria-label="Switch to system preference"  type="radio" name="__palette" id="__palette_2">
-    
-      <label class="md-header__button md-icon" title="Switch to system preference" for="__palette_0" hidden>
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12c0-2.42-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69Z"/></svg>
-      </label>
-    
-  
+</div>
+</div>
+</div>
+<form class="md-header__option" data-md-component="palette">
+<input aria-label="Switch to light mode" class="md-option" data-md-color-accent="indigo" data-md-color-media="(prefers-color-scheme)" data-md-color-primary="indigo" data-md-color-scheme="default" id="__palette_0" name="__palette" type="radio"/>
+<label class="md-header__button md-icon" for="__palette_1" hidden="" title="Switch to light mode">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="m14.3 16-.7-2h-3.2l-.7 2H7.8L11 7h2l3.2 9h-1.9M20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69m-9.15 3.96h2.3L12 9l-1.15 3.65Z"></path></svg>
+</label>
+<input aria-label="Switch to dark mode" class="md-option" data-md-color-accent="custom" data-md-color-media="(prefers-color-scheme: light)" data-md-color-primary="custom" data-md-color-scheme="default" id="__palette_1" name="__palette" type="radio"/>
+<label class="md-header__button md-icon" for="__palette_2" hidden="" title="Switch to dark mode">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69Z"></path></svg>
+</label>
+<input aria-label="Switch to system preference" class="md-option" data-md-color-accent="indigo" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-primary="black" data-md-color-scheme="slate" id="__palette_2" name="__palette" type="radio"/>
+<label class="md-header__button md-icon" for="__palette_0" hidden="" title="Switch to system preference">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12c0-2.42-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69Z"></path></svg>
+</label>
 </form>
-      
-    
-    
-      <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
-    
-    
-    
-      <label class="md-header__button md-icon" for="__search">
-        
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
-      </label>
-      <div class="md-search" data-md-component="search" role="dialog">
-  <label class="md-search__overlay" for="__search"></label>
-  <div class="md-search__inner" role="search">
-    <form class="md-search__form" name="search">
-      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
-      <label class="md-search__icon md-icon" for="__search">
-        
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
-        
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
-      </label>
-      <nav class="md-search__options" aria-label="Search">
-        
-        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
-          
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
-        </button>
-      </nav>
-      
-    </form>
-    <div class="md-search__output">
-      <div class="md-search__scrollwrap" data-md-scrollfix>
-        <div class="md-search-result" data-md-component="search-result">
-          <div class="md-search-result__meta">
+<script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+<label class="md-header__button md-icon" for="__search">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"></path></svg>
+</label>
+<div class="md-search" data-md-component="search" role="dialog">
+<label class="md-search__overlay" for="__search"></label>
+<div class="md-search__inner" role="search">
+<form class="md-search__form" name="search">
+<input aria-label="Search" autocapitalize="off" autocomplete="off" autocorrect="off" class="md-search__input" data-md-component="search-query" name="query" placeholder="Search" required="" spellcheck="false" type="text"/>
+<label class="md-search__icon md-icon" for="__search">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"></path></svg>
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"></path></svg>
+</label>
+<nav aria-label="Search" class="md-search__options">
+<button aria-label="Clear" class="md-search__icon md-icon" tabindex="-1" title="Clear" type="reset">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"></path></svg>
+</button>
+</nav>
+</form>
+<div class="md-search__output">
+<div class="md-search__scrollwrap" data-md-scrollfix="">
+<div class="md-search-result" data-md-component="search-result">
+<div class="md-search-result__meta">
             Initializing search
           </div>
-          <ol class="md-search-result__list" role="presentation"></ol>
-        </div>
-      </div>
-    </div>
-  </div>
+<ol class="md-search-result__list" role="presentation"></ol>
 </div>
-    
-    
-      <div class="md-header__source">
-        <a href="https://github.com/UtrechtUniversity/mimosa" title="Go to repository" class="md-source" data-md-component="source">
-  <div class="md-source__icon md-icon">
-    
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
-  </div>
-  <div class="md-source__repository">
+</div>
+</div>
+</div>
+</div>
+<div class="md-header__source">
+<a class="md-source" data-md-component="source" href="https://github.com/UtrechtUniversity/mimosa" title="Go to repository">
+<div class="md-source__icon md-icon">
+<svg viewbox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"></path></svg>
+</div>
+<div class="md-source__repository">
     GitHub
   </div>
 </a>
-      </div>
-    
-  </nav>
-  
+</div>
+</nav>
 </header>
-    
-    <div class="md-container" data-md-component="container">
-      
-      
-        
-          
-        
-      
-      <main class="md-main" data-md-component="main">
-        <div class="md-main__inner md-grid">
-          
-            
-              
-              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
-                <div class="md-sidebar__scrollwrap">
-                  <div class="md-sidebar__inner">
-                    
-
-
-
-<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
-  <label class="md-nav__title" for="__drawer">
-    <a href="../.." title="MIMOSA documentation" class="md-nav__button md-logo" aria-label="MIMOSA documentation" data-md-component="logo">
-      
-  <img src="../../assets/circle_logo.svg" alt="logo">
-
-    </a>
+<div class="md-container" data-md-component="container">
+<main class="md-main" data-md-component="main">
+<div class="md-main__inner md-grid">
+<div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation">
+<div class="md-sidebar__scrollwrap">
+<div class="md-sidebar__inner">
+<nav aria-label="Navigation" class="md-nav md-nav--primary" data-md-level="0">
+<label class="md-nav__title" for="__drawer">
+<a aria-label="MIMOSA documentation" class="md-nav__button md-logo" data-md-component="logo" href="../.." title="MIMOSA documentation">
+<img alt="logo" src="../../assets/circle_logo.svg"/>
+</a>
     MIMOSA documentation
   </label>
-  
-    <div class="md-nav__source">
-      <a href="https://github.com/UtrechtUniversity/mimosa" title="Go to repository" class="md-source" data-md-component="source">
-  <div class="md-source__icon md-icon">
-    
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
-  </div>
-  <div class="md-source__repository">
+<div class="md-nav__source">
+<a class="md-source" data-md-component="source" href="https://github.com/UtrechtUniversity/mimosa" title="Go to repository">
+<div class="md-source__icon md-icon">
+<svg viewbox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"></path></svg>
+</div>
+<div class="md-source__repository">
     GitHub
   </div>
 </a>
-    </div>
-  
-  <ul class="md-nav__list" data-md-scrollfix>
-    
-      
-      
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../.." class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
+</div>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../..">
+<span class="md-ellipsis">
     Home
   </span>
-  
-
-      </a>
-    </li>
-  
-
-    
-      
-      
-  
-  
-    
-  
-  
-  
-    
-    
-    
-    
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
-        
-          
-          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
-            
-  
-  <span class="md-ellipsis">
+</a>
+</li>
+<li class="md-nav__item md-nav__item--active md-nav__item--nested">
+<input checked="" class="md-nav__toggle md-toggle" id="__nav_2" type="checkbox"/>
+<label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+<span class="md-ellipsis">
     Model documentation
   </span>
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_2">
-            <span class="md-nav__icon md-icon"></span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="true" aria-labelledby="__nav_2_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_2">
+<span class="md-nav__icon md-icon"></span>
             Model documentation
           </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../general/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../general/">
+<span class="md-ellipsis">
     General structure
   </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-    
-  
-  
-  
-    
-    
-    
-    
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2" checked>
-        
-          
-          <label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="0">
-            
-  
-  <span class="md-ellipsis">
+</a>
+</li>
+<li class="md-nav__item md-nav__item--active md-nav__item--nested">
+<input checked="" class="md-nav__toggle md-toggle" id="__nav_2_2" type="checkbox"/>
+<label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="0">
+<span class="md-ellipsis">
     Components
   </span>
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_2_2">
-            <span class="md-nav__icon md-icon"></span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="true" aria-labelledby="__nav_2_2_label" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="__nav_2_2">
+<span class="md-nav__icon md-icon"></span>
             Components
           </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../economics/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../economics/">
+<span class="md-ellipsis">
     Economics
   </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../welfare/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../welfare/">
+<span class="md-ellipsis">
     Welfare
   </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../emissions/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../emissions/">
+<span class="md-ellipsis">
     Emissions and temperature
   </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../mitigation/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../mitigation/">
+<span class="md-ellipsis">
     Mitigation
   </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../sealevelrise/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../sealevelrise/">
+<span class="md-ellipsis">
     Sea-level rise
   </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-    
-  
-  
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  <span class="md-ellipsis">
+</a>
+</li>
+<li class="md-nav__item md-nav__item--active">
+<input class="md-nav__toggle md-toggle" id="__toc" type="checkbox"/>
+<label class="md-nav__link md-nav__link--active" for="__toc">
+<span class="md-ellipsis">
     Damages
   </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
-        
-  
-  <span class="md-ellipsis">
+<span class="md-nav__icon md-icon"></span>
+</label>
+<a class="md-nav__link md-nav__link--active" href="./">
+<span class="md-ellipsis">
     Damages
   </span>
-  
-
-      </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
+</a>
+<nav aria-label="Table of contents" class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">
+<span class="md-nav__icon md-icon"></span>
       Table of contents
     </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#impact-sectors-used-in-the-damage-functions" class="md-nav__link">
-    <span class="md-ellipsis">
+<ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#regional-damage-functions">
+<span class="md-ellipsis">
+      Regional damage functions
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#impact-sectors-used-in-the-damage-functions">
+<span class="md-ellipsis">
       Impact sectors used in the damage functions
     </span>
-  </a>
-  
+</a>
 </li>
-      
-    </ul>
-  
+</ul>
 </nav>
-      
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../regions/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../regions/">
+<span class="md-ellipsis">
     Region definitions
   </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../parameters/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../parameters/">
+<span class="md-ellipsis">
     Parameter reference
   </span>
-  
-
-      </a>
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../installation/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../installation/">
+<span class="md-ellipsis">
     Installing MIMOSA
   </span>
-  
-
-      </a>
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../run/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../run/">
+<span class="md-ellipsis">
     Running MIMOSA
   </span>
-  
-
-      </a>
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    
-    
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
-        
-          
-          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
-            
-  
-  <span class="md-ellipsis">
+</a>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_6" type="checkbox"/>
+<label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+<span class="md-ellipsis">
     Extending MIMOSA
   </span>
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_6">
-            <span class="md-nav__icon md-icon"></span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_6_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_6">
+<span class="md-nav__icon md-icon"></span>
             Extending MIMOSA
           </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../extending/general/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../extending/general/">
+<span class="md-ellipsis">
     Getting started
   </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../extending/components/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../extending/components/">
+<span class="md-ellipsis">
     New components
   </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../extending/variables_constraints/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../extending/variables_constraints/">
+<span class="md-ellipsis">
     Variables and constraints
   </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../extending/parameters/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../extending/parameters/">
+<span class="md-ellipsis">
     Parameters
   </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="https://github.com/UtrechtUniversity/mimosa" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="https://github.com/UtrechtUniversity/mimosa">
+<span class="md-ellipsis">
     Model code
   </span>
-  
-
-      </a>
-    </li>
-  
-
-    
-  </ul>
+</a>
+</li>
+</ul>
 </nav>
-                  </div>
-                </div>
-              </div>
-            
-            
-              
-              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
-                <div class="md-sidebar__scrollwrap">
-                  <div class="md-sidebar__inner">
-                    
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
+</div>
+</div>
+</div>
+<div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc">
+<div class="md-sidebar__scrollwrap">
+<div class="md-sidebar__inner">
+<nav aria-label="Table of contents" class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">
+<span class="md-nav__icon md-icon"></span>
       Table of contents
     </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#impact-sectors-used-in-the-damage-functions" class="md-nav__link">
-    <span class="md-ellipsis">
+<ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#regional-damage-functions">
+<span class="md-ellipsis">
+      Regional damage functions
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#impact-sectors-used-in-the-damage-functions">
+<span class="md-ellipsis">
       Impact sectors used in the damage functions
     </span>
-  </a>
-  
+</a>
 </li>
-      
-    </ul>
-  
+</ul>
 </nav>
-                  </div>
-                </div>
-              </div>
-            
-          
-          
-            <div class="md-content" data-md-component="content">
-              <article class="md-content__inner md-typeset">
-                
-                  
-
-  
-  
-
-
-  <h1>Damages</h1>
-
+</div>
+</div>
+</div>
+<div class="md-content" data-md-component="content">
+<article class="md-content__inner md-typeset">
+<h1>Damages</h1>
 <p><a href="../general/"><span class="twemoji"><svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M10.78 19.03a.75.75 0 0 1-1.06 0l-6.25-6.25a.75.75 0 0 1 0-1.06l6.25-6.25a.749.749 0 0 1 1.275.326.749.749 0 0 1-.215.734L5.81 11.5h14.44a.75.75 0 0 1 0 1.5H5.81l4.97 4.97a.75.75 0 0 1 0 1.06Z"></path></svg></span> Back to general structure</a></p>
 <p>Climate impacts in MIMOSA are calculated using the <a href="https://www.coacch.eu/">COACCH</a> damage functions, developed in 2023
 (see <a href="https://doi.org/10.1038/s41558-023-01636-1">van der Wijst et al., 2023</a>).</p>
+<h2 id="regional-damage-functions">Regional damage functions</h2>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:3"><input checked="checked" id="non-slr-damages" name="__tabbed_1" type="radio"><input id="slr-damages-optimal-adaptation" name="__tabbed_1" type="radio"><input id="slr-damages-no-adaptation" name="__tabbed_1" type="radio"><div class="tabbed-labels"><label for="non-slr-damages">Non-SLR damages</label><label for="slr-damages-optimal-adaptation">SLR damages (optimal adaptation)</label><label for="slr-damages-no-adaptation">SLR damages (no adaptation)</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p><div markdown="" style="overflow: scroll;">
+<div class="mkdocs-plotly" data-jsonpath="../../assets/plots/coacch_all_curves_noslr.json"></div>
+</div></p>
+</div>
+<div class="tabbed-block">
+<p><div markdown="" style="overflow: scroll;">
+<div class="mkdocs-plotly" data-jsonpath="../../assets/plots/coacch_all_curves_slr_ad.json"></div>
+</div></p>
+</div>
+<div class="tabbed-block">
+<p><div markdown="" style="overflow: scroll;">
+<div class="mkdocs-plotly" data-jsonpath="../../assets/plots/coacch_all_curves_slr_noad.json"></div>
+</div></p>
+</div>
+</div>
+</input></input></input></div>
 <h2 id="impact-sectors-used-in-the-damage-functions">Impact sectors used in the damage functions</h2>
 <table>
 <thead>
@@ -908,109 +459,65 @@
 </tr>
 </tbody>
 </table>
-
-
-
-
-
-
-
-
-
-
-
-
-                
-              </article>
-            </div>
-          
-          
+</article>
+</div>
 <script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
-        </div>
-        
-          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
-  
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12Z"/></svg>
+</div>
+<button class="md-top md-icon" data-md-component="top" hidden="" type="button">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12Z"></path></svg>
   Back to top
 </button>
-        
-      </main>
-      
-        <footer class="md-footer">
-  
-    
-      
-      <nav class="md-footer__inner md-grid" aria-label="Footer" >
-        
-          
-          <a href="../sealevelrise/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Sea-level rise">
-            <div class="md-footer__button md-icon">
-              
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
-            </div>
-            <div class="md-footer__title">
-              <span class="md-footer__direction">
+</main>
+<footer class="md-footer">
+<nav aria-label="Footer" class="md-footer__inner md-grid">
+<a aria-label="Previous: Sea-level rise" class="md-footer__link md-footer__link--prev" href="../sealevelrise/">
+<div class="md-footer__button md-icon">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"></path></svg>
+</div>
+<div class="md-footer__title">
+<span class="md-footer__direction">
                 Previous
               </span>
-              <div class="md-ellipsis">
+<div class="md-ellipsis">
                 Sea-level rise
               </div>
-            </div>
-          </a>
-        
-        
-          
-          <a href="../regions/" class="md-footer__link md-footer__link--next" aria-label="Next: Region definitions">
-            <div class="md-footer__title">
-              <span class="md-footer__direction">
+</div>
+</a>
+<a aria-label="Next: Region definitions" class="md-footer__link md-footer__link--next" href="../regions/">
+<div class="md-footer__title">
+<span class="md-footer__direction">
                 Next
               </span>
-              <div class="md-ellipsis">
+<div class="md-ellipsis">
                 Region definitions
               </div>
-            </div>
-            <div class="md-footer__button md-icon">
-              
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg>
-            </div>
-          </a>
-        
-      </nav>
-    
-  
-  <div class="md-footer-meta md-typeset">
-    <div class="md-footer-meta__inner md-grid">
-      <div class="md-copyright">
+</div>
+<div class="md-footer__button md-icon">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"></path></svg>
+</div>
+</a>
+</nav>
+<div class="md-footer-meta md-typeset">
+<div class="md-footer-meta__inner md-grid">
+<div class="md-copyright">
   
   
     Made with
-    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+    <a href="https://squidfunk.github.io/mkdocs-material/" rel="noopener" target="_blank">
       Material for MkDocs
     </a>
-  
 </div>
-      
-    </div>
-  </div>
+</div>
+</div>
 </footer>
-      
-    </div>
-    <div class="md-dialog" data-md-component="dialog">
-      <div class="md-dialog__inner md-typeset"></div>
-    </div>
-    
-    
-    <script id="__config" type="application/json">{"base": "../..", "features": ["content.code.copy", "content.code.annotate", "navigation.top", "navigation.expand", "navigation.footer"], "search": "../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
-    
-    
-      <script src="../../assets/javascripts/bundle.8fd75fb4.min.js"></script>
-      
-        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-      
-        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-      
-        <script src="../../js/open_in_new_tab.js"></script>
-      
-    
-  <script>document$.subscribe(() => {const lightbox = GLightbox({"touchNavigation": true, "loop": false, "zoomable": true, "draggable": true, "openEffect": "zoom", "closeEffect": "zoom", "slideEffect": "slide"});})</script></body>
+</div>
+<div class="md-dialog" data-md-component="dialog">
+<div class="md-dialog__inner md-typeset"></div>
+</div>
+<script id="__config" type="application/json">{"base": "../..", "features": ["content.code.copy", "content.code.annotate", "navigation.top", "navigation.expand", "navigation.footer"], "search": "../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+<script src="../../assets/javascripts/bundle.8fd75fb4.min.js"></script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<script src="../../js/open_in_new_tab.js"></script>
+<span hidden="True" id="default-template-settings">{"barmode": "relative", "coloraxis.colorbar.outlinewidth": 0, "coloraxis.colorbar.ticks": "", "colorway": ["#97CEE4", "#778663", "#6F7899", "#A7C682", "#8CA7D0", "#FAC182", "#F18872", "#bd7161"], "font.color": "#25292b", "font.family": "\"Frutiger LT Pro Condensed\", \"FrutigerLTPro-Condensed\", \"Open Sans\", verdana, arial, sans-serif", "font.size": 15.203926164664518, "legend.font.size": 15.203926164664518, "legend.title.font.size": 15.203926164664518, "legend.tracegroupgap": 0, "margin.r": 50, "margin.t": 20, "plot_bgcolor": "#F5F5F5", "title.font.family": "\"Frutiger LT Pro Condensed\", \"FrutigerLTPro-Condensed\", \"Open Sans\", verdana, arial, sans-serif", "title.font.size": 23.89188397304424, "title.x": 0.01, "title.xanchor": "left", "xaxis.automargin": true, "xaxis.linecolor": "rgba(0,0,0,0)", "xaxis.showgrid": false, "xaxis.ticks": "", "xaxis.title.font.size": 17.37591561675945, "xaxis.title.standoff": 0, "xaxis.zerolinecolor": "#8e8e8d", "xaxis.zerolinewidth": 2, "yaxis.automargin": true, "yaxis.gridcolor": "#d0d0d0", "yaxis.linecolor": "rgba(0,0,0,0)", "yaxis.gridwidth": 0.5429973630237328, "yaxis.ticks": "", "yaxis.title.font.size": 17.37591561675945, "yaxis.title.standoff": 0, "yaxis.zerolinecolor": "#8e8e8d", "yaxis.zerolinewidth": 2, "xaxis2.automargin": true, "xaxis2.linecolor": "rgba(0,0,0,0)", "xaxis2.showgrid": false, "xaxis2.ticks": "", "xaxis2.title.font.size": 17.37591561675945, "xaxis2.title.standoff": 0, "xaxis2.zerolinecolor": "#8e8e8d", "xaxis2.zerolinewidth": 2, "yaxis2.automargin": true, "yaxis2.gridcolor": "#d0d0d0", "yaxis2.linecolor": "rgba(0,0,0,0)", "yaxis2.gridwidth": 0.5429973630237328, "yaxis2.ticks": "", "yaxis2.title.font.size": 17.37591561675945, "yaxis2.title.standoff": 0, "yaxis2.zerolinecolor": "#8e8e8d", "yaxis2.zerolinewidth": 2, "xaxis3.automargin": true, "xaxis3.linecolor": "rgba(0,0,0,0)", "xaxis3.showgrid": false, "xaxis3.ticks": "", "xaxis3.title.font.size": 17.37591561675945, "xaxis3.title.standoff": 0, "xaxis3.zerolinecolor": "#8e8e8d", "xaxis3.zerolinewidth": 2, "yaxis3.automargin": true, "yaxis3.gridcolor": "#d0d0d0", "yaxis3.linecolor": "rgba(0,0,0,0)", "yaxis3.gridwidth": 0.5429973630237328, "yaxis3.ticks": "", "yaxis3.title.font.size": 17.37591561675945, "yaxis3.title.standoff": 0, "yaxis3.zerolinecolor": "#8e8e8d", "yaxis3.zerolinewidth": 2, "xaxis4.automargin": true, "xaxis4.linecolor": "rgba(0,0,0,0)", "xaxis4.showgrid": false, "xaxis4.ticks": "", "xaxis4.title.font.size": 17.37591561675945, "xaxis4.title.standoff": 0, "xaxis4.zerolinecolor": "#8e8e8d", "xaxis4.zerolinewidth": 2, "yaxis4.automargin": true, "yaxis4.gridcolor": "#d0d0d0", "yaxis4.linecolor": "rgba(0,0,0,0)", "yaxis4.gridwidth": 0.5429973630237328, "yaxis4.ticks": "", "yaxis4.title.font.size": 17.37591561675945, "yaxis4.title.standoff": 0, "yaxis4.zerolinecolor": "#8e8e8d", "yaxis4.zerolinewidth": 2, "xaxis5.automargin": true, "xaxis5.linecolor": "rgba(0,0,0,0)", "xaxis5.showgrid": false, "xaxis5.ticks": "", "xaxis5.title.font.size": 17.37591561675945, "xaxis5.title.standoff": 0, "xaxis5.zerolinecolor": "#8e8e8d", "xaxis5.zerolinewidth": 2, "yaxis5.automargin": true, "yaxis5.gridcolor": "#d0d0d0", "yaxis5.linecolor": "rgba(0,0,0,0)", "yaxis5.gridwidth": 0.5429973630237328, "yaxis5.ticks": "", "yaxis5.title.font.size": 17.37591561675945, "yaxis5.title.standoff": 0, "yaxis5.zerolinecolor": "#8e8e8d", "yaxis5.zerolinewidth": 2, "xaxis6.automargin": true, "xaxis6.linecolor": "rgba(0,0,0,0)", "xaxis6.showgrid": false, "xaxis6.ticks": "", "xaxis6.title.font.size": 17.37591561675945, "xaxis6.title.standoff": 0, "xaxis6.zerolinecolor": "#8e8e8d", "xaxis6.zerolinewidth": 2, "yaxis6.automargin": true, "yaxis6.gridcolor": "#d0d0d0", "yaxis6.linecolor": "rgba(0,0,0,0)", "yaxis6.gridwidth": 0.5429973630237328, "yaxis6.ticks": "", "yaxis6.title.font.size": 17.37591561675945, "yaxis6.title.standoff": 0, "yaxis6.zerolinecolor": "#8e8e8d", "yaxis6.zerolinewidth": 2, "xaxis7.automargin": true, "xaxis7.linecolor": "rgba(0,0,0,0)", "xaxis7.showgrid": false, "xaxis7.ticks": "", "xaxis7.title.font.size": 17.37591561675945, "xaxis7.title.standoff": 0, "xaxis7.zerolinecolor": "#8e8e8d", "xaxis7.zerolinewidth": 2, "yaxis7.automargin": true, "yaxis7.gridcolor": "#d0d0d0", "yaxis7.linecolor": "rgba(0,0,0,0)", "yaxis7.gridwidth": 0.5429973630237328, "yaxis7.ticks": "", "yaxis7.title.font.size": 17.37591561675945, "yaxis7.title.standoff": 0, "yaxis7.zerolinecolor": "#8e8e8d", "yaxis7.zerolinewidth": 2, "xaxis8.automargin": true, "xaxis8.linecolor": "rgba(0,0,0,0)", "xaxis8.showgrid": false, "xaxis8.ticks": "", "xaxis8.title.font.size": 17.37591561675945, "xaxis8.title.standoff": 0, "xaxis8.zerolinecolor": "#8e8e8d", "xaxis8.zerolinewidth": 2, "yaxis8.automargin": true, "yaxis8.gridcolor": "#d0d0d0", "yaxis8.linecolor": "rgba(0,0,0,0)", "yaxis8.gridwidth": 0.5429973630237328, "yaxis8.ticks": "", "yaxis8.title.font.size": 17.37591561675945, "yaxis8.title.standoff": 0, "yaxis8.zerolinecolor": "#8e8e8d", "yaxis8.zerolinewidth": 2, "xaxis9.automargin": true, "xaxis9.linecolor": "rgba(0,0,0,0)", "xaxis9.showgrid": false, "xaxis9.ticks": "", "xaxis9.title.font.size": 17.37591561675945, "xaxis9.title.standoff": 0, "xaxis9.zerolinecolor": "#8e8e8d", "xaxis9.zerolinewidth": 2, "yaxis9.automargin": true, "yaxis9.gridcolor": "#d0d0d0", "yaxis9.linecolor": "rgba(0,0,0,0)", "yaxis9.gridwidth": 0.5429973630237328, "yaxis9.ticks": "", "yaxis9.title.font.size": 17.37591561675945, "yaxis9.title.standoff": 0, "yaxis9.zerolinecolor": "#8e8e8d", "yaxis9.zerolinewidth": 2, "xaxis10.automargin": true, "xaxis10.linecolor": "rgba(0,0,0,0)", "xaxis10.showgrid": false, "xaxis10.ticks": "", "xaxis10.title.font.size": 17.37591561675945, "xaxis10.title.standoff": 0, "xaxis10.zerolinecolor": "#8e8e8d", "xaxis10.zerolinewidth": 2, "yaxis10.automargin": true, "yaxis10.gridcolor": "#d0d0d0", "yaxis10.linecolor": "rgba(0,0,0,0)", "yaxis10.gridwidth": 0.5429973630237328, "yaxis10.ticks": "", "yaxis10.title.font.size": 17.37591561675945, "yaxis10.title.standoff": 0, "yaxis10.zerolinecolor": "#8e8e8d", "yaxis10.zerolinewidth": 2, "xaxis11.automargin": true, "xaxis11.linecolor": "rgba(0,0,0,0)", "xaxis11.showgrid": false, "xaxis11.ticks": "", "xaxis11.title.font.size": 17.37591561675945, "xaxis11.title.standoff": 0, "xaxis11.zerolinecolor": "#8e8e8d", "xaxis11.zerolinewidth": 2, "yaxis11.automargin": true, "yaxis11.gridcolor": "#d0d0d0", "yaxis11.linecolor": "rgba(0,0,0,0)", "yaxis11.gridwidth": 0.5429973630237328, "yaxis11.ticks": "", "yaxis11.title.font.size": 17.37591561675945, "yaxis11.title.standoff": 0, "yaxis11.zerolinecolor": "#8e8e8d", "yaxis11.zerolinewidth": 2, "xaxis12.automargin": true, "xaxis12.linecolor": "rgba(0,0,0,0)", "xaxis12.showgrid": false, "xaxis12.ticks": "", "xaxis12.title.font.size": 17.37591561675945, "xaxis12.title.standoff": 0, "xaxis12.zerolinecolor": "#8e8e8d", "xaxis12.zerolinewidth": 2, "yaxis12.automargin": true, "yaxis12.gridcolor": "#d0d0d0", "yaxis12.linecolor": "rgba(0,0,0,0)", "yaxis12.gridwidth": 0.5429973630237328, "yaxis12.ticks": "", "yaxis12.title.font.size": 17.37591561675945, "yaxis12.title.standoff": 0, "yaxis12.zerolinecolor": "#8e8e8d", "yaxis12.zerolinewidth": 2, "xaxis13.automargin": true, "xaxis13.linecolor": "rgba(0,0,0,0)", "xaxis13.showgrid": false, "xaxis13.ticks": "", "xaxis13.title.font.size": 17.37591561675945, "xaxis13.title.standoff": 0, "xaxis13.zerolinecolor": "#8e8e8d", "xaxis13.zerolinewidth": 2, "yaxis13.automargin": true, "yaxis13.gridcolor": "#d0d0d0", "yaxis13.linecolor": "rgba(0,0,0,0)", "yaxis13.gridwidth": 0.5429973630237328, "yaxis13.ticks": "", "yaxis13.title.font.size": 17.37591561675945, "yaxis13.title.standoff": 0, "yaxis13.zerolinecolor": "#8e8e8d", "yaxis13.zerolinewidth": 2, "xaxis14.automargin": true, "xaxis14.linecolor": "rgba(0,0,0,0)", "xaxis14.showgrid": false, "xaxis14.ticks": "", "xaxis14.title.font.size": 17.37591561675945, "xaxis14.title.standoff": 0, "xaxis14.zerolinecolor": "#8e8e8d", "xaxis14.zerolinewidth": 2, "yaxis14.automargin": true, "yaxis14.gridcolor": "#d0d0d0", "yaxis14.linecolor": "rgba(0,0,0,0)", "yaxis14.gridwidth": 0.5429973630237328, "yaxis14.ticks": "", "yaxis14.title.font.size": 17.37591561675945, "yaxis14.title.standoff": 0, "yaxis14.zerolinecolor": "#8e8e8d", "yaxis14.zerolinewidth": 2, "xaxis15.automargin": true, "xaxis15.linecolor": "rgba(0,0,0,0)", "xaxis15.showgrid": false, "xaxis15.ticks": "", "xaxis15.title.font.size": 17.37591561675945, "xaxis15.title.standoff": 0, "xaxis15.zerolinecolor": "#8e8e8d", "xaxis15.zerolinewidth": 2, "yaxis15.automargin": true, "yaxis15.gridcolor": "#d0d0d0", "yaxis15.linecolor": "rgba(0,0,0,0)", "yaxis15.gridwidth": 0.5429973630237328, "yaxis15.ticks": "", "yaxis15.title.font.size": 17.37591561675945, "yaxis15.title.standoff": 0, "yaxis15.zerolinecolor": "#8e8e8d", "yaxis15.zerolinewidth": 2, "xaxis16.automargin": true, "xaxis16.linecolor": "rgba(0,0,0,0)", "xaxis16.showgrid": false, "xaxis16.ticks": "", "xaxis16.title.font.size": 17.37591561675945, "xaxis16.title.standoff": 0, "xaxis16.zerolinecolor": "#8e8e8d", "xaxis16.zerolinewidth": 2, "yaxis16.automargin": true, "yaxis16.gridcolor": "#d0d0d0", "yaxis16.linecolor": "rgba(0,0,0,0)", "yaxis16.gridwidth": 0.5429973630237328, "yaxis16.ticks": "", "yaxis16.title.font.size": 17.37591561675945, "yaxis16.title.standoff": 0, "yaxis16.zerolinecolor": "#8e8e8d", "yaxis16.zerolinewidth": 2, "xaxis17.automargin": true, "xaxis17.linecolor": "rgba(0,0,0,0)", "xaxis17.showgrid": false, "xaxis17.ticks": "", "xaxis17.title.font.size": 17.37591561675945, "xaxis17.title.standoff": 0, "xaxis17.zerolinecolor": "#8e8e8d", "xaxis17.zerolinewidth": 2, "yaxis17.automargin": true, "yaxis17.gridcolor": "#d0d0d0", "yaxis17.linecolor": "rgba(0,0,0,0)", "yaxis17.gridwidth": 0.5429973630237328, "yaxis17.ticks": "", "yaxis17.title.font.size": 17.37591561675945, "yaxis17.title.standoff": 0, "yaxis17.zerolinecolor": "#8e8e8d", "yaxis17.zerolinewidth": 2, "xaxis18.automargin": true, "xaxis18.linecolor": "rgba(0,0,0,0)", "xaxis18.showgrid": false, "xaxis18.ticks": "", "xaxis18.title.font.size": 17.37591561675945, "xaxis18.title.standoff": 0, "xaxis18.zerolinecolor": "#8e8e8d", "xaxis18.zerolinewidth": 2, "yaxis18.automargin": true, "yaxis18.gridcolor": "#d0d0d0", "yaxis18.linecolor": "rgba(0,0,0,0)", "yaxis18.gridwidth": 0.5429973630237328, "yaxis18.ticks": "", "yaxis18.title.font.size": 17.37591561675945, "yaxis18.title.standoff": 0, "yaxis18.zerolinecolor": "#8e8e8d", "yaxis18.zerolinewidth": 2, "xaxis19.automargin": true, "xaxis19.linecolor": "rgba(0,0,0,0)", "xaxis19.showgrid": false, "xaxis19.ticks": "", "xaxis19.title.font.size": 17.37591561675945, "xaxis19.title.standoff": 0, "xaxis19.zerolinecolor": "#8e8e8d", "xaxis19.zerolinewidth": 2, "yaxis19.automargin": true, "yaxis19.gridcolor": "#d0d0d0", "yaxis19.linecolor": "rgba(0,0,0,0)", "yaxis19.gridwidth": 0.5429973630237328, "yaxis19.ticks": "", "yaxis19.title.font.size": 17.37591561675945, "yaxis19.title.standoff": 0, "yaxis19.zerolinecolor": "#8e8e8d", "yaxis19.zerolinewidth": 2, "xaxis20.automargin": true, "xaxis20.linecolor": "rgba(0,0,0,0)", "xaxis20.showgrid": false, "xaxis20.ticks": "", "xaxis20.title.font.size": 17.37591561675945, "xaxis20.title.standoff": 0, "xaxis20.zerolinecolor": "#8e8e8d", "xaxis20.zerolinewidth": 2, "yaxis20.automargin": true, "yaxis20.gridcolor": "#d0d0d0", "yaxis20.linecolor": "rgba(0,0,0,0)", "yaxis20.gridwidth": 0.5429973630237328, "yaxis20.ticks": "", "yaxis20.title.font.size": 17.37591561675945, "yaxis20.title.standoff": 0, "yaxis20.zerolinecolor": "#8e8e8d", "yaxis20.zerolinewidth": 2, "xaxis21.automargin": true, "xaxis21.linecolor": "rgba(0,0,0,0)", "xaxis21.showgrid": false, "xaxis21.ticks": "", "xaxis21.title.font.size": 17.37591561675945, "xaxis21.title.standoff": 0, "xaxis21.zerolinecolor": "#8e8e8d", "xaxis21.zerolinewidth": 2, "yaxis21.automargin": true, "yaxis21.gridcolor": "#d0d0d0", "yaxis21.linecolor": "rgba(0,0,0,0)", "yaxis21.gridwidth": 0.5429973630237328, "yaxis21.ticks": "", "yaxis21.title.font.size": 17.37591561675945, "yaxis21.title.standoff": 0, "yaxis21.zerolinecolor": "#8e8e8d", "yaxis21.zerolinewidth": 2, "xaxis22.automargin": true, "xaxis22.linecolor": "rgba(0,0,0,0)", "xaxis22.showgrid": false, "xaxis22.ticks": "", "xaxis22.title.font.size": 17.37591561675945, "xaxis22.title.standoff": 0, "xaxis22.zerolinecolor": "#8e8e8d", "xaxis22.zerolinewidth": 2, "yaxis22.automargin": true, "yaxis22.gridcolor": "#d0d0d0", "yaxis22.linecolor": "rgba(0,0,0,0)", "yaxis22.gridwidth": 0.5429973630237328, "yaxis22.ticks": "", "yaxis22.title.font.size": 17.37591561675945, "yaxis22.title.standoff": 0, "yaxis22.zerolinecolor": "#8e8e8d", "yaxis22.zerolinewidth": 2, "xaxis23.automargin": true, "xaxis23.linecolor": "rgba(0,0,0,0)", "xaxis23.showgrid": false, "xaxis23.ticks": "", "xaxis23.title.font.size": 17.37591561675945, "xaxis23.title.standoff": 0, "xaxis23.zerolinecolor": "#8e8e8d", "xaxis23.zerolinewidth": 2, "yaxis23.automargin": true, "yaxis23.gridcolor": "#d0d0d0", "yaxis23.linecolor": "rgba(0,0,0,0)", "yaxis23.gridwidth": 0.5429973630237328, "yaxis23.ticks": "", "yaxis23.title.font.size": 17.37591561675945, "yaxis23.title.standoff": 0, "yaxis23.zerolinecolor": "#8e8e8d", "yaxis23.zerolinewidth": 2, "xaxis24.automargin": true, "xaxis24.linecolor": "rgba(0,0,0,0)", "xaxis24.showgrid": false, "xaxis24.ticks": "", "xaxis24.title.font.size": 17.37591561675945, "xaxis24.title.standoff": 0, "xaxis24.zerolinecolor": "#8e8e8d", "xaxis24.zerolinewidth": 2, "yaxis24.automargin": true, "yaxis24.gridcolor": "#d0d0d0", "yaxis24.linecolor": "rgba(0,0,0,0)", "yaxis24.gridwidth": 0.5429973630237328, "yaxis24.ticks": "", "yaxis24.title.font.size": 17.37591561675945, "yaxis24.title.standoff": 0, "yaxis24.zerolinecolor": "#8e8e8d", "yaxis24.zerolinewidth": 2, "xaxis25.automargin": true, "xaxis25.linecolor": "rgba(0,0,0,0)", "xaxis25.showgrid": false, "xaxis25.ticks": "", "xaxis25.title.font.size": 17.37591561675945, "xaxis25.title.standoff": 0, "xaxis25.zerolinecolor": "#8e8e8d", "xaxis25.zerolinewidth": 2, "yaxis25.automargin": true, "yaxis25.gridcolor": "#d0d0d0", "yaxis25.linecolor": "rgba(0,0,0,0)", "yaxis25.gridwidth": 0.5429973630237328, "yaxis25.ticks": "", "yaxis25.title.font.size": 17.37591561675945, "yaxis25.title.standoff": 0, "yaxis25.zerolinecolor": "#8e8e8d", "yaxis25.zerolinewidth": 2, "xaxis26.automargin": true, "xaxis26.linecolor": "rgba(0,0,0,0)", "xaxis26.showgrid": false, "xaxis26.ticks": "", "xaxis26.title.font.size": 17.37591561675945, "xaxis26.title.standoff": 0, "xaxis26.zerolinecolor": "#8e8e8d", "xaxis26.zerolinewidth": 2, "yaxis26.automargin": true, "yaxis26.gridcolor": "#d0d0d0", "yaxis26.linecolor": "rgba(0,0,0,0)", "yaxis26.gridwidth": 0.5429973630237328, "yaxis26.ticks": "", "yaxis26.title.font.size": 17.37591561675945, "yaxis26.title.standoff": 0, "yaxis26.zerolinecolor": "#8e8e8d", "yaxis26.zerolinewidth": 2, "xaxis27.automargin": true, "xaxis27.linecolor": "rgba(0,0,0,0)", "xaxis27.showgrid": false, "xaxis27.ticks": "", "xaxis27.title.font.size": 17.37591561675945, "xaxis27.title.standoff": 0, "xaxis27.zerolinecolor": "#8e8e8d", "xaxis27.zerolinewidth": 2, "yaxis27.automargin": true, "yaxis27.gridcolor": "#d0d0d0", "yaxis27.linecolor": "rgba(0,0,0,0)", "yaxis27.gridwidth": 0.5429973630237328, "yaxis27.ticks": "", "yaxis27.title.font.size": 17.37591561675945, "yaxis27.title.standoff": 0, "yaxis27.zerolinecolor": "#8e8e8d", "yaxis27.zerolinewidth": 2, "xaxis28.automargin": true, "xaxis28.linecolor": "rgba(0,0,0,0)", "xaxis28.showgrid": false, "xaxis28.ticks": "", "xaxis28.title.font.size": 17.37591561675945, "xaxis28.title.standoff": 0, "xaxis28.zerolinecolor": "#8e8e8d", "xaxis28.zerolinewidth": 2, "yaxis28.automargin": true, "yaxis28.gridcolor": "#d0d0d0", "yaxis28.linecolor": "rgba(0,0,0,0)", "yaxis28.gridwidth": 0.5429973630237328, "yaxis28.ticks": "", "yaxis28.title.font.size": 17.37591561675945, "yaxis28.title.standoff": 0, "yaxis28.zerolinecolor": "#8e8e8d", "yaxis28.zerolinewidth": 2, "xaxis29.automargin": true, "xaxis29.linecolor": "rgba(0,0,0,0)", "xaxis29.showgrid": false, "xaxis29.ticks": "", "xaxis29.title.font.size": 17.37591561675945, "xaxis29.title.standoff": 0, "xaxis29.zerolinecolor": "#8e8e8d", "xaxis29.zerolinewidth": 2, "yaxis29.automargin": true, "yaxis29.gridcolor": "#d0d0d0", "yaxis29.linecolor": "rgba(0,0,0,0)", "yaxis29.gridwidth": 0.5429973630237328, "yaxis29.ticks": "", "yaxis29.title.font.size": 17.37591561675945, "yaxis29.title.standoff": 0, "yaxis29.zerolinecolor": "#8e8e8d", "yaxis29.zerolinewidth": 2}</span><span hidden="True" id="slate-template-settings">{"autotypenumbers": "strict", "colorway": ["#97CEE4", "#778663", "#6F7899", "#A7C682", "#8CA7D0", "#FAC182", "#F18872", "#bd7161"], "font.color": "#f2f5fa", "hovermode": "closest", "hoverlabel.align": "left", "paper_bgcolor": "rgba(17,17,17,0)", "plot_bgcolor": "rgb(17,17,17)", "polar.bgcolor": "rgb(17,17,17)", "polar.angularaxis.gridcolor": "#506784", "polar.angularaxis.linecolor": "#506784", "polar.angularaxis.ticks": "", "polar.radialaxis.gridcolor": "#506784", "polar.radialaxis.linecolor": "#506784", "polar.radialaxis.ticks": "", "ternary.bgcolor": "rgb(17,17,17)", "ternary.aaxis.gridcolor": "#506784", "ternary.aaxis.linecolor": "#506784", "ternary.aaxis.ticks": "", "ternary.baxis.gridcolor": "#506784", "ternary.baxis.linecolor": "#506784", "ternary.baxis.ticks": "", "ternary.caxis.gridcolor": "#506784", "ternary.caxis.linecolor": "#506784", "ternary.caxis.ticks": "", "coloraxis.colorbar.outlinewidth": 0, "coloraxis.colorbar.ticks": "", "colorscale.sequential": [[0.0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1.0, "#f0f921"]], "colorscale.sequentialminus": [[0.0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1.0, "#f0f921"]], "colorscale.diverging": [[0, "#8e0152"], [0.1, "#c51b7d"], [0.2, "#de77ae"], [0.3, "#f1b6da"], [0.4, "#fde0ef"], [0.5, "#f7f7f7"], [0.6, "#e6f5d0"], [0.7, "#b8e186"], [0.8, "#7fbc41"], [0.9, "#4d9221"], [1, "#276419"]], "xaxis.gridcolor": "#283442", "xaxis.zerolinecolor": "#283442", "xaxis.automargin": true, "xaxis.linecolor": "rgba(0,0,0,0)", "xaxis.showgrid": false, "xaxis.ticks": "", "xaxis.title.font.size": 17.37591561675945, "xaxis.title.standoff": 0, "xaxis.zerolinewidth": 2, "yaxis.gridcolor": "#283442", "yaxis.zerolinecolor": "#444466", "yaxis.automargin": true, "yaxis.linecolor": "rgba(0,0,0,0)", "yaxis.gridwidth": 0.5429973630237328, "yaxis.ticks": "", "yaxis.title.font.size": 17.37591561675945, "yaxis.title.standoff": 0, "yaxis.zerolinewidth": 2, "scene.xaxis.backgroundcolor": "rgb(17,17,17)", "scene.xaxis.gridcolor": "#506784", "scene.xaxis.linecolor": "#506784", "scene.xaxis.showbackground": true, "scene.xaxis.ticks": "", "scene.xaxis.zerolinecolor": "#C8D4E3", "scene.xaxis.gridwidth": 2, "scene.yaxis.backgroundcolor": "rgb(17,17,17)", "scene.yaxis.gridcolor": "#506784", "scene.yaxis.linecolor": "#506784", "scene.yaxis.showbackground": true, "scene.yaxis.ticks": "", "scene.yaxis.zerolinecolor": "#C8D4E3", "scene.yaxis.gridwidth": 2, "scene.zaxis.backgroundcolor": "rgb(17,17,17)", "scene.zaxis.gridcolor": "#506784", "scene.zaxis.linecolor": "#506784", "scene.zaxis.showbackground": true, "scene.zaxis.ticks": "", "scene.zaxis.zerolinecolor": "#C8D4E3", "scene.zaxis.gridwidth": 2, "shapedefaults.line.color": "#f2f5fa", "annotationdefaults.arrowcolor": "#f2f5fa", "annotationdefaults.arrowhead": 0, "annotationdefaults.arrowwidth": 1, "geo.bgcolor": "rgb(17,17,17)", "geo.landcolor": "rgb(17,17,17)", "geo.subunitcolor": "#506784", "geo.showland": true, "geo.showlakes": true, "geo.lakecolor": "rgb(17,17,17)", "title.x": 0.05, "updatemenudefaults.bgcolor": "#506784", "updatemenudefaults.borderwidth": 0, "sliderdefaults.bgcolor": "#C8D4E3", "sliderdefaults.borderwidth": 1, "sliderdefaults.bordercolor": "rgb(17,17,17)", "sliderdefaults.tickwidth": 0, "mapbox.style": "dark", "xaxis2.gridcolor": "#283442", "xaxis2.zerolinecolor": "#283442", "xaxis2.automargin": true, "xaxis2.linecolor": "rgba(0,0,0,0)", "xaxis2.showgrid": false, "xaxis2.ticks": "", "xaxis2.title.font.size": 17.37591561675945, "xaxis2.title.standoff": 0, "xaxis2.zerolinewidth": 2, "yaxis2.gridcolor": "#283442", "yaxis2.zerolinecolor": "#444466", "yaxis2.automargin": true, "yaxis2.linecolor": "rgba(0,0,0,0)", "yaxis2.gridwidth": 0.5429973630237328, "yaxis2.ticks": "", "yaxis2.title.font.size": 17.37591561675945, "yaxis2.title.standoff": 0, "yaxis2.zerolinewidth": 2, "xaxis3.gridcolor": "#283442", "xaxis3.zerolinecolor": "#283442", "xaxis3.automargin": true, "xaxis3.linecolor": "rgba(0,0,0,0)", "xaxis3.showgrid": false, "xaxis3.ticks": "", "xaxis3.title.font.size": 17.37591561675945, "xaxis3.title.standoff": 0, "xaxis3.zerolinewidth": 2, "yaxis3.gridcolor": "#283442", "yaxis3.zerolinecolor": "#444466", "yaxis3.automargin": true, "yaxis3.linecolor": "rgba(0,0,0,0)", "yaxis3.gridwidth": 0.5429973630237328, "yaxis3.ticks": "", "yaxis3.title.font.size": 17.37591561675945, "yaxis3.title.standoff": 0, "yaxis3.zerolinewidth": 2, "xaxis4.gridcolor": "#283442", "xaxis4.zerolinecolor": "#283442", "xaxis4.automargin": true, "xaxis4.linecolor": "rgba(0,0,0,0)", "xaxis4.showgrid": false, "xaxis4.ticks": "", "xaxis4.title.font.size": 17.37591561675945, "xaxis4.title.standoff": 0, "xaxis4.zerolinewidth": 2, "yaxis4.gridcolor": "#283442", "yaxis4.zerolinecolor": "#444466", "yaxis4.automargin": true, "yaxis4.linecolor": "rgba(0,0,0,0)", "yaxis4.gridwidth": 0.5429973630237328, "yaxis4.ticks": "", "yaxis4.title.font.size": 17.37591561675945, "yaxis4.title.standoff": 0, "yaxis4.zerolinewidth": 2, "xaxis5.gridcolor": "#283442", "xaxis5.zerolinecolor": "#283442", "xaxis5.automargin": true, "xaxis5.linecolor": "rgba(0,0,0,0)", "xaxis5.showgrid": false, "xaxis5.ticks": "", "xaxis5.title.font.size": 17.37591561675945, "xaxis5.title.standoff": 0, "xaxis5.zerolinewidth": 2, "yaxis5.gridcolor": "#283442", "yaxis5.zerolinecolor": "#444466", "yaxis5.automargin": true, "yaxis5.linecolor": "rgba(0,0,0,0)", "yaxis5.gridwidth": 0.5429973630237328, "yaxis5.ticks": "", "yaxis5.title.font.size": 17.37591561675945, "yaxis5.title.standoff": 0, "yaxis5.zerolinewidth": 2, "xaxis6.gridcolor": "#283442", "xaxis6.zerolinecolor": "#283442", "xaxis6.automargin": true, "xaxis6.linecolor": "rgba(0,0,0,0)", "xaxis6.showgrid": false, "xaxis6.ticks": "", "xaxis6.title.font.size": 17.37591561675945, "xaxis6.title.standoff": 0, "xaxis6.zerolinewidth": 2, "yaxis6.gridcolor": "#283442", "yaxis6.zerolinecolor": "#444466", "yaxis6.automargin": true, "yaxis6.linecolor": "rgba(0,0,0,0)", "yaxis6.gridwidth": 0.5429973630237328, "yaxis6.ticks": "", "yaxis6.title.font.size": 17.37591561675945, "yaxis6.title.standoff": 0, "yaxis6.zerolinewidth": 2, "xaxis7.gridcolor": "#283442", "xaxis7.zerolinecolor": "#283442", "xaxis7.automargin": true, "xaxis7.linecolor": "rgba(0,0,0,0)", "xaxis7.showgrid": false, "xaxis7.ticks": "", "xaxis7.title.font.size": 17.37591561675945, "xaxis7.title.standoff": 0, "xaxis7.zerolinewidth": 2, "yaxis7.gridcolor": "#283442", "yaxis7.zerolinecolor": "#444466", "yaxis7.automargin": true, "yaxis7.linecolor": "rgba(0,0,0,0)", "yaxis7.gridwidth": 0.5429973630237328, "yaxis7.ticks": "", "yaxis7.title.font.size": 17.37591561675945, "yaxis7.title.standoff": 0, "yaxis7.zerolinewidth": 2, "xaxis8.gridcolor": "#283442", "xaxis8.zerolinecolor": "#283442", "xaxis8.automargin": true, "xaxis8.linecolor": "rgba(0,0,0,0)", "xaxis8.showgrid": false, "xaxis8.ticks": "", "xaxis8.title.font.size": 17.37591561675945, "xaxis8.title.standoff": 0, "xaxis8.zerolinewidth": 2, "yaxis8.gridcolor": "#283442", "yaxis8.zerolinecolor": "#444466", "yaxis8.automargin": true, "yaxis8.linecolor": "rgba(0,0,0,0)", "yaxis8.gridwidth": 0.5429973630237328, "yaxis8.ticks": "", "yaxis8.title.font.size": 17.37591561675945, "yaxis8.title.standoff": 0, "yaxis8.zerolinewidth": 2, "xaxis9.gridcolor": "#283442", "xaxis9.zerolinecolor": "#283442", "xaxis9.automargin": true, "xaxis9.linecolor": "rgba(0,0,0,0)", "xaxis9.showgrid": false, "xaxis9.ticks": "", "xaxis9.title.font.size": 17.37591561675945, "xaxis9.title.standoff": 0, "xaxis9.zerolinewidth": 2, "yaxis9.gridcolor": "#283442", "yaxis9.zerolinecolor": "#444466", "yaxis9.automargin": true, "yaxis9.linecolor": "rgba(0,0,0,0)", "yaxis9.gridwidth": 0.5429973630237328, "yaxis9.ticks": "", "yaxis9.title.font.size": 17.37591561675945, "yaxis9.title.standoff": 0, "yaxis9.zerolinewidth": 2, "xaxis10.gridcolor": "#283442", "xaxis10.zerolinecolor": "#283442", "xaxis10.automargin": true, "xaxis10.linecolor": "rgba(0,0,0,0)", "xaxis10.showgrid": false, "xaxis10.ticks": "", "xaxis10.title.font.size": 17.37591561675945, "xaxis10.title.standoff": 0, "xaxis10.zerolinewidth": 2, "yaxis10.gridcolor": "#283442", "yaxis10.zerolinecolor": "#444466", "yaxis10.automargin": true, "yaxis10.linecolor": "rgba(0,0,0,0)", "yaxis10.gridwidth": 0.5429973630237328, "yaxis10.ticks": "", "yaxis10.title.font.size": 17.37591561675945, "yaxis10.title.standoff": 0, "yaxis10.zerolinewidth": 2, "xaxis11.gridcolor": "#283442", "xaxis11.zerolinecolor": "#283442", "xaxis11.automargin": true, "xaxis11.linecolor": "rgba(0,0,0,0)", "xaxis11.showgrid": false, "xaxis11.ticks": "", "xaxis11.title.font.size": 17.37591561675945, "xaxis11.title.standoff": 0, "xaxis11.zerolinewidth": 2, "yaxis11.gridcolor": "#283442", "yaxis11.zerolinecolor": "#444466", "yaxis11.automargin": true, "yaxis11.linecolor": "rgba(0,0,0,0)", "yaxis11.gridwidth": 0.5429973630237328, "yaxis11.ticks": "", "yaxis11.title.font.size": 17.37591561675945, "yaxis11.title.standoff": 0, "yaxis11.zerolinewidth": 2, "xaxis12.gridcolor": "#283442", "xaxis12.zerolinecolor": "#283442", "xaxis12.automargin": true, "xaxis12.linecolor": "rgba(0,0,0,0)", "xaxis12.showgrid": false, "xaxis12.ticks": "", "xaxis12.title.font.size": 17.37591561675945, "xaxis12.title.standoff": 0, "xaxis12.zerolinewidth": 2, "yaxis12.gridcolor": "#283442", "yaxis12.zerolinecolor": "#444466", "yaxis12.automargin": true, "yaxis12.linecolor": "rgba(0,0,0,0)", "yaxis12.gridwidth": 0.5429973630237328, "yaxis12.ticks": "", "yaxis12.title.font.size": 17.37591561675945, "yaxis12.title.standoff": 0, "yaxis12.zerolinewidth": 2, "xaxis13.gridcolor": "#283442", "xaxis13.zerolinecolor": "#283442", "xaxis13.automargin": true, "xaxis13.linecolor": "rgba(0,0,0,0)", "xaxis13.showgrid": false, "xaxis13.ticks": "", "xaxis13.title.font.size": 17.37591561675945, "xaxis13.title.standoff": 0, "xaxis13.zerolinewidth": 2, "yaxis13.gridcolor": "#283442", "yaxis13.zerolinecolor": "#444466", "yaxis13.automargin": true, "yaxis13.linecolor": "rgba(0,0,0,0)", "yaxis13.gridwidth": 0.5429973630237328, "yaxis13.ticks": "", "yaxis13.title.font.size": 17.37591561675945, "yaxis13.title.standoff": 0, "yaxis13.zerolinewidth": 2, "xaxis14.gridcolor": "#283442", "xaxis14.zerolinecolor": "#283442", "xaxis14.automargin": true, "xaxis14.linecolor": "rgba(0,0,0,0)", "xaxis14.showgrid": false, "xaxis14.ticks": "", "xaxis14.title.font.size": 17.37591561675945, "xaxis14.title.standoff": 0, "xaxis14.zerolinewidth": 2, "yaxis14.gridcolor": "#283442", "yaxis14.zerolinecolor": "#444466", "yaxis14.automargin": true, "yaxis14.linecolor": "rgba(0,0,0,0)", "yaxis14.gridwidth": 0.5429973630237328, "yaxis14.ticks": "", "yaxis14.title.font.size": 17.37591561675945, "yaxis14.title.standoff": 0, "yaxis14.zerolinewidth": 2, "xaxis15.gridcolor": "#283442", "xaxis15.zerolinecolor": "#283442", "xaxis15.automargin": true, "xaxis15.linecolor": "rgba(0,0,0,0)", "xaxis15.showgrid": false, "xaxis15.ticks": "", "xaxis15.title.font.size": 17.37591561675945, "xaxis15.title.standoff": 0, "xaxis15.zerolinewidth": 2, "yaxis15.gridcolor": "#283442", "yaxis15.zerolinecolor": "#444466", "yaxis15.automargin": true, "yaxis15.linecolor": "rgba(0,0,0,0)", "yaxis15.gridwidth": 0.5429973630237328, "yaxis15.ticks": "", "yaxis15.title.font.size": 17.37591561675945, "yaxis15.title.standoff": 0, "yaxis15.zerolinewidth": 2, "xaxis16.gridcolor": "#283442", "xaxis16.zerolinecolor": "#283442", "xaxis16.automargin": true, "xaxis16.linecolor": "rgba(0,0,0,0)", "xaxis16.showgrid": false, "xaxis16.ticks": "", "xaxis16.title.font.size": 17.37591561675945, "xaxis16.title.standoff": 0, "xaxis16.zerolinewidth": 2, "yaxis16.gridcolor": "#283442", "yaxis16.zerolinecolor": "#444466", "yaxis16.automargin": true, "yaxis16.linecolor": "rgba(0,0,0,0)", "yaxis16.gridwidth": 0.5429973630237328, "yaxis16.ticks": "", "yaxis16.title.font.size": 17.37591561675945, "yaxis16.title.standoff": 0, "yaxis16.zerolinewidth": 2, "xaxis17.gridcolor": "#283442", "xaxis17.zerolinecolor": "#283442", "xaxis17.automargin": true, "xaxis17.linecolor": "rgba(0,0,0,0)", "xaxis17.showgrid": false, "xaxis17.ticks": "", "xaxis17.title.font.size": 17.37591561675945, "xaxis17.title.standoff": 0, "xaxis17.zerolinewidth": 2, "yaxis17.gridcolor": "#283442", "yaxis17.zerolinecolor": "#444466", "yaxis17.automargin": true, "yaxis17.linecolor": "rgba(0,0,0,0)", "yaxis17.gridwidth": 0.5429973630237328, "yaxis17.ticks": "", "yaxis17.title.font.size": 17.37591561675945, "yaxis17.title.standoff": 0, "yaxis17.zerolinewidth": 2, "xaxis18.gridcolor": "#283442", "xaxis18.zerolinecolor": "#283442", "xaxis18.automargin": true, "xaxis18.linecolor": "rgba(0,0,0,0)", "xaxis18.showgrid": false, "xaxis18.ticks": "", "xaxis18.title.font.size": 17.37591561675945, "xaxis18.title.standoff": 0, "xaxis18.zerolinewidth": 2, "yaxis18.gridcolor": "#283442", "yaxis18.zerolinecolor": "#444466", "yaxis18.automargin": true, "yaxis18.linecolor": "rgba(0,0,0,0)", "yaxis18.gridwidth": 0.5429973630237328, "yaxis18.ticks": "", "yaxis18.title.font.size": 17.37591561675945, "yaxis18.title.standoff": 0, "yaxis18.zerolinewidth": 2, "xaxis19.gridcolor": "#283442", "xaxis19.zerolinecolor": "#283442", "xaxis19.automargin": true, "xaxis19.linecolor": "rgba(0,0,0,0)", "xaxis19.showgrid": false, "xaxis19.ticks": "", "xaxis19.title.font.size": 17.37591561675945, "xaxis19.title.standoff": 0, "xaxis19.zerolinewidth": 2, "yaxis19.gridcolor": "#283442", "yaxis19.zerolinecolor": "#444466", "yaxis19.automargin": true, "yaxis19.linecolor": "rgba(0,0,0,0)", "yaxis19.gridwidth": 0.5429973630237328, "yaxis19.ticks": "", "yaxis19.title.font.size": 17.37591561675945, "yaxis19.title.standoff": 0, "yaxis19.zerolinewidth": 2, "xaxis20.gridcolor": "#283442", "xaxis20.zerolinecolor": "#283442", "xaxis20.automargin": true, "xaxis20.linecolor": "rgba(0,0,0,0)", "xaxis20.showgrid": false, "xaxis20.ticks": "", "xaxis20.title.font.size": 17.37591561675945, "xaxis20.title.standoff": 0, "xaxis20.zerolinewidth": 2, "yaxis20.gridcolor": "#283442", "yaxis20.zerolinecolor": "#444466", "yaxis20.automargin": true, "yaxis20.linecolor": "rgba(0,0,0,0)", "yaxis20.gridwidth": 0.5429973630237328, "yaxis20.ticks": "", "yaxis20.title.font.size": 17.37591561675945, "yaxis20.title.standoff": 0, "yaxis20.zerolinewidth": 2, "xaxis21.gridcolor": "#283442", "xaxis21.zerolinecolor": "#283442", "xaxis21.automargin": true, "xaxis21.linecolor": "rgba(0,0,0,0)", "xaxis21.showgrid": false, "xaxis21.ticks": "", "xaxis21.title.font.size": 17.37591561675945, "xaxis21.title.standoff": 0, "xaxis21.zerolinewidth": 2, "yaxis21.gridcolor": "#283442", "yaxis21.zerolinecolor": "#444466", "yaxis21.automargin": true, "yaxis21.linecolor": "rgba(0,0,0,0)", "yaxis21.gridwidth": 0.5429973630237328, "yaxis21.ticks": "", "yaxis21.title.font.size": 17.37591561675945, "yaxis21.title.standoff": 0, "yaxis21.zerolinewidth": 2, "xaxis22.gridcolor": "#283442", "xaxis22.zerolinecolor": "#283442", "xaxis22.automargin": true, "xaxis22.linecolor": "rgba(0,0,0,0)", "xaxis22.showgrid": false, "xaxis22.ticks": "", "xaxis22.title.font.size": 17.37591561675945, "xaxis22.title.standoff": 0, "xaxis22.zerolinewidth": 2, "yaxis22.gridcolor": "#283442", "yaxis22.zerolinecolor": "#444466", "yaxis22.automargin": true, "yaxis22.linecolor": "rgba(0,0,0,0)", "yaxis22.gridwidth": 0.5429973630237328, "yaxis22.ticks": "", "yaxis22.title.font.size": 17.37591561675945, "yaxis22.title.standoff": 0, "yaxis22.zerolinewidth": 2, "xaxis23.gridcolor": "#283442", "xaxis23.zerolinecolor": "#283442", "xaxis23.automargin": true, "xaxis23.linecolor": "rgba(0,0,0,0)", "xaxis23.showgrid": false, "xaxis23.ticks": "", "xaxis23.title.font.size": 17.37591561675945, "xaxis23.title.standoff": 0, "xaxis23.zerolinewidth": 2, "yaxis23.gridcolor": "#283442", "yaxis23.zerolinecolor": "#444466", "yaxis23.automargin": true, "yaxis23.linecolor": "rgba(0,0,0,0)", "yaxis23.gridwidth": 0.5429973630237328, "yaxis23.ticks": "", "yaxis23.title.font.size": 17.37591561675945, "yaxis23.title.standoff": 0, "yaxis23.zerolinewidth": 2, "xaxis24.gridcolor": "#283442", "xaxis24.zerolinecolor": "#283442", "xaxis24.automargin": true, "xaxis24.linecolor": "rgba(0,0,0,0)", "xaxis24.showgrid": false, "xaxis24.ticks": "", "xaxis24.title.font.size": 17.37591561675945, "xaxis24.title.standoff": 0, "xaxis24.zerolinewidth": 2, "yaxis24.gridcolor": "#283442", "yaxis24.zerolinecolor": "#444466", "yaxis24.automargin": true, "yaxis24.linecolor": "rgba(0,0,0,0)", "yaxis24.gridwidth": 0.5429973630237328, "yaxis24.ticks": "", "yaxis24.title.font.size": 17.37591561675945, "yaxis24.title.standoff": 0, "yaxis24.zerolinewidth": 2, "xaxis25.gridcolor": "#283442", "xaxis25.zerolinecolor": "#283442", "xaxis25.automargin": true, "xaxis25.linecolor": "rgba(0,0,0,0)", "xaxis25.showgrid": false, "xaxis25.ticks": "", "xaxis25.title.font.size": 17.37591561675945, "xaxis25.title.standoff": 0, "xaxis25.zerolinewidth": 2, "yaxis25.gridcolor": "#283442", "yaxis25.zerolinecolor": "#444466", "yaxis25.automargin": true, "yaxis25.linecolor": "rgba(0,0,0,0)", "yaxis25.gridwidth": 0.5429973630237328, "yaxis25.ticks": "", "yaxis25.title.font.size": 17.37591561675945, "yaxis25.title.standoff": 0, "yaxis25.zerolinewidth": 2, "xaxis26.gridcolor": "#283442", "xaxis26.zerolinecolor": "#283442", "xaxis26.automargin": true, "xaxis26.linecolor": "rgba(0,0,0,0)", "xaxis26.showgrid": false, "xaxis26.ticks": "", "xaxis26.title.font.size": 17.37591561675945, "xaxis26.title.standoff": 0, "xaxis26.zerolinewidth": 2, "yaxis26.gridcolor": "#283442", "yaxis26.zerolinecolor": "#444466", "yaxis26.automargin": true, "yaxis26.linecolor": "rgba(0,0,0,0)", "yaxis26.gridwidth": 0.5429973630237328, "yaxis26.ticks": "", "yaxis26.title.font.size": 17.37591561675945, "yaxis26.title.standoff": 0, "yaxis26.zerolinewidth": 2, "xaxis27.gridcolor": "#283442", "xaxis27.zerolinecolor": "#283442", "xaxis27.automargin": true, "xaxis27.linecolor": "rgba(0,0,0,0)", "xaxis27.showgrid": false, "xaxis27.ticks": "", "xaxis27.title.font.size": 17.37591561675945, "xaxis27.title.standoff": 0, "xaxis27.zerolinewidth": 2, "yaxis27.gridcolor": "#283442", "yaxis27.zerolinecolor": "#444466", "yaxis27.automargin": true, "yaxis27.linecolor": "rgba(0,0,0,0)", "yaxis27.gridwidth": 0.5429973630237328, "yaxis27.ticks": "", "yaxis27.title.font.size": 17.37591561675945, "yaxis27.title.standoff": 0, "yaxis27.zerolinewidth": 2, "xaxis28.gridcolor": "#283442", "xaxis28.zerolinecolor": "#283442", "xaxis28.automargin": true, "xaxis28.linecolor": "rgba(0,0,0,0)", "xaxis28.showgrid": false, "xaxis28.ticks": "", "xaxis28.title.font.size": 17.37591561675945, "xaxis28.title.standoff": 0, "xaxis28.zerolinewidth": 2, "yaxis28.gridcolor": "#283442", "yaxis28.zerolinecolor": "#444466", "yaxis28.automargin": true, "yaxis28.linecolor": "rgba(0,0,0,0)", "yaxis28.gridwidth": 0.5429973630237328, "yaxis28.ticks": "", "yaxis28.title.font.size": 17.37591561675945, "yaxis28.title.standoff": 0, "yaxis28.zerolinewidth": 2, "xaxis29.gridcolor": "#283442", "xaxis29.zerolinecolor": "#283442", "xaxis29.automargin": true, "xaxis29.linecolor": "rgba(0,0,0,0)", "xaxis29.showgrid": false, "xaxis29.ticks": "", "xaxis29.title.font.size": 17.37591561675945, "xaxis29.title.standoff": 0, "xaxis29.zerolinewidth": 2, "yaxis29.gridcolor": "#283442", "yaxis29.zerolinecolor": "#444466", "yaxis29.automargin": true, "yaxis29.linecolor": "rgba(0,0,0,0)", "yaxis29.gridwidth": 0.5429973630237328, "yaxis29.ticks": "", "yaxis29.title.font.size": 17.37591561675945, "yaxis29.title.standoff": 0, "yaxis29.zerolinewidth": 2}</span><script src="../../assets/javascripts/mkdocs-plotly-plugin.js"></script><script>document$.subscribe(() => {const lightbox = GLightbox({"touchNavigation": true, "loop": false, "zoomable": true, "draggable": true, "openEffect": "zoom", "closeEffect": "zoom", "slideEffect": "slide"});})</script></body>
 </html>
