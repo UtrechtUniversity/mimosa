@@ -30,6 +30,14 @@ Climate impacts in MIMOSA are calculated using the [COACCH](https://www.coacch.e
     ```
     </div>
 
+=== "Combined SLR and non-SLR damages"
+
+    <div style="overflow: scroll;" markdown>
+    ``` plotly
+    {"file_path": "./assets/plots/coacch_all_curves_combined.json"}
+    ```
+    </div>
+
 ## Impact sectors used in the damage functions
 
 | Climate change impact area | Model source | Variable used in CGE |
