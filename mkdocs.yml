@@ -77,6 +77,7 @@ plugins:
   - open-in-new-tab
   - plotly:
       template_default: assets/plots/template.json
+      template_slate: assets/plots/template_slate.json
   - glightbox
 
 markdown_extensions:
