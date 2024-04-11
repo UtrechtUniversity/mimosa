@@ -19,19 +19,41 @@ from mimosa.common import (
 
 
 def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
-    """Damage and adaptation costs equations and constraints
-    (COACCH specification)
+    """
+    The COACCH damage functions are split in two parts: temperature-dependent damages (non-SLR, as a function
+    of global mean temperature above pre-industrial), and sea-level rise damages (SLR, as function of global mean
+    sea-level rise in meters).
 
-    Necessary variables:
-        m.damage_costs (sum of residual damages and adaptation costs multiplied by gross GDP)
+    ## Temperature-dependent damages
 
-    Returns:
-        list of constraints (any of:
-           - GlobalConstraint
-           - GlobalInitConstraint
-           - RegionalConstraint
-           - RegionalInitConstraint
-        )
+    The temperature-dependent damages are modeled as a quadratic damage function $D(\\cdot)$ of global mean temperature:
+
+    $$
+    D(x; b_1, b_2) = b_1 \\cdot x + b_2 \\cdot x^2.
+    $$
+
+    To calculate the damages, three transformations have to be taken from the above quadratic equation:
+
+    * The COACCH damage functions were created as function of temperature relative to 1986-2005, which is 0.6°C above pre-industrial.
+        For this reason, the temperature is shifted by 0.6°C.
+    * The damages are scaled by a factor $a_{q,r}$, which depends on the quantile $q$ of the damage function. For
+        median damages, this factor is $a_{0.5,r} = 1$. The quantile can be set using the [damage quantile parameter](../parameters.md#economics.damages.quantile).
+    * Since we assume that until 2020 the climate damages are already incorporated in the baseline GDP,
+        we subtract the damages of the initial time period $t=0$.
+
+    Combining these three transformations, the damages are calculated as:
+
+    $$
+    \\text{damages}_{\\text{non-SLR},t,r} = a_{q,r} \\cdot \\big( D(\\text{temperature}_t - 0.6; b_{1,r}, b_{2,r}) -  D(T_0 - 0.6; b_{1,r}, b_{2,r}) \\big).
+    $$
+
+    All the damage coefficients are region-dependent (see [Damage functions and coefficients](./#damage-functions-and-coefficients)).
+    The
+
+    ## Sea-level rise damages
+
+    ...
+
     """
     constraints = []
 

@@ -3,40 +3,47 @@
 Climate impacts in MIMOSA are calculated using the [COACCH](https://www.coacch.eu/) damage functions, developed in 2023
 (see [van der Wijst et al., 2023](https://doi.org/10.1038/s41558-023-01636-1)).
 
-## Regional damage functions
+:::mimosa.components.damages.coacch.get_constraints
 
 
-=== "Non-SLR damages"
+## Damage functions and coefficients
 
-    <div style="overflow: scroll;" markdown>
-    ``` plotly
-    {"file_path": "./assets/plots/coacch_all_curves_noslr.json"}
-    ```
-    </div>
+??? info "Visualisation of damage functions and damage coefficients"
 
-=== "SLR damages (optimal adaptation)"
 
-    <div style="overflow: scroll;" markdown>
-    ``` plotly
-    {"file_path": "./assets/plots/coacch_all_curves_slr_ad.json"}
-    ```
-    </div>
+    [:material-download: Download COACCH damage function coefficients](../assets/data/COACCH_damage_function_coefficients_IMAGE_regions.xlsx){.md-button}
 
-=== "SLR damages (no adaptation)"
+    === "Non-SLR damages"
 
-    <div style="overflow: scroll;" markdown>
-    ``` plotly
-    {"file_path": "./assets/plots/coacch_all_curves_slr_noad.json"}
-    ```
-    </div>
+        <div style="overflow: scroll;" markdown>
+        ``` plotly
+        {"file_path": "./assets/plots/coacch_all_curves_noslr.json"}
+        ```
+        </div>
 
-=== "Combined SLR and non-SLR damages"
+    === "SLR damages (optimal adaptation)"
 
-    <div style="overflow: scroll;" markdown>
-    ``` plotly
-    {"file_path": "./assets/plots/coacch_all_curves_combined.json"}
-    ```
-    </div>
+        <div style="overflow: scroll;" markdown>
+        ``` plotly
+        {"file_path": "./assets/plots/coacch_all_curves_slr_ad.json"}
+        ```
+        </div>
+
+    === "SLR damages (no adaptation)"
+
+        <div style="overflow: scroll;" markdown>
+        ``` plotly
+        {"file_path": "./assets/plots/coacch_all_curves_slr_noad.json"}
+        ```
+        </div>
+
+    === "Combined SLR and non-SLR damages"
+
+        <div style="overflow: scroll;" markdown>
+        ``` plotly
+        {"file_path": "./assets/plots/coacch_all_curves_combined.json"}
+        ```
+        </div>
 
 ## Impact sectors used in the damage functions
 
