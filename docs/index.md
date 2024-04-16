@@ -1,4 +1,4 @@
-![image](assets/logo.svg)
+<img src="assets/logos/MIMOSA.svg" width=350 />
 # MIMOSA: Mathematical Integrated Model for Optimal and Stylised Assessment
 
 
