@@ -49,8 +49,8 @@ theme:
       toggle:
         icon: material/brightness-4
         name: Switch to system preference
-  favicon: assets/circle_logo.svg
-  logo: assets/circle_logo.svg
+  favicon: assets/logos/favicon.svg
+  logo: assets/logos/circle_logo.svg
   features:
     - content.code.copy
     - content.code.annotate
