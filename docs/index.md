@@ -1,4 +1,4 @@
-<img src="assets/logos/MIMOSA.svg" width=350 />
+![](assets/logos/MIMOSA.svg){.off-glb}
 # MIMOSA: Integrated Assessment Model for Cost-Benefit Analysis
 
 
