@@ -36,8 +36,8 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
 
     * The COACCH damage functions were created as function of temperature relative to 1986-2005, which is 0.6°C above pre-industrial.
         For this reason, the temperature is shifted by 0.6°C.
-    * The damages are scaled by a factor $a_{q,r}$, which depends on the quantile $q$ of the damage function. For
-        median damages, this factor is $a_{0.5,r} = 1$. The quantile can be set using the [damage quantile parameter](../parameters.md#economics.damages.quantile).
+    * The damages are scaled by a factor $a_{q,r}$, which depends on the quantile $q$ of the damage function. This represents the uncertainty
+        in the damage function. For median damages, this factor is $a_{0.5,r} = 1$. The quantile can be set using the [damage quantile parameter](../parameters.md#economics.damages.quantile).
     * Since we assume that until 2020 the climate damages are already incorporated in the baseline GDP,
         we subtract the damages of the initial time period $t=0$.
 
@@ -48,7 +48,12 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     $$
 
     All the damage coefficients are region-dependent (see [Damage functions and coefficients](./#damage-functions-and-coefficients)).
-    The
+
+    ### Temperature-dependent damages aggregated to the world, and comparison with the literature:
+
+    ``` plotly
+    {"file_path": "./assets/plots/coacch_literature_comparison.json"}
+    ```
 
     ## Sea-level rise damages
 
