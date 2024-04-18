@@ -22,7 +22,7 @@
     }
     @media (prefers-color-scheme: light) {
     #middle-lines {
-    stroke:#bcd278;
+    stroke:#536028;
     }
     }
   </style>
