@@ -146,7 +146,7 @@ fig_baseline_emissions = px.line(
 )
 
 fig_baseline_emissions.update_layout(
-    legend={"orientation": "h", "y": -1.05, "x": 0.5, "xanchor": "center"},
+    legend={"orientation": "h", "x": 0.5, "xanchor": "center"},
     margin={"r": 30, "t": 30, "l": 50},
 )
 (
