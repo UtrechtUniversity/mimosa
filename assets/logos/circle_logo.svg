@@ -13,17 +13,20 @@
      id="defs21449" />
      <style>
     #middle-lines {
-    stroke:#89a041;
+      stroke:#89a041;
+    }
+    #middle-circle {
+      fill: #fff;
     }
     @media (prefers-color-scheme: dark) {
-    #middle-lines {
-    stroke:#89a041;
-    }
+      #middle-lines {
+         stroke:#89a041;
+      }
     }
     @media (prefers-color-scheme: light) {
-    #middle-lines {
-    stroke:#536028;
-    }
+      #middle-lines {
+         stroke:#536028;
+      }
     }
   </style>
   <g
@@ -171,8 +174,8 @@
            transform="rotate(-30)" />
       </g>
       <circle
-         style="opacity:1;fill:#fcfbfa;fill-opacity:1;stroke:none;stroke-width:1.065;stroke-linecap:round;stroke-dasharray:none;stroke-opacity:1"
-         id="path12749-4"
+         style="opacity:1;fill-opacity:1;stroke:none;stroke-width:1.065;stroke-linecap:round;stroke-dasharray:none;stroke-opacity:1"
+         id="middle-circle"
          cx="109.80208"
          cy="124.35416"
          r="0.81409198" />
