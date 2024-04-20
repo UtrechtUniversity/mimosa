@@ -141,7 +141,6 @@ class InstantiatedModel:
             "t": V(range(num_years)),
             "year2100": V(year2100),
             "regions": V(params["regions"].keys()),
-            "fixed_adaptation": V(params["economics"]["adaptation"]["fixed"]),
         }
 
         parameter_mapping.update(parameter_mapping_manual)

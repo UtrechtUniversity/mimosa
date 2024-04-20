@@ -57,8 +57,12 @@ def check_obsolete_params(user_yaml, parsed_params, parser_tree):
         raise RuntimeWarning("Some config parameters are obsolete.")
 
 
+def load_default_yaml():
+    return load_yaml("config_default.yaml")
+
+
 def check_params(input_params, return_parser_tree=False):
-    default_yaml = load_yaml("config_default.yaml")
+    default_yaml = load_default_yaml()
 
     parsed_params, params_parser_tree = parse_params(
         default_yaml, input_params, return_parser_tree=True

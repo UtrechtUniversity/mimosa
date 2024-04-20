@@ -12,7 +12,7 @@ setup(
     author="Kaj-Ivar van der Wijst",
     author_email="k.i.vanderwijst@gmail.com",
     packages=["mimosa"],
-    url="https://kvanderwijst.github.io/MIMOSA/",
+    url="https://utrechtuniversity.github.io/mimosa/",
     license=license_txt,
     description="MIMOSA: Integrated Assessment Model for Cost-Benefit Analysis",
     long_description=description,

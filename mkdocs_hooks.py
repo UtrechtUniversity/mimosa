@@ -1,10 +1,17 @@
 import re
+import yaml
 import sys, os
 
 sys.path.insert(0, os.path.dirname(__file__))
 
 from mimosa import MIMOSA
-from mimosa.common.config.parseconfig import get_nested, check_params
+from mimosa.common.config.parseconfig import (
+    get_nested,
+    check_params,
+    flatten,
+    load_default_yaml,
+)
+from mimosa.common.config.utils.parsers import PARSER_FACTORY
 
 # Get the default parameters and the parser tree
 params, parser_tree = check_params({}, return_parser_tree=True)
@@ -13,7 +20,9 @@ params, parser_tree = check_params({}, return_parser_tree=True)
 model = MIMOSA(params).concrete_model
 
 
-def on_page_markdown(markdown, **kwargs):
+def markdown_parse_param_reference(markdown):
+    """Replace the string "{params::reference} with the list of parameters"""
+
     # Check if markdown has parameter reference
     check_str = "{params::reference}"
     if check_str not in markdown:
@@ -21,12 +30,81 @@ def on_page_markdown(markdown, **kwargs):
 
     # Build the parameter reference
     reference_markdown = recursive_param_print(parser_tree, "", [], "")
-    # for key, parser in parser_tree.items():
-    #     reference_markdown += f"## {key}\n"
-    #     # reference_markdown += f"{parser.to_string()}\n\n"
 
     # Replace the reference in the markdown
     markdown = markdown.replace(check_str, reference_markdown)
+
+    return markdown
+
+
+def markdown_parse_parser_types(markdown):
+    # Check if markdown has parameter reference
+    check_str = "{parsers::types}"
+    if check_str not in markdown:
+        return markdown
+
+    parser_types_markdown = """
+??? info "Parser types"
+
+"""
+
+    flattened_parser_tree = flatten(parser_tree)
+    default_yaml = load_default_yaml()
+
+    for parser_type, parser in PARSER_FACTORY.parsers.items():
+        parser_doc = parser.__doc__.replace("\n", f"\n    ")
+        parser_types_markdown += f"""
+    ??? parameter "{parser_type}"
+        <div id="parser-{parser_type}" markdown class="param_anchor">
+
+    {parser_doc}
+        """
+        # Get an example: first of this type
+        example_key = None
+        for key, value in flattened_parser_tree.items():
+            if value.type == parser_type:
+                example_key = key
+                break
+        if example_key is not None:
+            indent = "        "
+            keys = example_key.split(" - ")
+            keys_yaml = "".join(
+                [
+                    (
+                        (k + f":\n{indent}" + ("  ") * (i + 1))
+                        if i < len(keys) - 1
+                        else f"{k}:"
+                    )
+                    for i, k in enumerate(keys)
+                ]
+            )
+            example_value = get_nested(default_yaml, keys)
+            example_value_yaml = str(
+                "\n" + yaml.dump(example_value, default_flow_style=False)
+            ).replace("\n", f"\n{indent}" + "  " * len(keys))
+
+            n = len(keys_yaml.split("\n"))
+            m = len(example_value_yaml.split("\n"))
+            highlight_lines = " ".join([str(i) for i in range(n + 1, n + m)])
+            parser_types_markdown += f"""
+        Example usage:
+
+        ```yaml hl_lines="{highlight_lines}"
+
+        {keys_yaml}{example_value_yaml}
+
+        ```
+        </div>
+        """
+
+    markdown = markdown.replace(check_str, parser_types_markdown)
+    return markdown
+
+
+def on_page_markdown(markdown, **kwargs):
+
+    markdown = markdown_parse_param_reference(markdown)
+    markdown = markdown_parse_parser_types(markdown)
 
     return markdown
 

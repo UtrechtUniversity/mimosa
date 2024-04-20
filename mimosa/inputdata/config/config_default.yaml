@@ -226,22 +226,6 @@ economics:
       type: bool
       default: False
 
-  adaptation:
-    curr_level:
-      descr: When adaptation level is fixed, keep it at this level (Only used for AD-RICE2010)
-      type: float
-      min: 0
-      max: 1
-      default: 0
-
-    fixed:
-      descr: >-
-        Flag to keep adaptation at fixed value (curr_level).
-        (Only used for AD-RICE2010)
-        If false: the adaptation level is endogenously optimised.
-      type: bool
-      default: False
-
 ##################
 
 emissions:

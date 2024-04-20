@@ -98,6 +98,10 @@ class GeneralParser(ABC):
 
 
 class StringParser(GeneralParser):
+    """
+    String value
+    """
+
     def parse(self, value):
         if self.check_false(value):
             return False
@@ -105,6 +109,10 @@ class StringParser(GeneralParser):
 
 
 class StringOrPlainDictParser(GeneralParser):
+    """
+    Either a string or a dictionary. The keys/values of the dictionary are not checked or parsed separately.
+    """
+
     def parse(self, value):
         if self.check_false(value):
             return False
@@ -116,6 +124,10 @@ class StringOrPlainDictParser(GeneralParser):
 
 
 class FilepathParser(GeneralParser):
+    """
+    Filepath value. Currently exactly the same as the string type.
+    """
+
     def parse(self, value):
         if self.check_false(value):
             return False
@@ -124,6 +136,10 @@ class FilepathParser(GeneralParser):
 
 
 class BoolParser(GeneralParser):
+    """
+    Boolean value (true or false).
+    """
+
     def parse(self, value):
         if self.check_false(value):
             return False
@@ -174,18 +190,44 @@ class NumParser(GeneralParser):
 
 
 class FloatParser(NumParser):
+    """
+    Numerical value (float)
+
+    Extra properties:
+
+    * `min`: lower bound of parameter (default: -inf)
+    * `max`: upper bound of parameter (default: +inf)
+    """
+
     @property
     def num_type_fct(self):
         return float
 
 
 class IntParser(NumParser):
+    """
+    Numerical value (integer)
+
+    Extra properties:
+
+    * `min`: lower bound of parameter (default: -inf)
+    * `max`: upper bound of parameter (default: +inf)
+    """
+
     @property
     def num_type_fct(self):
         return int
 
 
 class EnumParser(GeneralParser):
+    """
+    Enum (discrete list of options)
+
+    Extra properties:
+
+    * `values`: list of allowed values
+    """
+
     def __init__(self, node, *args, **kwargs):
         GeneralParser.__init__(self, node, *args, **kwargs)
         self.allowed_values = node["values"]
@@ -208,6 +250,19 @@ class EnumParser(GeneralParser):
 
 
 class QuantityParser(GeneralParser):
+    """
+    Quantity (value with unit). The provided value will be converted to the `unit`, if possible.
+
+    For example, if the `unit` of a parameter is GtCO2, and the parameter value provided by the user
+    is "1000 MtCO2", the value will be converted automatically to "1 GtCO2". The value passed to MIMOSA will
+    therefore be 1, and not 1000. If the user provides "1000 US$", MIMOSA will raise an exception, as this
+    cannot be converted to GtCO2.
+
+    Extra properties:
+
+    * `unit`: Unit of the quantity
+    """
+
     def __init__(self, node, quant: Quantity, *args, **kwargs):
         GeneralParser.__init__(self, node, *args, **kwargs)
         self.unit = node["unit"]
@@ -236,6 +291,14 @@ class QuantityParser(GeneralParser):
 
 
 class ListParser(GeneralParser):
+    """
+    List of values. The values are also parsed individually, depending on the parser type given in the property `values`.
+
+    Extra properties:
+
+    * `values`: parser information for the values. For example, the values can be int, float, values with units, etc.
+    """
+
     def __init__(self, node, quant, *args, **kwargs):
         GeneralParser.__init__(self, node, quant, *args, **kwargs)
         self.values_parser = (
@@ -246,6 +309,7 @@ class ListParser(GeneralParser):
 
     @staticmethod
     def parse_if_not_none(parser: GeneralParser, value):
+        """If the value is None, simply None is returned. Otherwise each value of the list is parsed."""
         return parser.parse(value) if parser is not None else value
 
     def parse(self, value):
@@ -263,6 +327,15 @@ class ListParser(GeneralParser):
 
 
 class DictParser(ListParser):
+    """
+    Dictionary with keys and values. The values are also parsed individually, depending on the parser type given in the property `values`.
+
+    Extra properties:
+
+    * `values`: parser information for the values. For example, the values can be int, float, values with units, etc.
+    * `keys`: parser information for the keys
+    """
+
     def __init__(self, node, quant, *args, **kwargs):
         ListParser.__init__(self, node, quant, *args, **kwargs)
         # DictParser has an extra keys-parser compared to ListParser
@@ -290,28 +363,29 @@ class DictParser(ListParser):
 
 class ParserFactory:
     def __init__(self):
-        self._parsers = {}
+        self.parsers = {}
 
     def register_parser(self, typename: str, parser: GeneralParser):
-        self._parsers[typename] = parser
+        parser.type = typename
+        self.parsers[typename] = parser
 
     def create_parser(self, node: dict, quant: Quantity) -> GeneralParser:
         typename = node["type"]
         try:
-            parser = self._parsers[typename]
+            parser = self.parsers[typename]
         except KeyError:
             raise KeyError("Cannot find parser of type {}".format(typename))
         return parser(node, quant)
 
 
 PARSER_FACTORY = ParserFactory()
-PARSER_FACTORY.register_parser("str", StringParser)
-PARSER_FACTORY.register_parser("str_or_plain_dict", StringOrPlainDictParser)
-PARSER_FACTORY.register_parser("filepath", FilepathParser)
-PARSER_FACTORY.register_parser("bool", BoolParser)
-PARSER_FACTORY.register_parser("int", IntParser)
 PARSER_FACTORY.register_parser("float", FloatParser)
+PARSER_FACTORY.register_parser("int", IntParser)
+PARSER_FACTORY.register_parser("bool", BoolParser)
+PARSER_FACTORY.register_parser("str", StringParser)
 PARSER_FACTORY.register_parser("enum", EnumParser)
 PARSER_FACTORY.register_parser("quantity", QuantityParser)
 PARSER_FACTORY.register_parser("list", ListParser)
 PARSER_FACTORY.register_parser("dict", DictParser)
+PARSER_FACTORY.register_parser("filepath", FilepathParser)
+PARSER_FACTORY.register_parser("str_or_plain_dict", StringOrPlainDictParser)
