@@ -1,3 +1,5 @@
+# Extending MIMOSA
+
 ## Forking MIMOSA from GitHub
 
 ## General form of the model

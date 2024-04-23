@@ -1,3 +1,5 @@
+# Documentation of model components
+
 The MIMOSA model consists of several sub-modules, called model components. Each component is made up of multiple variables (global or regional), parameters and equations (called constraints).
 
 <div class="grid cards" markdown>
