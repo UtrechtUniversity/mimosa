@@ -85,7 +85,12 @@ def create_abstract_model(
         doc="timeandregional::GDP",
         units=quant.unit("currency_unit"),
     )
-    m.carbon_intensity = lambda year, region: None
+    m.baseline_carbon_intensity = Param(
+        m.t,
+        m.regions,
+        doc="timeandregional::carbon_intensity",
+        units=quant.unit("emissionsrate_unit/currency_unit"),
+    )
 
     def baseline_cumulative(year_start, year_end, region):
         years = np.linspace(year_start, year_end, 100)

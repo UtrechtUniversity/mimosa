@@ -37,9 +37,6 @@ class InstantiatedModel:
         # The data functions need to be changed in the abstract model
         # before initialization.
         self.abstract_model.baseline_emissions = self.data_store.data_object("baseline")
-        self.abstract_model.carbon_intensity = self.data_store.data_object(
-            "carbon_intensity"
-        )
 
     def create_instance(self):
         return self.abstract_model.create_instance(self.instance_data)

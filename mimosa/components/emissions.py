@@ -113,7 +113,7 @@ def _get_emissions_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
 
 
     ## Parameters defined in this module
-    - param::baseline_carbon_intensity
+    - param::use_carbon_intensity_for_baseline
     - param::cumulative_emissions_trapz
 
     [^1]: The effect of other greenhouse gases is implicitly accounted for in the TCRE which
@@ -130,7 +130,9 @@ def _get_emissions_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
         initialize=lambda m, t, r: m.baseline_emissions(m.year(t), r),
         units=quant.unit("emissionsrate_unit"),
     )
-    m.baseline_carbon_intensity = Param(doc="::emissions.baseline carbon intensity")
+    m.use_carbon_intensity_for_baseline = Param(
+        doc="::emissions.baseline carbon intensity"
+    )
 
     m.relative_abatement = Var(
         m.t,
@@ -154,9 +156,9 @@ def _get_emissions_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
                 lambda m, t, r: (
                     (
                         m.baseline[t, r]
-                        == m.carbon_intensity(m.year(t), r) * m.GDP_net[t, r]
+                        == m.baseline_carbon_intensity[t, r] * m.GDP_net[t, r]
                     )
-                    if value(m.baseline_carbon_intensity)
+                    if value(m.use_carbon_intensity_for_baseline)
                     else (m.baseline[t, r] == m.baseline_emissions(m.year(t), r))
                 ),
                 name="baseline_emissions",
@@ -168,7 +170,7 @@ def _get_emissions_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
                     == (1 - m.relative_abatement[t, r])
                     * (
                         m.baseline[t, r]
-                        if value(m.baseline_carbon_intensity)
+                        if value(m.use_carbon_intensity_for_baseline)
                         else m.baseline_emissions(m.year(t), r)
                         # Note: this should simply be m.baseline[t,r], but this is numerically less stable
                         # than m.baseline_emissions(m.year(t), r) whenever baseline intensity
