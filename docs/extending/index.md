@@ -6,7 +6,7 @@
 
 MIMOSA is built as a [Pyomo](https://www.pyomo.org/) model: an open-source Python package optimisation modelling language. 
 Pyomo models consist of a combination of variables, constraints and parameters. The constraints link together the variables
-in the form of (optionally) non-linear equations. One variable is defined as the optimisation objective: in MIMOSA's case, 
+in the form of (non-linear) equations. One variable is defined as the optimisation objective: in MIMOSA's case, 
 the net present value of the global welfare. Pyomo translates the combination of variables, constraints and parameters to
 a form suitable for an external solver. The solver maximises the objective variable, while trying to fulfill all the 
 constraints.
@@ -22,7 +22,7 @@ m = AbstractModel()
 
 This model will always be referred to as `m`.
 
-???+ info "A note about file structure"
+!!! info "A note about file structure"
 
     After forking and cloning MIMOSA to your computer, you will find a file structure that looks like this:
 
