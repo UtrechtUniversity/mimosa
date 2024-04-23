@@ -47,14 +47,14 @@ This model will always be referred to as `m`.
     ```
     
     1.  All the model components are tied together in this file
-    2.  The different components discussed in the [Model documentation](../components/general.md) pages are defined in the
+    2.  The different components discussed in the [Model documentation](../components/index.md) pages are defined in the
         Python files in this folder
     3.  All parameters types and default values are defined in this file
     4.  Example of a basic model run. Place your run files here, such that the mimosa package from this folder is used,
         and not a version previously installed through `pip install mimosa`.
 
     The different components discussed in the
-    [Model documentation](../components/general.md) pages are defined in the Python files in the folder
+    [Model documentation](../components/index.md) pages are defined in the Python files in the folder
     [`mimosa/components`]({{config.repo_url}}/tree/master/mimosa/components). All these modules are tied
     together in the file [`mimosa/abstract_model.py`]({{config.repo_url}}/blob/master/mimosa/abstract_model.py).
 

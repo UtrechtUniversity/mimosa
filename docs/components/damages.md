@@ -1,4 +1,4 @@
-[:octicons-arrow-left-24: Back to general structure](general.md)
+[:octicons-arrow-left-24: Back to general structure](index.md)
 
 Climate impacts in MIMOSA are calculated using the [COACCH](https://www.coacch.eu/) damage functions, developed in 2023
 (see [van der Wijst et al., 2023](https://doi.org/10.1038/s41558-023-01636-1)).

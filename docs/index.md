@@ -2,7 +2,7 @@
 # MIMOSA: Integrated Assessment Model for Cost-Benefit Analysis
 
 
-[Documentation :octicons-arrow-right-24:](components/general.md){.md-button}
+[Documentation :octicons-arrow-right-24:](components/index.md){.md-button}
 [Installation :octicons-arrow-right-24:](installation.md){.md-button}
 [Running :octicons-arrow-right-24:](run.md){.md-button}
 
