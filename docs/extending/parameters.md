@@ -108,7 +108,7 @@ Initializing their value is done in three steps:
 
 2. **Register this regional parameter file** in the configuration file under the key [`regional_parameter_files`](../parameters.md#regional_parameter_files):
 
-    ```yaml title="mimosa/inputdata/config/config_default.yaml" hl_lines="7 8 9"
+    ```yaml title="mimosa/inputdata/config/config_default.yaml" hl_lines="8 9 10"
     ...
     regional_parameter_files:
       ...
@@ -124,7 +124,7 @@ Initializing their value is done in three steps:
 
     ??? info "What if my parameter values have a different regional resolution?"
 
-        Test
+        Todo
 
     -------
     
