@@ -2,44 +2,33 @@
 Utils to calculate TFP using the Cobb-Douglas equation
 """
 
-import numpy as np
-from mimosa.common.data.utils import UnitValues
-from mimosa.common.regional_params import RegionalParamStore
+from mimosa.common import value
 
 
-def get_TFP(
-    region,
-    years,
-    gdp_all_regions,
-    population_all_regions,
-    regional_param_store: RegionalParamStore,
-) -> UnitValues:
-    params = regional_param_store.params
-    # quant = data_store.quant
-    tfp = []
-    dt = years[1] - years[0]
+def get_TFP_value(m, t, r):
 
-    # Parameters
-    alpha = params["economics"]["GDP"]["alpha"]
-    depr_cap = params["economics"]["GDP"]["depreciation of capital"]
-    savings_rate = params["economics"]["GDP"]["savings rate"]
+    alpha = value(m.alpha)
+    dt = value(m.dt)
+    dk = value(m.dk)
+    sr = value(m.sr)
 
-    # Get data
-    gdp_data = gdp_all_regions[region]
-    population_data = population_all_regions[region]
+    # Calculate the capital stock at time t
+    for s in range(t + 1):
+        if s == 0:
+            # Initial capital stock
+            capital = value(m.init_capitalstock_factor[r] * m.baseline_GDP[0, r])
+        else:
+            # For the subsequent years, calculate the capital stock with the stock growth formula
+            investments = sr * baseline_gdp
+            dKdt = calc_dKdt(capital, dk, investments, dt)
+            capital = dKdt * dt + capital
+        baseline_gdp = value(m.baseline_GDP[s, r])
 
-    # Initialise capital
-    capital = (
-        regional_param_store.getregional("economics", "init_capital_factor", region)
-        * gdp_data.yvalues[0]
-    )
+    # Calculate the TFP using the Cobb-Douglas equation
+    population = value(m.population[s, r])
+    tfp = baseline_gdp / calc_GDP(1, population, capital, alpha)
 
-    for gdp, pop in zip(gdp_data.yvalues, population_data.yvalues):
-        tfp.append(gdp / calc_GDP(1, pop, capital, alpha))
-        dKdt = calc_dKdt(capital, depr_cap, savings_rate * gdp, dt)
-        capital = dKdt * dt + capital
-
-    return UnitValues(gdp_data.xvalues, np.array(tfp))
+    return tfp
 
 
 def calc_dKdt(K, dk, I, dt):

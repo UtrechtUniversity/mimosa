@@ -47,12 +47,6 @@ class DataStore:
                 r: UnitValues(baseline[r].xvalues, baseline[r].yvalues / gdp[r].yvalues)
                 for r in params["regions"]
             },
-            "TFP": {
-                r: economics.get_TFP(
-                    r, self.data_years, gdp, population, regional_param_store
-                )
-                for r in params["regions"]
-            },
         }
 
     def _select_database(self):

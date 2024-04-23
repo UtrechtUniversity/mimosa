@@ -111,6 +111,8 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
 
     m.ignore_damages = Param(doc="::economics.damages.ignore damages")
 
+    m.TFP = Param(m.t, m.regions, initialize=economics.get_TFP_value)
+
     # Cobb-Douglas, GDP, investments, capital and consumption
     constraints.extend(
         [

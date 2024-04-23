@@ -74,11 +74,6 @@ def create_abstract_model(
         doc="timeandregional::population",
         units=quant.unit("billion people"),
     )
-    m.TFP = Param(
-        m.t,
-        m.regions,
-        doc="timeandregional::TFP",
-    )
     m.baseline_GDP = Param(
         m.t,
         m.regions,
