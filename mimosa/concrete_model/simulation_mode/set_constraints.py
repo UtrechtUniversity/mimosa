@@ -6,7 +6,7 @@ import pandas as pd
 from mimosa.common import (
     RegionalConstraint,
     GlobalConstraint,
-    is_regional,
+    has_time_and_region_dim,
     add_constraint,
 )
 from .utils import InterpolatingData, read_csv
@@ -53,7 +53,7 @@ def _fixed_data_constraint(m, variable_name, interp_data):
     # 3. Create constraints out of this
     eps = 1e-3  # TODO make eps a variable
 
-    if is_regional(getattr(m, variable_name)):
+    if has_time_and_region_dim(getattr(m, variable_name)):
         extra_constraints = _extra_regional_constraint(variable_name, interp_data, eps)
     else:
         extra_constraints = _extra_global_constraint(variable_name, interp_data, eps)

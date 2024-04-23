@@ -9,7 +9,7 @@ import hashlib
 import numpy as np
 import pandas as pd
 
-from mimosa.common import get_all_variables, value
+from mimosa.common import get_all_variables, get_all_time_region_params, value
 
 
 def save_output(params, m, experiment=None, hash_suffix=False, folder="output"):
@@ -20,7 +20,7 @@ def save_output(params, m, experiment=None, hash_suffix=False, folder="output"):
         settings_hash = ""
 
     # 2. Save the Pyomo variables and data functions
-    all_variables = get_all_variables(m)
+    all_variables = get_all_variables(m) + get_all_time_region_params(m)
 
     all_functions = [
         [[m.population, "population"], "billion people"]
@@ -30,7 +30,7 @@ def save_output(params, m, experiment=None, hash_suffix=False, folder="output"):
     for useful_var in all_variables:
         var_to_row(rows, m, useful_var.var, useful_var.is_regional, useful_var.unit)
     for var, unit in all_functions:
-        var_to_row(rows, m, var, True, unit)
+        var_to_row(rows, m, var, True, unit, is_fct=True)
     dataframe = rows_to_dataframe(rows, m)
 
     # add_param_columns(df, params, id, experiment)
@@ -46,7 +46,7 @@ def save_output(params, m, experiment=None, hash_suffix=False, folder="output"):
         json.dump(params, fh)
 
 
-def var_to_row(rows, m, var, is_regional, unit):
+def var_to_row(rows, m, var, is_regional, unit, is_fct=False):
     # If var is a list, second element is the name
     if isinstance(var, list):
         name = var[1]
@@ -56,11 +56,11 @@ def var_to_row(rows, m, var, is_regional, unit):
 
     # Check if var is a function or a pyomo variable
     if is_regional:
-        fct = lambda t, r: (var(m.year(t), r) if callable(var) else value(var[t, r]))
+        fct = lambda t, r: (var(m.year(t), r) if is_fct else value(var[t, r]))
         for r in m.regions:
             rows.append([name, r, unit] + [fct(t, r) for t in m.t])
     else:
-        fct = lambda t: (var(m.year(t)) if callable(var) else value(var[t]))
+        fct = lambda t: (var(m.year(t)) if is_fct else value(var[t]))
         rows.append([name, "Global", unit] + [fct(t) for t in m.t])
 
 
