@@ -361,6 +361,24 @@ class DictParser(ListParser):
         self.error(f"Cannot parse dictionary {value}")
 
 
+class DatasourceParser(DictParser):
+    """
+    Data source for a variable. It's a dictionary with the keys `variable`, `scenario`, `model`, and `file`.
+    """
+
+    def parse(self, value):
+        if self.check_false(value):
+            return False
+        if isinstance(value, dict):
+            parsed_dict = DictParser.parse(self, value)
+            # Check if the keys `variable`, `scenario`, `model`, and `file` are present
+            for key in ["variable", "scenario", "model", "file"]:
+                if key not in parsed_dict:
+                    self.error(f"Key {key} not found in datasource {value}")
+
+        return parsed_dict
+
+
 class ParserFactory:
     def __init__(self):
         self.parsers = {}
@@ -387,5 +405,6 @@ PARSER_FACTORY.register_parser("enum", EnumParser)
 PARSER_FACTORY.register_parser("quantity", QuantityParser)
 PARSER_FACTORY.register_parser("list", ListParser)
 PARSER_FACTORY.register_parser("dict", DictParser)
+PARSER_FACTORY.register_parser("datasource", DatasourceParser)
 PARSER_FACTORY.register_parser("filepath", FilepathParser)
 PARSER_FACTORY.register_parser("str_or_plain_dict", StringOrPlainDictParser)
