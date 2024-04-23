@@ -780,7 +780,7 @@
 <h2 id="general-form-of-the-model">General form of the model</h2>
 <p>MIMOSA is built as a <a href="https://www.pyomo.org/">Pyomo</a> model: an open-source Python package optimisation modelling language. 
 Pyomo models consist of a combination of variables, constraints and parameters. The constraints link together the variables
-in the form of (optionally) non-linear equations. One variable is defined as the optimisation objective: in MIMOSA's case, 
+in the form of (non-linear) equations. One variable is defined as the optimisation objective: in MIMOSA's case, 
 the net present value of the global welfare. Pyomo translates the combination of variables, constraints and parameters to
 a form suitable for an external solver. The solver maximises the objective variable, while trying to fulfill all the 
 constraints.</p>
@@ -791,8 +791,8 @@ this object is created:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a href="#__codelineno-0-1" id="__codelineno-0-1" name="__codelineno-0-1"></a><span class="n">m</span> <span class="o">=</span> <span class="n">AbstractModel</span><span class="p">()</span>
 </span></code></pre></div>
 <p>This model will always be referred to as <code>m</code>.</p>
-<details class="info" open="open">
-<summary>A note about file structure</summary>
+<div class="admonition info">
+<p class="admonition-title">A note about file structure</p>
 <p>After forking and cloning MIMOSA to your computer, you will find a file structure that looks like this:</p>
 <div class="language-python highlight"><span class="filename">MIMOSA file structure</span><pre><span></span><code><span id="__span-1-1"><a href="#__codelineno-1-1" id="__codelineno-1-1" name="__codelineno-1-1"></a><span class="n">mimosa</span>
 </span><span id="__span-1-2"><a href="#__codelineno-1-2" id="__codelineno-1-2" name="__codelineno-1-2"></a><span class="err">│</span>   <span class="n">abstract_model</span><span class="o">.</span><span class="n">py</span> <span class="c1"># (1)!</span>
@@ -825,7 +825,7 @@ this object is created:</p>
 <a href="../components/">Model documentation</a> pages are defined in the Python files in the folder
 <a href="https://github.com/UtrechtUniversity/mimosa/tree/master/mimosa/components"><code>mimosa/components</code></a>. All these modules are tied
 together in the file <a href="https://github.com/UtrechtUniversity/mimosa/blob/master/mimosa/abstract_model.py"><code>mimosa/abstract_model.py</code></a>.</p>
-</details>
+</div>
 <p>Typically, when extending MIMOSA, the following steps can be followed:</p>
 <ol>
 <li><a href="components/">Create a new component</a> (<code>optional</code>, only necessary if the extension is a new module)</li>
