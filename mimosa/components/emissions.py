@@ -54,7 +54,7 @@ def _get_emissions_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     There are two ways to calculate baseline emissions: either directly imported exogenously from
     the SSP scenarios, or calculated from the baseline carbon intensity from the SSPs. The latter
     accounts for the fact that in the absence of climate policy, baseline emissions would go down if
-    the GDP goes down, and vice versa. This can be chosen with the parameter [`baseline_carbon_intensity`](../parameters.md#emissions.baseline carbon intensity).
+    the GDP goes down, and vice versa. This can be chosen with the parameter [`use_baseline_carbon_intensity`](../parameters.md#emissions.baseline carbon intensity).
     If this parameter is set to true, baseline emissions are calculated as:
 
     $$
