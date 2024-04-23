@@ -68,8 +68,7 @@ def create_abstract_model(
     ######################
 
     m.baseline_emissions = lambda year, region: None
-    m.population = lambda year, region: None
-    m.pop = Param(
+    m.population = Param(
         m.t,
         m.regions,
         doc="timeandregional::population",

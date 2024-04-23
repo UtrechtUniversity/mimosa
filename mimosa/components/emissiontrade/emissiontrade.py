@@ -61,10 +61,8 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
             # Constraint that sets the global carbon price to the average of the regional carbon prices:
             GlobalConstraint(
                 lambda m, t: m.global_carbonprice[t]
-                == sum(
-                    m.carbonprice[t, r] * m.population(m.year(t), r) for r in m.regions
-                )
-                / sum(m.population(m.year(t), r) for r in m.regions),
+                == sum(m.carbonprice[t, r] * m.population[t, r] for r in m.regions)
+                / sum(m.population[t, r] for r in m.regions),
                 "global_carbonprice",
             ),
         ]

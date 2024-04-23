@@ -41,16 +41,16 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
             RegionalConstraint(
                 lambda m, t, r: m.utility[t, r]
                 == calc_regional_utility(
-                    m.consumption[t, r], m.L(m.year(t), r), m.inequal_aversion
+                    m.consumption[t, r], m.population[t, r], m.inequal_aversion
                 ),
                 "utility",
             ),
             GlobalConstraint(
                 lambda m, t: m.yearly_welfare[t]
-                == sum(m.L(m.year(t), r) for r in m.regions)
+                == sum(m.population[t, r] for r in m.regions)
                 * calc_global_utility(
                     sum(m.utility[t, r] for r in m.regions),
-                    sum(m.L(m.year(t), r) for r in m.regions),
+                    sum(m.population[t, r] for r in m.regions),
                     m.elasmu,
                     m.inequal_aversion,
                 ),
