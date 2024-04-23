@@ -79,13 +79,13 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
 
     m.init_capitalstock_factor = Param(
         m.regions,
-        units=quant.unit("currency_unit"),
+        units=quant.unit("dimensionless"),
         doc="regional::economics.init_capital_factor",
     )
     m.capital_stock = Var(
         m.t,
         m.regions,
-        initialize=lambda m, t, r: m.init_capitalstock_factor[r] * m.GDP(m.year(t), r),
+        initialize=lambda m, t, r: m.init_capitalstock_factor[r] * m.baseline_GDP[t, r],
         units=quant.unit("currency_unit"),
     )
 
@@ -97,14 +97,14 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     m.GDP_gross = Var(
         m.t,
         m.regions,
-        initialize=lambda m, t, r: m.GDP(m.year(0), r),
+        initialize=lambda m, t, r: m.baseline_GDP[0, r],
         units=quant.unit("currency_unit"),
     )
     m.GDP_net = Var(
         m.t,
         m.regions,
         units=quant.unit("currency_unit"),
-        initialize=lambda m, t, r: m.GDP(m.year(0), r),
+        initialize=lambda m, t, r: m.baseline_GDP[0, r],
     )
     m.investments = Var(m.t, m.regions, units=quant.unit("currency_unit"))
     m.consumption = Var(m.t, m.regions, units=quant.unit("currency_unit"))
@@ -118,7 +118,7 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
                 lambda m, t, r: (
                     m.GDP_gross[t, r]
                     == economics.calc_GDP(
-                        m.TFP(m.year(t), r),
+                        m.TFP[t, r],
                         m.population[t, r],
                         soft_min(m.capital_stock[t, r], scale=10),
                         m.alpha,
@@ -129,7 +129,7 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
                 "GDP_gross",
             ),
             RegionalInitConstraint(
-                lambda m, r: m.GDP_gross[0, r] == m.GDP(m.year(0), r), "GDP_gross_init"
+                lambda m, r: m.GDP_gross[0, r] == m.baseline_GDP[0, r], "GDP_gross_init"
             ),
             RegionalConstraint(
                 lambda m, t, r: m.GDP_net[t, r]
@@ -164,7 +164,7 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
             ),
             RegionalInitConstraint(
                 lambda m, r: m.capital_stock[0, r]
-                == m.init_capitalstock_factor[r] * m.GDP(m.year(0), r)
+                == m.init_capitalstock_factor[r] * m.baseline_GDP[0, r]
             ),
         ]
     )
