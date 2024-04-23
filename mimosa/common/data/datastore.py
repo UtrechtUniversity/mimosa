@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 from scipy.interpolate import interp1d
 
-from mimosa.common import economics, quant
+from mimosa.common import quant
 from .utils import UnitValues, extrapolate
 
 
@@ -31,7 +31,7 @@ class DataStore:
     databases = {}
     cached_data = {}
 
-    def __init__(self, params, regional_param_store):
+    def __init__(self, params):
         self.params = params
         self._select_database()
         self._create_data_years()

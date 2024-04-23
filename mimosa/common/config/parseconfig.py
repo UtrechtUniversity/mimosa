@@ -2,6 +2,8 @@
 Parses the config.yaml file and checks for consistency with the default config template.
 """
 
+import re
+
 from mimosa.common.utils import load_yaml
 from mimosa.common import quant
 
@@ -40,7 +42,7 @@ def check_obsolete_params(user_yaml, parsed_params, parser_tree):
             parser_type = get_nested(parser_tree, keys).type
         except (AttributeError, KeyError):
             parser_type = None
-        if isinstance(node, dict) and parser_type != "dict":
+        if isinstance(node, dict) and parser_type not in ["dict", "datasource"]:
             return False
         return True
 
@@ -73,6 +75,35 @@ def check_params(input_params, return_parser_tree=False):
     if return_parser_tree:
         return parsed_params, params_parser_tree
     return parsed_params
+
+
+def parse_param_values(params):
+    """
+    Check parameter values for references to other parameter values
+
+    References to other parameter values can be made like:
+
+    "{SSP}"
+
+    or
+
+    "{emissions - carbonbudget}" (join the nested keys with " - ")
+
+    """
+
+    flat_params = flatten(params)
+    for flat_key, value in flat_params.items():
+        if not isinstance(value, str):
+            continue
+        for match in re.findall(r"\{([\w -]+)\}", value):
+            try:
+                other_value = flat_params[match]
+                new_value = value.replace(f"{{{match}}}", other_value)
+                set_nested(params, flat_key.split(" - "), new_value)
+            except KeyError:
+                pass
+
+    return params
 
 
 def load_params(user_yaml_filename=None):

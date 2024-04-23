@@ -23,7 +23,7 @@ from mimosa.common import (
     utils,
     logger,
 )
-from mimosa.common.config.parseconfig import check_params
+from mimosa.common.config.parseconfig import check_params, parse_param_values
 from mimosa.export import visualise_ipopt_output, save_output
 from mimosa.abstract_model import create_abstract_model
 from mimosa.concrete_model.instantiate_params import InstantiatedModel
@@ -50,6 +50,7 @@ class MIMOSA:
     def __init__(self, params: dict):
         # Check if input parameter dictionary is valid
         params, parser_tree = check_params(params, True)
+        params = parse_param_values(params)
         self.params = params
         self.param_parser_tree = parser_tree
         self.regions = params["regions"]
@@ -95,7 +96,7 @@ class MIMOSA:
         )
 
         # Create the data store
-        self.data_store = data.DataStore(self.params, self.regional_param_store)
+        self.data_store = data.DataStore(self.params)
 
         # Using these help objects, create the instantiated model
         instantiated_model = InstantiatedModel(
