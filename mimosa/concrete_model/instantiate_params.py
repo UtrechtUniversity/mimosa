@@ -134,6 +134,17 @@ class InstantiatedModel:
                     param_category, param_name
                 )
 
+            ### Time and regional dependent parameter, from data store
+            if parameter_doc_str.startswith("timeandregional::"):
+                var_name = parameter_doc_str.split("::")[1]
+                parameter_mapping[parameter.name] = {
+                    (t, r): self.data_store.data_object(var_name)(
+                        self.abstract_model.year(t), r
+                    )
+                    for t in range(num_years)
+                    for r in params["regions"].keys()
+                }
+
         parameter_mapping_manual = {
             "beginyear": V(t_start),
             "dt": V(dt),

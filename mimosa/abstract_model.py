@@ -5,7 +5,7 @@ Contains all model equations and constraints
 """
 
 import numpy as np
-from mimosa.common import Param, AbstractModel, Set, add_constraint
+from mimosa.common import Param, AbstractModel, Set, add_constraint, quant
 from mimosa.components import (
     effortsharing,
     emissions,
@@ -69,6 +69,13 @@ def create_abstract_model(
 
     m.baseline_emissions = lambda year, region: None
     m.population = lambda year, region: None
+    m.pop = Param(
+        m.t,
+        m.regions,
+        doc="timeandregional::population",
+        units=quant.unit("billion people"),
+    )
+
     m.TFP = lambda year, region: None
     m.GDP = lambda year, region: None
     m.carbon_intensity = lambda year, region: None

@@ -119,7 +119,7 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
                     m.GDP_gross[t, r]
                     == economics.calc_GDP(
                         m.TFP(m.year(t), r),
-                        m.L(m.year(t), r),
+                        m.pop[t, r],
                         soft_min(m.capital_stock[t, r], scale=10),
                         m.alpha,
                     )

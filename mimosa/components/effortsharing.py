@@ -74,8 +74,7 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     m.percapconv_share_pop = Param(
         m.t,
         m.regions,
-        initialize=lambda m, t, r: m.population(m.year(t), r)
-        / sum(m.population(m.year(t), s) for s in m.regions),
+        initialize=lambda m, t, r: m.pop[t, r] / sum(m.pop[t, s] for s in m.regions),
     )
 
     constraints.extend(
