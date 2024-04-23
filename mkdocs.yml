@@ -16,7 +16,7 @@ nav:
   - Installing MIMOSA: installation.md
   - Running MIMOSA: run.md
   - Extending MIMOSA:
-      - Getting started: extending/general.md
+      - extending/index.md
       - New components: extending/components.md
       - Variables and constraints: extending/variables_constraints.md
       - Parameters: extending/parameters.md
@@ -55,7 +55,8 @@ theme:
     - content.code.copy
     - content.code.annotate
     - navigation.top
-    - navigation.expand
+    # - navigation.expand
+    - navigation.indexes
     - navigation.footer
 
 watch:

@@ -64,6 +64,76 @@ In the example above, the PRTP has a type [`float`](#parser-float). The followin
 
 ## Regional parameters {id="regional-params"}
 
+The configuration file can be used to set *scalar* parameters. However, some parameters are regional. These are created like:
+
+```python
+m.new_regional_param = Param(m.regions)
+```
+
+Initializing their value is done in three steps:
+
+1. **Create a CSV file** with a column `region` and the columns with regional parameter values you want to use:
+
+    In the folder [`mimosa/inputdata/regionalparams/`]({{config.repo_url}}/tree/master/mimosa/inputdata/regionalparams/), create a new CSV file:
+
+    ```python hl_lines="10"
+    mimosa
+    │   ...
+    │
+    └─── inputdata
+        └─── config
+            │   config_default.csv
+        └─── regionalparams
+            │   economics.csv
+            |   mac.csv 
+            |   newfile.csv
+            |   ...
+
+    ```
+
+    This file should have at least a column `region` and one (or more) columns for the regional values:
+
+    :fontawesome-solid-file-csv: `mimosa/inputdata/regionalparams/newfile.csv`
+
+    | region | newparam1 | newparam2 | ... |
+    | -- | -- | -- | -- |
+    | CAN | 1.992 | 2.317 | ... |
+    | USA | 2.035 | 1.745 |
+    | ... | ... | ... |
+
+    Note that this file can contain multiple columns (for multiple regional parameters). It is good practice to group the parameter values when the parameters are somehow related with each other.
+
+    -------
+
+
+2. **Register this regional parameter file** in the configuration file under the key [`regional_parameter_files`](../parameters.md#regional_parameter_files):
+
+    ```yaml title="mimosa/inputdata/config/config_default.yaml" hl_lines="7 8 9"
+    ...
+    regional_parameter_files:
+      ...
+      default:
+        economics:
+          filename: inputdata/regionalparams/economics.csv
+          regionstype: IMAGE26
+        newparamgroup:
+          filename: inputdata/regionalparams/newfile.csv
+          regionstype: IMAGE26
+        ...
+    ```
+
+    ??? info "What if my parameter values have a different regional resolution?"
+
+        Test
+
+    -------
+    
+3. **Link the `Param`** to the relevant column in the CSV file:
+
+    ```python
+    m.new_regional_param = Param(m.regions, doc="regional::newparamgroup.newparam1")
+    ```
+
 ## Advanced: dynamic parameter settings
 
 ## Advanced: complex parameter manipulations with `instantiate_params.py`

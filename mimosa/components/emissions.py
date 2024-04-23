@@ -434,8 +434,8 @@ def _get_inertia_and_budget_constraints(
     \\text{regional emissions}_t \\geq \\text{regional min level}.
     $$
 
-    Note that currently, the regional emission level is the same for every region, but this could be easily changed if needed (see
-    [Extending MIMOSA](../extending/general.md)).
+    Note that currently, the minimum regional emission level is the same for every region, but this could be easily changed if needed (see
+    [Extending MIMOSA](../extending/index.md)).
 
     ## Constraints on emissions after 2100
 

@@ -442,12 +442,6 @@ regional_parameter_files:
     COACCH:
       filename: inputdata/regionalparams/COACCH.csv
       regionstype: COACCH
-    ADRICE2010:
-      filename: inputdata/regionalparams/ADRICE2010.csv
-      regionstype: ADRICE2010
-    ADRICE2012:
-      filename: inputdata/regionalparams/ADRICE2012.csv
-      regionstype: ADRICE2012
 
 ##################
 
