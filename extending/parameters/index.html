@@ -745,6 +745,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#time-and-region-dependent-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      Time and region dependent data
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#advanced-dynamic-parameter-settings" class="md-nav__link">
     <span class="md-ellipsis">
       Advanced: dynamic parameter settings
@@ -757,15 +766,6 @@
   <a href="#advanced-complex-parameter-manipulations-with-instantiate_paramspy" class="md-nav__link">
     <span class="md-ellipsis">
       Advanced: complex parameter manipulations with instantiate_params.py
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#time-and-region-dependent-data" class="md-nav__link">
-    <span class="md-ellipsis">
-      Time and region dependent data
     </span>
   </a>
   
@@ -865,6 +865,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#time-and-region-dependent-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      Time and region dependent data
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#advanced-dynamic-parameter-settings" class="md-nav__link">
     <span class="md-ellipsis">
       Advanced: dynamic parameter settings
@@ -877,15 +886,6 @@
   <a href="#advanced-complex-parameter-manipulations-with-instantiate_paramspy" class="md-nav__link">
     <span class="md-ellipsis">
       Advanced: complex parameter manipulations with instantiate_params.py
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#time-and-region-dependent-data" class="md-nav__link">
-    <span class="md-ellipsis">
-      Time and region dependent data
     </span>
   </a>
   
@@ -1013,17 +1013,7 @@
 <summary>str</summary>
 <div class="param_anchor" id="parser-str" markdown="">
 <p>String value</p>
-<p>Example usage:</p>
-<p><div class="language-yaml highlight"><pre><span></span><code><span id="__span-7-1"><a href="#__codelineno-7-1" id="__codelineno-7-1" name="__codelineno-7-1"></a><span class="nt">input</span><span class="p">:</span>
-</span><span id="__span-7-2"><a href="#__codelineno-7-2" id="__codelineno-7-2" name="__codelineno-7-2"></a><span class="w">  </span><span class="nt">baselines</span><span class="p">:</span>
-</span><span id="__span-7-3"><a href="#__codelineno-7-3" id="__codelineno-7-3" name="__codelineno-7-3"></a><span class="w">    </span><span class="nt">SSP1</span><span class="p">:</span>
-</span><span id="__span-7-4"><a href="#__codelineno-7-4" id="__codelineno-7-4" name="__codelineno-7-4"></a><span class="w">      </span><span class="nt">scenario</span><span class="p">:</span>
-</span><span id="__span-7-5"><a href="#__codelineno-7-5" id="__codelineno-7-5" name="__codelineno-7-5"></a><span class="hll"><span class="w">        </span><span class="nt">default</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SSP1-Ref-SPA0-V17</span>
-</span></span><span id="__span-7-6"><a href="#__codelineno-7-6" id="__codelineno-7-6" name="__codelineno-7-6"></a><span class="hll"><span class="w">        </span><span class="nt">descr</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Scenario name of SSP1 baseline</span>
-</span></span><span id="__span-7-7"><a href="#__codelineno-7-7" id="__codelineno-7-7" name="__codelineno-7-7"></a><span class="hll"><span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">str</span>
-</span></span></code></pre></div>
-</p></div>
-</details>
+</div></details>
 <details class="parameter">
 <summary>enum</summary>
 <div class="param_anchor" id="parser-enum" markdown="">
@@ -1033,16 +1023,16 @@
 <li><code>values</code>: list of allowed values</li>
 </ul>
 <p>Example usage:</p>
-<p><div class="language-yaml highlight"><pre><span></span><code><span id="__span-8-1"><a href="#__codelineno-8-1" id="__codelineno-8-1" name="__codelineno-8-1"></a><span class="nt">SSP</span><span class="p">:</span>
-</span><span id="__span-8-2"><a href="#__codelineno-8-2" id="__codelineno-8-2" name="__codelineno-8-2"></a><span class="hll"><span class="w">  </span><span class="nt">default</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SSP2</span>
-</span></span><span id="__span-8-3"><a href="#__codelineno-8-3" id="__codelineno-8-3" name="__codelineno-8-3"></a><span class="hll"><span class="w">  </span><span class="nt">descr</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SSP, used for population, baseline GDP and baseline emissions</span>
-</span></span><span id="__span-8-4"><a href="#__codelineno-8-4" id="__codelineno-8-4" name="__codelineno-8-4"></a><span class="hll"><span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">enum</span>
-</span></span><span id="__span-8-5"><a href="#__codelineno-8-5" id="__codelineno-8-5" name="__codelineno-8-5"></a><span class="hll"><span class="w">  </span><span class="nt">values</span><span class="p">:</span>
-</span></span><span id="__span-8-6"><a href="#__codelineno-8-6" id="__codelineno-8-6" name="__codelineno-8-6"></a><span class="hll"><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SSP1</span>
-</span></span><span id="__span-8-7"><a href="#__codelineno-8-7" id="__codelineno-8-7" name="__codelineno-8-7"></a><span class="hll"><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SSP2</span>
-</span></span><span id="__span-8-8"><a href="#__codelineno-8-8" id="__codelineno-8-8" name="__codelineno-8-8"></a><span class="hll"><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SSP3</span>
-</span></span><span id="__span-8-9"><a href="#__codelineno-8-9" id="__codelineno-8-9" name="__codelineno-8-9"></a><span class="hll"><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SSP4</span>
-</span></span><span id="__span-8-10"><a href="#__codelineno-8-10" id="__codelineno-8-10" name="__codelineno-8-10"></a><span class="hll"><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SSP5</span>
+<p><div class="language-yaml highlight"><pre><span></span><code><span id="__span-7-1"><a href="#__codelineno-7-1" id="__codelineno-7-1" name="__codelineno-7-1"></a><span class="nt">SSP</span><span class="p">:</span>
+</span><span id="__span-7-2"><a href="#__codelineno-7-2" id="__codelineno-7-2" name="__codelineno-7-2"></a><span class="hll"><span class="w">  </span><span class="nt">default</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SSP2</span>
+</span></span><span id="__span-7-3"><a href="#__codelineno-7-3" id="__codelineno-7-3" name="__codelineno-7-3"></a><span class="hll"><span class="w">  </span><span class="nt">descr</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SSP, used for population, baseline GDP and baseline emissions</span>
+</span></span><span id="__span-7-4"><a href="#__codelineno-7-4" id="__codelineno-7-4" name="__codelineno-7-4"></a><span class="hll"><span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">enum</span>
+</span></span><span id="__span-7-5"><a href="#__codelineno-7-5" id="__codelineno-7-5" name="__codelineno-7-5"></a><span class="hll"><span class="w">  </span><span class="nt">values</span><span class="p">:</span>
+</span></span><span id="__span-7-6"><a href="#__codelineno-7-6" id="__codelineno-7-6" name="__codelineno-7-6"></a><span class="hll"><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SSP1</span>
+</span></span><span id="__span-7-7"><a href="#__codelineno-7-7" id="__codelineno-7-7" name="__codelineno-7-7"></a><span class="hll"><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SSP2</span>
+</span></span><span id="__span-7-8"><a href="#__codelineno-7-8" id="__codelineno-7-8" name="__codelineno-7-8"></a><span class="hll"><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SSP3</span>
+</span></span><span id="__span-7-9"><a href="#__codelineno-7-9" id="__codelineno-7-9" name="__codelineno-7-9"></a><span class="hll"><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SSP4</span>
+</span></span><span id="__span-7-10"><a href="#__codelineno-7-10" id="__codelineno-7-10" name="__codelineno-7-10"></a><span class="hll"><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SSP5</span>
 </span></span></code></pre></div>
 </p></div>
 </details>
@@ -1059,13 +1049,13 @@ cannot be converted to GtCO2.</p>
 <li><code>unit</code>: Unit of the quantity</li>
 </ul>
 <p>Example usage:</p>
-<p><div class="language-yaml highlight"><pre><span></span><code><span id="__span-9-1"><a href="#__codelineno-9-1" id="__codelineno-9-1" name="__codelineno-9-1"></a><span class="nt">economics</span><span class="p">:</span>
-</span><span id="__span-9-2"><a href="#__codelineno-9-2" id="__codelineno-9-2" name="__codelineno-9-2"></a><span class="w">  </span><span class="nt">MAC</span><span class="p">:</span>
-</span><span id="__span-9-3"><a href="#__codelineno-9-3" id="__codelineno-9-3" name="__codelineno-9-3"></a><span class="w">    </span><span class="nt">gamma</span><span class="p">:</span>
-</span><span id="__span-9-4"><a href="#__codelineno-9-4" id="__codelineno-9-4" name="__codelineno-9-4"></a><span class="hll"><span class="w">      </span><span class="nt">default</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2601 USD2005/tCO2</span>
-</span></span><span id="__span-9-5"><a href="#__codelineno-9-5" id="__codelineno-9-5" name="__codelineno-9-5"></a><span class="hll"><span class="w">      </span><span class="nt">descr</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Calibration level of the MAC (carbon price for 100% reduction)</span>
-</span></span><span id="__span-9-6"><a href="#__codelineno-9-6" id="__codelineno-9-6" name="__codelineno-9-6"></a><span class="hll"><span class="w">      </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">quantity</span>
-</span></span><span id="__span-9-7"><a href="#__codelineno-9-7" id="__codelineno-9-7" name="__codelineno-9-7"></a><span class="hll"><span class="w">      </span><span class="nt">unit</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">currency_unit/emissionsrate_unit</span>
+<p><div class="language-yaml highlight"><pre><span></span><code><span id="__span-8-1"><a href="#__codelineno-8-1" id="__codelineno-8-1" name="__codelineno-8-1"></a><span class="nt">economics</span><span class="p">:</span>
+</span><span id="__span-8-2"><a href="#__codelineno-8-2" id="__codelineno-8-2" name="__codelineno-8-2"></a><span class="w">  </span><span class="nt">MAC</span><span class="p">:</span>
+</span><span id="__span-8-3"><a href="#__codelineno-8-3" id="__codelineno-8-3" name="__codelineno-8-3"></a><span class="w">    </span><span class="nt">gamma</span><span class="p">:</span>
+</span><span id="__span-8-4"><a href="#__codelineno-8-4" id="__codelineno-8-4" name="__codelineno-8-4"></a><span class="hll"><span class="w">      </span><span class="nt">default</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2601 USD2005/tCO2</span>
+</span></span><span id="__span-8-5"><a href="#__codelineno-8-5" id="__codelineno-8-5" name="__codelineno-8-5"></a><span class="hll"><span class="w">      </span><span class="nt">descr</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Calibration level of the MAC (carbon price for 100% reduction)</span>
+</span></span><span id="__span-8-6"><a href="#__codelineno-8-6" id="__codelineno-8-6" name="__codelineno-8-6"></a><span class="hll"><span class="w">      </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">quantity</span>
+</span></span><span id="__span-8-7"><a href="#__codelineno-8-7" id="__codelineno-8-7" name="__codelineno-8-7"></a><span class="hll"><span class="w">      </span><span class="nt">unit</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">currency_unit/emissionsrate_unit</span>
 </span></span></code></pre></div>
 </p></div>
 </details>
@@ -1078,23 +1068,23 @@ cannot be converted to GtCO2.</p>
 <li><code>values</code>: parser information for the values. For example, the values can be int, float, values with units, etc.</li>
 </ul>
 <p>Example usage:</p>
-<p><div class="language-yaml highlight"><pre><span></span><code><span id="__span-10-1"><a href="#__codelineno-10-1" id="__codelineno-10-1" name="__codelineno-10-1"></a><span class="nt">regionsmappings</span><span class="p">:</span>
-</span><span id="__span-10-2"><a href="#__codelineno-10-2" id="__codelineno-10-2" name="__codelineno-10-2"></a><span class="hll"><span class="w">  </span><span class="nt">default</span><span class="p">:</span>
-</span></span><span id="__span-10-3"><a href="#__codelineno-10-3" id="__codelineno-10-3" name="__codelineno-10-3"></a><span class="hll"><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">conversiontable</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">inputdata/regions/IMAGE26_COACCH.csv</span>
-</span></span><span id="__span-10-4"><a href="#__codelineno-10-4" id="__codelineno-10-4" name="__codelineno-10-4"></a><span class="hll"><span class="w">    </span><span class="nt">regionstype1</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">IMAGE26</span>
-</span></span><span id="__span-10-5"><a href="#__codelineno-10-5" id="__codelineno-10-5" name="__codelineno-10-5"></a><span class="hll"><span class="w">    </span><span class="nt">regionstype2</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">COACCH</span>
-</span></span><span id="__span-10-6"><a href="#__codelineno-10-6" id="__codelineno-10-6" name="__codelineno-10-6"></a><span class="hll"><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">conversiontable</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">inputdata/regions/IMAGE26_ADRICE2010.csv</span>
-</span></span><span id="__span-10-7"><a href="#__codelineno-10-7" id="__codelineno-10-7" name="__codelineno-10-7"></a><span class="hll"><span class="w">    </span><span class="nt">regionstype1</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">IMAGE26</span>
-</span></span><span id="__span-10-8"><a href="#__codelineno-10-8" id="__codelineno-10-8" name="__codelineno-10-8"></a><span class="hll"><span class="w">    </span><span class="nt">regionstype2</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ADRICE2010</span>
-</span></span><span id="__span-10-9"><a href="#__codelineno-10-9" id="__codelineno-10-9" name="__codelineno-10-9"></a><span class="hll"><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">conversiontable</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">inputdata/regions/IMAGE26_ADRICE2012.csv</span>
-</span></span><span id="__span-10-10"><a href="#__codelineno-10-10" id="__codelineno-10-10" name="__codelineno-10-10"></a><span class="hll"><span class="w">    </span><span class="nt">regionstype1</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">IMAGE26</span>
-</span></span><span id="__span-10-11"><a href="#__codelineno-10-11" id="__codelineno-10-11" name="__codelineno-10-11"></a><span class="hll"><span class="w">    </span><span class="nt">regionstype2</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ADRICE2012</span>
-</span></span><span id="__span-10-12"><a href="#__codelineno-10-12" id="__codelineno-10-12" name="__codelineno-10-12"></a><span class="hll"><span class="w">  </span><span class="nt">descr</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">List of region types and their conversion tables. Only used for regional parameters,</span>
-</span></span><span id="__span-10-13"><a href="#__codelineno-10-13" id="__codelineno-10-13" name="__codelineno-10-13"></a><span class="hll"><span class="w">    </span><span class="l l-Scalar l-Scalar-Plain">not for aggregating or disaggregating variables or other output.</span>
-</span></span><span id="__span-10-14"><a href="#__codelineno-10-14" id="__codelineno-10-14" name="__codelineno-10-14"></a><span class="hll"><span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">list</span>
-</span></span><span id="__span-10-15"><a href="#__codelineno-10-15" id="__codelineno-10-15" name="__codelineno-10-15"></a><span class="hll"><span class="w">  </span><span class="nt">values</span><span class="p">:</span>
-</span></span><span id="__span-10-16"><a href="#__codelineno-10-16" id="__codelineno-10-16" name="__codelineno-10-16"></a><span class="hll"><span class="w">    </span><span class="nt">descr</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Dictionary with keys `regionstype1`, `regionstype2` and `conversiontable`.</span>
-</span></span><span id="__span-10-17"><a href="#__codelineno-10-17" id="__codelineno-10-17" name="__codelineno-10-17"></a><span class="hll"><span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dict</span>
+<p><div class="language-yaml highlight"><pre><span></span><code><span id="__span-9-1"><a href="#__codelineno-9-1" id="__codelineno-9-1" name="__codelineno-9-1"></a><span class="nt">regionsmappings</span><span class="p">:</span>
+</span><span id="__span-9-2"><a href="#__codelineno-9-2" id="__codelineno-9-2" name="__codelineno-9-2"></a><span class="hll"><span class="w">  </span><span class="nt">default</span><span class="p">:</span>
+</span></span><span id="__span-9-3"><a href="#__codelineno-9-3" id="__codelineno-9-3" name="__codelineno-9-3"></a><span class="hll"><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">conversiontable</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">inputdata/regions/IMAGE26_COACCH.csv</span>
+</span></span><span id="__span-9-4"><a href="#__codelineno-9-4" id="__codelineno-9-4" name="__codelineno-9-4"></a><span class="hll"><span class="w">    </span><span class="nt">regionstype1</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">IMAGE26</span>
+</span></span><span id="__span-9-5"><a href="#__codelineno-9-5" id="__codelineno-9-5" name="__codelineno-9-5"></a><span class="hll"><span class="w">    </span><span class="nt">regionstype2</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">COACCH</span>
+</span></span><span id="__span-9-6"><a href="#__codelineno-9-6" id="__codelineno-9-6" name="__codelineno-9-6"></a><span class="hll"><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">conversiontable</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">inputdata/regions/IMAGE26_ADRICE2010.csv</span>
+</span></span><span id="__span-9-7"><a href="#__codelineno-9-7" id="__codelineno-9-7" name="__codelineno-9-7"></a><span class="hll"><span class="w">    </span><span class="nt">regionstype1</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">IMAGE26</span>
+</span></span><span id="__span-9-8"><a href="#__codelineno-9-8" id="__codelineno-9-8" name="__codelineno-9-8"></a><span class="hll"><span class="w">    </span><span class="nt">regionstype2</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ADRICE2010</span>
+</span></span><span id="__span-9-9"><a href="#__codelineno-9-9" id="__codelineno-9-9" name="__codelineno-9-9"></a><span class="hll"><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">conversiontable</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">inputdata/regions/IMAGE26_ADRICE2012.csv</span>
+</span></span><span id="__span-9-10"><a href="#__codelineno-9-10" id="__codelineno-9-10" name="__codelineno-9-10"></a><span class="hll"><span class="w">    </span><span class="nt">regionstype1</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">IMAGE26</span>
+</span></span><span id="__span-9-11"><a href="#__codelineno-9-11" id="__codelineno-9-11" name="__codelineno-9-11"></a><span class="hll"><span class="w">    </span><span class="nt">regionstype2</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ADRICE2012</span>
+</span></span><span id="__span-9-12"><a href="#__codelineno-9-12" id="__codelineno-9-12" name="__codelineno-9-12"></a><span class="hll"><span class="w">  </span><span class="nt">descr</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">List of region types and their conversion tables. Only used for regional parameters,</span>
+</span></span><span id="__span-9-13"><a href="#__codelineno-9-13" id="__codelineno-9-13" name="__codelineno-9-13"></a><span class="hll"><span class="w">    </span><span class="l l-Scalar l-Scalar-Plain">not for aggregating or disaggregating variables or other output.</span>
+</span></span><span id="__span-9-14"><a href="#__codelineno-9-14" id="__codelineno-9-14" name="__codelineno-9-14"></a><span class="hll"><span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">list</span>
+</span></span><span id="__span-9-15"><a href="#__codelineno-9-15" id="__codelineno-9-15" name="__codelineno-9-15"></a><span class="hll"><span class="w">  </span><span class="nt">values</span><span class="p">:</span>
+</span></span><span id="__span-9-16"><a href="#__codelineno-9-16" id="__codelineno-9-16" name="__codelineno-9-16"></a><span class="hll"><span class="w">    </span><span class="nt">descr</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Dictionary with keys `regionstype1`, `regionstype2` and `conversiontable`.</span>
+</span></span><span id="__span-9-17"><a href="#__codelineno-9-17" id="__codelineno-9-17" name="__codelineno-9-17"></a><span class="hll"><span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dict</span>
 </span></span></code></pre></div>
 </p></div>
 </details>
@@ -1108,28 +1098,47 @@ cannot be converted to GtCO2.</p>
 <li><code>keys</code>: parser information for the keys</li>
 </ul>
 <p>Example usage:</p>
-<p><div class="language-yaml highlight"><pre><span></span><code><span id="__span-11-1"><a href="#__codelineno-11-1" id="__codelineno-11-1" name="__codelineno-11-1"></a><span class="nt">regional_parameter_files</span><span class="p">:</span>
-</span><span id="__span-11-2"><a href="#__codelineno-11-2" id="__codelineno-11-2" name="__codelineno-11-2"></a><span class="hll"><span class="w">  </span><span class="nt">default</span><span class="p">:</span>
-</span></span><span id="__span-11-3"><a href="#__codelineno-11-3" id="__codelineno-11-3" name="__codelineno-11-3"></a><span class="hll"><span class="w">    </span><span class="nt">COACCH</span><span class="p">:</span>
-</span></span><span id="__span-11-4"><a href="#__codelineno-11-4" id="__codelineno-11-4" name="__codelineno-11-4"></a><span class="hll"><span class="w">      </span><span class="nt">filename</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">inputdata/regionalparams/COACCH.csv</span>
-</span></span><span id="__span-11-5"><a href="#__codelineno-11-5" id="__codelineno-11-5" name="__codelineno-11-5"></a><span class="hll"><span class="w">      </span><span class="nt">regionstype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">COACCH</span>
-</span></span><span id="__span-11-6"><a href="#__codelineno-11-6" id="__codelineno-11-6" name="__codelineno-11-6"></a><span class="hll"><span class="w">    </span><span class="nt">MAC</span><span class="p">:</span>
-</span></span><span id="__span-11-7"><a href="#__codelineno-11-7" id="__codelineno-11-7" name="__codelineno-11-7"></a><span class="hll"><span class="w">      </span><span class="nt">filename</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">inputdata/regionalparams/mac.csv</span>
-</span></span><span id="__span-11-8"><a href="#__codelineno-11-8" id="__codelineno-11-8" name="__codelineno-11-8"></a><span class="hll"><span class="w">      </span><span class="nt">regionstype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">IMAGE26</span>
-</span></span><span id="__span-11-9"><a href="#__codelineno-11-9" id="__codelineno-11-9" name="__codelineno-11-9"></a><span class="hll"><span class="w">    </span><span class="nt">economics</span><span class="p">:</span>
-</span></span><span id="__span-11-10"><a href="#__codelineno-11-10" id="__codelineno-11-10" name="__codelineno-11-10"></a><span class="hll"><span class="w">      </span><span class="nt">filename</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">inputdata/regionalparams/economics.csv</span>
-</span></span><span id="__span-11-11"><a href="#__codelineno-11-11" id="__codelineno-11-11" name="__codelineno-11-11"></a><span class="hll"><span class="w">      </span><span class="nt">regionstype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">IMAGE26</span>
-</span></span><span id="__span-11-12"><a href="#__codelineno-11-12" id="__codelineno-11-12" name="__codelineno-11-12"></a><span class="hll"><span class="w">  </span><span class="nt">descr</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Dictionary of regional parameter files. If the regionstype of the file is different</span>
-</span></span><span id="__span-11-13"><a href="#__codelineno-11-13" id="__codelineno-11-13" name="__codelineno-11-13"></a><span class="hll"><span class="w">    </span><span class="l l-Scalar l-Scalar-Plain">from the regionstype of the model, the file is converted using the `regionsmappings`</span>
-</span></span><span id="__span-11-14"><a href="#__codelineno-11-14" id="__codelineno-11-14" name="__codelineno-11-14"></a><span class="hll"><span class="w">    </span><span class="l l-Scalar l-Scalar-Plain">parameter.</span>
-</span></span><span id="__span-11-15"><a href="#__codelineno-11-15" id="__codelineno-11-15" name="__codelineno-11-15"></a><span class="hll"><span class="w">  </span><span class="nt">keys</span><span class="p">:</span>
-</span></span><span id="__span-11-16"><a href="#__codelineno-11-16" id="__codelineno-11-16" name="__codelineno-11-16"></a><span class="hll"><span class="w">    </span><span class="nt">descr</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Names of the parameter category (e.g. 'MAC', 'damage', 'adaptation', etc.)</span>
-</span></span><span id="__span-11-17"><a href="#__codelineno-11-17" id="__codelineno-11-17" name="__codelineno-11-17"></a><span class="hll"><span class="w">      </span><span class="l l-Scalar l-Scalar-Plain">used when assigning the values to the regional parameters.</span>
-</span></span><span id="__span-11-18"><a href="#__codelineno-11-18" id="__codelineno-11-18" name="__codelineno-11-18"></a><span class="hll"><span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">str</span>
-</span></span><span id="__span-11-19"><a href="#__codelineno-11-19" id="__codelineno-11-19" name="__codelineno-11-19"></a><span class="hll"><span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dict</span>
-</span></span><span id="__span-11-20"><a href="#__codelineno-11-20" id="__codelineno-11-20" name="__codelineno-11-20"></a><span class="hll"><span class="w">  </span><span class="nt">values</span><span class="p">:</span>
-</span></span><span id="__span-11-21"><a href="#__codelineno-11-21" id="__codelineno-11-21" name="__codelineno-11-21"></a><span class="hll"><span class="w">    </span><span class="nt">descr</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Dictionary with keys `filename` and `regionstype`</span>
-</span></span><span id="__span-11-22"><a href="#__codelineno-11-22" id="__codelineno-11-22" name="__codelineno-11-22"></a><span class="hll"><span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dict</span>
+<p><div class="language-yaml highlight"><pre><span></span><code><span id="__span-10-1"><a href="#__codelineno-10-1" id="__codelineno-10-1" name="__codelineno-10-1"></a><span class="nt">regional_parameter_files</span><span class="p">:</span>
+</span><span id="__span-10-2"><a href="#__codelineno-10-2" id="__codelineno-10-2" name="__codelineno-10-2"></a><span class="hll"><span class="w">  </span><span class="nt">default</span><span class="p">:</span>
+</span></span><span id="__span-10-3"><a href="#__codelineno-10-3" id="__codelineno-10-3" name="__codelineno-10-3"></a><span class="hll"><span class="w">    </span><span class="nt">COACCH</span><span class="p">:</span>
+</span></span><span id="__span-10-4"><a href="#__codelineno-10-4" id="__codelineno-10-4" name="__codelineno-10-4"></a><span class="hll"><span class="w">      </span><span class="nt">filename</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">inputdata/regionalparams/COACCH.csv</span>
+</span></span><span id="__span-10-5"><a href="#__codelineno-10-5" id="__codelineno-10-5" name="__codelineno-10-5"></a><span class="hll"><span class="w">      </span><span class="nt">regionstype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">COACCH</span>
+</span></span><span id="__span-10-6"><a href="#__codelineno-10-6" id="__codelineno-10-6" name="__codelineno-10-6"></a><span class="hll"><span class="w">    </span><span class="nt">MAC</span><span class="p">:</span>
+</span></span><span id="__span-10-7"><a href="#__codelineno-10-7" id="__codelineno-10-7" name="__codelineno-10-7"></a><span class="hll"><span class="w">      </span><span class="nt">filename</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">inputdata/regionalparams/mac.csv</span>
+</span></span><span id="__span-10-8"><a href="#__codelineno-10-8" id="__codelineno-10-8" name="__codelineno-10-8"></a><span class="hll"><span class="w">      </span><span class="nt">regionstype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">IMAGE26</span>
+</span></span><span id="__span-10-9"><a href="#__codelineno-10-9" id="__codelineno-10-9" name="__codelineno-10-9"></a><span class="hll"><span class="w">    </span><span class="nt">economics</span><span class="p">:</span>
+</span></span><span id="__span-10-10"><a href="#__codelineno-10-10" id="__codelineno-10-10" name="__codelineno-10-10"></a><span class="hll"><span class="w">      </span><span class="nt">filename</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">inputdata/regionalparams/economics.csv</span>
+</span></span><span id="__span-10-11"><a href="#__codelineno-10-11" id="__codelineno-10-11" name="__codelineno-10-11"></a><span class="hll"><span class="w">      </span><span class="nt">regionstype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">IMAGE26</span>
+</span></span><span id="__span-10-12"><a href="#__codelineno-10-12" id="__codelineno-10-12" name="__codelineno-10-12"></a><span class="hll"><span class="w">  </span><span class="nt">descr</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Dictionary of regional parameter files. If the regionstype of the file is different</span>
+</span></span><span id="__span-10-13"><a href="#__codelineno-10-13" id="__codelineno-10-13" name="__codelineno-10-13"></a><span class="hll"><span class="w">    </span><span class="l l-Scalar l-Scalar-Plain">from the regionstype of the model, the file is converted using the `regionsmappings`</span>
+</span></span><span id="__span-10-14"><a href="#__codelineno-10-14" id="__codelineno-10-14" name="__codelineno-10-14"></a><span class="hll"><span class="w">    </span><span class="l l-Scalar l-Scalar-Plain">parameter.</span>
+</span></span><span id="__span-10-15"><a href="#__codelineno-10-15" id="__codelineno-10-15" name="__codelineno-10-15"></a><span class="hll"><span class="w">  </span><span class="nt">keys</span><span class="p">:</span>
+</span></span><span id="__span-10-16"><a href="#__codelineno-10-16" id="__codelineno-10-16" name="__codelineno-10-16"></a><span class="hll"><span class="w">    </span><span class="nt">descr</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Names of the parameter category (e.g. 'MAC', 'damage', 'adaptation', etc.)</span>
+</span></span><span id="__span-10-17"><a href="#__codelineno-10-17" id="__codelineno-10-17" name="__codelineno-10-17"></a><span class="hll"><span class="w">      </span><span class="l l-Scalar l-Scalar-Plain">used when assigning the values to the regional parameters.</span>
+</span></span><span id="__span-10-18"><a href="#__codelineno-10-18" id="__codelineno-10-18" name="__codelineno-10-18"></a><span class="hll"><span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">str</span>
+</span></span><span id="__span-10-19"><a href="#__codelineno-10-19" id="__codelineno-10-19" name="__codelineno-10-19"></a><span class="hll"><span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dict</span>
+</span></span><span id="__span-10-20"><a href="#__codelineno-10-20" id="__codelineno-10-20" name="__codelineno-10-20"></a><span class="hll"><span class="w">  </span><span class="nt">values</span><span class="p">:</span>
+</span></span><span id="__span-10-21"><a href="#__codelineno-10-21" id="__codelineno-10-21" name="__codelineno-10-21"></a><span class="hll"><span class="w">    </span><span class="nt">descr</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Dictionary with keys `filename` and `regionstype`</span>
+</span></span><span id="__span-10-22"><a href="#__codelineno-10-22" id="__codelineno-10-22" name="__codelineno-10-22"></a><span class="hll"><span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dict</span>
+</span></span></code></pre></div>
+</p></div>
+</details>
+<details class="parameter">
+<summary>datasource</summary>
+<div class="param_anchor" id="parser-datasource" markdown="">
+<p>Data source for a variable. It's a dictionary with the keys <code>variable</code>, <code>unit</code>, <code>scenario</code>, <code>model</code>, and <code>file</code>.</p>
+<p>Example usage:</p>
+<p><div class="language-yaml highlight"><pre><span></span><code><span id="__span-11-1"><a href="#__codelineno-11-1" id="__codelineno-11-1" name="__codelineno-11-1"></a><span class="nt">input</span><span class="p">:</span>
+</span><span id="__span-11-2"><a href="#__codelineno-11-2" id="__codelineno-11-2" name="__codelineno-11-2"></a><span class="w">  </span><span class="nt">variables</span><span class="p">:</span>
+</span><span id="__span-11-3"><a href="#__codelineno-11-3" id="__codelineno-11-3" name="__codelineno-11-3"></a><span class="w">    </span><span class="nt">GDP</span><span class="p">:</span>
+</span><span id="__span-11-4"><a href="#__codelineno-11-4" id="__codelineno-11-4" name="__codelineno-11-4"></a><span class="hll"><span class="w">      </span><span class="nt">default</span><span class="p">:</span>
+</span></span><span id="__span-11-5"><a href="#__codelineno-11-5" id="__codelineno-11-5" name="__codelineno-11-5"></a><span class="hll"><span class="w">        </span><span class="nt">file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">inputdata/data/data_IMAGE_SSP.csv</span>
+</span></span><span id="__span-11-6"><a href="#__codelineno-11-6" id="__codelineno-11-6" name="__codelineno-11-6"></a><span class="hll"><span class="w">        </span><span class="nt">model</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">IMAGE</span>
+</span></span><span id="__span-11-7"><a href="#__codelineno-11-7" id="__codelineno-11-7" name="__codelineno-11-7"></a><span class="hll"><span class="w">        </span><span class="nt">scenario</span><span class="p">:</span><span class="w"> </span><span class="s">'{SSP}-Ref-SPA0-V17'</span>
+</span></span><span id="__span-11-8"><a href="#__codelineno-11-8" id="__codelineno-11-8" name="__codelineno-11-8"></a><span class="hll"><span class="w">        </span><span class="nt">unit</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">currency_unit</span>
+</span></span><span id="__span-11-9"><a href="#__codelineno-11-9" id="__codelineno-11-9" name="__codelineno-11-9"></a><span class="hll"><span class="w">        </span><span class="nt">variable</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">GDP|PPP</span>
+</span></span><span id="__span-11-10"><a href="#__codelineno-11-10" id="__codelineno-11-10" name="__codelineno-11-10"></a><span class="hll"><span class="w">      </span><span class="nt">descr</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Data source of GDP</span>
+</span></span><span id="__span-11-11"><a href="#__codelineno-11-11" id="__codelineno-11-11" name="__codelineno-11-11"></a><span class="hll"><span class="w">      </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">datasource</span>
 </span></span></code></pre></div>
 </p></div>
 </details>
@@ -1137,15 +1146,7 @@ cannot be converted to GtCO2.</p>
 <summary>filepath</summary>
 <div class="param_anchor" id="parser-filepath" markdown="">
 <p>Filepath value. Currently exactly the same as the string type.</p>
-<p>Example usage:</p>
-<p><div class="language-yaml highlight"><pre><span></span><code><span id="__span-12-1"><a href="#__codelineno-12-1" id="__codelineno-12-1" name="__codelineno-12-1"></a><span class="nt">input</span><span class="p">:</span>
-</span><span id="__span-12-2"><a href="#__codelineno-12-2" id="__codelineno-12-2" name="__codelineno-12-2"></a><span class="w">  </span><span class="nt">db_filename</span><span class="p">:</span>
-</span><span id="__span-12-3"><a href="#__codelineno-12-3" id="__codelineno-12-3" name="__codelineno-12-3"></a><span class="hll"><span class="w">    </span><span class="nt">default</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">inputdata/data/data_IMAGE_SSP.csv</span>
-</span></span><span id="__span-12-4"><a href="#__codelineno-12-4" id="__codelineno-12-4" name="__codelineno-12-4"></a><span class="hll"><span class="w">    </span><span class="nt">descr</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Path to IAMC-formatted CSV file for baseline data</span>
-</span></span><span id="__span-12-5"><a href="#__codelineno-12-5" id="__codelineno-12-5" name="__codelineno-12-5"></a><span class="hll"><span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">filepath</span>
-</span></span></code></pre></div>
-</p></div>
-</details>
+</div></details>
 <details class="parameter">
 <summary>str_or_plain_dict</summary>
 <div class="param_anchor" id="parser-str_or_plain_dict" markdown="">
@@ -1154,24 +1155,24 @@ cannot be converted to GtCO2.</p>
 </details>
 <h2 id="regional-params">Regional parameters</h2>
 <p>The configuration file can be used to set <em>scalar</em> parameters. However, some parameters are regional. These are created like:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-13-1"><a href="#__codelineno-13-1" id="__codelineno-13-1" name="__codelineno-13-1"></a><span class="n">m</span><span class="o">.</span><span class="n">new_regional_param</span> <span class="o">=</span> <span class="n">Param</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">regions</span><span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-12-1"><a href="#__codelineno-12-1" id="__codelineno-12-1" name="__codelineno-12-1"></a><span class="n">m</span><span class="o">.</span><span class="n">new_regional_param</span> <span class="o">=</span> <span class="n">Param</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">regions</span><span class="p">)</span>
 </span></code></pre></div>
 <p>Initializing their value is done in three steps:</p>
 <ol>
 <li>
 <p><strong>Create a CSV file</strong> with a column <code>region</code> and the columns with regional parameter values you want to use:</p>
 <p>In the folder <a href="https://github.com/UtrechtUniversity/mimosa/tree/master/mimosa/inputdata/regionalparams/"><code>mimosa/inputdata/regionalparams/</code></a>, create a new CSV file:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-14-1"><a href="#__codelineno-14-1" id="__codelineno-14-1" name="__codelineno-14-1"></a><span class="n">mimosa</span>
-</span><span id="__span-14-2"><a href="#__codelineno-14-2" id="__codelineno-14-2" name="__codelineno-14-2"></a><span class="err">│</span>   <span class="o">...</span>
-</span><span id="__span-14-3"><a href="#__codelineno-14-3" id="__codelineno-14-3" name="__codelineno-14-3"></a><span class="err">│</span>
-</span><span id="__span-14-4"><a href="#__codelineno-14-4" id="__codelineno-14-4" name="__codelineno-14-4"></a><span class="err">└───</span> <span class="n">inputdata</span>
-</span><span id="__span-14-5"><a href="#__codelineno-14-5" id="__codelineno-14-5" name="__codelineno-14-5"></a>    <span class="err">└───</span> <span class="n">config</span>
-</span><span id="__span-14-6"><a href="#__codelineno-14-6" id="__codelineno-14-6" name="__codelineno-14-6"></a>        <span class="err">│</span>   <span class="n">config_default</span><span class="o">.</span><span class="n">csv</span>
-</span><span id="__span-14-7"><a href="#__codelineno-14-7" id="__codelineno-14-7" name="__codelineno-14-7"></a>    <span class="err">└───</span> <span class="n">regionalparams</span>
-</span><span id="__span-14-8"><a href="#__codelineno-14-8" id="__codelineno-14-8" name="__codelineno-14-8"></a>        <span class="err">│</span>   <span class="n">economics</span><span class="o">.</span><span class="n">csv</span>
-</span><span id="__span-14-9"><a href="#__codelineno-14-9" id="__codelineno-14-9" name="__codelineno-14-9"></a>        <span class="o">|</span>   <span class="n">mac</span><span class="o">.</span><span class="n">csv</span> 
-</span><span id="__span-14-10"><a href="#__codelineno-14-10" id="__codelineno-14-10" name="__codelineno-14-10"></a><span class="hll">        <span class="o">|</span>   <span class="n">newfile</span><span class="o">.</span><span class="n">csv</span>
-</span></span><span id="__span-14-11"><a href="#__codelineno-14-11" id="__codelineno-14-11" name="__codelineno-14-11"></a>        <span class="o">|</span>   <span class="o">...</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-13-1"><a href="#__codelineno-13-1" id="__codelineno-13-1" name="__codelineno-13-1"></a><span class="n">mimosa</span>
+</span><span id="__span-13-2"><a href="#__codelineno-13-2" id="__codelineno-13-2" name="__codelineno-13-2"></a><span class="err">│</span>   <span class="o">...</span>
+</span><span id="__span-13-3"><a href="#__codelineno-13-3" id="__codelineno-13-3" name="__codelineno-13-3"></a><span class="err">│</span>
+</span><span id="__span-13-4"><a href="#__codelineno-13-4" id="__codelineno-13-4" name="__codelineno-13-4"></a><span class="err">└───</span> <span class="n">inputdata</span>
+</span><span id="__span-13-5"><a href="#__codelineno-13-5" id="__codelineno-13-5" name="__codelineno-13-5"></a>    <span class="err">└───</span> <span class="n">config</span>
+</span><span id="__span-13-6"><a href="#__codelineno-13-6" id="__codelineno-13-6" name="__codelineno-13-6"></a>        <span class="err">│</span>   <span class="n">config_default</span><span class="o">.</span><span class="n">csv</span>
+</span><span id="__span-13-7"><a href="#__codelineno-13-7" id="__codelineno-13-7" name="__codelineno-13-7"></a>    <span class="err">└───</span> <span class="n">regionalparams</span>
+</span><span id="__span-13-8"><a href="#__codelineno-13-8" id="__codelineno-13-8" name="__codelineno-13-8"></a>        <span class="err">│</span>   <span class="n">economics</span><span class="o">.</span><span class="n">csv</span>
+</span><span id="__span-13-9"><a href="#__codelineno-13-9" id="__codelineno-13-9" name="__codelineno-13-9"></a>        <span class="o">|</span>   <span class="n">mac</span><span class="o">.</span><span class="n">csv</span> 
+</span><span id="__span-13-10"><a href="#__codelineno-13-10" id="__codelineno-13-10" name="__codelineno-13-10"></a><span class="hll">        <span class="o">|</span>   <span class="n">newfile</span><span class="o">.</span><span class="n">csv</span>
+</span></span><span id="__span-13-11"><a href="#__codelineno-13-11" id="__codelineno-13-11" name="__codelineno-13-11"></a>        <span class="o">|</span>   <span class="o">...</span>
 </span></code></pre></div>
 <p>This file should have at least a column <code>region</code> and one (or more) columns for the regional values:</p>
 <p><span class="twemoji"><svg viewbox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M0 64C0 28.7 28.7 0 64 0h160v128c0 17.7 14.3 32 32 32h128v144H176c-35.3 0-64 28.7-64 64v144H64c-35.3 0-64-28.7-64-64V64zm384 64H256V0l128 128zM200 352h16c22.1 0 40 17.9 40 40v8c0 8.8-7.2 16-16 16s-16-7.2-16-16v-8c0-4.4-3.6-8-8-8h-16c-4.4 0-8 3.6-8 8v80c0 4.4 3.6 8 8 8h16c4.4 0 8-3.6 8-8v-8c0-8.8 7.2-16 16-16s16 7.2 16 16v8c0 22.1-17.9 40-40 40h-16c-22.1 0-40-17.9-40-40v-80c0-22.1 17.9-40 40-40zm133.1 0H368c8.8 0 16 7.2 16 16s-7.2 16-16 16h-34.9c-7.2 0-13.1 5.9-13.1 13.1 0 5.2 3 9.9 7.8 12l37.4 16.6c16.3 7.2 26.8 23.4 26.8 41.2 0 24.9-20.2 45.1-45.1 45.1H304c-8.8 0-16-7.2-16-16s7.2-16 16-16h42.9c7.2 0 13.1-5.9 13.1-13.1 0-5.2-3-9.9-7.8-12l-37.4-16.6c-16.3-7.2-26.8-23.4-26.8-41.2 0-24.9 20.2-45.1 45.1-45.1zm98.9 0c8.8 0 16 7.2 16 16v31.6c0 23 5.5 45.6 16 66 10.5-20.3 16-42.9 16-66V368c0-8.8 7.2-16 16-16s16 7.2 16 16v31.6c0 34.7-10.3 68.7-29.6 97.6l-5.1 7.7c-3 4.5-8 7.1-13.3 7.1s-10.3-2.7-13.3-7.1l-5.1-7.7c-19.3-28.9-29.6-62.9-29.6-97.6V368c0-8.8 7.2-16 16-16z"></path></svg></span> <code>mimosa/inputdata/regionalparams/newfile.csv</code></p>
@@ -1210,17 +1211,17 @@ cannot be converted to GtCO2.</p>
 </li>
 <li>
 <p><strong>Register this regional parameter file</strong> in the configuration file under the key <a href="../../parameters/#regional_parameter_files"><code>regional_parameter_files</code></a>:</p>
-<div class="language-yaml highlight"><span class="filename">mimosa/inputdata/config/config_default.yaml</span><pre><span></span><code><span id="__span-15-1"><a href="#__codelineno-15-1" id="__codelineno-15-1" name="__codelineno-15-1"></a><span class="nn">...</span>
-</span><span id="__span-15-2"><a href="#__codelineno-15-2" id="__codelineno-15-2" name="__codelineno-15-2"></a><span class="nt">regional_parameter_files</span><span class="p">:</span>
-</span><span id="__span-15-3"><a href="#__codelineno-15-3" id="__codelineno-15-3" name="__codelineno-15-3"></a><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">...</span>
-</span><span id="__span-15-4"><a href="#__codelineno-15-4" id="__codelineno-15-4" name="__codelineno-15-4"></a><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">default</span><span class="p p-Indicator">:</span>
-</span><span id="__span-15-5"><a href="#__codelineno-15-5" id="__codelineno-15-5" name="__codelineno-15-5"></a><span class="w">    </span><span class="nt">economics</span><span class="p">:</span>
-</span><span id="__span-15-6"><a href="#__codelineno-15-6" id="__codelineno-15-6" name="__codelineno-15-6"></a><span class="w">      </span><span class="nt">filename</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">inputdata/regionalparams/economics.csv</span>
-</span><span id="__span-15-7"><a href="#__codelineno-15-7" id="__codelineno-15-7" name="__codelineno-15-7"></a><span class="w">      </span><span class="nt">regionstype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">IMAGE26</span>
-</span><span id="__span-15-8"><a href="#__codelineno-15-8" id="__codelineno-15-8" name="__codelineno-15-8"></a><span class="hll"><span class="w">    </span><span class="nt">newparamgroup</span><span class="p">:</span>
-</span></span><span id="__span-15-9"><a href="#__codelineno-15-9" id="__codelineno-15-9" name="__codelineno-15-9"></a><span class="hll"><span class="w">      </span><span class="nt">filename</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">inputdata/regionalparams/newfile.csv</span>
-</span></span><span id="__span-15-10"><a href="#__codelineno-15-10" id="__codelineno-15-10" name="__codelineno-15-10"></a><span class="hll"><span class="w">      </span><span class="nt">regionstype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">IMAGE26</span>
-</span></span><span id="__span-15-11"><a href="#__codelineno-15-11" id="__codelineno-15-11" name="__codelineno-15-11"></a><span class="w">    </span><span class="l l-Scalar l-Scalar-Plain">...</span>
+<div class="language-yaml highlight"><span class="filename">mimosa/inputdata/config/config_default.yaml</span><pre><span></span><code><span id="__span-14-1"><a href="#__codelineno-14-1" id="__codelineno-14-1" name="__codelineno-14-1"></a><span class="nn">...</span>
+</span><span id="__span-14-2"><a href="#__codelineno-14-2" id="__codelineno-14-2" name="__codelineno-14-2"></a><span class="nt">regional_parameter_files</span><span class="p">:</span>
+</span><span id="__span-14-3"><a href="#__codelineno-14-3" id="__codelineno-14-3" name="__codelineno-14-3"></a><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">...</span>
+</span><span id="__span-14-4"><a href="#__codelineno-14-4" id="__codelineno-14-4" name="__codelineno-14-4"></a><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">default</span><span class="p p-Indicator">:</span>
+</span><span id="__span-14-5"><a href="#__codelineno-14-5" id="__codelineno-14-5" name="__codelineno-14-5"></a><span class="w">    </span><span class="nt">economics</span><span class="p">:</span>
+</span><span id="__span-14-6"><a href="#__codelineno-14-6" id="__codelineno-14-6" name="__codelineno-14-6"></a><span class="w">      </span><span class="nt">filename</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">inputdata/regionalparams/economics.csv</span>
+</span><span id="__span-14-7"><a href="#__codelineno-14-7" id="__codelineno-14-7" name="__codelineno-14-7"></a><span class="w">      </span><span class="nt">regionstype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">IMAGE26</span>
+</span><span id="__span-14-8"><a href="#__codelineno-14-8" id="__codelineno-14-8" name="__codelineno-14-8"></a><span class="hll"><span class="w">    </span><span class="nt">newparamgroup</span><span class="p">:</span>
+</span></span><span id="__span-14-9"><a href="#__codelineno-14-9" id="__codelineno-14-9" name="__codelineno-14-9"></a><span class="hll"><span class="w">      </span><span class="nt">filename</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">inputdata/regionalparams/newfile.csv</span>
+</span></span><span id="__span-14-10"><a href="#__codelineno-14-10" id="__codelineno-14-10" name="__codelineno-14-10"></a><span class="hll"><span class="w">      </span><span class="nt">regionstype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">IMAGE26</span>
+</span></span><span id="__span-14-11"><a href="#__codelineno-14-11" id="__codelineno-14-11" name="__codelineno-14-11"></a><span class="w">    </span><span class="l l-Scalar l-Scalar-Plain">...</span>
 </span></code></pre></div>
 <details class="info">
 <summary>What if my parameter values have a different regional resolution?</summary>
@@ -1230,13 +1231,144 @@ cannot be converted to GtCO2.</p>
 </li>
 <li>
 <p><strong>Link the <code>Param</code></strong> to the relevant column in the CSV file:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-16-1"><a href="#__codelineno-16-1" id="__codelineno-16-1" name="__codelineno-16-1"></a><span class="n">m</span><span class="o">.</span><span class="n">new_regional_param</span> <span class="o">=</span> <span class="n">Param</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">regions</span><span class="p">,</span> <span class="n">doc</span><span class="o">=</span><span class="s2">"regional::newparamgroup.newparam1"</span><span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-15-1"><a href="#__codelineno-15-1" id="__codelineno-15-1" name="__codelineno-15-1"></a><span class="n">m</span><span class="o">.</span><span class="n">new_regional_param</span> <span class="o">=</span> <span class="n">Param</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">regions</span><span class="p">,</span> <span class="n">doc</span><span class="o">=</span><span class="s2">"regional::newparamgroup.newparam1"</span><span class="p">)</span>
 </span></code></pre></div>
 </li>
 </ol>
+<h2 id="time-and-region-dependent-data">Time and region dependent data</h2>
+<p>The third type of parameters are time and region dependent parameters. This is typically used for baseline data, such as population, GDP, etc. </p>
+<p>They are defined like any other parameter, but with the <code>time</code> and <code>regions</code> dimensions. For example, the population data is defined as:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-16-1"><a href="#__codelineno-16-1" id="__codelineno-16-1" name="__codelineno-16-1"></a><span class="n">m</span><span class="o">.</span><span class="n">population</span> <span class="o">=</span> <span class="n">Param</span><span class="p">(</span>
+</span><span id="__span-16-2"><a href="#__codelineno-16-2" id="__codelineno-16-2" name="__codelineno-16-2"></a>    <span class="n">m</span><span class="o">.</span><span class="n">t</span><span class="p">,</span>
+</span><span id="__span-16-3"><a href="#__codelineno-16-3" id="__codelineno-16-3" name="__codelineno-16-3"></a>    <span class="n">m</span><span class="o">.</span><span class="n">regions</span><span class="p">,</span>
+</span><span id="__span-16-4"><a href="#__codelineno-16-4" id="__codelineno-16-4" name="__codelineno-16-4"></a>    <span class="n">doc</span><span class="o">=</span><span class="s2">"timeandregional::population"</span><span class="p">,</span>
+</span><span id="__span-16-5"><a href="#__codelineno-16-5" id="__codelineno-16-5" name="__codelineno-16-5"></a>    <span class="n">units</span><span class="o">=</span><span class="n">quant</span><span class="o">.</span><span class="n">unit</span><span class="p">(</span><span class="s2">"billion people"</span><span class="p">),</span> <span class="c1"># (1)!</span>
+</span><span id="__span-16-6"><a href="#__codelineno-16-6" id="__codelineno-16-6" name="__codelineno-16-6"></a><span class="p">)</span>
+</span></code></pre></div>
+<ol>
+<li>The <code>units</code> field is optional, but it is good practice to include it. This is especially important for numerical values with units (values that are not dimensionless). The <code>quant</code> module is imported as <code>quant</code> from the <code>mimosa</code> package.</li>
+</ol>
+<p>Just like regional parameters, the parameter values are linked to the underlying data using the <code>doc</code> field, starting with <code>timeandregional::</code>. The input data source should be in IAMC format. For each parameter, the filename, variable, scenario and model should be specified in the configuration file:</p>
+<div class="language-yaml highlight"><span class="filename">mimosa/inputdata/config/config_default.yaml</span><pre><span></span><code><span id="__span-17-1"><a href="#__codelineno-17-1" id="__codelineno-17-1" name="__codelineno-17-1"></a><span class="nn">...</span>
+</span><span id="__span-17-2"><a href="#__codelineno-17-2" id="__codelineno-17-2" name="__codelineno-17-2"></a><span class="nt">input</span><span class="p">:</span>
+</span><span id="__span-17-3"><a href="#__codelineno-17-3" id="__codelineno-17-3" name="__codelineno-17-3"></a><span class="w">  </span><span class="nt">variables</span><span class="p">:</span>
+</span><span id="__span-17-4"><a href="#__codelineno-17-4" id="__codelineno-17-4" name="__codelineno-17-4"></a><span class="w">    </span><span class="nt">population</span><span class="p">:</span><span class="w"> </span><span class="c1"># (1)!</span>
+</span><span id="__span-17-5"><a href="#__codelineno-17-5" id="__codelineno-17-5" name="__codelineno-17-5"></a><span class="w">      </span><span class="nt">descr</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Data source of population</span>
+</span><span id="__span-17-6"><a href="#__codelineno-17-6" id="__codelineno-17-6" name="__codelineno-17-6"></a><span class="w">      </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">datasource</span>
+</span><span id="__span-17-7"><a href="#__codelineno-17-7" id="__codelineno-17-7" name="__codelineno-17-7"></a><span class="w">      </span><span class="nt">default</span><span class="p">:</span>
+</span><span id="__span-17-8"><a href="#__codelineno-17-8" id="__codelineno-17-8" name="__codelineno-17-8"></a><span class="hll"><span class="w">        </span><span class="nt">variable</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Population</span>
+</span></span><span id="__span-17-9"><a href="#__codelineno-17-9" id="__codelineno-17-9" name="__codelineno-17-9"></a><span class="hll"><span class="w">        </span><span class="nt">unit</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">population_unit</span>
+</span></span><span id="__span-17-10"><a href="#__codelineno-17-10" id="__codelineno-17-10" name="__codelineno-17-10"></a><span class="hll"><span class="w">        </span><span class="nt">scenario</span><span class="p">:</span><span class="w"> </span><span class="s">"{SSP}-Ref-SPA0-V17"</span>
+</span></span><span id="__span-17-11"><a href="#__codelineno-17-11" id="__codelineno-17-11" name="__codelineno-17-11"></a><span class="hll"><span class="w">        </span><span class="nt">model</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">IMAGE</span>
+</span></span><span id="__span-17-12"><a href="#__codelineno-17-12" id="__codelineno-17-12" name="__codelineno-17-12"></a><span class="hll"><span class="w">        </span><span class="nt">file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">inputdata/data/data_IMAGE_SSP.csv</span>
+</span></span><span id="__span-17-13"><a href="#__codelineno-17-13" id="__codelineno-17-13" name="__codelineno-17-13"></a><span class="w">    </span><span class="l l-Scalar l-Scalar-Plain">...</span>
+</span></code></pre></div>
+<ol>
+<li>The name defined here (<code>population</code>) should match the name used in the <code>doc</code> field of the parameter definition: <code>timeandregional::<b>population</b></code>.</li>
+</ol>
+<p>The <code>file</code> field should point to the IAMC formatted data file. The IAMC format is a CSV file with the following columns:</p>
+<p><span class="twemoji"><svg viewbox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M0 64C0 28.7 28.7 0 64 0h160v128c0 17.7 14.3 32 32 32h128v144H176c-35.3 0-64 28.7-64 64v144H64c-35.3 0-64-28.7-64-64V64zm384 64H256V0l128 128zM200 352h16c22.1 0 40 17.9 40 40v8c0 8.8-7.2 16-16 16s-16-7.2-16-16v-8c0-4.4-3.6-8-8-8h-16c-4.4 0-8 3.6-8 8v80c0 4.4 3.6 8 8 8h16c4.4 0 8-3.6 8-8v-8c0-8.8 7.2-16 16-16s16 7.2 16 16v8c0 22.1-17.9 40-40 40h-16c-22.1 0-40-17.9-40-40v-80c0-22.1 17.9-40 40-40zm133.1 0H368c8.8 0 16 7.2 16 16s-7.2 16-16 16h-34.9c-7.2 0-13.1 5.9-13.1 13.1 0 5.2 3 9.9 7.8 12l37.4 16.6c16.3 7.2 26.8 23.4 26.8 41.2 0 24.9-20.2 45.1-45.1 45.1H304c-8.8 0-16-7.2-16-16s7.2-16 16-16h42.9c7.2 0 13.1-5.9 13.1-13.1 0-5.2-3-9.9-7.8-12l-37.4-16.6c-16.3-7.2-26.8-23.4-26.8-41.2 0-24.9 20.2-45.1 45.1-45.1zm98.9 0c8.8 0 16 7.2 16 16v31.6c0 23 5.5 45.6 16 66 10.5-20.3 16-42.9 16-66V368c0-8.8 7.2-16 16-16s16 7.2 16 16v31.6c0 34.7-10.3 68.7-29.6 97.6l-5.1 7.7c-3 4.5-8 7.1-13.3 7.1s-10.3-2.7-13.3-7.1l-5.1-7.7c-19.3-28.9-29.6-62.9-29.6-97.6V368c0-8.8 7.2-16 16-16z"></path></svg></span> <a href="https://github.com/UtrechtUniversity/mimosa/tree/master/mimosa/inputdata/data/data_IMAGE_SSP.csv"><code>mimosa/inputdata/data/data_IMAGE_SSP.csv</code></a></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Model</th>
+<th style="text-align: left;">Scenario</th>
+<th style="text-align: left;">Region</th>
+<th style="text-align: left;">Variable</th>
+<th style="text-align: left;">Unit</th>
+<th style="text-align: right;">2010</th>
+<th style="text-align: right;">2020</th>
+<th style="text-align: right;">2030</th>
+<th style="text-align: right;">2040</th>
+<th style="text-align: right;">2050</th>
+<th style="text-align: right;">2060</th>
+<th style="text-align: right;">2070</th>
+<th style="text-align: right;">2080</th>
+<th style="text-align: right;">2090</th>
+<th style="text-align: right;">2100</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">IMAGE</td>
+<td style="text-align: left;">SSP1-Ref-SPA0-V17</td>
+<td style="text-align: left;">BRA</td>
+<td style="text-align: left;">GDP|PPP</td>
+<td style="text-align: left;">billion US$2005/yr</td>
+<td style="text-align: right;">1967.58</td>
+<td style="text-align: right;">2679.72</td>
+<td style="text-align: right;">3829.08</td>
+<td style="text-align: right;">5331.48</td>
+<td style="text-align: right;">6912.49</td>
+<td style="text-align: right;">8386.99</td>
+<td style="text-align: right;">9572.49</td>
+<td style="text-align: right;">10475.8</td>
+<td style="text-align: right;">11043.6</td>
+<td style="text-align: right;">11245.4</td>
+</tr>
+<tr>
+<td style="text-align: left;">IMAGE</td>
+<td style="text-align: left;">SSP2-Ref-SPA0-V17</td>
+<td style="text-align: left;">BRA</td>
+<td style="text-align: left;">GDP|PPP</td>
+<td style="text-align: left;">billion US$2005/yr</td>
+<td style="text-align: right;">1967.58</td>
+<td style="text-align: right;">2697.05</td>
+<td style="text-align: right;">3618.3</td>
+<td style="text-align: right;">4491.94</td>
+<td style="text-align: right;">5378.44</td>
+<td style="text-align: right;">6285.55</td>
+<td style="text-align: right;">7175.7</td>
+<td style="text-align: right;">8083.65</td>
+<td style="text-align: right;">8970.67</td>
+<td style="text-align: right;">9881.11</td>
+</tr>
+<tr>
+<td style="text-align: left;">IMAGE</td>
+<td style="text-align: left;">SSP3-Ref-SPA0-V17</td>
+<td style="text-align: left;">BRA</td>
+<td style="text-align: left;">GDP|PPP</td>
+<td style="text-align: left;">billion US$2005/yr</td>
+<td style="text-align: right;">1967.58</td>
+<td style="text-align: right;">2714.89</td>
+<td style="text-align: right;">3464.9</td>
+<td style="text-align: right;">3888.87</td>
+<td style="text-align: right;">4152.04</td>
+<td style="text-align: right;">4333.24</td>
+<td style="text-align: right;">4462.94</td>
+<td style="text-align: right;">4575.67</td>
+<td style="text-align: right;">4633.92</td>
+<td style="text-align: right;">4679.27</td>
+</tr>
+<tr>
+<td style="text-align: left;">...</td>
+<td style="text-align: left;">...</td>
+<td style="text-align: left;">...</td>
+<td style="text-align: left;">...</td>
+<td style="text-align: left;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+</tr>
+</tbody>
+</table>
+<details class="info" open="open">
+<summary>Configuration values dependent on other parameter values</summary>
+<p>In the example above, the name of the scenario depends on the SSP. Every string in the configuration file can contain references
+to other parameters, and are referred to using curly brackets <code>{}</code>. If you want to refer to a nested parameter (like <a href="../../parameters/#effort%20sharing.regime"><code>effort sharing &gt; regime</code></a>), they should be joined
+with <code>-</code>:</p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-18-1"><a href="#__codelineno-18-1" id="__codelineno-18-1" name="__codelineno-18-1"></a><span class="nt">scenario</span><span class="p">:</span><span class="w"> </span><span class="s">"Scenario-with-{SSP}-and-{effort</span><span class="nv"> </span><span class="s">sharing</span><span class="nv"> </span><span class="s">-</span><span class="nv"> </span><span class="s">regime}"</span>
+</span></code></pre></div>
+</details>
 <h2 id="advanced-dynamic-parameter-settings">Advanced: dynamic parameter settings</h2>
 <h2 id="advanced-complex-parameter-manipulations-with-instantiate_paramspy">Advanced: complex parameter manipulations with <code>instantiate_params.py</code></h2>
-<h2 id="time-and-region-dependent-data">Time and region dependent data</h2>
 
 
 
