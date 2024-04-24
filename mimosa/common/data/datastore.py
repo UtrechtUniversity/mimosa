@@ -4,7 +4,7 @@ from a data file in IIASA database format
 """
 
 import os
-from typing import Callable, Dict
+from typing import Dict
 import numpy as np
 import pandas as pd
 from scipy.interpolate import interp1d
@@ -19,9 +19,6 @@ class DataStore:
 
     This data is read from a data file in IIASA format, and automatically transformed
     to the right units as specified in the config file.
-
-    Usage: once the data store is initialised, only the method `DataStore.data_object` will
-    be used.
     """
 
     # Class property and not instance property to reduce redundancy
@@ -128,17 +125,6 @@ class DataStore:
     def interp_data(self, year, region, variable):
         values = self._data_values[variable][region]
         return np.interp(year, values.xvalues, values.yvalues)
-
-    def data_object(self, variable: str) -> Callable[[int, str], float]:
-        """Creates a function giving the value of `variable` at a given year and regions.
-
-        Args:
-            variable (str): any of the keys of self._data_values
-
-        Returns:
-            Callable[[int, str], float]: interpolating function of type f(year, region)
-        """
-        return lambda year, region: self.interp_data(year, region, variable)
 
     def __repr__(self):
         return "DataStore with data values {} calculated on the years {}-{} for the regions {} and {}".format(

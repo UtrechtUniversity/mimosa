@@ -67,7 +67,6 @@ def create_abstract_model(
     # Will be initialised when creating a concrete instance of the model
     ######################
 
-    m.baseline_emissions = lambda year, region: None
     m.population = Param(
         m.t,
         m.regions,
@@ -86,14 +85,11 @@ def create_abstract_model(
         doc="timeandregional::carbon_intensity",
         units=quant.unit("emissionsrate_unit/currency_unit"),
     )
-
-    def baseline_cumulative(year_start, year_end, region):
-        years = np.linspace(year_start, year_end, 100)
-        return np.trapz(m.baseline_emissions(years, region), x=years)
-
-    m.baseline_cumulative = baseline_cumulative
-    m.baseline_cumulative_global = lambda m, year_start, year_end: sum(
-        baseline_cumulative(year_start, year_end, r) for r in m.regions
+    m.baseline_emissions = Param(
+        m.t,
+        m.regions,
+        doc="timeandregional::emissions",
+        units=quant.unit("emissionsrate_unit"),
     )
 
     ######################

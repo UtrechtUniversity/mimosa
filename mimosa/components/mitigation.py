@@ -306,10 +306,7 @@ def _get_learning_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
         GlobalConstraint(
             lambda m, t: m.LBD_factor[t]
             == soft_min(
-                (
-                    m.baseline_cumulative_global(m, m.year(0), m.year(t))
-                    - m.cumulative_emissions[t]
-                )
+                (m.cumulative_global_baseline_emissions[t] - m.cumulative_emissions[t])
                 / m.LBD_scaling
                 + 1.0
             )

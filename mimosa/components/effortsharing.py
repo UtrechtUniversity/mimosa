@@ -67,8 +67,8 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     # )
     m.percapconv_share_init = Param(
         m.regions,
-        initialize=lambda m, r: m.baseline_emissions(m.year(0), r)
-        / sum(m.baseline_emissions(m.year(0), s) for s in m.regions),
+        initialize=lambda m, r: m.baseline_emissions[0, r]
+        / sum(m.baseline_emissions[0, s] for s in m.regions),
     )
     m.percapconv_year = Param(initialize=2050, doc="::effort sharing.percapconv_year")
     m.percapconv_share_pop = Param(

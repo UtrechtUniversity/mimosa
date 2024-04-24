@@ -25,20 +25,10 @@ class InstantiatedModel:
         self.params = regional_param_store.params
         self.param_parser_tree = regional_param_store.param_parser_tree
 
-        # First, set the data functions in the abstract model
-        self.set_data_functions()
-
         self.instance_data = self.get_param_values()
 
         if create_concrete_model:
             self.concrete_model = self.create_instance()
-
-    def set_data_functions(self):
-        # The data functions need to be changed in the abstract model
-        # before initialization.
-        self.abstract_model.baseline_emissions = self.data_store.data_object(
-            "emissions"
-        )
 
     def create_instance(self):
         return self.abstract_model.create_instance(self.instance_data)
