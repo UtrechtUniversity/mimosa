@@ -37,6 +37,10 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
         :::mimosa.components.emissions._get_inertia_and_budget_constraints
 
     """
+
+    # First set baseline emission functions (cumulative emissions and global cumulative emissions)
+    _set_baseline_emissions(m)
+
     constraints = (
         _get_emissions_constraints(m)
         + _get_temperature_constraints(m)
@@ -44,6 +48,36 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     )
 
     return constraints
+
+
+def _set_baseline_emissions(m: AbstractModel) -> None:
+
+    # Create a param for the regional cumulative baseline emissions
+    def _calc_cum_baseline_emissions(m, t, r):
+        values_t = range(t + 1)
+        values = [value(m.baseline_emissions[s, r]) for s in values_t]
+        years = value(m.beginyear) + np.array(values_t) * value(m.dt)
+        return np.trapz(values, years)
+
+    m.cumulative_baseline_emissions = Param(
+        m.t, m.regions, initialize=_calc_cum_baseline_emissions
+    )
+
+    # And create a param for the global cumulative baseline emissions
+    m.cumulative_global_baseline_emissions = Param(
+        m.t,
+        initialize=lambda m, t: sum(
+            value(m.cumulative_baseline_emissions[t, r]) for r in m.regions
+        ),
+    )
+
+    # Finally, create a param for the regional baseline carbon intensity
+    m.baseline_carbon_intensity = Param(
+        m.t,
+        m.regions,
+        initialize=lambda m, t, r: (m.baseline_emissions[t, r] / m.baseline_GDP[t, r]),
+        units=quant.unit("emissionsrate_unit/currency_unit"),
+    )
 
 
 def _get_emissions_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
@@ -134,23 +168,6 @@ def _get_emissions_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     )
     m.use_carbon_intensity_for_baseline = Param(
         doc="::emissions.baseline carbon intensity"
-    )
-
-    def _calc_cum_baseline_emissions(m, t, r):
-        values_t = range(t + 1)
-        values = [value(m.baseline_emissions[s, r]) for s in values_t]
-        years = value(m.beginyear) + np.array(values_t) * value(m.dt)
-        return np.trapz(values, years)
-
-    m.cumulative_baseline_emissions = Param(
-        m.t, m.regions, initialize=_calc_cum_baseline_emissions
-    )
-
-    m.cumulative_global_baseline_emissions = Param(
-        m.t,
-        initialize=lambda m, t: sum(
-            value(m.cumulative_baseline_emissions[t, r]) for r in m.regions
-        ),
     )
 
     m.relative_abatement = Var(

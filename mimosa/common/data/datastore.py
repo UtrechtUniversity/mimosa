@@ -35,15 +35,6 @@ class DataStore:
             self._select_database(var_info["file"])
             self._data_values[var_name] = self._create_data_values(var_info)
 
-        self._data_values["carbon_intensity"] = {
-            r: UnitValues(
-                self._data_values["emissions"][r].xvalues,
-                self._data_values["emissions"][r].yvalues
-                / self._data_values["GDP"][r].yvalues,
-            )
-            for r in params["regions"]
-        }
-
     def _select_database(self, filename):
         """Makes sure the file doesn't need to be read multiple times"""
         full_path = os.path.join(

@@ -79,12 +79,6 @@ def create_abstract_model(
         doc="timeandregional::GDP",
         units=quant.unit("currency_unit"),
     )
-    m.baseline_carbon_intensity = Param(
-        m.t,
-        m.regions,
-        doc="timeandregional::carbon_intensity",
-        units=quant.unit("emissionsrate_unit/currency_unit"),
-    )
     m.baseline_emissions = Param(
         m.t,
         m.regions,
