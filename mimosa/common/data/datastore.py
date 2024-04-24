@@ -31,7 +31,7 @@ class DataStore:
         self._create_data_years()
         self._data_values = {}
 
-        for var_name, var_info in params["input"]["variables_new"].items():
+        for var_name, var_info in params["input"]["variables"].items():
             self._select_database(var_info["file"])
             self._data_values[var_name] = self._create_data_values(var_info)
 

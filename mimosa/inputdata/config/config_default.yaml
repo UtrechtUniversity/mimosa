@@ -487,76 +487,36 @@ regions:
 ##################
 
 input:
-  db_filename:
-    descr: Path to IAMC-formatted CSV file for baseline data
-    type: filepath
-    default: inputdata/data/data_IMAGE_SSP.csv
-
-  baselines:
-    SSP1:
-      scenario:
-        descr: Scenario name of SSP1 baseline
-        type: str
-        default: SSP1-Ref-SPA0-V17
-      model:
-        descr: Model name of SSP1 baseline
-        type: str
-        default: IMAGE
-    SSP2:
-      scenario:
-        descr: Scenario name of SSP2 baseline
-        type: str
-        default: SSP2-Ref-SPA0-V17
-      model:
-        descr: Model name of SSP2 baseline
-        type: str
-        default: IMAGE
-    SSP3:
-      scenario:
-        descr: Scenario name of SSP3 baseline
-        type: str
-        default: SSP3-Ref-SPA0-V17
-      model:
-        descr: Model name of SSP3 baseline
-        type: str
-        default: IMAGE
-    SSP4:
-      scenario:
-        descr: Scenario name of SSP4 baseline
-        type: str
-        default: SSP4-Ref-SPA0-V17
-      model:
-        descr: Model name of SSP4 baseline
-        type: str
-        default: IMAGE
-    SSP5:
-      scenario:
-        descr: Scenario name of SSP5 baseline
-        type: str
-        default: SSP5-Ref-SPA0-V17
-      model:
-        descr: Model name of SSP5 baseline
-        type: str
-        default: IMAGE
-
   variables:
     GDP:
-      descr: Variable name for GDP in data file
-      type: enum
-      values:
-        - GDP|PPP
-        - GDP|MER
-      default: GDP|PPP
+      descr: Data source of GDP
+      type: datasource
+      default:
+        variable: GDP|PPP
+        unit: currency_unit
+        scenario: "{SSP}-Ref-SPA0-V17"
+        model: IMAGE
+        file: inputdata/data/data_IMAGE_SSP.csv
 
     emissions:
-      descr: Variable name for emissions variable
-      type: str
-      default: Emissions|CO2
+      descr: Data source of baseline emissions
+      type: datasource
+      default:
+        variable: Emissions|CO2
+        unit: emissionsrate_unit
+        scenario: "{SSP}-Ref-SPA0-V17"
+        model: IMAGE
+        file: inputdata/data/data_IMAGE_SSP.csv
 
     population:
-      descr: Variable name for population variable
-      type: str
-      default: Population
+      descr: Data source of population
+      type: datasource
+      default:
+        variable: Population
+        unit: population_unit
+        scenario: "{SSP}-Ref-SPA0-V17"
+        model: IMAGE
+        file: inputdata/data/data_IMAGE_SSP.csv
 
 ##################
 
