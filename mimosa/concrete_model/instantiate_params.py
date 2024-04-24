@@ -43,30 +43,11 @@ class InstantiatedModel:
 
         ## Damage module:
 
-        # Instance data for RICE2010 damage/adaptation:
-        if damage_module == "RICE2010":
-            self._set_instance_data_rice2010(instance_data)
-
         # Instance data for COACCH damages:
         if damage_module == "COACCH":
             # Only used if combined damage function is used,
             # otherwise, the parameter values are set dynamically
             self._set_instance_data_coacch(instance_data)
-
-        # For WITCH damage/adaption:
-        # if damage_module == "WITCH":
-        #     instance_data[None].update(self._instance_data_witch())
-
-        # Raise warning for partially irreversible damages when damage module != RICE2010:
-        if (
-            damage_module == "RICE2010"
-            and self.params["economics"]["damages"]["percentage reversible"] != 1
-        ):
-            raise NotImplementedError(
-                'Partially irreversible damages not implemented for damage module "{}"'.format(
-                    damage_module
-                )
-            )
 
         return instance_data
 
@@ -142,14 +123,6 @@ class InstantiatedModel:
 
         if "custom_mapping" in params["simulation"]:
             parameter_mapping.update(params["simulation"]["custom_mapping"])
-
-        instance_data[None].update(parameter_mapping)
-
-    def _set_instance_data_rice2010(self, instance_data) -> None:
-        params = self.params
-        parameter_mapping = {
-            "adapt_curr_level": V(params["economics"]["adaptation"]["curr_level"]),
-        }
 
         instance_data[None].update(parameter_mapping)
 
