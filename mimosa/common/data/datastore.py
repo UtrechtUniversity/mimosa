@@ -16,10 +16,7 @@ from .utils import UnitValues, extrapolate
 class DataStore:
     """The DataStore object is used when instantiating a concrete model from the
     abstract mimosa. It provides values for time and region dependent data:
-      - baseline emissions
-      - population
-      - baseline GDP / carbon intensity
-      - TFP
+
     This data is read from a data file in IIASA format, and automatically transformed
     to the right units as specified in the config file.
 
@@ -33,38 +30,35 @@ class DataStore:
 
     def __init__(self, params):
         self.params = params
-        self._select_database()
-        self._create_data_years()
 
-        baseline = self._create_data_values("emissions", "emissionsrate_unit")
-        population = self._create_data_values("population", "population_unit")
-        gdp = self._create_data_values("GDP", "currency_unit")
-        self._data_values = {
-            "baseline": baseline,
-            "population": population,
-            "GDP": gdp,
-            "carbon_intensity": {
-                r: UnitValues(baseline[r].xvalues, baseline[r].yvalues / gdp[r].yvalues)
-                for r in params["regions"]
-            },
+        self._create_data_years()
+        self._data_values = {}
+
+        for var_name, var_info in params["input"]["variables_new"].items():
+            self._select_database(var_info["file"])
+            self._data_values[var_name] = self._create_data_values(var_info)
+
+        self._data_values["carbon_intensity"] = {
+            r: UnitValues(
+                self._data_values["emissions"][r].xvalues,
+                self._data_values["emissions"][r].yvalues
+                / self._data_values["GDP"][r].yvalues,
+            )
+            for r in params["regions"]
         }
 
-    def _select_database(self):
+    def _select_database(self, filename):
         """Makes sure the file doesn't need to be read multiple times"""
-        filename = os.path.join(
+        full_path = os.path.join(
             os.path.dirname(__file__),
             "../../",
-            self.params["input"]["db_filename"],
+            filename,
         )
         if filename not in DataStore.databases:
-            database = pd.read_csv(filename)
+            database = pd.read_csv(full_path)
             database.columns = database.columns.str.lower()
             DataStore.databases[filename] = database
             self.cached_data[filename] = {}
-
-        self.database = DataStore.databases[filename]
-        self.cache = self.cached_data[filename]
-        self.filename = filename
 
     def _create_data_years(self):
         beginyear = self.params["time"]["start"]
@@ -72,29 +66,21 @@ class DataStore:
         dt = self.params["time"]["dt"]
         self.data_years = np.arange(beginyear, endyear, dt)
 
-    def _create_data_values(self, variable, to_unit=None) -> Dict[str, UnitValues]:
+    def _create_data_values(self, var_info) -> Dict[str, UnitValues]:
         regions = self.params["regions"]
         return {
-            region: self._get_data(self.data_years, region, variable, to_unit)
+            region: self._get_data(self.data_years, region, var_info)
             for region in regions
         }
 
-    def _get_data_from_database(self, region, variable):
-        SSP = self.params["SSP"]
-        model = self.params["input"]["baselines"][SSP]["model"]
-        scenario = self.params["input"]["baselines"][SSP]["scenario"]
-        variablename = self.params["input"]["variables"][variable]
-
-        cached_data = self._get_cached_data_from_database(
-            model, scenario, region, variablename
-        )
-
-        return cached_data["years"], cached_data["values"], cached_data["unit"]
-
-    def _get_cached_data_from_database(self, model, scenario, region, variablename):
+    def _get_cached_data_from_database(self, var_info, region):
+        filename = var_info["file"]
+        model = var_info["model"]
+        scenario = var_info["scenario"]
+        variablename = var_info["variable"]
         key = (model, scenario, region, variablename)
-        if key not in self.cache:
-            database = self.database
+        if key not in self.cached_data[filename]:
+            database = DataStore.databases[filename]
             selection = database.loc[
                 (database["model"] == model)
                 & (database["scenario"] == scenario)
@@ -109,32 +95,37 @@ class DataStore:
                     )
                 )
 
-            self.cache[key] = {
+            self.cached_data[filename][key] = {
                 "years": selection.loc[:, "2010":].columns.values.astype(float),
                 "values": selection.loc[:, "2010":].values[0],
                 "unit": selection.iloc[0]["unit"],
             }
-        return self.cache[key]
+        return self.cached_data[filename][key]
 
-    def _get_data(self, output_years, region, variable, to_unit=None) -> UnitValues:
+    def _get_data(self, output_years, region, var_info) -> UnitValues:
         # 1. Get data from database
-        years, values, unit = self._get_data_from_database(region, variable)
+        years_values_unit = self._get_cached_data_from_database(var_info, region)
+        years = years_values_unit["years"]
+        values = years_values_unit["values"]
+        unit = years_values_unit["unit"]
 
-        if to_unit is not None:
-            quantity = quant(values, unit, to_unit, only_magnitude=False)
+        if "unit" in var_info:
+            quantity = quant(values, unit, var_info["unit"], only_magnitude=False)
             values = quantity.magnitude
             unit = quantity.units
 
         # 2. Extrapolate this data to beyond 2100
         extra_years = np.arange(2110, 2260, 10)
-        extended_data = extrapolate(values, years, extra_years, [variable, region])
+        extended_data = extrapolate(
+            values, years, extra_years, [var_info["variable"], region]
+        )
         extended_years = np.concatenate([years, extra_years])
 
         # 3. Interpolate the combined data
         interp_fct = interp1d(extended_years, extended_data, kind="cubic")
         return UnitValues(output_years, interp_fct(output_years), unit)
 
-    def _interp_data(self, year, region, variable):
+    def interp_data(self, year, region, variable):
         values = self._data_values[variable][region]
         return np.interp(year, values.xvalues, values.yvalues)
 
@@ -147,14 +138,13 @@ class DataStore:
         Returns:
             Callable[[int, str], float]: interpolating function of type f(year, region)
         """
-        return lambda year, region: self._interp_data(year, region, variable)
+        return lambda year, region: self.interp_data(year, region, variable)
 
     def __repr__(self):
-        return "DataStore with data values {} calculated on the years {}-{} from input file {} for the regions {} and {}".format(
+        return "DataStore with data values {} calculated on the years {}-{} for the regions {} and {}".format(
             list(self._data_values.keys()),
             self.data_years[0],
             self.data_years[-1],
-            self.filename,
             list(self.params["regions"].keys()),
             self.params["SSP"],
         )

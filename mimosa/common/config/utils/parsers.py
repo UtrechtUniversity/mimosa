@@ -363,7 +363,7 @@ class DictParser(ListParser):
 
 class DatasourceParser(DictParser):
     """
-    Data source for a variable. It's a dictionary with the keys `variable`, `scenario`, `model`, and `file`.
+    Data source for a variable. It's a dictionary with the keys `variable`, `unit`, `scenario`, `model`, and `file`.
     """
 
     def parse(self, value):
@@ -371,8 +371,8 @@ class DatasourceParser(DictParser):
             return False
         if isinstance(value, dict):
             parsed_dict = DictParser.parse(self, value)
-            # Check if the keys `variable`, `scenario`, `model`, and `file` are present
-            for key in ["variable", "scenario", "model", "file"]:
+            # Check if the keys `variable`, `unit`, `scenario`, `model`, and `file` are present
+            for key in ["variable", "unit", "scenario", "model", "file"]:
                 if key not in parsed_dict:
                     self.error(f"Key {key} not found in datasource {value}")
 

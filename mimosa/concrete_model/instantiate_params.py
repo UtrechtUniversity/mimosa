@@ -36,7 +36,9 @@ class InstantiatedModel:
     def set_data_functions(self):
         # The data functions need to be changed in the abstract model
         # before initialization.
-        self.abstract_model.baseline_emissions = self.data_store.data_object("baseline")
+        self.abstract_model.baseline_emissions = self.data_store.data_object(
+            "emissions"
+        )
 
     def create_instance(self):
         return self.abstract_model.create_instance(self.instance_data)
@@ -130,8 +132,8 @@ class InstantiatedModel:
             if parameter_doc_str.startswith("timeandregional::"):
                 var_name = parameter_doc_str.split("::")[1]
                 parameter_mapping[parameter.name] = {
-                    (t, r): self.data_store.data_object(var_name)(
-                        self.abstract_model.year(t), r
+                    (t, r): self.data_store.interp_data(
+                        self.abstract_model.year(t), r, var_name
                     )
                     for t in range(num_years)
                     for r in params["regions"].keys()

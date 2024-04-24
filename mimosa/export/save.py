@@ -33,10 +33,12 @@ def save_output(params, m, experiment=None, hash_suffix=False, folder="output"):
     os.makedirs(folder + "/", exist_ok=True)
     filename = f"{experiment}_{settings_hash}" if hash_suffix else experiment
 
-    dataframe.to_csv(f"{folder}/{filename}.csv", float_format="%.6g", index=False)
+    path = f"{folder}/{filename}.csv"
+    dataframe.to_csv(path, float_format="%.6g", index=False)
+    print(f"Saved to {path}")
 
     # 3. Save the param file
-    with open(f"{folder}/{filename}.csv.params.json", "w") as fh:
+    with open(f"{path}.params.json", "w") as fh:
         json.dump(params, fh)
 
 
