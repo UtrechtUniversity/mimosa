@@ -585,6 +585,8 @@
       
         
       
+        
+      
     
     
     
@@ -708,6 +710,39 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Constraints">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#conditionally-skip-constraints" class="md-nav__link">
+    <span class="md-ellipsis">
+      Conditionally skip constraints
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#advanced-soft-equality-constraints" class="md-nav__link">
+    <span class="md-ellipsis">
+      Advanced: soft-equality constraints
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#advanced-numerical-stability" class="md-nav__link">
+    <span class="md-ellipsis">
+      Advanced: numerical stability
+    </span>
+  </a>
+  
 </li>
       
     </ul>
@@ -731,6 +766,27 @@
   
   <span class="md-ellipsis">
     Parameters
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../units/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Units
   </span>
   
 
@@ -807,6 +863,39 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Constraints">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#conditionally-skip-constraints" class="md-nav__link">
+    <span class="md-ellipsis">
+      Conditionally skip constraints
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#advanced-soft-equality-constraints" class="md-nav__link">
+    <span class="md-ellipsis">
+      Advanced: soft-equality constraints
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#advanced-numerical-stability" class="md-nav__link">
+    <span class="md-ellipsis">
+      Advanced: numerical stability
+    </span>
+  </a>
+  
 </li>
       
     </ul>
@@ -846,6 +935,71 @@ all GDP-related variables and constraints. Each component has a function <code>g
 </span></code></pre></div>
 <p>If the variable is not dependent on either time or region, remove the <code>m.t</code> or <code>m.regions</code> from the variable definition.</p>
 <h2 id="constraints">Constraints</h2>
+<p>The relationships between variables are defined through constraints. Constraints are Python functions (often lambda functions)
+that represent the underlying equations of the model. In our example, a constraint would relate the carbon intensity to the
+emissions and the GDP:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a href="#__codelineno-1-1" id="__codelineno-1-1" name="__codelineno-1-1"></a><span class="n">RegionalConstraint</span><span class="p">(</span>
+</span><span id="__span-1-2"><a href="#__codelineno-1-2" id="__codelineno-1-2" name="__codelineno-1-2"></a>    <span class="k">lambda</span> <span class="n">m</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">r</span><span class="p">:</span> <span class="n">m</span><span class="o">.</span><span class="n">carbon_intensity</span><span class="p">[</span><span class="n">t</span><span class="p">,</span> <span class="n">r</span><span class="p">]</span> <span class="o">==</span> <span class="n">m</span><span class="o">.</span><span class="n">regional_emissions</span><span class="p">[</span><span class="n">t</span><span class="p">,</span> <span class="n">r</span><span class="p">]</span> <span class="o">/</span> <span class="n">m</span><span class="o">.</span><span class="n">GDP_net</span><span class="p">[</span><span class="n">t</span><span class="p">,</span> <span class="n">r</span><span class="p">],</span>
+</span><span id="__span-1-3"><a href="#__codelineno-1-3" id="__codelineno-1-3" name="__codelineno-1-3"></a>    <span class="n">name</span><span class="o">=</span><span class="s2">"carbon_intensity"</span>
+</span><span id="__span-1-4"><a href="#__codelineno-1-4" id="__codelineno-1-4" name="__codelineno-1-4"></a><span class="p">)</span>
+</span></code></pre></div>
+<p>The constraint consists of two parts: the lambda function with the equation, and the name of the constraint. Note that the lambda
+function always has the model <code>m</code> as the first argument, followed by the indices of the variables that the constraint relates.</p>
+<p>There are four types of constraints, depending on whether they depend on regions, time, or both:</p>
+<ul>
+<li>
+<p>Region and time dependent:</p>
+<p><code>RegionalConstraint(lambda m, t, r: ..., name="...")</code></p>
+</li>
+<li>
+<p>Only region dependent:</p>
+<p><code>RegionalInitConstraint(lambda m, r: ..., name="...")</code></p>
+</li>
+<li>
+<p>Only time dependent, not on region:</p>
+<p><code>GlobalConstraint(lambda m, t: ..., name="...")</code></p>
+</li>
+<li>
+<p>Not dependent on time nor on region:</p>
+<p><code>GlobalInitConstraint(lambda m: ..., name="...")</code></p>
+</li>
+</ul>
+<p>Next, MIMOSA needs to know where the constraints are created. Every component therefore consists of a function called <code>get_constraints()</code> (see <a href="../components/">Components</a>). This function returns a list of constraints. Add the new constraint to the list:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a href="#__codelineno-2-1" id="__codelineno-2-1" name="__codelineno-2-1"></a><span class="k">def</span> <span class="nf">get_constraints</span><span class="p">(</span><span class="n">m</span><span class="p">):</span>
+</span><span id="__span-2-2"><a href="#__codelineno-2-2" id="__codelineno-2-2" name="__codelineno-2-2"></a>    <span class="n">constraints</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="__span-2-3"><a href="#__codelineno-2-3" id="__codelineno-2-3" name="__codelineno-2-3"></a>    <span class="c1"># ... existing code ...</span>
+</span><span id="__span-2-4"><a href="#__codelineno-2-4" id="__codelineno-2-4" name="__codelineno-2-4"></a>
+</span><span id="__span-2-5"><a href="#__codelineno-2-5" id="__codelineno-2-5" name="__codelineno-2-5"></a><span class="hll">    <span class="n">constraints</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span>
+</span></span><span id="__span-2-6"><a href="#__codelineno-2-6" id="__codelineno-2-6" name="__codelineno-2-6"></a><span class="hll">        <span class="n">RegionalConstraint</span><span class="p">(</span>
+</span></span><span id="__span-2-7"><a href="#__codelineno-2-7" id="__codelineno-2-7" name="__codelineno-2-7"></a><span class="hll">            <span class="k">lambda</span> <span class="n">m</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">r</span><span class="p">:</span> <span class="n">m</span><span class="o">.</span><span class="n">carbon_intensity</span><span class="p">[</span><span class="n">t</span><span class="p">,</span> <span class="n">r</span><span class="p">]</span> <span class="o">==</span> <span class="n">m</span><span class="o">.</span><span class="n">regional_emissions</span><span class="p">[</span><span class="n">t</span><span class="p">,</span> <span class="n">r</span><span class="p">]</span> <span class="o">/</span> <span class="n">m</span><span class="o">.</span><span class="n">GDP_net</span><span class="p">[</span><span class="n">t</span><span class="p">,</span> <span class="n">r</span><span class="p">],</span>
+</span></span><span id="__span-2-8"><a href="#__codelineno-2-8" id="__codelineno-2-8" name="__codelineno-2-8"></a><span class="hll">            <span class="n">name</span><span class="o">=</span><span class="s2">"carbon_intensity"</span>
+</span></span><span id="__span-2-9"><a href="#__codelineno-2-9" id="__codelineno-2-9" name="__codelineno-2-9"></a><span class="hll">        <span class="p">),</span>
+</span></span><span id="__span-2-10"><a href="#__codelineno-2-10" id="__codelineno-2-10" name="__codelineno-2-10"></a><span class="hll">        <span class="o">...</span>
+</span></span><span id="__span-2-11"><a href="#__codelineno-2-11" id="__codelineno-2-11" name="__codelineno-2-11"></a><span class="hll">    <span class="p">])</span>
+</span></span><span id="__span-2-12"><a href="#__codelineno-2-12" id="__codelineno-2-12" name="__codelineno-2-12"></a>
+</span><span id="__span-2-13"><a href="#__codelineno-2-13" id="__codelineno-2-13" name="__codelineno-2-13"></a>    <span class="k">return</span> <span class="n">constraints</span>
+</span></code></pre></div>
+<p><strong>Note:</strong> as shown in this example, constraints do not need to be equality constraints. They can also be inequality constraints. Also, 
+constraints do need to be in the form of <code>m.variable == expression</code>: the left-hand-side and the right-hand-side can be non-linear combinations of variables and parameters.</p>
+<h4 id="conditionally-skip-constraints">Conditionally skip constraints</h4>
+<p>If a constraint should only be enforced under certain conditions, you can use an the <code>Constraint.Skip</code> statement. This can be for certain time periods, regions, or any condition based on parameters. It is not possible to skip constraints based on variable values.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a href="#__codelineno-3-1" id="__codelineno-3-1" name="__codelineno-3-1"></a><span class="n">GlobalConstraint</span><span class="p">(</span>
+</span><span id="__span-3-2"><a href="#__codelineno-3-2" id="__codelineno-3-2" name="__codelineno-3-2"></a>    <span class="k">lambda</span> <span class="n">m</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="p">(</span>
+</span><span id="__span-3-3"><a href="#__codelineno-3-3" id="__codelineno-3-3" name="__codelineno-3-3"></a>        <span class="n">m</span><span class="o">.</span><span class="n">global_emissions</span><span class="p">[</span><span class="n">t</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">0</span>
+</span><span id="__span-3-4"><a href="#__codelineno-3-4" id="__codelineno-3-4" name="__codelineno-3-4"></a><span class="hll">        <span class="k">if</span> <span class="n">m</span><span class="o">.</span><span class="n">year</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2100</span>
+</span></span><span id="__span-3-5"><a href="#__codelineno-3-5" id="__codelineno-3-5" name="__codelineno-3-5"></a><span class="hll">        <span class="k">else</span> <span class="n">Constraint</span><span class="o">.</span><span class="n">Skip</span>
+</span></span><span id="__span-3-6"><a href="#__codelineno-3-6" id="__codelineno-3-6" name="__codelineno-3-6"></a>    <span class="p">),</span>
+</span><span id="__span-3-7"><a href="#__codelineno-3-7" id="__codelineno-3-7" name="__codelineno-3-7"></a>    <span class="n">name</span><span class="o">=</span><span class="s2">"net_zero_after_2100"</span><span class="p">,</span>
+</span><span id="__span-3-8"><a href="#__codelineno-3-8" id="__codelineno-3-8" name="__codelineno-3-8"></a><span class="p">)</span>
+</span></code></pre></div>
+<p><strong>Note:</strong> the variable <code>t</code> is a time index (starting at <code>t=0</code>), and <code>m.year(t)</code> returns the year of the time index <code>t</code>.</p>
+<h2 id="advanced-soft-equality-constraints">Advanced: soft-equality constraints</h2>
+<h2 id="advanced-numerical-stability">Advanced: numerical stability</h2>
+<ul>
+<li>Avoid division by zero: add a small number to the denominator</li>
+<li>Avoid large numbers: scale the variables by choosing appropriate units</li>
+<li>Avoid negative numbers in exponents and square roots by using the <code>soft_min</code> and <code>soft_max</code> functions</li>
+</ul>
 
 
 
