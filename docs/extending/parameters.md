@@ -134,9 +134,61 @@ Initializing their value is done in three steps:
     m.new_regional_param = Param(m.regions, doc="regional::newparamgroup.newparam1")
     ```
 
+## Time and region dependent data
+
+The third type of parameters are time and region dependent parameters. This is typically used for baseline data, such as population, GDP, etc. 
+
+They are defined like any other parameter, but with the `time` and `regions` dimensions. For example, the population data is defined as:
+
+```python
+m.population = Param(
+    m.t,
+    m.regions,
+    doc="timeandregional::population",
+    units=quant.unit("billion people"), # (1)!
+)
+```
+
+1.  The `units` field is optional, but it is good practice to include it. This is especially important for numerical values with units (values that are not dimensionless). The `quant` module is imported as `quant` from the `mimosa` package.
+
+Just like regional parameters, the parameter values are linked to the underlying data using the `doc` field, starting with `timeandregional::`. The input data source should be in IAMC format. For each parameter, the filename, variable, scenario and model should be specified in the configuration file:
+
+```yaml title="mimosa/inputdata/config/config_default.yaml" hl_lines="8 9 10 11 12"
+...
+input:
+  variables:
+    population: # (1)!
+      descr: Data source of population
+      type: datasource
+      default:
+        variable: Population
+        unit: population_unit
+        scenario: "{SSP}-Ref-SPA0-V17"
+        model: IMAGE
+        file: inputdata/data/data_IMAGE_SSP.csv
+    ...
+```
+
+1. The name defined here (`population`) should match the name used in the `doc` field of the parameter definition: <code>timeandregional::<b>population</b></code>.
+
+The `file` field should point to the IAMC formatted data file. The IAMC format is a CSV file with the following columns:
+
+:fontawesome-solid-file-csv: [`mimosa/inputdata/data/data_IMAGE_SSP.csv`]({{config.repo_url}}/tree/master/mimosa/inputdata/data/data_IMAGE_SSP.csv)
+
+{{ read_csv("mimosa/inputdata/data/data_IMAGE_SSP.csv", nrows=3) }}
+|... | ... |... |... |
+
+???+ info "Configuration values dependent on other parameter values"
+
+    In the example above, the name of the scenario depends on the SSP. Every string in the configuration file can contain references
+    to other parameters, and are referred to using curly brackets `{}`. If you want to refer to a nested parameter (like [`effort sharing > regime`](../parameters.md#effort%20sharing.regime)), they should be joined
+    with ` - `:
+
+    ```yaml
+    scenario: "Scenario-with-{SSP}-and-{effort sharing - regime}"
+    ```
+
 ## Advanced: dynamic parameter settings
 
 ## Advanced: complex parameter manipulations with `instantiate_params.py`
 
-
-## Time and region dependent data
