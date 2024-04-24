@@ -16,7 +16,8 @@ MIMOSA is being developed at the [Copernicus Institute of Sustainable Developmen
 
 [<img src="assets/logos/UU_logo_2021_EN_RGB.png#only-light" width="40%">](https://www.uu.nl/en/research/copernicus-institute-of-sustainable-development)
 [<img src="assets/logos/UU_logo_2021_EN_RGB_diap.png#only-dark" width="40%">](https://www.uu.nl/en/research/copernicus-institute-of-sustainable-development)
-[<img src="assets/logos/IMAGE.png" width="40%">](https://www.pbl.nl/en/image/home)
+[<img src="assets/logos/IMAGE.png#only-light" width="40%">](https://www.pbl.nl/en/image/home)
+[<img src="assets/logos/IMAGE-for-dark-bg.png#only-dark" width="40%">](https://www.pbl.nl/en/image/home)
 
 
 ### General
