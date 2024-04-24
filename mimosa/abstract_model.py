@@ -4,7 +4,6 @@ Abstract representation of the model
 Contains all model equations and constraints
 """
 
-import numpy as np
 from mimosa.common import Param, AbstractModel, Set, add_constraint, quant
 from mimosa.components import (
     effortsharing,
@@ -63,8 +62,7 @@ def create_abstract_model(
     m.regions = Set(ordered=True)
 
     ######################
-    # Create data functions
-    # Will be initialised when creating a concrete instance of the model
+    # Create data params for baseline values
     ######################
 
     m.population = Param(
