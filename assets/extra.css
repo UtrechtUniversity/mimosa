@@ -24,6 +24,10 @@ nav.md-nav a[target=_blank]::after {
     content: ""
 }
 
+.md-nav__link svg {
+    width: 20px;
+}
+
 .param_group .param_content {
     padding-left: 30px;
     border-left: 3px solid #f0f0f0;
