@@ -1,3 +1,7 @@
+---
+icon: material/arrow-projectile-multiple
+---
+
 [:octicons-arrow-left-24: Back to general structure](index.md)
 
 ## Welfare and utility

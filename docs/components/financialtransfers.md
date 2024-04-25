@@ -1,7 +1,7 @@
 ---
-icon: octicons/cloud-16
+icon: fontawesome/solid/money-bill-transfer
 ---
 
 [:octicons-arrow-left-24: Back to general structure](index.md)
 
-:::mimosa.components.emissions.get_constraints
+TODO

@@ -62,7 +62,7 @@ The MIMOSA model consists of several sub-modules, called model components. Each 
 
     `Optional` Various effort-sharing regimes to distribute the mitigation (and sometimes damage) costs
 
-    [:octicons-arrow-right-24: Read more](#){.md-button}
+    [:octicons-arrow-right-24: Read more](effortsharing.md){.md-button}
 
 
 -   #### :material-earth: Emission trading
@@ -71,7 +71,7 @@ The MIMOSA model consists of several sub-modules, called model components. Each 
 
     `Optional` Allows for global trade of emission reductions
 
-    [:octicons-arrow-right-24: Read more](#){.md-button}
+    [:octicons-arrow-right-24: Read more](emissiontrading.md){.md-button}
 
 -   #### :fontawesome-solid-money-bill-transfer: Financial transfers
 
@@ -79,7 +79,7 @@ The MIMOSA model consists of several sub-modules, called model components. Each 
 
     `Optional` Financial transfer schemes like a global damage cost pool
 
-    [:octicons-arrow-right-24: Read more](#){.md-button}
+    [:octicons-arrow-right-24: Read more](financialtransfers.md){.md-button}
 
 
 

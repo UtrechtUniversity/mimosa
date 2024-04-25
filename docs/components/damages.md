@@ -1,3 +1,7 @@
+---
+icon: material/home-flood
+---
+
 [:octicons-arrow-left-24: Back to general structure](index.md)
 
 Climate impacts in MIMOSA are calculated using the [COACCH](https://www.coacch.eu/) damage functions, developed in 2023
