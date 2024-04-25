@@ -22,55 +22,101 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     regions following pre-defined equity principles. By default, in MIMOSA, no effort-sharing regime is imposed.
 
     Besides no regime at all, there are three types of effort-sharing regimes implemented in MIMOSA. This can be
-    set using the [`effort_sharing_regime`](../parameters.md#effort sharing.regime) parameter:
+    set using the [`effort_sharing_regime`](../parameters.md#effort sharing.regime) parameter.
 
-    - `noregime` (default): No effort-sharing regime is imposed.
-    - [`equal_mitigation_costs`](#equal-mitigation-costs): Mitigation costs equal among regions as a percentage of GDP.
-    - [`equal_total_costs`](#equal-total-costs): Total costs (mitigation costs + damage costs) equal among regions as a percentage of GDP.
-    - [`per_cap_convergence`](#per-capita-convergence): Per capita emissions converge to a common level.
-
+    === "No regime `default`"
+        Usage:
+        ```python hl_lines="2"
+        params = load_params()
+        params["effort sharing"]["regime"] = "noregime"
+        model = MIMOSA(params)
+        ```
 
     === "Equal mitigation costs"
-        In this regime, the mitigation costs should be equal among regions as a percentage of GDP.
+        Usage:
+        ```python hl_lines="2"
+        params = load_params()
+        params["effort sharing"]["regime"] = "equal_mitigation_costs"
+        model = MIMOSA(params)
+        ```
+
+        :::mimosa.components.effortsharing._get_equal_mitigation_costs_constraints
 
     === "Equal total costs"
-        In this regime, the total costs (mitigation costs + damage costs + financial transfers) should be equal among regions as a percentage of GDP.
+        Usage:
+        ```python hl_lines="2"
+        params = load_params()
+        params["effort sharing"]["regime"] = "equal_total_costs"
+        model = MIMOSA(params)
+        ```
+
+        :::mimosa.components.effortsharing._get_equal_total_costs_constraints
 
     === "Per capita convergence"
-        In this regime, the per capita emissions should converge to a common level. The common level is calculated as the weighted average of the per capita emissions of all regions. The weights are the population shares of the regions.
+        Usage:
+        ```python hl_lines="2"
+        params = load_params()
+        params["effort sharing"]["regime"] = "per_cap_convergence"
+        model = MIMOSA(params)
+        ```
+
+        :::mimosa.components.effortsharing._get_percapconv_constraints
     """
-    constraints = []
 
     m.effort_sharing_regime = Param(within=Any, doc="::effort sharing.regime")
 
     ## effort sharing scheme:
     m.effort_sharing_common_level = Var(m.t, units=quant.unit("fraction_of_GDP"))
 
-    constraints.extend(
-        [
-            # Total costs: mitigation + damage costs should be equal among regions as % GDP
-            RegionalSoftEqualityConstraint(
-                lambda m, t, r: m.rel_mitigation_costs[t, r]
-                + m.damage_costs[t, r]
-                + m.rel_financial_transfer[t, r],
-                lambda m, t, r: m.effort_sharing_common_level[t],
-                "effort_sharing_regime_total_costs",
-                ignore_if=lambda m, t, r: value(m.effort_sharing_regime)
-                != "equal_total_costs"
-                or m.year(t) > 2100,
-            ),
-            # Mitigation costs: mitigation costs should be equal among regions as % GDP
-            RegionalSoftEqualityConstraint(
-                lambda m, t, r: m.rel_mitigation_costs[t, r],
-                lambda m, t, r: m.effort_sharing_common_level[t],
-                "effort_sharing_regime_mitigation_costs",
-                ignore_if=lambda m, t, r: value(m.effort_sharing_regime)
-                != "equal_mitigation_costs",
-                # or m.year(t) > 2125,
-            ),
-        ]
+    constraints = (
+        _get_equal_mitigation_costs_constraints()
+        + _get_equal_total_costs_constraints()
+        + _get_percapconv_constraints(m)
     )
 
+    return constraints
+
+
+def _get_equal_mitigation_costs_constraints() -> Sequence[GeneralConstraint]:
+    """
+    In this regime, the mitigation costs should be equal among regions as a percentage of GDP.
+    """
+    return [
+        RegionalSoftEqualityConstraint(
+            lambda m, t, r: m.rel_mitigation_costs[t, r],
+            lambda m, t, r: m.effort_sharing_common_level[t],
+            "effort_sharing_regime_mitigation_costs",
+            ignore_if=lambda m, t, r: value(m.effort_sharing_regime)
+            != "equal_mitigation_costs",
+            # or m.year(t) > 2125,
+        ),
+    ]
+
+
+def _get_equal_total_costs_constraints() -> Sequence[GeneralConstraint]:
+    """
+    In this regime, the total costs (mitigation costs + damage costs + financial transfers) should be equal among regions as a percentage of GDP.
+    """
+
+    return [
+        # Total costs: mitigation + damage costs should be equal among regions as % GDP
+        RegionalSoftEqualityConstraint(
+            lambda m, t, r: m.rel_mitigation_costs[t, r]
+            + m.damage_costs[t, r]
+            + m.rel_financial_transfer[t, r],
+            lambda m, t, r: m.effort_sharing_common_level[t],
+            "effort_sharing_regime_total_costs",
+            ignore_if=lambda m, t, r: value(m.effort_sharing_regime)
+            != "equal_total_costs"
+            or m.year(t) > 2100,
+        ),
+    ]
+
+
+def _get_percapconv_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
+    """
+    In this regime, the per capita emissions should converge to a common level. The common level is calculated as the weighted average of the per capita emissions of all regions. The weights are the population shares of the regions.
+    """
     ## Per capita convergence:
     # m.regional_per_cap_emissions = Var(
     #     m.t, m.regions, units=quant.unit("emissionsrate_unit/population_unit")
@@ -88,22 +134,18 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
         / sum(m.population[t, s] for s in m.regions),
     )
 
-    constraints.extend(
-        [
-            RegionalSoftEqualityConstraint(
-                lambda m, t, r: percapconv_share_rule(m, t, r) * m.global_emissions[t],
-                lambda m, t, r: m.baseline[t, r] - m.paid_for_emission_reductions[t, r],
-                epsilon=None,
-                absolute_epsilon=0.01,
-                ignore_if=lambda m, t, r: value(m.effort_sharing_regime)
-                != "per_cap_convergence"
-                or t == 0,
-                name="percapconv_rule",
-            ),
-        ]
-    )
-
-    return constraints
+    return [
+        RegionalSoftEqualityConstraint(
+            lambda m, t, r: percapconv_share_rule(m, t, r) * m.global_emissions[t],
+            lambda m, t, r: m.baseline[t, r] - m.paid_for_emission_reductions[t, r],
+            epsilon=None,
+            absolute_epsilon=0.01,
+            ignore_if=lambda m, t, r: value(m.effort_sharing_regime)
+            != "per_cap_convergence"
+            or t == 0,
+            name="percapconv_rule",
+        ),
+    ]
 
 
 def percapconv_share_rule(m, t, r):
