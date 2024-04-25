@@ -85,3 +85,24 @@ nav.md-nav a[target=_blank]::after {
 .md-typeset details.parameter:focus-within {
     box-shadow: 0 0 0 .2rem rgba(120, 155, 43, 0.05)
 }
+
+
+a[href*="parameters/#"] code,
+a[href*="parameters/#"]:not(:has(code)) {
+    position: relative;
+    padding: 0.1rem .2rem 0.1rem 1.3rem;
+    white-space: nowrap;
+}
+
+a[href*="parameters/#"] code::before,
+a[href*="parameters/#"]:not(:has(code))::before {
+    content: "";
+    height: .9rem;
+    width: .9rem;
+    mask-size: contain;
+    position: absolute;
+    top: .1em;
+    left: 0.3em;
+    background-color: currentcolor;
+    mask-image: var(--md-admonition-icon--parameter)
+}
