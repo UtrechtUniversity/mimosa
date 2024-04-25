@@ -37,11 +37,11 @@ def create_abstract_model(
     Builds the abstract model for MIMOSA by combining all components. Some components are optional. In the
     parameters, different variants of some components can be chosen. The components are:
 
-    - `damage_module`: The damage module to use
-    - `emissiontrade_module`: The emission trading module to use
-    - `financialtransfer_module`: The financial transfer module to use
-    - `welfare_module`: The welfare module to use
-    - `objective_module`: The objective module to use
+    - [`damage_module`](../parameters.md#model.damage%20module): The damage module to use
+    - [`emissiontrade_module`](../parameters.md#model.emissiontrade%20module): The emission trading module to use
+    - [`financialtransfer_module`](../parameters.md#model.financialtransfer%20module): The financial transfer module to use
+    - [`welfare_module`](../parameters.md#model.welfare%20module): The welfare module to use
+    - [`objective_module`](../parameters.md#model.objective%20module): The objective module to use
 
     """
     m = AbstractModel()
