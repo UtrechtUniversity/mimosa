@@ -17,17 +17,27 @@ from mimosa.common import (
 
 
 def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
-    """Emissions and temperature equations and constraints
+    """
+    Effort-sharing regimes can be used to enforce the redistribution of mitigation effort and damage costs among
+    regions following pre-defined equity principles. By default, in MIMOSA, no effort-sharing regime is imposed.
 
-    Necessary variables:
+    Besides no regime at all, there are three types of effort-sharing regimes implemented in MIMOSA. This can be
+    set using the [`effort_sharing_regime`](../parameters.md#effort sharing.regime) parameter:
 
-    Returns:
-        list of constraints (any of:
-           - GlobalConstraint
-           - GlobalInitConstraint
-           - RegionalConstraint
-           - RegionalInitConstraint
-        )
+    - `noregime` (default): No effort-sharing regime is imposed.
+    - [`equal_mitigation_costs`](#equal-mitigation-costs): Mitigation costs equal among regions as a percentage of GDP.
+    - [`equal_total_costs`](#equal-total-costs): Total costs (mitigation costs + damage costs) equal among regions as a percentage of GDP.
+    - [`per_cap_convergence`](#per-capita-convergence): Per capita emissions converge to a common level.
+
+
+    === "Equal mitigation costs"
+        In this regime, the mitigation costs should be equal among regions as a percentage of GDP.
+
+    === "Equal total costs"
+        In this regime, the total costs (mitigation costs + damage costs + financial transfers) should be equal among regions as a percentage of GDP.
+
+    === "Per capita convergence"
+        In this regime, the per capita emissions should converge to a common level. The common level is calculated as the weighted average of the per capita emissions of all regions. The weights are the population shares of the regions.
     """
     constraints = []
 
