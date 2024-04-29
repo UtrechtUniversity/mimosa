@@ -191,7 +191,7 @@ def _get_percapconv_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]
     :::mimosa.components.effortsharing.percapconv_share_rule
 
     Finally, the allowances per region are added as constraint on the regional emissions. Since this regime needs
-    emission trading to avoid infeasibility, the regional emissions can be expressed as the baseline emissions
+    [emission trading](emissiontrading.md) to avoid infeasibility, the regional emissions can be expressed as the baseline emissions
     minus the reductions that this region needs to pay for (this is not necessarily equal to the regional emissions
     in physical terms, as the region can buy or sell allowances from other regions):
 
