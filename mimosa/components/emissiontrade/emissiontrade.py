@@ -40,24 +40,11 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     """
     constraints = []
 
-    m.area_under_MAC = Var(
-        m.t,
-        m.regions,
-        within=NonNegativeReals,
-        initialize=0,
-        units=quant.unit("currency_unit"),
-    )
-
     m.global_carbonprice = Var(m.t)
 
     # The global mitigation cost pool:
     constraints.extend(
         [
-            RegionalConstraint(
-                lambda m, t, r: m.area_under_MAC[t, r]
-                == AC(m.relative_abatement[t, r], m, t, r) * m.baseline[t, r],
-                "abatement_costs",
-            ),
             # Constraint that sets the global carbon price to the average of the regional carbon prices:
             GlobalConstraint(
                 lambda m, t: m.global_carbonprice[t]
@@ -82,19 +69,11 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     constraints.extend(
         [
             GlobalConstraint(
-                lambda m, t: sum(m.mitigation_costs[t, r] for r in m.regions)
-                == sum(m.area_under_MAC[t, r] for r in m.regions),
+                lambda m, t: sum(
+                    m.import_export_mitigation_cost_balance[t, r] for r in m.regions
+                )
+                == 0.0,
                 "sum_mitigation_equals_sum_area_under_mac",
-            ),
-            RegionalConstraint(
-                lambda m, t, r: (
-                    m.mitigation_costs[t, r]
-                    == m.area_under_MAC[t, r]
-                    + m.import_export_mitigation_cost_balance[t, r]
-                    if t > 0
-                    else Constraint.Skip
-                ),
-                "mitigation_costs_equals_area_under_mac_plus_import_export_mitigation_cost_balance",
             ),
             # Constraint: from import/export mitigation costs to import/export of emissions using the global carbon price
             RegionalConstraint(

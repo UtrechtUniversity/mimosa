@@ -5,9 +5,12 @@ Type: no trade
 """
 
 from typing import Sequence
-from mimosa.common import AbstractModel, GeneralConstraint, RegionalConstraint, Param
-
-from mimosa.components.mitigation import AC
+from mimosa.common import (
+    AbstractModel,
+    GeneralConstraint,
+    Param,
+    quant,
+)
 
 
 def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
@@ -25,18 +28,13 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
            - RegionalInitConstraint
         )
     """
-    constraints = []
+    constraints = []  # No constraints here
 
-    m.import_export_emission_reduction_balance = Param(m.t, m.regions, initialize=0)
-
-    constraints.extend(
-        [
-            RegionalConstraint(
-                lambda m, t, r: (m.mitigation_costs[t, r])
-                == AC(m.relative_abatement[t, r], m, t, r) * m.baseline[t, r],
-                "mitigation_costs",
-            ),
-        ]
+    m.import_export_emission_reduction_balance = Param(
+        m.t, m.regions, units=quant.unit("emissionsrate_unit"), initialize=0
+    )
+    m.import_export_mitigation_cost_balance = Param(
+        m.t, m.regions, units=quant.unit("currency_unit"), initialize=0
     )
 
     return constraints

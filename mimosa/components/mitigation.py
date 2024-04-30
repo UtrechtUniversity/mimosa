@@ -144,15 +144,7 @@ def _get_mac_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
 
     constraints = []
 
-    # Mitigation costs and MAC
-    m.mitigation_costs = Var(
-        m.t,
-        m.regions,
-        # within=NonNegativeReals,
-        initialize=0,
-        units=quant.unit("currency_unit"),
-    )
-    m.rel_mitigation_costs = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
+    # MAC: linking the carbon price to the relative abatement
     m.MAC_gamma = Param(doc="::economics.MAC.gamma")
     m.MAC_beta = Param(doc="::economics.MAC.beta")
     m.MAC_scaling_factor = Param(
@@ -165,9 +157,6 @@ def _get_mac_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
         bounds=lambda m: (0, 2 * m.MAC_gamma),
         units=quant.unit("currency_unit/emissions_unit"),
     )
-    m.rel_mitigation_costs_min_level = Param(
-        doc="::economics.MAC.rel_mitigation_costs_min_level"
-    )
     constraints.extend(
         [
             RegionalConstraint(
@@ -177,6 +166,44 @@ def _get_mac_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
             ),
             RegionalInitConstraint(
                 lambda m, r: m.carbonprice[0, r] == 0, "init_carbon_price"
+            ),
+        ]
+    )
+
+    # Mitigation costs
+
+    # Note that the mitigation costs are equal to the area under the MAC plus
+    # potential import/export of mitigation costs (if emission trading is enabled)
+    m.mitigation_costs = Var(
+        m.t,
+        m.regions,
+        initialize=0,
+        units=quant.unit("currency_unit"),
+    )
+    m.area_under_MAC = Var(
+        m.t,
+        m.regions,
+        initialize=0,
+        units=quant.unit("currency_unit"),
+    )
+    m.rel_mitigation_costs = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
+    m.rel_mitigation_costs_min_level = Param(
+        doc="::economics.MAC.rel_mitigation_costs_min_level"
+    )
+    constraints.extend(
+        [
+            RegionalConstraint(
+                lambda m, t, r: (m.mitigation_costs[t, r])
+                == AC(m.relative_abatement[t, r], m, t, r) * m.baseline[t, r]
+                + m.import_export_mitigation_cost_balance[t, r],
+                "mitigation_costs",
+            ),
+            # Extra (dummy) constraint for the variable area_under_MAC, which is the same as the mitigation costs
+            # when no emission trading is enabled
+            RegionalConstraint(
+                lambda m, t, r: m.area_under_MAC[t, r]
+                == AC(m.relative_abatement[t, r], m, t, r) * m.baseline[t, r],
+                "area_under_MAC",
             ),
             RegionalConstraint(
                 lambda m, t, r: m.rel_mitigation_costs[t, r]
