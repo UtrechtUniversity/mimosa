@@ -66,7 +66,7 @@ watch:
   - mimosa
 
 hooks:
-  - mkdocs_hooks.py
+  - docs/scripts/mkdocs_hooks.py
 
 plugins:
   - mkdocstrings:
@@ -79,6 +79,7 @@ plugins:
   - table-reader
   - macros:
       include_dir: tests
+      module_name: docs/scripts/mkdocs_macros
   - open-in-new-tab
   - plotly:
       template_default: assets/plots/template.json
