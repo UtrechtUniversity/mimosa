@@ -180,7 +180,7 @@ The `file` field should point to the IAMC formatted data file. The IAMC format i
 
 ???+ info "Configuration values dependent on other parameter values"
 
-    In the example above, the name of the scenario depends on the SSP. Every string in the configuration file can contain references
+    In the example above, the name of the scenario depends on the [`SSP`](../parameters.md#SSP). Every string in the configuration file can contain references
     to other parameters, and are referred to using curly brackets `{}`. If you want to refer to a nested parameter (like [`effort sharing > regime`](../parameters.md#effort%20sharing.regime)), they should be joined
     with ` - `:
 

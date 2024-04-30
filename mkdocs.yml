@@ -77,7 +77,8 @@ plugins:
           paths: [src]
   - search
   - table-reader
-  - macros
+  - macros:
+      include_dir: tests
   - open-in-new-tab
   - plotly:
       template_default: assets/plots/template.json
