@@ -17,19 +17,33 @@ from mimosa.common import (
 
 
 def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
-    """Damage cost trading equations and constraints
-    (no-trade specification)
+    """
+    When allowing financial transfers for a global damage cost pool, a region can
+    receive financial transfers up to its level of climate damages:
 
-    Necessary variables:
-        - m.financial_transfer
+    $$
+    \\text{financial transf.}_{t,r} \\geq - \\text{damages}_{t,r} \\cdot \\text{GDP}_{\\text{gross},t,r}
+    $$
 
-    Returns:
-        list of constraints (any of:
-           - GlobalConstraint
-           - GlobalInitConstraint
-           - RegionalConstraint
-           - RegionalInitConstraint
-        )
+    The sum of financial transfers per time period should be zero, since it is a redistribution
+    of costs:
+
+    $$
+    \\sum_r \\text{financial transf.}_{t,r} = 0
+    $$
+
+    Also, in the first year, no financial transfers are allowed:
+
+    $$ \\text{financial_transf.}_{0,r} = 0. $$
+
+    Finally, the financial transfers are expressed in currency units (dollars). They can also
+    be expressed as percentage of GDP:
+
+    $$
+    \\text{rel. financial transf.}_{t,r} = \\frac{\\text{financial transf.}_{t,r}}{\\text{GDP}_{\\text{gross},t,r}}
+    $$
+
+
     """
     constraints = []
 
@@ -40,9 +54,11 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     constraints.extend(
         [
             GlobalConstraint(
-                lambda m, t: sum(m.financial_transfer[t, r] for r in m.regions) == 0.0
-                if t > 0
-                else Constraint.Skip,
+                lambda m, t: (
+                    sum(m.financial_transfer[t, r] for r in m.regions) == 0.0
+                    if t > 0
+                    else Constraint.Skip
+                ),
                 "zero_sum_of_yearly_financial_transfer",
             ),
             RegionalInitConstraint(

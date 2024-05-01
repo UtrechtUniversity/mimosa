@@ -9,19 +9,12 @@ from mimosa.common import AbstractModel, GeneralConstraint, RegionalConstraint, 
 
 
 def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
-    """Damage cost trading equations and constraints
-    (no-trade specification)
+    """
+    Without financial transfers, this variable is always equal to zero:
 
-    Necessary variables:
-        - m.financial_transfer
-
-    Returns:
-        list of constraints (any of:
-           - GlobalConstraint
-           - GlobalInitConstraint
-           - RegionalConstraint
-           - RegionalInitConstraint
-        )
+    $$
+    \\text{financial transf.}_{t,r} = \\text{rel. financial transf.} = 0.0
+    $$
     """
     constraints = []
 

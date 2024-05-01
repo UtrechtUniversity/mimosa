@@ -22,7 +22,11 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     """
     The COACCH damage functions are split in two parts: temperature-dependent damages (non-SLR, as a function
     of global mean temperature above pre-industrial), and sea-level rise damages (SLR, as function of global mean
-    sea-level rise in meters).
+    sea-level rise in meters):
+
+    $$
+    \\text{damages}_{t,r} = \\text{damages}_{\\text{non-SLR},t,r} + \\text{damages}_{\\text{SLR},t,r}
+    $$
 
     ## Temperature-dependent damages
 

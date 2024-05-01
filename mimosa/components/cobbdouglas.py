@@ -35,7 +35,15 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     mitigation costs from the gross GDP. *(Note that in MIMOSA, the damages are expressed as a fraction of the gross GDP,
     whereas the mitigation costs are expressed in absolute terms.)*
 
-    $$ \\text{GDP}_{\\text{net},t,r} = \\text{GDP}_{\\text{gross},t,r} \\cdot (1 - \\text{damage costs}_{t,r}) - \\text{mitigation costs}_{t,r}$$
+    $$
+    \\begin{align}
+    \\text{GDP}_{\\text{net},t,r} =\\ & \\text{GDP}_{\\text{gross},t,r} \\cdot (1 - \\text{damage costs}_{t,r}) \\\\
+    &\\ \\ \\ - \\text{mitigation costs}_{t,r} - \\text{financial transf.}_{t,r}
+    \\end{align}
+    $$
+
+    The last term represents optional financial transfers to compensate regions for damage
+    costs. By default this term is always 0 (see [Financial transfers](financialtransfers.md)).
 
     ## Investments and consumption
 

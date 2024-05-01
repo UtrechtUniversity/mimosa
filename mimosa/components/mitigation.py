@@ -149,7 +149,7 @@ def _get_mac_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     $$
 
     Finally, the mitigation costs used in MIMOSA are equal to the area under the MAC, plus potentially import/export of mitigation
-    costs if [emission trading](emissiontrade.md) is enabled:
+    costs if [emission trading](emissiontrading.md) is enabled:
 
     $$
     \\text{mitigation costs}_{t,r} = \\text{area under MAC}_{t,r} + \\text{import/export mitigation cost balance}_{t,r}.
