@@ -105,7 +105,8 @@ def _get_mac_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
 
     $$
     \\begin{align}
-    \\text{carbon price}_{t,r} &= \\text{regional scaling factor}_{r} \\cdot \\text{MAC}_t(a_{t,r})\\\\
+    \\text{carbon price}_{t,r} &= \\text{MAC}_{\\text{regional},t,r}(a_{t,r})\\\\
+    &= \\text{regional scaling factor}_{r} \\cdot \\text{MAC}_t(a_{t,r})\\\\
     &= \\text{regional scaling factor}_{r} \\cdot \\left( \\gamma \\cdot a_{t,r}^{\\beta}\\right) \\cdot \\text{learning factor}_t.
     \\end{align}
     $$
@@ -131,7 +132,48 @@ def _get_mac_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
 
 
     ## Mitigation costs
-    [todo]
+    The mitigation costs are calculated as area under the MAC:
+
+    ``` {.plotly .center_align_plotly}
+    {"file_path": "./assets/plots/mac_explanation.json"}
+    ```
+
+    Since the MAC is expressed in terms of relative abatement, we still need to multiply by the baseline emissions to obtain
+    mitigation costs in currency unit (dollars). The area under the MAC is therefore calculated as:
+    
+    $$
+    \\begin{align}
+    \\text{area under MAC}_{t,r} &= \\left(\\int_0^{a_{t,r}} \\text{MAC}_{\\text{regional},t,r}(a)\\ da \\right) \\cdot \\text{baseline emissions}_{t,r}\\\\
+    &= \\text{factor}_{t,r} \\cdot \\frac{\\gamma \\cdot a_{t,r}^{\\beta+1}}{\\beta+1} \\cdot \\text{baseline emissions}_{t,r}
+    \\end{align}
+    $$
+
+    Finally, the mitigation costs used in MIMOSA are equal to the area under the MAC, plus potentially import/export of mitigation
+    costs if [emission trading](emissiontrade.md) is enabled:
+
+    $$
+    \\text{mitigation costs}_{t,r} = \\text{area under MAC}_{t,r} + \\text{import/export mitigation cost balance}_{t,r}.
+    $$
+
+
+    ### Relative mitigation costs and minimum level of mitigation costs
+    Contrary to damages, the mitigation costs are expressed in absolute dollars, not in percentage of GDP. The relative mitigation
+    costs are also available as a variable:
+
+    $$
+    \\text{rel mitigation costs}_{t,r} = \\frac{\\text{mitigation costs}_{t,r}}{\\text{GDP}_{\\text{gross}, t,r}}.
+    $$
+
+    When emission trading is allowed, some regions may even have negative mitigation costs. How negative this can become can
+    be configured with the parameter [`rel_mitigation_costs_min_level`](../parameters.md#economics.MAC.rel_mitigation_costs_min_level).
+
+    $$
+    \\text{rel mitigation costs}_{t,r} \\geq \\text{rel mitigation costs min level}.
+    $$
+
+    By default, this parameter is 0, meaning that the mitigation costs can not become negative.
+
+
 
 
     ## Parameters defined in this module
