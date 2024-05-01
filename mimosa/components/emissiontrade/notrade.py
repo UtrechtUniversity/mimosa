@@ -14,19 +14,14 @@ from mimosa.common import (
 
 
 def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
-    """Emission trading equations and constraints
-    (no-trade specification)
+    """
+    Without emission trading, the import/export of emission reductions and mitigation costs is always zero:
 
-    Necessary variables:
-        m.mitigation_costs (abatement costs as paid for by this region)
+    $$
+    \\text{import/export mitigation cost balance}_{t,r} = 0
+    $$
 
-    Returns:
-        list of constraints (any of:
-           - GlobalConstraint
-           - GlobalInitConstraint
-           - RegionalConstraint
-           - RegionalInitConstraint
-        )
+    This means that the mitigation costs and the area under the MAC are exactly the same for each region (see [Mitigation costs](mitigation.md#mitigation-costs)).
     """
     constraints = []  # No constraints here
 

@@ -359,8 +359,8 @@ model:
     type: enum
     values:
       - notrade
-      - globalcostpool
       - emissiontrade
+      - globalcostpool
     default: notrade
 
   financialtransfer module:

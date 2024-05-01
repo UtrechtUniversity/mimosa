@@ -1,9 +1,3 @@
-"""
-Model equations and constraints:
-Emission trading module
-Type: global cost pool
-"""
-
 from typing import Sequence
 from mimosa.common import (
     AbstractModel,
@@ -20,29 +14,28 @@ from mimosa.common import (
     soft_min,
 )
 
-from mimosa.components.mitigation import AC
-
 
 def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
-    """Emission trading equations and constraints
-    (global cost pool specification)
+    """
+    In MIMOSA, every region can reduce its own emissions. The price for this is determined
+    by the area under the MAC (see [Mitigation](mitigation.md#mitigation-costs)). On top of that,
+    regions can trade emission reductions with each other. Regions can pay other regions to reduce
+    their emissions, or receive payments for reducing their own emissions. The financial transfers for
+    this are captured in the variable $\\text{import/export mitigation cost balance}_{t,r}$. For every timestep,
+    the sum of these transfers should be zero:
 
-    Necessary variables:
-        m.mitigation_costs (abatement costs as paid for by this region)
+    $$
+    \\sum_r \\text{import/export mitigation cost balance}_{t,r} = 0
+    $$
 
-    Returns:
-        list of constraints (any of:
-           - GlobalConstraint
-           - GlobalInitConstraint
-           - RegionalConstraint
-           - RegionalInitConstraint
-        )
+
+
     """
     constraints = []
 
     m.global_carbonprice = Var(m.t)
 
-    # The global mitigation cost pool:
+    # Emissions are traded at the global carbon price
     constraints.extend(
         [
             # Constraint that sets the global carbon price to the average of the regional carbon prices:
