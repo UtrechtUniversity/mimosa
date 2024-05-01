@@ -28,6 +28,39 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     \\text{damages}_{t,r} = \\text{damages}_{\\text{non-SLR},t,r} + \\text{damages}_{\\text{SLR},t,r}
     $$
 
+    :::mimosa.components.damages.coacch._get_constraints_temperature_dependent
+
+    :::mimosa.components.damages.coacch._get_constraints_slr
+
+
+    """
+    constraints = []
+
+    m.damage_costs = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
+    m.damage_scale_factor = Param(doc="::economics.damages.scale factor")
+
+    # Total damages are sum of non-SLR and SLR damages
+    constraints.append(
+        RegionalConstraint(
+            lambda m, t, r: m.damage_costs[t, r]
+            == m.damage_costs_non_slr[t, r] + m.damage_costs_slr[t, r],
+            "damage_costs",
+        ),
+    )
+
+    # Get constraints for temperature dependent damages
+    constraints.extend(_get_constraints_temperature_dependent(m))
+
+    # Get constraints for sea-level rise damages
+    constraints.extend(_get_constraints_slr(m))
+
+    return constraints
+
+
+def _get_constraints_temperature_dependent(
+    m: AbstractModel,
+) -> Sequence[GeneralConstraint]:
+    """
     ## Temperature-dependent damages
 
     The temperature-dependent damages are modeled as a quadratic damage function $D(\\cdot)$ of global mean temperature:
@@ -59,15 +92,8 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     {"file_path": "./assets/plots/coacch_literature_comparison.json"}
     ```
 
-    ## Sea-level rise damages
-
-    ...
-
     """
     constraints = []
-
-    m.damage_costs = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
-    m.damage_scale_factor = Param(doc="::economics.damages.scale factor")
 
     # Damages not related to SLR (dependent on temperature)
     m.damage_costs_non_slr = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
@@ -97,6 +123,18 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
             "damage_costs_non_slr",
         )
     )
+
+    return constraints
+
+
+def _get_constraints_slr(m: AbstractModel) -> Sequence[GeneralConstraint]:
+    """
+
+    ## Sea-level rise damages
+
+    ...
+    """
+    constraints = []
 
     # SLR damages
     m.damage_costs_slr = Var(
@@ -144,15 +182,6 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
             * damage_fct(m.total_SLR[t], m.total_SLR[0], m, r, is_slr=True),
             "damage_costs_slr",
         )
-    )
-
-    # Total damages are sum of non-SLR and SLR damages
-    constraints.append(
-        RegionalConstraint(
-            lambda m, t, r: m.damage_costs[t, r]
-            == m.damage_costs_non_slr[t, r] + m.damage_costs_slr[t, r],
-            "damage_costs",
-        ),
     )
 
     return constraints
