@@ -130,8 +130,8 @@ def _get_mac_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     relative to the world average, we obtain a scaling factor for the MAC.
 
 
-
-    ## Mitigation costs
+    <h3 id="mitigation-costs">Mitigation costs</h3>
+    
     The mitigation costs are calculated as area under the MAC:
 
     ``` {.plotly .center_align_plotly}
