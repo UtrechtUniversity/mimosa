@@ -106,3 +106,7 @@ a[href*="parameters/#"]:not(:has(code))::before {
     background-color: currentcolor;
     mask-image: var(--md-admonition-icon--parameter)
 }
+
+.center_align_plotly .plot-container.plotly .svg-container {
+    margin: 0 auto;
+}

@@ -863,7 +863,254 @@
   <h1>Emission trading</h1>
 
 <p><a href="../"><span class="twemoji"><svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M10.78 19.03a.75.75 0 0 1-1.06 0l-6.25-6.25a.75.75 0 0 1 0-1.06l6.25-6.25a.749.749 0 0 1 1.275.326.749.749 0 0 1-.215.734L5.81 11.5h14.44a.75.75 0 0 1 0 1.5H5.81l4.97 4.97a.75.75 0 0 1 0 1.06Z"></path></svg></span> Back to general structure</a></p>
-<p>TODO</p>
+<p>By default, every region has to pay for their own emission reductions. However, emission trading is a mechanism to allow regions to trade emission allowances with each other. This way, regions can pay for reductions in other regions if it is cheaper than reducing their own emissions or when following an effort-sharing regime.</p>
+<p>The emission trading module can be chosen using the parameter <a href="../../parameters/#model.emissiontrade%20module"><code>params["model"]["emissiontrade module"]</code></a></p>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="no-emission-trade-default" name="__tabbed_1" type="radio"/><input id="with-emission-trade" name="__tabbed_1" type="radio"/><div class="tabbed-labels"><label for="no-emission-trade-default">No emission trade <code>default</code></label><label for="with-emission-trade">With emission trade</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p>Usage:
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a href="#__codelineno-0-1" id="__codelineno-0-1" name="__codelineno-0-1"></a><span class="n">params</span> <span class="o">=</span> <span class="n">load_params</span><span class="p">()</span>
+</span><span id="__span-0-2"><a href="#__codelineno-0-2" id="__codelineno-0-2" name="__codelineno-0-2"></a><span class="hll"><span class="n">params</span><span class="p">[</span><span class="s2">"model"</span><span class="p">][</span><span class="s2">"emissiontrade module"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"notrade"</span>
+</span></span><span id="__span-0-3"><a href="#__codelineno-0-3" id="__codelineno-0-3" name="__codelineno-0-3"></a><span class="n">model</span> <span class="o">=</span> <span class="n">MIMOSA</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+</span></code></pre></div></p>
+<div class="doc doc-object doc-function">
+<div class="doc doc-contents first">
+<p>Without emission trading, the import/export of emission reductions and mitigation costs is always zero:</p>
+<div class="arithmatex">\[
+\text{import/export mitigation cost balance}_{t,r} = 0
+\]</div>
+<p>This means that the mitigation costs and the area under the MAC are exactly the same for each region (see <a href="../mitigation/#mitigation-costs">Mitigation costs</a>).</p>
+<details class="quote">
+<summary>Source code in <code>mimosa/components/emissiontrade/notrade.py</code></summary>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-16">16</a></span>
+<span class="normal"><a href="#__codelineno-0-17">17</a></span>
+<span class="normal"><a href="#__codelineno-0-18">18</a></span>
+<span class="normal"><a href="#__codelineno-0-19">19</a></span>
+<span class="normal"><a href="#__codelineno-0-20">20</a></span>
+<span class="normal"><a href="#__codelineno-0-21">21</a></span>
+<span class="normal"><a href="#__codelineno-0-22">22</a></span>
+<span class="normal"><a href="#__codelineno-0-23">23</a></span>
+<span class="normal"><a href="#__codelineno-0-24">24</a></span>
+<span class="normal"><a href="#__codelineno-0-25">25</a></span>
+<span class="normal"><a href="#__codelineno-0-26">26</a></span>
+<span class="normal"><a href="#__codelineno-0-27">27</a></span>
+<span class="normal"><a href="#__codelineno-0-28">28</a></span>
+<span class="normal"><a href="#__codelineno-0-29">29</a></span>
+<span class="normal"><a href="#__codelineno-0-30">30</a></span>
+<span class="normal"><a href="#__codelineno-0-31">31</a></span>
+<span class="normal"><a href="#__codelineno-0-32">32</a></span>
+<span class="normal"><a href="#__codelineno-0-33">33</a></span>
+<span class="normal"><a href="#__codelineno-0-34">34</a></span>
+<span class="normal"><a href="#__codelineno-0-35">35</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16"></a><span class="k">def</span> <span class="nf">get_constraints</span><span class="p">(</span><span class="n">m</span><span class="p">:</span> <span class="n">AbstractModel</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">GeneralConstraint</span><span class="p">]:</span>
+</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17"></a><span class="w">    </span><span class="sd">"""</span>
+</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18"></a><span class="sd">    Without emission trading, the import/export of emission reductions and mitigation costs is always zero:</span>
+</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19"></a>
+</span><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20"></a><span class="sd">    $$</span>
+</span><span id="__span-0-21"><a id="__codelineno-0-21" name="__codelineno-0-21"></a><span class="sd">    \\text{import/export mitigation cost balance}_{t,r} = 0</span>
+</span><span id="__span-0-22"><a id="__codelineno-0-22" name="__codelineno-0-22"></a><span class="sd">    $$</span>
+</span><span id="__span-0-23"><a id="__codelineno-0-23" name="__codelineno-0-23"></a>
+</span><span id="__span-0-24"><a id="__codelineno-0-24" name="__codelineno-0-24"></a><span class="sd">    This means that the mitigation costs and the area under the MAC are exactly the same for each region (see [Mitigation costs](mitigation.md#mitigation-costs)).</span>
+</span><span id="__span-0-25"><a id="__codelineno-0-25" name="__codelineno-0-25"></a><span class="sd">    """</span>
+</span><span id="__span-0-26"><a id="__codelineno-0-26" name="__codelineno-0-26"></a>    <span class="n">constraints</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># No constraints here</span>
+</span><span id="__span-0-27"><a id="__codelineno-0-27" name="__codelineno-0-27"></a>
+</span><span id="__span-0-28"><a id="__codelineno-0-28" name="__codelineno-0-28"></a>    <span class="n">m</span><span class="o">.</span><span class="n">import_export_emission_reduction_balance</span> <span class="o">=</span> <span class="n">Param</span><span class="p">(</span>
+</span><span id="__span-0-29"><a id="__codelineno-0-29" name="__codelineno-0-29"></a>        <span class="n">m</span><span class="o">.</span><span class="n">t</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">regions</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="n">quant</span><span class="o">.</span><span class="n">unit</span><span class="p">(</span><span class="s2">"emissionsrate_unit"</span><span class="p">),</span> <span class="n">initialize</span><span class="o">=</span><span class="mi">0</span>
+</span><span id="__span-0-30"><a id="__codelineno-0-30" name="__codelineno-0-30"></a>    <span class="p">)</span>
+</span><span id="__span-0-31"><a id="__codelineno-0-31" name="__codelineno-0-31"></a>    <span class="n">m</span><span class="o">.</span><span class="n">import_export_mitigation_cost_balance</span> <span class="o">=</span> <span class="n">Param</span><span class="p">(</span>
+</span><span id="__span-0-32"><a id="__codelineno-0-32" name="__codelineno-0-32"></a>        <span class="n">m</span><span class="o">.</span><span class="n">t</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">regions</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="n">quant</span><span class="o">.</span><span class="n">unit</span><span class="p">(</span><span class="s2">"currency_unit"</span><span class="p">),</span> <span class="n">initialize</span><span class="o">=</span><span class="mi">0</span>
+</span><span id="__span-0-33"><a id="__codelineno-0-33" name="__codelineno-0-33"></a>    <span class="p">)</span>
+</span><span id="__span-0-34"><a id="__codelineno-0-34" name="__codelineno-0-34"></a>
+</span><span id="__span-0-35"><a id="__codelineno-0-35" name="__codelineno-0-35"></a>    <span class="k">return</span> <span class="n">constraints</span>
+</span></code></pre></div></td></tr></table></div>
+</details>
+</div>
+</div></div>
+<div class="tabbed-block">
+<p>Usage:
+<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a href="#__codelineno-1-1" id="__codelineno-1-1" name="__codelineno-1-1"></a><span class="n">params</span> <span class="o">=</span> <span class="n">load_params</span><span class="p">()</span>
+</span><span id="__span-1-2"><a href="#__codelineno-1-2" id="__codelineno-1-2" name="__codelineno-1-2"></a><span class="hll"><span class="n">params</span><span class="p">[</span><span class="s2">"model"</span><span class="p">][</span><span class="s2">"emissiontrade module"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"emissiontrade"</span>
+</span></span><span id="__span-1-3"><a href="#__codelineno-1-3" id="__codelineno-1-3" name="__codelineno-1-3"></a><span class="n">model</span> <span class="o">=</span> <span class="n">MIMOSA</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+</span></code></pre></div></p>
+<div class="doc doc-object doc-function">
+<div class="doc doc-contents first">
+<p>In MIMOSA, every region can reduce its own emissions. The price for this is determined
+by the area under the MAC (see <a href="../mitigation/#mitigation-costs">Mitigation</a>). On top of that,
+regions can trade emission reductions with each other. Regions can pay other regions to reduce
+their emissions, or receive payments for reducing their own emissions. The financial transfers for
+this are captured in the variable <span class="arithmatex">\(\text{import/export mitigation cost balance}_{t,r}\)</span>. For every timestep,
+the sum of these transfers should be zero:</p>
+<div class="arithmatex">\[
+\sum_r \text{import/export mitigation cost balance}_{t,r} = 0
+\]</div>
+<details class="quote">
+<summary>Source code in <code>mimosa/components/emissiontrade/emissiontrade.py</code></summary>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-18">18</a></span>
+<span class="normal"><a href="#__codelineno-0-19">19</a></span>
+<span class="normal"><a href="#__codelineno-0-20">20</a></span>
+<span class="normal"><a href="#__codelineno-0-21">21</a></span>
+<span class="normal"><a href="#__codelineno-0-22">22</a></span>
+<span class="normal"><a href="#__codelineno-0-23">23</a></span>
+<span class="normal"><a href="#__codelineno-0-24">24</a></span>
+<span class="normal"><a href="#__codelineno-0-25">25</a></span>
+<span class="normal"><a href="#__codelineno-0-26">26</a></span>
+<span class="normal"><a href="#__codelineno-0-27">27</a></span>
+<span class="normal"><a href="#__codelineno-0-28">28</a></span>
+<span class="normal"><a href="#__codelineno-0-29">29</a></span>
+<span class="normal"><a href="#__codelineno-0-30">30</a></span>
+<span class="normal"><a href="#__codelineno-0-31">31</a></span>
+<span class="normal"><a href="#__codelineno-0-32">32</a></span>
+<span class="normal"><a href="#__codelineno-0-33">33</a></span>
+<span class="normal"><a href="#__codelineno-0-34">34</a></span>
+<span class="normal"><a href="#__codelineno-0-35">35</a></span>
+<span class="normal"><a href="#__codelineno-0-36">36</a></span>
+<span class="normal"><a href="#__codelineno-0-37">37</a></span>
+<span class="normal"><a href="#__codelineno-0-38">38</a></span>
+<span class="normal"><a href="#__codelineno-0-39">39</a></span>
+<span class="normal"><a href="#__codelineno-0-40">40</a></span>
+<span class="normal"><a href="#__codelineno-0-41">41</a></span>
+<span class="normal"><a href="#__codelineno-0-42">42</a></span>
+<span class="normal"><a href="#__codelineno-0-43">43</a></span>
+<span class="normal"><a href="#__codelineno-0-44">44</a></span>
+<span class="normal"><a href="#__codelineno-0-45">45</a></span>
+<span class="normal"><a href="#__codelineno-0-46">46</a></span>
+<span class="normal"><a href="#__codelineno-0-47">47</a></span>
+<span class="normal"><a href="#__codelineno-0-48">48</a></span>
+<span class="normal"><a href="#__codelineno-0-49">49</a></span>
+<span class="normal"><a href="#__codelineno-0-50">50</a></span>
+<span class="normal"><a href="#__codelineno-0-51">51</a></span>
+<span class="normal"><a href="#__codelineno-0-52">52</a></span>
+<span class="normal"><a href="#__codelineno-0-53">53</a></span>
+<span class="normal"><a href="#__codelineno-0-54">54</a></span>
+<span class="normal"><a href="#__codelineno-0-55">55</a></span>
+<span class="normal"><a href="#__codelineno-0-56">56</a></span>
+<span class="normal"><a href="#__codelineno-0-57">57</a></span>
+<span class="normal"><a href="#__codelineno-0-58">58</a></span>
+<span class="normal"><a href="#__codelineno-0-59">59</a></span>
+<span class="normal"><a href="#__codelineno-0-60">60</a></span>
+<span class="normal"><a href="#__codelineno-0-61">61</a></span>
+<span class="normal"><a href="#__codelineno-0-62">62</a></span>
+<span class="normal"><a href="#__codelineno-0-63">63</a></span>
+<span class="normal"><a href="#__codelineno-0-64">64</a></span>
+<span class="normal"><a href="#__codelineno-0-65">65</a></span>
+<span class="normal"><a href="#__codelineno-0-66">66</a></span>
+<span class="normal"><a href="#__codelineno-0-67">67</a></span>
+<span class="normal"><a href="#__codelineno-0-68">68</a></span>
+<span class="normal"><a href="#__codelineno-0-69">69</a></span>
+<span class="normal"><a href="#__codelineno-0-70">70</a></span>
+<span class="normal"><a href="#__codelineno-0-71">71</a></span>
+<span class="normal"><a href="#__codelineno-0-72">72</a></span>
+<span class="normal"><a href="#__codelineno-0-73">73</a></span>
+<span class="normal"><a href="#__codelineno-0-74">74</a></span>
+<span class="normal"><a href="#__codelineno-0-75">75</a></span>
+<span class="normal"><a href="#__codelineno-0-76">76</a></span>
+<span class="normal"><a href="#__codelineno-0-77">77</a></span>
+<span class="normal"><a href="#__codelineno-0-78">78</a></span>
+<span class="normal"><a href="#__codelineno-0-79">79</a></span>
+<span class="normal"><a href="#__codelineno-0-80">80</a></span>
+<span class="normal"><a href="#__codelineno-0-81">81</a></span>
+<span class="normal"><a href="#__codelineno-0-82">82</a></span>
+<span class="normal"><a href="#__codelineno-0-83">83</a></span>
+<span class="normal"><a href="#__codelineno-0-84">84</a></span>
+<span class="normal"><a href="#__codelineno-0-85">85</a></span>
+<span class="normal"><a href="#__codelineno-0-86">86</a></span>
+<span class="normal"><a href="#__codelineno-0-87">87</a></span>
+<span class="normal"><a href="#__codelineno-0-88">88</a></span>
+<span class="normal"><a href="#__codelineno-0-89">89</a></span>
+<span class="normal"><a href="#__codelineno-0-90">90</a></span>
+<span class="normal"><a href="#__codelineno-0-91">91</a></span>
+<span class="normal"><a href="#__codelineno-0-92">92</a></span>
+<span class="normal"><a href="#__codelineno-0-93">93</a></span>
+<span class="normal"><a href="#__codelineno-0-94">94</a></span>
+<span class="normal"><a href="#__codelineno-0-95">95</a></span>
+<span class="normal"><a href="#__codelineno-0-96">96</a></span>
+<span class="normal"><a href="#__codelineno-0-97">97</a></span>
+<span class="normal"><a href="#__codelineno-0-98">98</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18"></a><span class="k">def</span> <span class="nf">get_constraints</span><span class="p">(</span><span class="n">m</span><span class="p">:</span> <span class="n">AbstractModel</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">GeneralConstraint</span><span class="p">]:</span>
+</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19"></a><span class="w">    </span><span class="sd">"""</span>
+</span><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20"></a><span class="sd">    In MIMOSA, every region can reduce its own emissions. The price for this is determined</span>
+</span><span id="__span-0-21"><a id="__codelineno-0-21" name="__codelineno-0-21"></a><span class="sd">    by the area under the MAC (see [Mitigation](mitigation.md#mitigation-costs)). On top of that,</span>
+</span><span id="__span-0-22"><a id="__codelineno-0-22" name="__codelineno-0-22"></a><span class="sd">    regions can trade emission reductions with each other. Regions can pay other regions to reduce</span>
+</span><span id="__span-0-23"><a id="__codelineno-0-23" name="__codelineno-0-23"></a><span class="sd">    their emissions, or receive payments for reducing their own emissions. The financial transfers for</span>
+</span><span id="__span-0-24"><a id="__codelineno-0-24" name="__codelineno-0-24"></a><span class="sd">    this are captured in the variable $\\text{import/export mitigation cost balance}_{t,r}$. For every timestep,</span>
+</span><span id="__span-0-25"><a id="__codelineno-0-25" name="__codelineno-0-25"></a><span class="sd">    the sum of these transfers should be zero:</span>
+</span><span id="__span-0-26"><a id="__codelineno-0-26" name="__codelineno-0-26"></a>
+</span><span id="__span-0-27"><a id="__codelineno-0-27" name="__codelineno-0-27"></a><span class="sd">    $$</span>
+</span><span id="__span-0-28"><a id="__codelineno-0-28" name="__codelineno-0-28"></a><span class="sd">    \\sum_r \\text{import/export mitigation cost balance}_{t,r} = 0</span>
+</span><span id="__span-0-29"><a id="__codelineno-0-29" name="__codelineno-0-29"></a><span class="sd">    $$</span>
+</span><span id="__span-0-30"><a id="__codelineno-0-30" name="__codelineno-0-30"></a>
+</span><span id="__span-0-31"><a id="__codelineno-0-31" name="__codelineno-0-31"></a>
+</span><span id="__span-0-32"><a id="__codelineno-0-32" name="__codelineno-0-32"></a>
+</span><span id="__span-0-33"><a id="__codelineno-0-33" name="__codelineno-0-33"></a><span class="sd">    """</span>
+</span><span id="__span-0-34"><a id="__codelineno-0-34" name="__codelineno-0-34"></a>    <span class="n">constraints</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="__span-0-35"><a id="__codelineno-0-35" name="__codelineno-0-35"></a>
+</span><span id="__span-0-36"><a id="__codelineno-0-36" name="__codelineno-0-36"></a>    <span class="n">m</span><span class="o">.</span><span class="n">global_carbonprice</span> <span class="o">=</span> <span class="n">Var</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">t</span><span class="p">)</span>
+</span><span id="__span-0-37"><a id="__codelineno-0-37" name="__codelineno-0-37"></a>
+</span><span id="__span-0-38"><a id="__codelineno-0-38" name="__codelineno-0-38"></a>    <span class="c1"># Emissions are traded at the global carbon price</span>
+</span><span id="__span-0-39"><a id="__codelineno-0-39" name="__codelineno-0-39"></a>    <span class="n">constraints</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+</span><span id="__span-0-40"><a id="__codelineno-0-40" name="__codelineno-0-40"></a>        <span class="p">[</span>
+</span><span id="__span-0-41"><a id="__codelineno-0-41" name="__codelineno-0-41"></a>            <span class="c1"># Constraint that sets the global carbon price to the average of the regional carbon prices:</span>
+</span><span id="__span-0-42"><a id="__codelineno-0-42" name="__codelineno-0-42"></a>            <span class="n">GlobalConstraint</span><span class="p">(</span>
+</span><span id="__span-0-43"><a id="__codelineno-0-43" name="__codelineno-0-43"></a>                <span class="k">lambda</span> <span class="n">m</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="n">m</span><span class="o">.</span><span class="n">global_carbonprice</span><span class="p">[</span><span class="n">t</span><span class="p">]</span>
+</span><span id="__span-0-44"><a id="__codelineno-0-44" name="__codelineno-0-44"></a>                <span class="o">==</span> <span class="nb">sum</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">carbonprice</span><span class="p">[</span><span class="n">t</span><span class="p">,</span> <span class="n">r</span><span class="p">]</span> <span class="o">*</span> <span class="n">m</span><span class="o">.</span><span class="n">population</span><span class="p">[</span><span class="n">t</span><span class="p">,</span> <span class="n">r</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">m</span><span class="o">.</span><span class="n">regions</span><span class="p">)</span>
+</span><span id="__span-0-45"><a id="__codelineno-0-45" name="__codelineno-0-45"></a>                <span class="o">/</span> <span class="nb">sum</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">population</span><span class="p">[</span><span class="n">t</span><span class="p">,</span> <span class="n">r</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">m</span><span class="o">.</span><span class="n">regions</span><span class="p">),</span>
+</span><span id="__span-0-46"><a id="__codelineno-0-46" name="__codelineno-0-46"></a>                <span class="s2">"global_carbonprice"</span><span class="p">,</span>
+</span><span id="__span-0-47"><a id="__codelineno-0-47" name="__codelineno-0-47"></a>            <span class="p">),</span>
+</span><span id="__span-0-48"><a id="__codelineno-0-48" name="__codelineno-0-48"></a>        <span class="p">]</span>
+</span><span id="__span-0-49"><a id="__codelineno-0-49" name="__codelineno-0-49"></a>    <span class="p">)</span>
+</span><span id="__span-0-50"><a id="__codelineno-0-50" name="__codelineno-0-50"></a>
+</span><span id="__span-0-51"><a id="__codelineno-0-51" name="__codelineno-0-51"></a>    <span class="c1">## Extra reporting variables:</span>
+</span><span id="__span-0-52"><a id="__codelineno-0-52" name="__codelineno-0-52"></a>
+</span><span id="__span-0-53"><a id="__codelineno-0-53" name="__codelineno-0-53"></a>    <span class="n">m</span><span class="o">.</span><span class="n">paid_for_emission_reductions</span> <span class="o">=</span> <span class="n">Var</span><span class="p">(</span>
+</span><span id="__span-0-54"><a id="__codelineno-0-54" name="__codelineno-0-54"></a>        <span class="n">m</span><span class="o">.</span><span class="n">t</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">regions</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="n">quant</span><span class="o">.</span><span class="n">unit</span><span class="p">(</span><span class="s2">"emissionsrate_unit"</span><span class="p">)</span>
+</span><span id="__span-0-55"><a id="__codelineno-0-55" name="__codelineno-0-55"></a>    <span class="p">)</span>
+</span><span id="__span-0-56"><a id="__codelineno-0-56" name="__codelineno-0-56"></a>    <span class="n">m</span><span class="o">.</span><span class="n">import_export_emission_reduction_balance</span> <span class="o">=</span> <span class="n">Var</span><span class="p">(</span>
+</span><span id="__span-0-57"><a id="__codelineno-0-57" name="__codelineno-0-57"></a>        <span class="n">m</span><span class="o">.</span><span class="n">t</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">regions</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="n">quant</span><span class="o">.</span><span class="n">unit</span><span class="p">(</span><span class="s2">"emissionsrate_unit"</span><span class="p">)</span>
+</span><span id="__span-0-58"><a id="__codelineno-0-58" name="__codelineno-0-58"></a>    <span class="p">)</span>
+</span><span id="__span-0-59"><a id="__codelineno-0-59" name="__codelineno-0-59"></a>    <span class="n">m</span><span class="o">.</span><span class="n">import_export_mitigation_cost_balance</span> <span class="o">=</span> <span class="n">Var</span><span class="p">(</span>
+</span><span id="__span-0-60"><a id="__codelineno-0-60" name="__codelineno-0-60"></a>        <span class="n">m</span><span class="o">.</span><span class="n">t</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">regions</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="n">quant</span><span class="o">.</span><span class="n">unit</span><span class="p">(</span><span class="s2">"currency_unit"</span><span class="p">)</span>
+</span><span id="__span-0-61"><a id="__codelineno-0-61" name="__codelineno-0-61"></a>    <span class="p">)</span>
+</span><span id="__span-0-62"><a id="__codelineno-0-62" name="__codelineno-0-62"></a>    <span class="n">constraints</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+</span><span id="__span-0-63"><a id="__codelineno-0-63" name="__codelineno-0-63"></a>        <span class="p">[</span>
+</span><span id="__span-0-64"><a id="__codelineno-0-64" name="__codelineno-0-64"></a>            <span class="n">GlobalConstraint</span><span class="p">(</span>
+</span><span id="__span-0-65"><a id="__codelineno-0-65" name="__codelineno-0-65"></a>                <span class="k">lambda</span> <span class="n">m</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="nb">sum</span><span class="p">(</span>
+</span><span id="__span-0-66"><a id="__codelineno-0-66" name="__codelineno-0-66"></a>                    <span class="n">m</span><span class="o">.</span><span class="n">import_export_mitigation_cost_balance</span><span class="p">[</span><span class="n">t</span><span class="p">,</span> <span class="n">r</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">m</span><span class="o">.</span><span class="n">regions</span>
+</span><span id="__span-0-67"><a id="__codelineno-0-67" name="__codelineno-0-67"></a>                <span class="p">)</span>
+</span><span id="__span-0-68"><a id="__codelineno-0-68" name="__codelineno-0-68"></a>                <span class="o">==</span> <span class="mf">0.0</span><span class="p">,</span>
+</span><span id="__span-0-69"><a id="__codelineno-0-69" name="__codelineno-0-69"></a>                <span class="s2">"sum_mitigation_equals_sum_area_under_mac"</span><span class="p">,</span>
+</span><span id="__span-0-70"><a id="__codelineno-0-70" name="__codelineno-0-70"></a>            <span class="p">),</span>
+</span><span id="__span-0-71"><a id="__codelineno-0-71" name="__codelineno-0-71"></a>            <span class="c1"># Constraint: from import/export mitigation costs to import/export of emissions using the global carbon price</span>
+</span><span id="__span-0-72"><a id="__codelineno-0-72" name="__codelineno-0-72"></a>            <span class="n">RegionalConstraint</span><span class="p">(</span>
+</span><span id="__span-0-73"><a id="__codelineno-0-73" name="__codelineno-0-73"></a>                <span class="k">lambda</span> <span class="n">m</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">r</span><span class="p">:</span> <span class="p">(</span>
+</span><span id="__span-0-74"><a id="__codelineno-0-74" name="__codelineno-0-74"></a>                    <span class="n">m</span><span class="o">.</span><span class="n">import_export_emission_reduction_balance</span><span class="p">[</span><span class="n">t</span><span class="p">,</span> <span class="n">r</span><span class="p">]</span>
+</span><span id="__span-0-75"><a id="__codelineno-0-75" name="__codelineno-0-75"></a>                    <span class="o">==</span> <span class="n">m</span><span class="o">.</span><span class="n">import_export_mitigation_cost_balance</span><span class="p">[</span><span class="n">t</span><span class="p">,</span> <span class="n">r</span><span class="p">]</span>
+</span><span id="__span-0-76"><a id="__codelineno-0-76" name="__codelineno-0-76"></a>                    <span class="o">/</span> <span class="n">soft_min</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">global_carbonprice</span><span class="p">[</span><span class="n">t</span><span class="p">])</span>
+</span><span id="__span-0-77"><a id="__codelineno-0-77" name="__codelineno-0-77"></a>                    <span class="k">if</span> <span class="n">t</span> <span class="o">&gt;</span> <span class="mi">0</span>
+</span><span id="__span-0-78"><a id="__codelineno-0-78" name="__codelineno-0-78"></a>                    <span class="k">else</span> <span class="n">Constraint</span><span class="o">.</span><span class="n">Skip</span>
+</span><span id="__span-0-79"><a id="__codelineno-0-79" name="__codelineno-0-79"></a>                <span class="p">),</span>
+</span><span id="__span-0-80"><a id="__codelineno-0-80" name="__codelineno-0-80"></a>                <span class="s2">"import_export_emission_reduction_balance"</span><span class="p">,</span>
+</span><span id="__span-0-81"><a id="__codelineno-0-81" name="__codelineno-0-81"></a>            <span class="p">),</span>
+</span><span id="__span-0-82"><a id="__codelineno-0-82" name="__codelineno-0-82"></a>            <span class="c1"># Constraint: paid for emission reductions</span>
+</span><span id="__span-0-83"><a id="__codelineno-0-83" name="__codelineno-0-83"></a>            <span class="n">RegionalConstraint</span><span class="p">(</span>
+</span><span id="__span-0-84"><a id="__codelineno-0-84" name="__codelineno-0-84"></a>                <span class="k">lambda</span> <span class="n">m</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">r</span><span class="p">:</span> <span class="p">(</span>
+</span><span id="__span-0-85"><a id="__codelineno-0-85" name="__codelineno-0-85"></a>                    <span class="n">m</span><span class="o">.</span><span class="n">paid_for_emission_reductions</span><span class="p">[</span><span class="n">t</span><span class="p">,</span> <span class="n">r</span><span class="p">]</span>
+</span><span id="__span-0-86"><a id="__codelineno-0-86" name="__codelineno-0-86"></a>                    <span class="o">==</span> <span class="p">(</span>
+</span><span id="__span-0-87"><a id="__codelineno-0-87" name="__codelineno-0-87"></a>                        <span class="n">m</span><span class="o">.</span><span class="n">regional_emission_reduction</span><span class="p">[</span><span class="n">t</span><span class="p">,</span> <span class="n">r</span><span class="p">]</span>
+</span><span id="__span-0-88"><a id="__codelineno-0-88" name="__codelineno-0-88"></a>                        <span class="o">+</span> <span class="n">m</span><span class="o">.</span><span class="n">import_export_emission_reduction_balance</span><span class="p">[</span><span class="n">t</span><span class="p">,</span> <span class="n">r</span><span class="p">]</span>
+</span><span id="__span-0-89"><a id="__codelineno-0-89" name="__codelineno-0-89"></a>                    <span class="p">)</span>
+</span><span id="__span-0-90"><a id="__codelineno-0-90" name="__codelineno-0-90"></a>                    <span class="k">if</span> <span class="n">t</span> <span class="o">&gt;</span> <span class="mi">0</span>
+</span><span id="__span-0-91"><a id="__codelineno-0-91" name="__codelineno-0-91"></a>                    <span class="k">else</span> <span class="n">Constraint</span><span class="o">.</span><span class="n">Skip</span>
+</span><span id="__span-0-92"><a id="__codelineno-0-92" name="__codelineno-0-92"></a>                <span class="p">),</span>
+</span><span id="__span-0-93"><a id="__codelineno-0-93" name="__codelineno-0-93"></a>                <span class="s2">"paid_for_emission_reductions"</span><span class="p">,</span>
+</span><span id="__span-0-94"><a id="__codelineno-0-94" name="__codelineno-0-94"></a>            <span class="p">),</span>
+</span><span id="__span-0-95"><a id="__codelineno-0-95" name="__codelineno-0-95"></a>        <span class="p">]</span>
+</span><span id="__span-0-96"><a id="__codelineno-0-96" name="__codelineno-0-96"></a>    <span class="p">)</span>
+</span><span id="__span-0-97"><a id="__codelineno-0-97" name="__codelineno-0-97"></a>
+</span><span id="__span-0-98"><a id="__codelineno-0-98" name="__codelineno-0-98"></a>    <span class="k">return</span> <span class="n">constraints</span>
+</span></code></pre></div></td></tr></table></div>
+</details>
+</div>
+</div></div>
+</div>
+</div>
 
 
 

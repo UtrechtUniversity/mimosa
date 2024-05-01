@@ -1473,7 +1473,7 @@ cannot be converted to GtCO2.</p>
 </table>
 <details class="info" open="open">
 <summary>Configuration values dependent on other parameter values</summary>
-<p>In the example above, the name of the scenario depends on the SSP. Every string in the configuration file can contain references
+<p>In the example above, the name of the scenario depends on the <a href="../../parameters/#SSP"><code>SSP</code></a>. Every string in the configuration file can contain references
 to other parameters, and are referred to using curly brackets <code>{}</code>. If you want to refer to a nested parameter (like <a href="../../parameters/#effort%20sharing.regime"><code>effort sharing &gt; regime</code></a>), they should be joined
 with <code>-</code>:</p>
 <div class="language-yaml highlight"><pre><span></span><code><span id="__span-18-1"><a href="#__codelineno-18-1" id="__codelineno-18-1" name="__codelineno-18-1"></a><span class="nt">scenario</span><span class="p">:</span><span class="w"> </span><span class="s">"Scenario-with-{SSP}-and-{effort</span><span class="nv"> </span><span class="s">sharing</span><span class="nv"> </span><span class="s">-</span><span class="nv"> </span><span class="s">regime}"</span>
