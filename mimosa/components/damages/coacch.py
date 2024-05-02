@@ -33,6 +33,12 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     :::mimosa.components.damages.coacch._get_constraints_slr
 
 
+
+    ## Parameters defined in this module
+    - param::damage_scale_factor
+    - manualparam::damage quantile::economics.damages.quantile
+
+
     """
     constraints = []
 
@@ -132,7 +138,47 @@ def _get_constraints_slr(m: AbstractModel) -> Sequence[GeneralConstraint]:
 
     ## Sea-level rise damages
 
-    ...
+    In MIMOSA, sea-level rise damages are modelled separately from temperature dependent damages, as they occur
+    on a different time scale: sea-level rise is a slow process with high inertia. Therefore, these damages are
+    calculated as a function of global mean sea-level rise (SLR) in meters (calculated in the [Sea-level rise](sealevelrise.md) component).
+
+    The SLR damages are calculated with the DIVA impact model (see [Impact sectors used in the damage functions](./#impact-sectors-used-in-the-damage-functions)).
+    These damages are available either with optimal adaptation (and include adaptation costs), or without adaptation. This can be
+    chosen with the parameter [coacch_slr_withadapt](../parameters.md#economics.damages.coacch_slr_withadapt). By default, the optimal
+    adaptation case is used.
+
+    Depending on the region, the SLR damages are modelled with different functional forms following from a best-fit regression. The
+    SLR damages are either quadratic, linear, or logistic:
+
+    $$
+    D_{\\text{\\{form\\}}_r}(\\text{SLR}; \\cdot) = \\begin{cases}
+    D_{\\text{quadratic}}(\\text{SLR}; b_1, b_2) = b_1 \\cdot \\text{SLR} + b_2 \\cdot \\text{SLR}^2\\\\[.2cm]
+    D_{\\text{linear}}(\\text{SLR}; b_1) = b_1 \\cdot \\text{SLR}\\\\[.2cm]
+    D_{\\text{logistic}}(\\text{SLR}; b_1, b_2, b_3) = \\frac{b_1}{1 + b_2 \\cdot e^{-b_3 \\cdot \\text{SLR}}} - \\frac{b_1}{1 + b_2}
+    \\end{cases}
+    $$
+
+    The functional form depends on the regression of the underlying impact data (see [Damage functions and coefficients](./#damage-functions-and-coefficients)),
+    and are equal to:
+
+    <div class="tiny_table table_first_col_header table_scrollable" markdown>
+    {{ read_csv_macro("docs/assets/data/coacch_slr_form.csv") }}
+    </div>
+
+    To calculate the SLR damage costs, two additional transformations have to be taken:
+
+    * Similar to temperature-dependent damages, the SLR damages are scaled by a factor $a_{q,r}$, which depends on the quantile $q$ of the damage function.
+        This represents the uncertainty in the damage function. For median damages, this factor is $a_{0.5,r} = 1$. The quantile can be set using the
+        [damage quantile parameter](../parameters.md#economics.damages.quantile).
+    * Since we assume that until 2020 the climate damages are already incorporated in the baseline GDP,
+        we subtract the damages of the initial time period $t=0$.
+
+    The SLR damage costs therefore become:
+
+    $$
+    \\text{damages}_{\\text{SLR},t,r} = a_{q,r} \\cdot \\big( D_{\\text{\\{form\\}}_r}(\\text{SLR}_t; \\cdot) - D_{\\text{\\{form\\}}_r}(\\text{SLR}_0; \\cdot) \\big).
+    $$
+
     """
     constraints = []
 
