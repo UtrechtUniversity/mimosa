@@ -1,6 +1,6 @@
 # Installing MIMOSA
 
-MIMOSA is written in Python, can be installed using `pip`:
+MIMOSA is written in Python, and can be installed using `pip`:
 ```bash
 pip install mimosa
 ```
@@ -57,23 +57,25 @@ model1.save("run1")
     5. You can test if everything works by opening an Anaconda Prompt and typing `ipopt`. It should show something like this:<br><br>![](assets/fig/install03.png)<br><br>
 
 
-## Using the NEOS server
+??? info "Running MIMOSA without local computations"
 
-The MIMOSA runs can also easily be sent to the NEOS server (<https://neos-server.org>) for remote optimisation. This way, the installation of IPOPT is not required. This can be useful if you don't want to use your own computer to do the runs. However, this is typically much slower than installing IPOPT locally.
+    If you don't want to install IPOPT on your computer, you can also use the NEOS server (<https://neos-server.org>) to run MIMOSA remotely. This way,
+    the installation of IPOPT is not required. This can be useful if you don't want to use your own computer to do the runs. However, this is typically much slower than installing IPOPT locally.
 
-First, on the NEOS website, sign up for a free account. You can then run MIMOSA with NEOS enabled by simply providing it with the email address you used to sign up for NEOS:
+    First, on the NEOS website, sign up for a free account. You can then run MIMOSA with NEOS enabled by simply providing it with the email address you used to sign up for NEOS:
 
-```python
-from mimosa import MIMOSA, load_params
+    ```python
+    from mimosa import MIMOSA, load_params
 
-params = load_params()
+    params = load_params()
 
-model1 = MIMOSA(params)
-model1.solve(use_neos=True, neos_email="your.email@email.com")
-model1.save("run1")
-```
+    model1 = MIMOSA(params)
+    # Change "your.email@email.com" to your the email address you used to sign up for NEOS
+    model1.solve(use_neos=True, neos_email="your.email@email.com") 
+    model1.save("run1")
+    ```
 
-Depending on the MIMOSA parameters chosen and on how busy the NEOS server is, running the model might take a while (typically a couple of minutes).
+    Depending on the MIMOSA parameters chosen and on how busy the NEOS server is, running the model might take a while (typically a couple of minutes).
 
 
 [Next: Running MIMOSA :octicons-arrow-right-24:](run.md){.md-button}

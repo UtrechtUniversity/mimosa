@@ -6,9 +6,6 @@
 [Installation :octicons-arrow-right-24:](installation.md){.md-button}
 [Running :octicons-arrow-right-24:](run.md){.md-button}
 
-???+ warning
-    This documentation is still under construction and will be updated regularly.
-
 MIMOSA is an Integrated Assessment Model (IAM) part of the [IMAGE family](https://www.pbl.nl/en/image/home), with 26 regions covering the whole world. It is a relatively simple Cost-Benefit IAM that still covers the relevant technological and socio-economic dynamics. The climate impacts are calculated using state-of-the-art COACCH damage functions, and the mitigation costs have been directly calibrated to the IPCC AR6 WGIII database.
 
 
@@ -26,8 +23,8 @@ The model is written in the Python optimisation package [Pyomo](https://www.pyom
 [IPOPT](https://coin-or.github.io/Ipopt/) (an open-source large-scale nonlinear optimisation suite) to solve the model.
 
 
-![](assets/fig/mimosa_overview_dark.png#only-dark)
-![](assets/fig/mimosa_overview.png#only-light)
+[![](assets/fig/mimosa_overview_dark.png#only-dark)
+![](assets/fig/mimosa_overview.png#only-light)](components/index.md)
 *Schematic overview of the MIMOSA model. Adapted from [[1]](#1).*
 
 

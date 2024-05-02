@@ -158,7 +158,9 @@ def _get_constraints_slr(m: AbstractModel) -> Sequence[GeneralConstraint]:
     \\end{cases}
     $$
 
-    The functional form depends on the regression of the underlying impact data (see [Damage functions and coefficients](./#damage-functions-and-coefficients)),
+    The values of $b_1$, $b_2$, and $b_3$ are region-dependent and depend on whether adaptation is included or not. These are different
+    values than the coefficients in the temperature-dependent damages. The functional form
+    depends on the regression of the underlying impact data (see [Damage functions and coefficients](./#damage-functions-and-coefficients)),
     and are equal to:
 
     <div class="tiny_table table_first_col_header table_scrollable" markdown>
