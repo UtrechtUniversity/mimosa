@@ -2,6 +2,8 @@ import re
 import yaml
 import sys, os
 
+import mkdocs_table_reader_plugin
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../../"))
 
 from mimosa import MIMOSA, load_params
@@ -32,6 +34,10 @@ def recursive_traverse_components(current_component):
 def define_env(env):
     for constraint in all_constraints:
         env.variables[constraint.name] = constraint.doc
+
+    @env.macro
+    def read_csv_macro(*args, **kwargs):
+        return mkdocs_table_reader_plugin.readers.read_csv(*args, **kwargs)
 
     # get mkdocstrings' Python handler
     python_handler = env.conf["plugins"]["mkdocstrings"].get_handler("python")
