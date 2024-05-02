@@ -10,7 +10,7 @@ class MockAbstractModel:
 
 def test_mac():
     m = MockAbstractModel()
-    m.MAC_scaling_factor = [1] * len(m.regions)
+    m.MAC_scaling_factor = {r: 1 for r in m.regions}
     m.MAC_gamma = 100
     m.MAC_beta = 3
 
