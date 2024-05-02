@@ -395,3 +395,26 @@ fig_mac.update_layout(width=600, height=400).update_xaxes(
     dtick=1000,
 )
 fig_mac.write_json("docs/assets/plots/mac_explanation.json")
+
+
+##############
+# COACCH SLR param
+##############
+
+
+def strip_prefix_form(form_dict):
+    return {
+        key: value.replace("Robust-", "").replace("OLS-", "")
+        for key, value in form_dict.items()
+    }
+
+
+form_slr_ad = model.regional_param_store.get("COACCH", "SLR-Ad_form")
+form_slr_noad = model.regional_param_store.get("COACCH", "SLR-NoAd_form")
+form_slr = pd.DataFrame(
+    {
+        "SLR (with opt. adapt.)": strip_prefix_form(form_slr_ad),
+        "SLR (no adaptation)": strip_prefix_form(form_slr_noad),
+    }
+).rename_axis("Region", axis=0)
+form_slr.to_csv("docs/assets/data/coacch_slr_form.csv")

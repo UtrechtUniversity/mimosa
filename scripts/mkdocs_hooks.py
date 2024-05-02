@@ -163,9 +163,8 @@ def _print_param(tree, mainkey, breadcrumbs, indent=""):
 
 
 def on_page_content(html, **kwargs):
-    pattern = re.compile(r"param::[a-zA-Z0-9_]+")
-    for match in re.findall(pattern, html):
-        param_name = match.split("param::")[1]
+    pattern = re.compile(r"(param::([a-zA-Z0-9_]+))")
+    for match, param_name in re.findall(pattern, html):
         try:
             param = getattr(model, param_name)
             formatted_text = f"<code>{param_name}</code>"
@@ -175,6 +174,19 @@ def on_page_content(html, **kwargs):
                     keys = param.doc.split("::")[1].split(".")
                     doc = get_nested(parser_tree, keys).to_string()
                     formatted_text = f"<a href='../../parameters/#{param.doc.split('::')[1]}'><code>{param_name}</code></a>: {doc}"
+            html = html.replace(match, formatted_text)
+
+        except AttributeError:
+            pass
+    # Manual parameters
+    pattern = re.compile(r"(manualparam::([a-zA-Z0-9_ ]+)::([a-zA-Z0-9_.]+))")
+    for match, param_title, param_key_str in re.findall(pattern, html):
+        try:
+            formatted_text = f"<code>{param_title}</code>"
+            # Ignore the regional parameters for now
+            keys = param_key_str.split(".")
+            doc = get_nested(parser_tree, keys).to_string()
+            formatted_text = f"<a href='../../parameters/#{param_key_str}'><code>{param_title}</code></a>: {doc}"
             html = html.replace(match, formatted_text)
 
         except AttributeError:

@@ -110,3 +110,30 @@ a[href*="parameters/#"]:not(:has(code))::before {
 .center_align_plotly .plot-container.plotly .svg-container {
     margin: 0 auto;
 }
+
+/* Tiny table: less margins */
+.tiny_table {
+
+    table th,
+    table td {
+        padding-top: .3em !important;
+        padding-bottom: .3em !important;
+    }
+}
+
+.table_first_col_header {
+    table td:first-child {
+        font-weight: bold;
+    }
+}
+
+.table_scrollable {
+    overflow-y: auto;
+    max-height: 300px;
+    /* padding: 15px 0 5px; */
+    padding-top: 5px;
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0, black var(--top-mask-size, 0), black calc(100% - var(--bottom-mask-size, 0)), transparent 100%);
+    mask-image: linear-gradient(to bottom, transparent 0, black var(--top-mask-size, 0), black calc(100% - var(--bottom-mask-size, 0)), transparent 100%);
+    --top-mask-size: 40px;
+    --bottom-mask-size: 40px;
+}
