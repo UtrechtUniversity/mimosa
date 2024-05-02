@@ -24,7 +24,7 @@ from mimosa.common import (
     logger,
 )
 from mimosa.common.config.parseconfig import check_params, parse_param_values
-from mimosa.export import visualise_ipopt_output, save_output
+from mimosa.export import save_output  # , visualise_ipopt_output
 from mimosa.abstract_model import create_abstract_model
 from mimosa.concrete_model.instantiate_params import InstantiatedModel
 from mimosa.concrete_model import simulation_mode
@@ -182,8 +182,8 @@ class MIMOSA:
             results = opt.solve(
                 self.concrete_model, tee=verbose, symbolic_solver_labels=True
             )
-            if ipopt_output_file is not None:
-                visualise_ipopt_output(ipopt_output_file)
+            # if ipopt_output_file is not None:
+            #     visualise_ipopt_output(ipopt_output_file)
 
         self.postprocessing()
 
