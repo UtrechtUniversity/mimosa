@@ -16,6 +16,9 @@ scipy
 # mkdocs-macros-plugin
 # mkdocs-glightbox
 
+# For testing:
+# pytest
+
 
 # For export:
 # plotly
