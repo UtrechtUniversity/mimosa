@@ -1,18 +1,18 @@
 import pytest
 
-from mimosa.common.config.utils import parsers
+from mimosa.common.config.utils import PARSER_FACTORY
 from mimosa.common import quant
 
 
 def test_float_parser():
-    p = parsers.FloatParser({"type": "float"})
+    p = PARSER_FACTORY.create_parser({"type": "float"}, quant)
     assert p.parse(1.5) == 1.5
 
     # Test if raises error when given a string
     with pytest.raises(ValueError):
         p.parse("test")
 
-    p2 = parsers.FloatParser({"type": "float", "min": 5.5, "max": 10})
+    p2 = PARSER_FACTORY.create_parser({"type": "float", "min": 5.5, "max": 10}, quant)
     assert p2.parse(5.5) == 5.5
     assert p2.parse(10) == 10
 
@@ -22,12 +22,12 @@ def test_float_parser():
     with pytest.raises(ValueError):
         p2.parse(11.1)
 
-    p3 = parsers.FloatParser({"type": "float", "can_be_false": True})
+    p3 = PARSER_FACTORY.create_parser({"type": "float", "can_be_false": True}, quant)
     assert p3.parse(False) is False
 
 
 def test_int_parser():
-    p = parsers.IntParser({"type": "int"})
+    p = PARSER_FACTORY.create_parser({"type": "int"}, quant)
     assert p.parse(1) == 1
     assert p.parse(1.3) == 1
 
@@ -35,7 +35,7 @@ def test_int_parser():
     with pytest.raises(ValueError):
         p.parse("test")
 
-    p2 = parsers.IntParser({"type": "int", "min": 5, "max": 10})
+    p2 = PARSER_FACTORY.create_parser({"type": "int", "min": 5, "max": 10}, quant)
     assert p2.parse(5) == 5
     assert p2.parse(10) == 10
 
@@ -45,12 +45,12 @@ def test_int_parser():
     with pytest.raises(ValueError):
         p2.parse(11)
 
-    p3 = parsers.IntParser({"type": "int", "can_be_false": True})
+    p3 = PARSER_FACTORY.create_parser({"type": "int", "can_be_false": True}, quant)
     assert p3.parse(False) is False
 
 
 def test_bool_parser():
-    p = parsers.BoolParser({"type": "bool"})
+    p = PARSER_FACTORY.create_parser({"type": "bool"}, quant)
     assert p.parse(True) is True
     assert p.parse(False) is False
     assert p.parse("true") is True
@@ -68,18 +68,20 @@ def test_bool_parser():
 
 
 def test_str_parser():
-    p = parsers.StringParser({"type": "str"})
+    p = PARSER_FACTORY.create_parser({"type": "str"}, quant)
     assert p.parse("test") == "test"
     assert p.parse(1) == "1"
     assert p.parse(1.5) == "1.5"
     assert p.parse(True) == "True"
 
-    p2 = parsers.StringParser({"type": "str", "can_be_false": True})
+    p2 = PARSER_FACTORY.create_parser({"type": "str", "can_be_false": True}, quant)
     assert p2.parse(False) is False
 
 
 def test_enum_parser():
-    p = parsers.EnumParser({"type": "enum", "values": ["a", "b", "c"], "default": "a"})
+    p = PARSER_FACTORY.create_parser(
+        {"type": "enum", "values": ["a", "b", "c"], "default": "a"}, quant
+    )
     assert p.parse("a") == "a"
     assert p.parse("b") == "b"
     assert p.parse("c") == "c"
@@ -87,29 +89,32 @@ def test_enum_parser():
     with pytest.raises(ValueError):
         p.parse("d")
 
-    p2 = parsers.EnumParser(
+    p2 = PARSER_FACTORY.create_parser(
         {
             "type": "enum",
             "values": ["a", "b", "c"],
             "default": "a",
             "can_be_false": True,
-        }
+        },
+        quant,
     )
     assert p2.parse(False) is False
 
     # Test if raises error if default not in allowed values:
     with pytest.raises(ValueError):
-        parsers.EnumParser({"type": "enum", "values": ["a", "b", "c"]})
+        PARSER_FACTORY.create_parser({"type": "enum", "values": ["a", "b", "c"]}, quant)
     with pytest.raises(ValueError):
-        parsers.EnumParser({"type": "enum", "values": ["a", "b", "c"], "default": "d"})
+        PARSER_FACTORY.create_parser(
+            {"type": "enum", "values": ["a", "b", "c"], "default": "d"}, quant
+        )
 
     # Should raise an error if values is not a list
     with pytest.raises(TypeError):
-        parsers.EnumParser({"type": "enum", "values": 3})
+        PARSER_FACTORY.create_parser({"type": "enum", "values": 3}, quant)
 
 
 def test_quantity_parser():
-    p = parsers.QuantityParser({"type": "quantity", "unit": "m"}, quant)
+    p = PARSER_FACTORY.create_parser({"type": "quantity", "unit": "m"}, quant)
     # Parser should only check if value is parsable by quant, and return the string
     assert p.parse("300 m") == "300 m"
     assert p.parse("0.3 km") == "0.3 km"
@@ -125,13 +130,13 @@ def test_quantity_parser():
         p.parse(False)
 
     # Test can_be_false:
-    p2 = parsers.QuantityParser(
+    p2 = PARSER_FACTORY.create_parser(
         {"type": "quantity", "unit": "m", "can_be_false": True}, quant
     )
     assert p2.parse(False) is False
 
     # If unit is empty:
-    p3 = parsers.QuantityParser({"type": "quantity", "unit": ""}, quant)
+    p3 = PARSER_FACTORY.create_parser({"type": "quantity", "unit": ""}, quant)
     assert p3.parse("5") == "5"
 
     with pytest.raises(ValueError):
@@ -139,7 +144,7 @@ def test_quantity_parser():
 
 
 def test_list_parser_without_element_type():
-    p = parsers.ListParser({"type": "list"}, quant)
+    p = PARSER_FACTORY.create_parser({"type": "list"}, quant)
     assert p.parse([1, 2, 3]) == [1, 2, 3]
     assert p.parse([]) == []
 
@@ -149,12 +154,14 @@ def test_list_parser_without_element_type():
     with pytest.raises(ValueError):
         p.parse(False)
 
-    p2 = parsers.ListParser({"type": "list", "can_be_false": True}, quant)
+    p2 = PARSER_FACTORY.create_parser({"type": "list", "can_be_false": True}, quant)
     assert p2.parse(False) is False
 
 
 def test_list_parser_with_element_type():
-    p = parsers.ListParser({"type": "list", "values": {"type": "float"}}, quant)
+    p = PARSER_FACTORY.create_parser(
+        {"type": "list", "values": {"type": "float"}}, quant
+    )
     assert p.parse([1, 2.5, 3]) == [1.0, 2.5, 3.0]
     assert p.parse([]) == []
 
@@ -165,7 +172,7 @@ def test_list_parser_with_element_type():
 
 
 def test_list_parser_with_list_of_lists():
-    p = parsers.ListParser(
+    p = PARSER_FACTORY.create_parser(
         {"type": "list", "values": {"type": "list", "values": {"type": "float"}}}, quant
     )
     assert p.parse([[1, 2.5], [3, 4.5]]) == [[1.0, 2.5], [3.0, 4.5]]
@@ -180,7 +187,7 @@ def test_list_parser_with_list_of_lists():
 
 
 def test_dict_parser():
-    p = parsers.DictParser({"type": "dict"}, quant)
+    p = PARSER_FACTORY.create_parser({"type": "dict"}, quant)
     assert p.parse({"a": 1, 3: 2}) == {"a": 1, 3: 2}
     assert p.parse({}) == {}
 
@@ -192,7 +199,9 @@ def test_dict_parser():
 
 
 def test_dict_parser_value_type():
-    p = parsers.DictParser({"type": "dict", "values": {"type": "float"}}, quant)
+    p = PARSER_FACTORY.create_parser(
+        {"type": "dict", "values": {"type": "float"}}, quant
+    )
     assert p.parse({"a": 1, 3: 2.5}) == {"a": 1.0, 3: 2.5}
 
     with pytest.raises(ValueError):
@@ -200,13 +209,13 @@ def test_dict_parser_value_type():
 
 
 def test_dict_parser_key_type():
-    p = parsers.DictParser({"type": "dict", "keys": {"type": "str"}}, quant)
+    p = PARSER_FACTORY.create_parser({"type": "dict", "keys": {"type": "str"}}, quant)
     assert p.parse({"a": 1, "b": 2.5}) == {"a": 1, "b": 2.5}
     assert p.parse({1: 1, "3": 2.5}) == {"1": 1, "3": 2.5}
 
 
 def test_dict_parser_key_value_type():
-    p = parsers.DictParser(
+    p = PARSER_FACTORY.create_parser(
         {
             "type": "dict",
             "keys": {"type": "str"},
@@ -237,14 +246,14 @@ def _create_datasource_dict():
 
 
 def test_datasource_parser():
-    p = parsers.DatasourceParser({"type": "datasource"}, quant)
+    p = PARSER_FACTORY.create_parser({"type": "datasource"}, quant)
     value = _create_datasource_dict()
     assert p.parse(value) == value
 
 
 @pytest.mark.parametrize("key", ["variable", "unit", "scenario", "model", "file"])
 def test_datasource_missing_info(key):
-    p = parsers.DatasourceParser({"type": "datasource"}, quant)
+    p = PARSER_FACTORY.create_parser({"type": "datasource"}, quant)
     value = _create_datasource_dict()
     del value[key]
     with pytest.raises(ValueError):
@@ -252,14 +261,14 @@ def test_datasource_missing_info(key):
 
 
 def test_stringorplaindict_parser():
-    p = parsers.StringOrPlainDictParser({"type": "stringorplaindict"})
+    p = PARSER_FACTORY.create_parser({"type": "str_or_plain_dict"}, quant)
     assert p.parse("test") == "test"
     assert p.parse({"a": 1}) == {"a": 1}
     assert p.parse(1) == "1"
 
     assert p.parse(False) == "False"
 
-    p2 = parsers.StringOrPlainDictParser(
-        {"type": "stringorplaindict", "can_be_false": True}
+    p2 = PARSER_FACTORY.create_parser(
+        {"type": "str_or_plain_dict", "can_be_false": True}, quant
     )
     assert p2.parse(False) is False
