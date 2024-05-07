@@ -49,3 +49,7 @@ def load_yaml(filename):
     with open(full_filename, "r", encoding="utf8") as configfile:
         output = yaml.safe_load(configfile)
     return output
+
+
+class MimosaSolverWarning(Warning):
+    pass
