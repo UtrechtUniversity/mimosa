@@ -8,6 +8,7 @@ Finally, the export functions are called here.
 """
 
 import os
+import warnings
 
 from mimosa.common import (
     AbstractModel,
@@ -151,6 +152,7 @@ class MIMOSA:
         use_neos=False,
         neos_email=None,
         ipopt_output_file=None,
+        ipopt_maxiter=None,
     ) -> None:
         """Sends the concrete model to a solver.
 
@@ -160,6 +162,7 @@ class MIMOSA:
             use_neos (bool, optional): Uses the external NEOS server for solving. Defaults to False.
             neos_email (str or None, optional): E-mail address for NEOS server. Defaults to None.
             ipopt_output_file (str or None, optional): Filename for IPOPT intermediate output. Defaults to None.
+            ipopt_maxiter (int or None, optional): Maximum number of iterations for IPOPT. If None, use IPOPT defaults.
 
         Raises:
             SolverException: raised if solver did not exit with status OK
@@ -176,7 +179,8 @@ class MIMOSA:
             # Solve locally using ipopt
             opt: OptSolver = SolverFactory("ipopt")
             opt.options["halt_on_ampl_error"] = halt_on_ampl_error
-            # opt.options["max_iter"] = 5
+            if ipopt_maxiter is not None:
+                opt.options["max_iter"] = ipopt_maxiter
             if ipopt_output_file is not None:
                 opt.options["output_file"] = ipopt_output_file
             results = opt.solve(
@@ -190,13 +194,16 @@ class MIMOSA:
         logger.info("Status: {}".format(results.solver.status))
 
         if results.solver.status != SolverStatus.ok:
-            logger.error(
-                "Status: {}, termination condition: {}".format(
+            if results.solver.status == SolverStatus.warning:
+                warning_message = "MIMOSA did not solve succesfully. Status: {}, termination condition: {}".format(
                     results.solver.status, results.solver.termination_condition
                 )
-            )
+                logger.error(warning_message)
+                warnings.warn(warning_message, utils.MimosaSolverWarning)
             if results.solver.status != SolverStatus.warning:
-                raise SolverException("Solver did not exit with status OK")
+                raise SolverException(
+                    f"Solver did not exit with status OK: {results.solver.status}"
+                )
 
         logger.info(
             "Final NPV: {}".format(
