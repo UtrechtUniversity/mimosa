@@ -204,7 +204,7 @@ class MIMOSA:
                     results.solver.status, results.solver.termination_condition
                 )
                 logger.error(warning_message)
-                warnings.warn(warning_message, utils.MimosaSolverWarning)
+                raise SolverException(warning_message, utils.MimosaSolverWarning)
             if results.solver.status != SolverStatus.warning:
                 raise SolverException(
                     f"Solver did not exit with status OK: {results.solver.status}"
