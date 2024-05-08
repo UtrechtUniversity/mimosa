@@ -5,7 +5,7 @@ A basic run of MIMOSA requires 4 steps: loading the parameters, building the mod
 With this code, the default parameter values are used (see [Parameter reference](parameters.md)).
 
 ``` python
-{% include "runs/run_base.py" %}
+--8<-- "tests/runs/run_base.py"
 ```
 
 1.   Read the default parameters
@@ -37,7 +37,7 @@ The default parameters from `load_params()` are given as a nested dictionary. Ev
 In this example, the [carbon budget](parameters.md#emissions.carbonbudget) is changed to 500 GtCO2. 
 
 ``` python hl_lines="4 5 6"
-{% include "runs/run_carbonbudget.py" %} 
+--8<-- "tests/runs/run_carbonbudget.py"
 ```
 
 1.   Change the parameter of emissions > carbonbudget to the string "500 GtCO2"
@@ -46,7 +46,7 @@ In this example, the [carbon budget](parameters.md#emissions.carbonbudget) is ch
 Multiple parameters can also be changed at the same time. In this example, the high end of the [damages](parameters.md#economics.damages.quantile) and of the [climate sensitivity (TCRE)](parameters.md#temperature.TCRE) are used, combined with the low end of the [discount rate (PRTP)](parameters.md#economics.PRTP).
 
 ``` python hl_lines="4 5 6 7 8"
-{% include "runs/run_high_dmg_tcre_low_prtp.py" %}
+--8<-- "tests/runs/run_high_dmg_tcre_low_prtp.py"
 ```
 
 ### Doing multiple runs
@@ -57,18 +57,7 @@ through regular Python loops:
 
 
 ``` python hl_lines="3 7 12"
-from mimosa import MIMOSA, load_params
-
-for budget in ["500 GtCO2", "700 GtCO2", "1000 GtCO2"]:
-
-     params = load_params()
-
-     params["emissions"]["carbonbudget"] = budget
-
-     model3 = MIMOSA(params)
-     model3.solve()
-
-     model3.save(f"run_example3_{budget}") # (1)!
+--8<-- "tests/runs/run_multipleruns.py"
 ```
 
 1. Don't forget to save each file to a different name, otherwise they will be overwritten at each iteration of the loop.
@@ -80,26 +69,7 @@ It can be useful to do a MIMOSA run with zero mitigation: a baseline run. We dis
 === "Baseline ignoring damages"
 
      ``` python hl_lines="4 5 6 7"
-     from mimosa import MIMOSA, load_params
-
-     params = load_params()
-
-     params["emissions"]["carbonbudget"] = False
-     params["economics"]["damages"]["ignore damages"] = True
-     
-     params["model"]["welfare module"] = "cost_minimising"
-
-     # Disable some emission reduction constraints
-     params["emissions"]["non increasing emissions after 2100"] = False
-     params["emissions"]["not positive after budget year"] = False
-     params["emissions"]["inertia"]["regional"] = False
-     params["emissions"]["inertia"]["global"] = False
-
-     params["time"]["end"] = 2150
-
-     model = MIMOSA(params)
-     model.solve()
-     model.save("baseline_ignore_damages")
+     --8<-- "tests/runs/run_baseline_nodamages.py"
      ```
 
 === "No policy scenario with damages"
