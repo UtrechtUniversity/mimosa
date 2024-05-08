@@ -58,6 +58,8 @@ class MIMOSA:
 
         self.abstract_model = self.get_abstract_model()
         self.concrete_model = self.create_instance()
+        self.status = None  # Not started yet
+        self.last_saved_filename = None  # Nothing saved yes
         self.preprocessing()
 
     def get_abstract_model(self) -> AbstractModel:
@@ -167,6 +169,7 @@ class MIMOSA:
         Raises:
             SolverException: raised if solver did not exit with status OK
         """
+        self.status = None  # Not started yet
 
         if use_neos:
             # Send concrete model to external solver on NEOS server
@@ -193,6 +196,8 @@ class MIMOSA:
 
         logger.info("Status: {}".format(results.solver.status))
 
+        self.status = results.solver.status
+
         if results.solver.status != SolverStatus.ok:
             if results.solver.status == SolverStatus.warning:
                 warning_message = "MIMOSA did not solve succesfully. Status: {}, termination condition: {}".format(
@@ -211,8 +216,9 @@ class MIMOSA:
             )
         )
 
-    def save(self, experiment=None, **kwargs):
-        save_output(self.params, self.concrete_model, experiment, **kwargs)
+    def save(self, filename=None, **kwargs):
+        self.last_saved_filename = filename
+        save_output(self.params, self.concrete_model, filename, **kwargs)
 
 
 ###########################
