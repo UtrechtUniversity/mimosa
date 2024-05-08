@@ -46,18 +46,7 @@ In this example, the [carbon budget](parameters.md#emissions.carbonbudget) is ch
 Multiple parameters can also be changed at the same time. In this example, the high end of the [damages](parameters.md#economics.damages.quantile) and of the [climate sensitivity (TCRE)](parameters.md#temperature.TCRE) are used, combined with the low end of the [discount rate (PRTP)](parameters.md#economics.PRTP).
 
 ``` python hl_lines="4 5 6 7 8"
-from mimosa import MIMOSA, load_params
-
-params = load_params()
-
-params["economics"]["damages"]["quantile"] = 0.95
-params["temperature"]["TCRE"] = "0.82 delta_degC/(TtCO2)"
-params["economics"]["PRTP"] = 0.001
-
-model2 = MIMOSA(params)
-model2.solve()
-
-model2.save("run_example2")
+{% include "runs/run_high_dmg_tcre_low_prtp.py" %}
 ```
 
 ### Doing multiple runs
