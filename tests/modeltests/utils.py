@@ -1,5 +1,6 @@
-import pandas as pd
 import os
+import runpy
+import pandas as pd
 
 from mimosa.common.utils import MimosaSolverWarning
 from mimosa.common import SolverStatus
@@ -7,11 +8,9 @@ from mimosa.common import SolverStatus
 
 def exec_run(filename):
     """Filename is relative to the variable "/tests/"."""
-    _locals = locals()
     filename = os.path.join(os.path.dirname(__file__), "../", filename)
-    with open(filename, encoding="utf-8") as file:
-        exec(file.read(), globals(), _locals)
-    return _locals
+    _globals = runpy.run_path(filename)
+    return _globals
 
 
 def read_output(model=None, filename=None):
