@@ -87,27 +87,7 @@ It can be useful to do a MIMOSA run with zero mitigation: a baseline run. We dis
 MIMOSA has some built-in effort sharing regimes. In this example, they are used in combination with a carbon budget (but it could be used in CBA mode). The welfare module is set to cost minimising, as this is typically used with effort sharing regimes. Effort sharing would be impossible without emission trading. Finally, this would often be infeasible for some regions, if we didn't allow for some extra financial transfers beyond just emission trading, which is why we set the relative mitigation cost minimum level to a small negative number.
 
 ```python
-from mimosa import MIMOSA, load_params
-
-
-# Loop over the three available effort sharing regimes
-for regime in [
-     "equal_mitigation_costs",
-     "equal_total_costs",
-     "per_cap_convergence",
-]:
-     params = load_params()
-     params["model"]["emissiontrade module"] = "emissiontrade"
-     params["model"]["welfare module"] = "cost_minimising"
-     params["emissions"]["carbonbudget"] = "700 GtCO2"
-     params["effort sharing"]["regime"] = regime
-     params["economics"]["MAC"]["rel_mitigation_costs_min_level"] = -0.3
-     params["time"]["end"] = 2100
-
-     model1 = MIMOSA(params)
-     model1.solve()
-     model1.save(f"run_{regime}")
-
+--8<-- "tests/runs/run_effortsharing.py"
 ```
 
 ### Advanced: logging
