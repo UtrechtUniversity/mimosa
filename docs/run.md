@@ -95,27 +95,7 @@ MIMOSA has some built-in effort sharing regimes. In this example, they are used 
 The solve status (optimal, impossible, etc), model solve time and the final maximised value can be logged to an external log file (along with the warnings or errors from the code). This can be very useful when doing many runs overnight. In this code example, the log is written to the file `mainlog.log`:
 
 ``` python hl_lines="5 6 7 8 9 10 11 12 13"
-import logging
-import logging.handlers
-
-from mimosa import MIMOSA, load_params
-
-handler = logging.handlers.WatchedFileHandler("mainlog.log")
-handler.setFormatter(
-    logging.Formatter("[%(levelname)s, %(asctime)s] %(name)s - %(message)s")
-)
-root = logging.getLogger()
-root.setLevel("INFO")
-root.addHandler(handler)
-
-params = load_params()
-
-# Make changes to the params if needed
-params["emissions"]["carbonbudget"] = False
-
-model1 = MIMOSA(params)
-model1.solve(verbose=False) # (1)!
-model1.save("run1")
+--8<-- "tests/runs/run_logging.py"
 ```
 
 1. By setting `verbose=False`, the IPOPT output is not printed.
