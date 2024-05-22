@@ -9,6 +9,8 @@ from mimosa.common import (
     Var,
     Param,
     GeneralConstraint,
+    Constraint,
+    RegionalConstraint,
     RegionalSoftEqualityConstraint,
     Any,
     quant,
@@ -218,12 +220,14 @@ def _get_percapconv_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]
         / sum(m.population[t, s] for s in m.regions),
     )
 
+    m.percapconv_share = Param(m.t, m.regions, initialize=percapconv_share_rule)
+
     return [
         RegionalSoftEqualityConstraint(
-            lambda m, t, r: percapconv_share_rule(m, t, r) * m.global_emissions[t],
-            lambda m, t, r: m.baseline[t, r] - m.paid_for_emission_reductions[t, r],
+            lambda m, t, r: m.percapconv_share[t, r] * m.global_emissions[t],
+            lambda m, t, r: m.regional_emission_allowances[t, r],
             epsilon=None,
-            absolute_epsilon=0.01,
+            absolute_epsilon=0.001,
             ignore_if=lambda m, t, r: value(m.effort_sharing_regime)
             != "per_cap_convergence"
             or t == 0,
