@@ -75,6 +75,9 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     m.paid_for_emission_reductions = Var(
         m.t, m.regions, units=quant.unit("emissionsrate_unit")
     )
+    m.regional_emission_allowances = Var(
+        m.t, m.regions, units=quant.unit("emissionsrate_unit")
+    )
     m.import_export_emission_reduction_balance = Var(
         m.t, m.regions, units=quant.unit("emissionsrate_unit")
     )
@@ -113,6 +116,15 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
                     else Constraint.Skip
                 ),
                 "paid_for_emission_reductions",
+            ),
+            # Constraint: regional emission allowances, equal to baseline minus paid for emission reductions
+            RegionalConstraint(
+                lambda m, t, r: (
+                    m.regional_emission_allowances[t, r]
+                    == m.baseline[t, r] - m.paid_for_emission_reductions[t, r]
+                    if t > 0
+                    else Constraint.Skip
+                )
             ),
         ]
     )

@@ -231,6 +231,10 @@ class EnumParser(GeneralParser):
     def __init__(self, node, *args, **kwargs):
         GeneralParser.__init__(self, node, *args, **kwargs)
         self.allowed_values = node["values"]
+        if self.default not in self.allowed_values:
+            self.error(
+                f"Default value {self.default} not in allowed values {self.allowed_values}"
+            )
 
     def parse(self, value):
         if self.check_false(value):
@@ -376,7 +380,8 @@ class DatasourceParser(DictParser):
                 if key not in parsed_dict:
                     self.error(f"Key {key} not found in datasource {value}")
 
-        return parsed_dict
+            return parsed_dict
+        self.error(f"Cannot parse datasource {value}. Must be a dictionary.")
 
 
 class ParserFactory:

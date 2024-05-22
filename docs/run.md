@@ -5,7 +5,7 @@ A basic run of MIMOSA requires 4 steps: loading the parameters, building the mod
 With this code, the default parameter values are used (see [Parameter reference](parameters.md)).
 
 ``` python
-{% include "runs/run_base.py" %}
+--8<-- "tests/runs/run_base.py"
 ```
 
 1.   Read the default parameters
@@ -37,7 +37,7 @@ The default parameters from `load_params()` are given as a nested dictionary. Ev
 In this example, the [carbon budget](parameters.md#emissions.carbonbudget) is changed to 500 GtCO2. 
 
 ``` python hl_lines="4 5 6"
-{% include "runs/run_carbonbudget.py" %} 
+--8<-- "tests/runs/run_carbonbudget.py"
 ```
 
 1.   Change the parameter of emissions > carbonbudget to the string "500 GtCO2"
@@ -46,18 +46,7 @@ In this example, the [carbon budget](parameters.md#emissions.carbonbudget) is ch
 Multiple parameters can also be changed at the same time. In this example, the high end of the [damages](parameters.md#economics.damages.quantile) and of the [climate sensitivity (TCRE)](parameters.md#temperature.TCRE) are used, combined with the low end of the [discount rate (PRTP)](parameters.md#economics.PRTP).
 
 ``` python hl_lines="4 5 6 7 8"
-from mimosa import MIMOSA, load_params
-
-params = load_params()
-
-params["economics"]["damages"]["quantile"] = 0.95
-params["temperature"]["TCRE"] = "0.82 delta_degC/(TtCO2)"
-params["economics"]["PRTP"] = 0.001
-
-model2 = MIMOSA(params)
-model2.solve()
-
-model2.save("run_example2")
+--8<-- "tests/runs/run_high_dmg_tcre_low_prtp.py"
 ```
 
 ### Doing multiple runs
@@ -68,18 +57,7 @@ through regular Python loops:
 
 
 ``` python hl_lines="3 7 12"
-from mimosa import MIMOSA, load_params
-
-for budget in ["500 GtCO2", "700 GtCO2", "1000 GtCO2"]:
-
-     params = load_params()
-
-     params["emissions"]["carbonbudget"] = budget
-
-     model3 = MIMOSA(params)
-     model3.solve()
-
-     model3.save(f"run_example3_{budget}") # (1)!
+--8<-- "tests/runs/run_multipleruns.py"
 ```
 
 1. Don't forget to save each file to a different name, otherwise they will be overwritten at each iteration of the loop.
@@ -91,60 +69,13 @@ It can be useful to do a MIMOSA run with zero mitigation: a baseline run. We dis
 === "Baseline ignoring damages"
 
      ``` python hl_lines="4 5 6 7"
-     from mimosa import MIMOSA, load_params
-
-     params = load_params()
-
-     params["emissions"]["carbonbudget"] = False
-     params["economics"]["damages"]["ignore damages"] = True
-     
-     params["model"]["welfare module"] = "cost_minimising"
-
-     # Disable some emission reduction constraints
-     params["emissions"]["non increasing emissions after 2100"] = False
-     params["emissions"]["not positive after budget year"] = False
-     params["emissions"]["inertia"]["regional"] = False
-     params["emissions"]["inertia"]["global"] = False
-
-     params["time"]["end"] = 2150
-
-     model = MIMOSA(params)
-     model.solve()
-     model.save("baseline_ignore_damages")
+     --8<-- "tests/runs/run_baseline_nodamages.py"
      ```
 
 === "No policy scenario with damages"
 
      ```python hl_lines="9 10 11 12 13 14 15 16 17"
-     from mimosa import MIMOSA, load_params
-
-     params = load_params()
-
-     params["emissions"]["carbonbudget"] = False
-     params["economics"]["damages"]["ignore damages"] = False # (1)!
-     params["model"]["welfare module"] = "cost_minimising"
-
-     # Force the mitigation effort to be zero
-     params["simulation"]["simulationmode"] = True
-     params["simulation"]["constraint_variables"] = {
-          "relative_abatement": {
-               year: {region: 0.0 for region in params["regions"]}
-               for year in range(2025, 2151, 5)
-          },
-     }
-     params["economics"]["MAC"]["gamma"] = "0.00001 USD2005/tCO2" # (2)!
-
-     # Disable some emission reduction constraints
-     params["emissions"]["non increasing emissions after 2100"] = False
-     params["emissions"]["not positive after budget year"] = False
-     params["emissions"]["inertia"]["regional"] = False
-     params["emissions"]["inertia"]["global"] = False
-
-     params["time"]["end"] = 2150
-
-     model = MIMOSA(params)
-     model.solve()
-     model.save("baseline_no_policy")
+     --8<-- "tests/runs/run_nopolicy_withdamages.py"
      ```
 
      1. This is default, so this line could be removed
@@ -156,27 +87,7 @@ It can be useful to do a MIMOSA run with zero mitigation: a baseline run. We dis
 MIMOSA has some built-in effort sharing regimes. In this example, they are used in combination with a carbon budget (but it could be used in CBA mode). The welfare module is set to cost minimising, as this is typically used with effort sharing regimes. Effort sharing would be impossible without emission trading. Finally, this would often be infeasible for some regions, if we didn't allow for some extra financial transfers beyond just emission trading, which is why we set the relative mitigation cost minimum level to a small negative number.
 
 ```python
-from mimosa import MIMOSA, load_params
-
-
-# Loop over the three available effort sharing regimes
-for regime in [
-     "equal_mitigation_costs",
-     "equal_total_costs",
-     "per_cap_convergence",
-]:
-     params = load_params()
-     params["model"]["emissiontrade module"] = "emissiontrade"
-     params["model"]["welfare module"] = "cost_minimising"
-     params["emissions"]["carbonbudget"] = "700 GtCO2"
-     params["effort sharing"]["regime"] = regime
-     params["economics"]["MAC"]["rel_mitigation_costs_min_level"] = -0.3
-     params["time"]["end"] = 2100
-
-     model1 = MIMOSA(params)
-     model1.solve()
-     model1.save(f"run_{regime}")
-
+--8<-- "tests/runs/run_effortsharing.py"
 ```
 
 ### Advanced: logging
@@ -184,27 +95,7 @@ for regime in [
 The solve status (optimal, impossible, etc), model solve time and the final maximised value can be logged to an external log file (along with the warnings or errors from the code). This can be very useful when doing many runs overnight. In this code example, the log is written to the file `mainlog.log`:
 
 ``` python hl_lines="5 6 7 8 9 10 11 12 13"
-import logging
-import logging.handlers
-
-from mimosa import MIMOSA, load_params
-
-handler = logging.handlers.WatchedFileHandler("mainlog.log")
-handler.setFormatter(
-    logging.Formatter("[%(levelname)s, %(asctime)s] %(name)s - %(message)s")
-)
-root = logging.getLogger()
-root.setLevel("INFO")
-root.addHandler(handler)
-
-params = load_params()
-
-# Make changes to the params if needed
-params["emissions"]["carbonbudget"] = False
-
-model1 = MIMOSA(params)
-model1.solve(verbose=False) # (1)!
-model1.save("run1")
+--8<-- "tests/runs/run_logging.py"
 ```
 
 1. By setting `verbose=False`, the IPOPT output is not printed.

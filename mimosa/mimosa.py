@@ -25,7 +25,7 @@ from mimosa.common import (
     logger,
 )
 from mimosa.common.config.parseconfig import check_params, parse_param_values
-from mimosa.export import visualise_ipopt_output, save_output
+from mimosa.export import save_output  # , visualise_ipopt_output
 from mimosa.abstract_model import create_abstract_model
 from mimosa.concrete_model.instantiate_params import InstantiatedModel
 from mimosa.concrete_model import simulation_mode
@@ -58,6 +58,8 @@ class MIMOSA:
 
         self.abstract_model = self.get_abstract_model()
         self.concrete_model = self.create_instance()
+        self.status = None  # Not started yet
+        self.last_saved_filename = None  # Nothing saved yes
         self.preprocessing()
 
     def get_abstract_model(self) -> AbstractModel:
@@ -167,6 +169,7 @@ class MIMOSA:
         Raises:
             SolverException: raised if solver did not exit with status OK
         """
+        self.status = None  # Not started yet
 
         if use_neos:
             # Send concrete model to external solver on NEOS server
@@ -186,12 +189,14 @@ class MIMOSA:
             results = opt.solve(
                 self.concrete_model, tee=verbose, symbolic_solver_labels=True
             )
-            if ipopt_output_file is not None:
-                visualise_ipopt_output(ipopt_output_file)
+            # if ipopt_output_file is not None:
+            #     visualise_ipopt_output(ipopt_output_file)
 
         self.postprocessing()
 
         logger.info("Status: {}".format(results.solver.status))
+
+        self.status = results.solver.status
 
         if results.solver.status != SolverStatus.ok:
             if results.solver.status == SolverStatus.warning:
@@ -199,7 +204,7 @@ class MIMOSA:
                     results.solver.status, results.solver.termination_condition
                 )
                 logger.error(warning_message)
-                warnings.warn(warning_message, utils.MimosaSolverWarning)
+                raise SolverException(warning_message, utils.MimosaSolverWarning)
             if results.solver.status != SolverStatus.warning:
                 raise SolverException(
                     f"Solver did not exit with status OK: {results.solver.status}"
@@ -211,8 +216,9 @@ class MIMOSA:
             )
         )
 
-    def save(self, experiment=None, **kwargs):
-        save_output(self.params, self.concrete_model, experiment, **kwargs)
+    def save(self, filename=None, **kwargs):
+        self.last_saved_filename = filename
+        save_output(self.params, self.concrete_model, filename, **kwargs)
 
 
 ###########################

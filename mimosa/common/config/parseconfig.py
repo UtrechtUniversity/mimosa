@@ -10,25 +10,38 @@ from mimosa.common import quant
 from .utils import PARSER_FACTORY, set_nested, get_nested, flatten
 
 
+def recursive_traverse(dict_to_traverse, leaf_function, leaf_criterium=None):
+    if leaf_criterium is None:
+        leaf_criterium = lambda x: not isinstance(x, dict)
+
+    def _do_recursive_traverse(curr_keys, subset):
+        for key, node in subset.items():
+            keys = list(curr_keys) + [key]
+            if leaf_criterium(node):
+                leaf_function(keys, node)
+            else:
+                _do_recursive_traverse(keys, node)
+
+    _do_recursive_traverse([], dict_to_traverse)
+
+
 def parse_params(default_yaml, user_yaml, return_parser_tree=False):
     parsed_dict = {}
     parser_tree = {}
 
-    def _recursive_traverse(curr_keys, subset):
-        for key, node in subset.items():
-            keys = list(curr_keys) + [key]
-            if isinstance(node, dict) and "type" not in node:
-                _recursive_traverse(keys, node)
-            else:
-                parser = PARSER_FACTORY.create_parser(node, quant)
+    def leaf_criterium(node):
+        return not isinstance(node, dict) or "type" in node
 
-                # Save the parser instance for possible later use
-                set_nested(parser_tree, keys, parser)
+    def leaf_function(keys, node):
+        parser = PARSER_FACTORY.create_parser(node, quant)
 
-                # Save the parsed value
-                set_nested(parsed_dict, keys, parser.get(user_yaml, keys))
+        # Save the parser instance for possible later use
+        set_nested(parser_tree, keys, parser)
 
-    _recursive_traverse([], default_yaml)
+        # Save the parsed value
+        set_nested(parsed_dict, keys, parser.get(user_yaml, keys))
+
+    recursive_traverse(default_yaml, leaf_function, leaf_criterium)
 
     if return_parser_tree:
         return parsed_dict, parser_tree
@@ -36,7 +49,7 @@ def parse_params(default_yaml, user_yaml, return_parser_tree=False):
     return parsed_dict
 
 
-def check_obsolete_params(user_yaml, parsed_params, parser_tree):
+def create_leaf_criterium(parser_tree):
     def leaf_criterium(keys, node):
         try:
             parser_type = get_nested(parser_tree, keys).type
@@ -45,6 +58,13 @@ def check_obsolete_params(user_yaml, parsed_params, parser_tree):
         if isinstance(node, dict) and parser_type not in ["dict", "datasource"]:
             return False
         return True
+
+    return leaf_criterium
+
+
+def check_obsolete_params(user_yaml, parsed_params, parser_tree):
+
+    leaf_criterium = create_leaf_criterium(parser_tree)
 
     keys_user = set(flatten(user_yaml, leaf_criterium=leaf_criterium))
     keys_parsed = set(flatten(parsed_params, leaf_criterium=leaf_criterium))
@@ -91,17 +111,24 @@ def parse_param_values(params):
 
     """
 
-    flat_params = flatten(params)
-    for flat_key, value in flat_params.items():
-        if not isinstance(value, str):
-            continue
-        for match in re.findall(r"\{([\w -]+)\}", value):
+    # Perform a recursive traversal of the parameter dictionary and parse
+    # all values that contain references to other parameters
+
+    def leaf_criterium(node):
+        return not isinstance(node, dict)
+
+    def leaf_function(keys, node):
+        if not isinstance(node, str):
+            return
+        for match in re.findall(r"\{([\w -]+)\}", node):
             try:
-                other_value = flat_params[match]
-                new_value = value.replace(f"{{{match}}}", other_value)
-                set_nested(params, flat_key.split(" - "), new_value)
+                other_value = get_nested(params, match.split(" - "))
+                new_value = node.replace(f"{{{match}}}", other_value)
+                set_nested(params, keys, new_value)
             except KeyError:
                 pass
+
+    recursive_traverse(params, leaf_function, leaf_criterium)
 
     return params
 
