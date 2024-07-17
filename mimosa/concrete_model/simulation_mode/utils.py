@@ -2,7 +2,6 @@
 Utils
 """
 
-
 from glob import glob
 
 import numpy as np
@@ -49,7 +48,10 @@ class InterpolatingData:
         return InterpolatedUnivariateSpline(all_years, new_values)
 
     def get(self, region, year):
-        value = self.region_interp_fct[region](year)
-        if len(value.shape) == 0:
-            return float(value)
-        return value
+        try:
+            value = self.region_interp_fct[region](year)
+            if len(value.shape) == 0:
+                return float(value)
+            return value
+        except KeyError:
+            return None

@@ -8,6 +8,7 @@ from mimosa.common import (
     GlobalConstraint,
     has_time_and_region_dim,
     add_constraint,
+    Constraint,
 )
 from .utils import InterpolatingData, read_csv
 
@@ -71,16 +72,20 @@ def _fixed_data_constraint(m, variable_name, interp_data):
 def _extra_regional_constraint(variable_name, interp_data, eps):
     return [
         RegionalConstraint(
-            lambda m, t, r: getattr(m, variable_name)[t, r]
-            - interp_data.get(r, m.year(t))
-            <= eps
+            lambda m, t, r: (
+                getattr(m, variable_name)[t, r] - interp_data.get(r, m.year(t)) <= eps
+                if interp_data.get(r, m.year(t)) is not None
+                else Constraint.Skip
+            )
             # if m.year(t) <= interp_data.maxyear
             # else Constraint.Skip
         ),
         RegionalConstraint(
-            lambda m, t, r: getattr(m, variable_name)[t, r]
-            - interp_data.get(r, m.year(t))
-            >= -eps
+            lambda m, t, r: (
+                getattr(m, variable_name)[t, r] - interp_data.get(r, m.year(t)) >= -eps
+                if interp_data.get(r, m.year(t)) is not None
+                else Constraint.Skip
+            )
             # if m.year(t) <= interp_data.maxyear
             # else Constraint.Skip
         ),
@@ -90,16 +95,22 @@ def _extra_regional_constraint(variable_name, interp_data, eps):
 def _extra_global_constraint(variable_name, interp_data: InterpolatingData, eps):
     return [
         GlobalConstraint(
-            lambda m, t: getattr(m, variable_name)[t]
-            - interp_data.get("Global", m.year(t))
-            <= eps
+            lambda m, t: (
+                getattr(m, variable_name)[t] - interp_data.get("Global", m.year(t))
+                <= eps
+                if interp_data.get("Global", m.year(t)) is not None
+                else Constraint.Skip
+            )
             # if t > 0  # and m.year(t) <= interp_data.maxyear
             # else Constraint.Skip
         ),
         GlobalConstraint(
-            lambda m, t: getattr(m, variable_name)[t]
-            - interp_data.get("Global", m.year(t))
-            >= -eps
+            lambda m, t: (
+                getattr(m, variable_name)[t] - interp_data.get("Global", m.year(t))
+                >= -eps
+                if interp_data.get("Global", m.year(t)) is not None
+                else Constraint.Skip
+            )
             # if t > 0  # and m.year(t) <= interp_data.maxyear
             # else Constraint.Skip
         ),
