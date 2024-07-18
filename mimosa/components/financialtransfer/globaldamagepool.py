@@ -13,6 +13,7 @@ from mimosa.common import (
     RegionalInitConstraint,
     Constraint,
     Var,
+    quant,
 )
 
 
@@ -48,8 +49,12 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     constraints = []
 
     # Note: positive financial transfer means paying money, negative means receiving
-    m.financial_transfer = Var(m.t, m.regions, initialize=0)
-    m.rel_financial_transfer = Var(m.t, m.regions, initialize=0)
+    m.financial_transfer = Var(
+        m.t, m.regions, initialize=0, units=quant.unit("currency_unit")
+    )
+    m.rel_financial_transfer = Var(
+        m.t, m.regions, initialize=0, units=quant.unit("fraction_of_GDP")
+    )
 
     constraints.extend(
         [

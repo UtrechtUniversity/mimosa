@@ -262,7 +262,7 @@ def _get_mac_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     )
 
     # Keep track of relative global costs
-    m.global_rel_mitigation_costs = Var(m.t)
+    m.global_rel_mitigation_costs = Var(m.t, units=quant.unit("fraction_of_GDP"))
     constraints.extend(
         [
             GlobalConstraint(

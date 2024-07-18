@@ -60,7 +60,10 @@ def _set_baseline_emissions(m: AbstractModel) -> None:
         return np.trapz(values, years)
 
     m.cumulative_baseline_emissions = Param(
-        m.t, m.regions, initialize=_calc_cum_baseline_emissions
+        m.t,
+        m.regions,
+        initialize=_calc_cum_baseline_emissions,
+        units=quant.unit("emissions_unit"),
     )
 
     # And create a param for the global cumulative baseline emissions

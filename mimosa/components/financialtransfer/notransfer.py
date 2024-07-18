@@ -5,7 +5,7 @@ Type: no transfer
 """
 
 from typing import Sequence
-from mimosa.common import AbstractModel, GeneralConstraint, RegionalConstraint, Param
+from mimosa.common import AbstractModel, GeneralConstraint, quant, Param
 
 
 def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
@@ -19,7 +19,11 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     constraints = []
 
     # Since it is always zero, it is better to make it a Param instead of Var for numerical stability
-    m.financial_transfer = Param(m.t, m.regions, initialize=0)
-    m.rel_financial_transfer = Param(m.t, m.regions, initialize=0)
+    m.financial_transfer = Param(
+        m.t, m.regions, initialize=0, units=quant.unit("currency_unit")
+    )
+    m.rel_financial_transfer = Param(
+        m.t, m.regions, initialize=0, units=quant.unit("fraction_of_GDP")
+    )
 
     return constraints
