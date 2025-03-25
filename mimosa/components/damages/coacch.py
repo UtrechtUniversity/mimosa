@@ -46,7 +46,7 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     m.damage_costs = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP")) #Waarom heeft dit geen initialize=lambda? De functie ervan was toch om te beginnen met een lege set. Waarom doe je dat wel in de Cobb-Douglas
                                                                               #maar niet hier?
     m.damage_scale_factor = Param(doc="::economics.damages.scale factor")
-    m.damage_absolute_global = Var(
+    m.damage_relative_global = Var(
         m.t,
         units=quant.unit("currency_unit"),
     )
@@ -62,9 +62,9 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     # Absolute global damages
     constraints.append(
         GlobalConstraint(
-            lambda m, t: m.damage_absolute_global[t]
+            lambda m, t: m.damage_relative_global[t]
             == (sum(m.damage_costs[t, r] * m.GDP_gross[t, r] for r in m.regions) / m.global_GDP_gross[t]),
-            "damage_absolute_global",
+            "damage_relative_global",
         )
     )
 
