@@ -268,7 +268,7 @@ def _get_mac_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
             GlobalConstraint(
                 lambda m, t: m.global_rel_mitigation_costs[t]
                 == sum(m.mitigation_costs[t, r] for r in m.regions)
-                / sum(m.GDP_gross[t, r] for r in m.regions),
+                / m.global_GDP_gross[t],
                 "global_rel_mitigation_costs",
             )
         ]

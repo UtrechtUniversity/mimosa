@@ -7,4 +7,4 @@ params["emissions"]["carbonbudget"] = False
 
 model1 = MIMOSA(params)
 model1.solve()
-model1.save("run1")
+model1.save("run2")
