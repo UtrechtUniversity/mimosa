@@ -32,6 +32,7 @@ class InterpolatingData:
 
     def __init__(self, data):
         # extrapolate
+        self.minyear = float(data.columns[0])
         self.maxyear = float(data.columns[-1])
         self.region_interp_fct = {
             region: self.interp(row) for region, row in data.iterrows()
@@ -48,6 +49,8 @@ class InterpolatingData:
         return InterpolatedUnivariateSpline(all_years, new_values)
 
     def get(self, region, year):
+        if year < self.minyear or year > self.maxyear:
+            return None
         try:
             value = self.region_interp_fct[region](year)
             if len(value.shape) == 0:
