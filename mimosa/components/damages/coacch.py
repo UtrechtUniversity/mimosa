@@ -47,7 +47,7 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     m.damage_scale_factor = Param(doc="::economics.damages.scale factor")
     m.damage_relative_global = Var(
         m.t,
-        units=quant.unit("currency_unit"),
+        units=quant.unit("fraction_of_GDP"),
     )
     # Total damages are sum of non-SLR and SLR damages
     constraints.append(

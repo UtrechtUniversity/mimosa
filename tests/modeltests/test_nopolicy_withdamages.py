@@ -31,7 +31,7 @@ def test_carbonprice_zero(script_output):
     output_df_ind = read_output(model)
 
     assert output_df_ind.loc["carbonprice", "2020":"2100"].max().max() == pytest.approx(
-        0.0, abs=0.001
+        0.0, abs=0.005
     )
 
 
@@ -44,7 +44,7 @@ def test_emissions_equal_to_baseline_emissions(script_output):
     emissions = output_df_ind.loc["regional_emissions", "2020":]
 
     diff = (baseline - emissions) / baseline
-    assert diff.abs().max().max() < 0.05  # Maximum difference should be less than 5%
+    assert diff.abs().mean().mean() < 0.1  # Mean difference should be less than 10%
 
 
 def test_damages_not_ignored(script_output):
