@@ -16,6 +16,7 @@ from mimosa.common import (
     soft_min,
     economics,
     quant,
+    GlobalConstraint,
 )
 
 
@@ -108,6 +109,11 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
         initialize=lambda m, t, r: m.baseline_GDP[0, r],
         units=quant.unit("currency_unit"),
     )
+    m.global_GDP_gross = Var(
+        m.t,
+        initialize=lambda m, t: sum(m.baseline_GDP[t, r] for r in m.regions),
+        units=quant.unit("currency_unit"),
+    )
     m.GDP_net = Var(
         m.t,
         m.regions,
@@ -141,6 +147,14 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
             RegionalInitConstraint(
                 lambda m, r: m.GDP_gross[0, r] == m.baseline_GDP[0, r], "GDP_gross_init"
             ),
+            GlobalConstraint(
+                lambda m, t: (
+                    m.global_GDP_gross[t]
+                    == sum(m.GDP_gross[t, r] for r in m.regions)
+                ),
+                "global_GDP_gross",
+            ),
+
             RegionalConstraint(
                 lambda m, t, r: m.GDP_net[t, r]
                 == m.GDP_gross[t, r]
