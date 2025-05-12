@@ -11,7 +11,7 @@ params["simulation"]["simulationmode"] = True
 params["simulation"]["constraint_variables"] = {
     "carbonprice": {
         year: {region: 0.0 for region in params["regions"]}
-        for year in range(2025, 2151, 5)
+        for year in range(2025, 2150, 5)
     },
 }
 
