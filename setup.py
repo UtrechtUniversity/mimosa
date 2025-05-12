@@ -8,7 +8,7 @@ with open("LICENSE") as fh:
 
 setup(
     name="mimosa",
-    version="0.1.8",
+    version="0.1.9",
     author="Kaj-Ivar van der Wijst",
     author_email="k.vanderwijst@uu.nl",
     packages=["mimosa"],
@@ -17,6 +17,6 @@ setup(
     description="MIMOSA: Integrated Assessment Model for Cost-Benefit Analysis",
     long_description=description,
     long_description_content_type="text/markdown",
-    install_requires=["numpy<2.0", "pandas", "pyomo<=6.7.1", "pint", "pyyaml", "scipy"],
+    install_requires=["numpy", "pandas", "pyomo", "pint", "pyyaml", "scipy"],
     include_package_data=True,
 )
