@@ -167,7 +167,10 @@ def _get_percapconv_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]
     params["effort sharing"]["percapconv_year"] = 2050
 
     # Per-capita convergence needs emission trading to avoid infeasibility
-    params["model"]["emissiontrade_module"] = "emissiontrade"
+    params["model"]["emissiontrade module"] = "emissiontrade"
+
+    # Allow negative mitigation costs for feasibility
+    params["economics"]["MAC"]["rel_mitigation_costs_min_level"] = -0.2
     model = MIMOSA(params)
     ```
 
