@@ -9,25 +9,21 @@ import hashlib
 import numpy as np
 import pandas as pd
 
-from model.common import get_all_variables, value
+from model.common import get_all_variables, get_all_time_region_params, value
 
 
 def save_output(params, m, experiment=None, hash_suffix=False, folder="output"):
 
     # 1. Create a unique identifier
     if hash_suffix:
-        settings_hash = hashlib.md5(json.dumps(params, default=lambda x: x.__dict__).encode()).hexdigest()[:9]
+        settings_hash = hashlib.md5(json.dumps(params).encode()).hexdigest()[:9]
     else:
         settings_hash = ""
 
     # 2. Save the Pyomo variables and data functions
-    all_variables = get_all_variables(m)
-
-    all_functions = [[m.population, "population"]]
+    all_variables = get_all_variables(m) + get_all_time_region_params(m)
 
     rows = []
-    for var in all_functions:
-        var_to_row(rows, m, var, True, None)
     for useful_var in all_variables:
         var_to_row(rows, m, useful_var.var, useful_var.is_regional, useful_var.unit)
     dataframe = rows_to_dataframe(rows, m)
@@ -38,11 +34,13 @@ def save_output(params, m, experiment=None, hash_suffix=False, folder="output"):
     os.makedirs(folder + "/", exist_ok=True)
     filename = f"{experiment}_{settings_hash}" if hash_suffix else experiment
 
-    dataframe.to_csv(f"{folder}/{filename}.csv", float_format="%.6g", index=False)
+    path = f"{folder}/{filename}.csv"
+    dataframe.to_csv(path, float_format="%.6g", index=False)
+    print(f"Saved to {path}")
 
     # 3. Save the param file
-    with open(f"{folder}/{filename}.csv.params.json", "w") as fh:
-        json.dump(params, fh, default=lambda x: x.__dict__)
+    with open(f"{path}.params.json", "w") as fh:
+        json.dump(params, fh)
 
 
 def var_to_row(rows, m, var, is_regional, unit):
@@ -55,12 +53,10 @@ def var_to_row(rows, m, var, is_regional, unit):
 
     # Check if var is a function or a pyomo variable
     if is_regional:
-        fct = lambda t, r: (var(m.year(t), r) if callable(var) else value(var[t, r]))
         for r in m.regions:
-            rows.append([name, r, unit] + [fct(t, r) for t in m.t])
+            rows.append([name, r, unit] + [value(var[t, r]) for t in m.t])
     else:
-        fct = lambda t: (var(m.year(t)) if callable(var) else value(var[t]))
-        rows.append([name, "Global", unit] + [fct(t) for t in m.t])
+        rows.append([name, "Global", unit] + [value(var[t]) for t in m.t])
 
 
 def rows_to_dataframe(rows, m):

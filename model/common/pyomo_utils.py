@@ -4,16 +4,16 @@ from abc import ABC, abstractmethod
 import numpy as np
 from pyomo.core.base.units_container import PintUnitExtractionVisitor
 
-from pyomo.environ import Var, Constraint
+from pyomo.environ import Var, Constraint, Param
 import pyomo.environ
 
 # Monkey patch to make sure that the unit stays the same after calling a arctan-function.
 # By default, the unit becomes "radian", causing trouble in subsequent unit comparisons.
 # Since we use arctan a lot as a "soft-min/max" function, the unit should stay the same as
 # the input unit
-PintUnitExtractionVisitor.unary_function_method_map[
-    "atan"
-] = PintUnitExtractionVisitor._get_unit_for_single_child
+PintUnitExtractionVisitor.unary_function_method_map["atan"] = (
+    PintUnitExtractionVisitor._get_unit_for_single_child
+)
 
 
 from pyomo.environ import units
@@ -138,7 +138,7 @@ class UsefulVar:
         self.var = getattr(m, name)
 
         self.name = name
-        self.is_regional = is_regional(self.var)
+        self.is_regional = has_time_and_region_dim(self.var)
         self.unit = get_unit(self.var)
         self.indices = get_indices(self.var)
 
@@ -153,19 +153,24 @@ def get_all_variables(m):
     ]
 
 
-def is_regional(var):
+def get_all_time_region_params(m):
+    """Returns all parameters with time and region dimensions"""
+    return [
+        UsefulVar(m, param.name)
+        for param in m.component_objects(Param)
+        if has_time_and_region_dim(param) and not param.name.startswith("_")
+    ]
+
+
+def has_time_and_region_dim(var):
     """Returns true if the Pyomo variable `var` is regional, false if it is global"""
     # While there is no explicit Pyomo way to obtain the indices, we can use
     # this private property to check if variable has multiple indices
-    if var._implicit_subsets is None:
-        return False
-    return True
+    return var.index_set().dimen > 1
 
 
 def get_indices(var):
-    if is_regional(var):
-        return [index.name for index in var._implicit_subsets]
-    return [var.index_set().name]
+    return [index.local_name for index in var.index_set().subsets()]
 
 
 def get_unit(var):
@@ -175,4 +180,3 @@ def get_unit(var):
     # Bugfix replace "/a" to "/yr" ("annum" is less clear than year)
     # Note that we should not replace e.g. "/atm", hence the negative lookahead
     return re.sub("/a(?![a-zA-Z])", "/yr", pyomo_unit_str)
-

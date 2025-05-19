@@ -7,7 +7,7 @@ from model.common import (
     RegionalConstraint,
     GlobalConstraint,
     Constraint,
-    is_regional,
+    has_time_and_region_dim,
     add_constraint,
 )
 from .utils import InterpolatingData, read_csv
@@ -59,7 +59,7 @@ def _fixed_data_constraint(m, variable_name, interp_data):
     # 3. Create constraints out of this
     eps = 1e-3  # TODO make eps a variable
 
-    if is_regional(getattr(m, variable_name)):
+    if has_time_and_region_dim(getattr(m, variable_name)):
         extra_constraints = _extra_regional_constraint(variable_name, interp_data, eps)
     else:
         extra_constraints = _extra_global_constraint(variable_name, interp_data, eps)
@@ -77,18 +77,18 @@ def _fixed_data_constraint(m, variable_name, interp_data):
 def _extra_regional_constraint(variable_name, interp_data: InterpolatingData, eps):
     return [
         RegionalConstraint(
-            lambda m, t, r: getattr(m, variable_name)[t, r]
-            - interp_data.get(r, m.year(t))
-            <= eps
-            if m.year(t) >= interp_data.minyear
-            else Constraint.Skip
+            lambda m, t, r: (
+                getattr(m, variable_name)[t, r] - interp_data.get(r, m.year(t)) <= eps
+                if m.year(t) >= interp_data.minyear
+                else Constraint.Skip
+            )
         ),
         RegionalConstraint(
-            lambda m, t, r: getattr(m, variable_name)[t, r]
-            - interp_data.get(r, m.year(t))
-            >= -eps
-            if m.year(t) >= interp_data.minyear
-            else Constraint.Skip
+            lambda m, t, r: (
+                getattr(m, variable_name)[t, r] - interp_data.get(r, m.year(t)) >= -eps
+                if m.year(t) >= interp_data.minyear
+                else Constraint.Skip
+            )
         ),
     ]
 
@@ -96,17 +96,19 @@ def _extra_regional_constraint(variable_name, interp_data: InterpolatingData, ep
 def _extra_global_constraint(variable_name, interp_data: InterpolatingData, eps):
     return [
         GlobalConstraint(
-            lambda m, t: getattr(m, variable_name)[t]
-            - interp_data.get("Global", m.year(t))
-            <= eps
-            if m.year(t) >= interp_data.minyear
-            else Constraint.Skip
+            lambda m, t: (
+                getattr(m, variable_name)[t] - interp_data.get("Global", m.year(t))
+                <= eps
+                if m.year(t) >= interp_data.minyear
+                else Constraint.Skip
+            )
         ),
         GlobalConstraint(
-            lambda m, t: getattr(m, variable_name)[t]
-            - interp_data.get("Global", m.year(t))
-            >= -eps
-            if m.year(t) >= interp_data.minyear
-            else Constraint.Skip
+            lambda m, t: (
+                getattr(m, variable_name)[t] - interp_data.get("Global", m.year(t))
+                >= -eps
+                if m.year(t) >= interp_data.minyear
+                else Constraint.Skip
+            )
         ),
     ]
