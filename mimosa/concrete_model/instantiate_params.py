@@ -121,7 +121,7 @@ class InstantiatedModel:
         parameter_mapping.update(parameter_mapping_manual)
 
         # Set time-dependent MAC calibration factor, depending on the SSP:
-        parameter_mapping["mac_ssp_calibration_factor"] = {
+        parameter_mapping["MAC_SSP_calibration_factor"] = {
             t: self.data_store.interp_data_from_dict(
                 self.abstract_model.year(t),
                 params["economics"]["MAC"]["SSP_calibration_factor"][params["SSP"]],
