@@ -26,9 +26,238 @@ from mimosa.components.sealevelrise import (
 )
 from mimosa.components.welfare.utility_fct import calc_utility
 
+from inspect import signature
+
+
+# baseline
+# regional_emissions
+# regional_emission_reduction
+# global_emissions
+# cumulative_emissions
+# emission_relative_cumulative
+# temperature
+
+# capital_stock
+# GDP_gross
+# global_GDP_gross
+
+# slr_thermal
+# slr_cumgis
+# slr_cumgsic
+# total_SLR
+# damage_costs_slr
+# damage_costs_nonslr
+# damage_costs
+# damage_relative_global
+
+# LOT_factor
+# LBD_factor
+# learning_factor
+
+# carbonprice
+# mitigation_costs
+# rel_mitigation_costs
+# area_under_MAC
+# global_cost_per_emission_reduction_unit
+# global_emission_reduction_per_cost_unit
+# global_rel_mitigation_costs
+
+# GDP_net
+# investments
+# consumption
+
+# utility
+# yearly_welfare
+# NPV
+
+expressions_rhs = {
+    "baseline": lambda m, t, r: (
+        (
+            m.baseline_carbon_intensity[t, r]
+            * (m.GDP_net[t - 1, r] if t > 1 else m.GDP_gross[t, r])
+        )
+        if value(m.use_carbon_intensity_for_baseline)
+        else m.baseline_emissions[t, r]
+    ),
+    "regional_emissions": lambda m, t, r: (
+        (1 - m.relative_abatement[t, r])
+        * (
+            m.baseline[t, r]
+            if value(m.use_carbon_intensity_for_baseline)
+            else m.baseline_emissions[t, r]
+        )
+        if t > 0
+        else m.baseline_emissions[0, r]
+    ),
+    "regional_emission_reduction": lambda m, t, r: (
+        m.baseline[t, r] - m.regional_emissions[t, r]
+    ),
+    "global_emissions": lambda m, t: (
+        sum(m.regional_emissions[t, r] for r in m.regions)
+        if t > 0
+        else sum(m.baseline_emissions[0, r] for r in m.regions)
+    ),
+    "cumulative_emissions": lambda m, t: (
+        m.cumulative_emissions[t - 1]
+        + (
+            (m.dt * (m.global_emissions[t] + m.global_emissions[t - 1]) / 2)
+            if value(m.cumulative_emissions_trapz)
+            else (m.dt * m.global_emissions[t])
+        )
+        if t > 0
+        else 0
+    ),
+    "emission_relative_cumulative": lambda m, t: (
+        m.cumulative_emissions[t] / m.cumulative_global_baseline_emissions[t]
+        if t > 0
+        else 1
+    ),
+    "temperature": lambda m, t: (
+        m.T0 + m.TCRE * m.cumulative_emissions[t] if t > 0 else m.T0
+    ),
+    "capital_stock": lambda m, t, r: (
+        m.capital_stock[t - 1, r]
+        + m.dt
+        * economics.calc_dKdt(
+            m.capital_stock[t, r], m.dk, m.investments[t - 1, r], m.dt
+        )
+        if t > 0
+        else m.init_capitalstock_factor[r] * m.baseline_GDP[0, r]
+    ),
+    "GDP_gross": lambda m, t, r: (
+        economics.calc_GDP(
+            m.TFP[t, r],
+            m.population[t, r],
+            soft_min(m.capital_stock[t, r], scale=10),
+            m.alpha,
+        )
+        if t > 0
+        else m.baseline_GDP[0, r]
+    ),
+    "global_GDP_gross": lambda m, t: (sum(m.GDP_gross[t, r] for r in m.regions)),
+    "slr_thermal": lambda m, t: (
+        slr_thermal_expansion(m.slr_thermal[t - 1], m.temperature[t - 1], m)
+        if t > 0
+        else slr_thermal_expansion_init(m)
+    ),
+    "slr_cumgsic": lambda m, t: (
+        slr_gsic(m.slr_cumgsic[t - 1], m.temperature[t - 1], m) if t > 0 else 0.015
+    ),
+    "slr_cumgis": lambda m, t: (
+        slr_gis(m.slr_cumgis[t - 1], m.temperature[t - 1], m) if t > 0 else 0.006
+    ),
+    "total_SLR": lambda m, t: (m.slr_thermal[t] + m.slr_cumgsic[t] + m.slr_cumgis[t]),
+    "damage_costs_non_slr": lambda m, t, r: (
+        m.damage_scale_factor
+        * damage_fct(m.temperature[t] - 0.6, m.T0 - 0.6, m, r, is_slr=False)
+    ),
+    "damage_costs_slr": lambda m, t, r: (
+        m.damage_scale_factor
+        * damage_fct(m.total_SLR[t], m.total_SLR[0], m, r, is_slr=True)
+    ),
+    "damage_costs": lambda m, t, r: (
+        m.damage_costs_non_slr[t, r] + m.damage_costs_slr[t, r]
+    ),
+    "damage_relative_global": lambda m, t: (
+        sum(m.damage_costs[t, r] * m.GDP_gross[t, r] for r in m.regions)
+        / m.global_GDP_gross[t]
+    ),
+    "LBD_factor": lambda m, t: (
+        soft_min(
+            (
+                m.cumulative_global_baseline_emissions[t - 1]
+                - m.cumulative_emissions[t - 1]  # Now changed to t-1, check
+            )
+            / m.LBD_scaling
+            + 1.0
+        )
+        ** m.log_LBD_rate
+        if t > 0
+        else 1.0
+    ),
+    "LOT_factor": lambda m, t: (1 / (1 + m.LOT_rate) ** t),
+    "learning_factor": lambda m, t: (m.LBD_factor[t] * m.LOT_factor[t]),
+    "carbonprice": lambda m, t, r: (
+        MAC(m.relative_abatement[t, r], m, t, r) if t > 0 else 0
+    ),
+    "mitigation_costs": lambda m, t, r: (
+        AC(m.relative_abatement[t, r], m, t, r) * m.baseline[t, r]
+        + m.import_export_mitigation_cost_balance[t, r]
+    ),
+    "rel_mitigation_costs": lambda m, t, r: (
+        m.mitigation_costs[t, r] / m.GDP_gross[t, r]
+    ),
+    "area_under_MAC": lambda m, t, r: (
+        AC(m.relative_abatement[t, r], m, t, r) * m.baseline[t, r]
+    ),
+    "global_cost_per_emission_reduction_unit": lambda m, t: (
+        sum(m.mitigation_costs[t, r] for r in m.regions)
+        / soft_min(sum(m.regional_emission_reduction[t, r] for r in m.regions))
+        if t > 0
+        else 0
+    ),
+    "global_emission_reduction_per_cost_unit": lambda m, t: (
+        sum(m.regional_emission_reduction[t, r] for r in m.regions)
+        / soft_min(sum(m.mitigation_costs[t, r] for r in m.regions))
+        if t > 0
+        else 0
+    ),
+    "global_rel_mitigation_costs": lambda m, t: (
+        sum(m.mitigation_costs[t, r] for r in m.regions) / m.global_GDP_gross[t]
+    ),
+    "GDP_net": lambda m, t, r: (
+        m.GDP_gross[t, r]
+        * (1 - (m.damage_costs[t, r] if not value(m.ignore_damages) else 0))
+        - m.mitigation_costs[t, r]
+        - m.financial_transfer[t, r]
+    ),
+    "investments": lambda m, t, r: (m.sr * m.GDP_net[t, r]),
+    "consumption": lambda m, t, r: ((1 - m.sr) * m.GDP_net[t, r]),
+    "utility": lambda m, t, r: (
+        calc_utility(m.consumption[t, r], m.population[t, r], m.elasmu)
+    ),
+    "yearly_welfare": lambda m, t: (
+        sum(m.population[t, r] * m.utility[t, r] for r in m.regions)
+    ),
+    "NPV": lambda m, t: (
+        m.NPV[t - 1]
+        + m.dt * exp(-m.PRTP * (m.year(t) - m.beginyear)) * m.yearly_welfare[t]
+        if t > 0
+        else 0
+    ),
+}
+
 
 def get_all_constraints(m: AbstractModel):
-    constraints = [
+
+    constraints = []
+    for var_lhs, expr_rhs in expressions_rhs.items():
+        # Check if it is a regional or global constraint using len(signature(expr_rhs).parameters)
+        num_params = len(signature(expr_rhs).parameters)
+        if num_params == 3:
+            constraints.append(
+                RegionalConstraint(
+                    lambda m, t, r, expr_rhs=expr_rhs, var_lhs=var_lhs: getattr(
+                        m, var_lhs
+                    )[t, r]
+                    == expr_rhs(m, t, r),
+                    name=var_lhs,
+                )
+            )
+        elif num_params == 2:
+            constraints.append(
+                GlobalConstraint(
+                    lambda m, t, expr_rhs=expr_rhs, var_lhs=var_lhs: getattr(
+                        m, var_lhs
+                    )[t]
+                    == expr_rhs(m, t),
+                    name=var_lhs,
+                )
+            )
+        else:
+            print(f"Unknown number of parameters for {var_lhs}")
+
+    constraints_vars = [
         RegionalConstraint(
             lambda m, t, r: (
                 (
@@ -263,7 +492,7 @@ def get_all_constraints(m: AbstractModel):
         ####################################
         ####################################
         RegionalInitConstraint(
-            lambda m, r: m.carbonprice[0, r] == 0, "init_carbon_price"
+            lambda m, r: m.relative_abatement[0, r] == 0, "init_carbon_price"
         ),
         RegionalConstraint(
             lambda m, t, r: m.carbonprice[t, r]
@@ -355,6 +584,9 @@ def get_all_constraints(m: AbstractModel):
         ),
         ####################################
         ####################################
+    ]
+
+    constraints_bounds = [
         GlobalConstraint(
             lambda m, t: (
                 m.cumulative_emissions[t]
@@ -437,4 +669,4 @@ def get_all_constraints(m: AbstractModel):
         ),
     ]
 
-    return constraints
+    return constraints_vars + constraints_bounds
