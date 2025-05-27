@@ -44,6 +44,7 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     constraints = []
 
     m.gross_damage_costs = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP")) 
+    m.damage_costs = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP)"))
     m.damage_scale_factor = Param(doc="::economics.damages.scale factor")
     m.damage_relative_global = Var(
         m.t,
