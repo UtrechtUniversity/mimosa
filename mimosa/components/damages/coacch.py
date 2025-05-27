@@ -44,7 +44,7 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     constraints = []
 
     m.gross_damage_costs = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP")) #nieuwe variabele
-    m.damage_costs = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP)")) #nieuwe variabele
+    m.damage_costs = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP")) #nieuwe variabele
     m.adaptation_level = Var(
         m.t, m.regions, bounds=(0, 1)
     ) # nieuwe variabele
