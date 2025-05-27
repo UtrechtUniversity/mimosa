@@ -43,7 +43,14 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     """
     constraints = []
 
-    m.damage_costs = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP")) 
+    m.gross_damage_costs = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP")) #nieuwe variabele
+    m.damage_costs = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP")) #nieuwe variabele
+    m.adaptation_level = Var(
+        m.t, m.regions, bounds=(0, 1)
+    ) # nieuwe variabele
+    m.adaptation_costs = Var(
+        m.t, m.regions, units=quant.unit("fraction_of_GDP")
+    )  # nieuwe variabele
     m.damage_scale_factor = Param(doc="::economics.damages.scale factor")
     m.damage_relative_global = Var(
         m.t,
@@ -52,7 +59,7 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     # Total damages are sum of non-SLR and SLR damages
     constraints.append(
         RegionalConstraint(
-            lambda m, t, r: m.damage_costs[t, r]
+            lambda m, t, r: m.gross_damage_costs[t, r]
             == m.damage_costs_non_slr[t, r] + m.damage_costs_slr[t, r],
             "damage_costs",
         ),
@@ -62,10 +69,33 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     constraints.append(
         GlobalConstraint(
             lambda m, t: m.damage_relative_global[t]
-            == (sum(m.damage_costs[t, r] * m.GDP_gross[t, r] for r in m.regions) / m.global_GDP_gross[t]),
+            == (sum(m.gross_damage_costs[t, r] * m.GDP_gross[t, r] for r in m.regions) / m.global_GDP_gross[t]),
             "damage_relative_global",
         )
     )
+
+    #Nieuwe constraint die als filler de waarde van adaptation_level tijdelijk vastzet op 0.75> Nog aan te passen.
+    constraints.append(
+        RegionalConstraint(
+            lambda m, t, r: m.adaptation_level[t, r] == 0.75,
+            "adaptation_level",
+        )
+    )
+    #Nieuwe constraint die de waarde van adaptation_costs vastzet op 0.01. Nog aan te passen.
+    constraints.append(
+        RegionalConstraint(
+            lambda m, t, r: m.adaptation_costs[t, r] == 0.01,
+            "adaptation_costs",
+        )
+    )
+    #Nieuwe constraint voor damage_costs
+    constraints.append(
+        RegionalConstraint(
+            lambda m, t, r: m.damage_costs[t, r]
+            == (1 - m.adaptation_level[t, r]) * m.gross_damage_costs[t, r] + m.adaptation_costs[t, r],
+        )
+    )
+
 
     # Get constraints for temperature dependent damages
     constraints.extend(_get_constraints_temperature_dependent(m))
