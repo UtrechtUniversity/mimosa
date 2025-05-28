@@ -44,11 +44,13 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     """
     constraints = []
 
-    m.gross_damage_costs = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP")) #nieuwe variabele
-    m.damage_costs = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP")) #nieuwe variabele
-    m.adaptation_level = Var(
-        m.t, m.regions, bounds=(0, 1)
-    ) # nieuwe variabele
+    m.gross_damage_costs = Var(
+        m.t, m.regions, units=quant.unit("fraction_of_GDP")
+    )  # nieuwe variabele
+    m.damage_costs = Var(
+        m.t, m.regions, units=quant.unit("fraction_of_GDP")
+    )  # nieuwe variabele
+    m.adaptation_level = Var(m.t, m.regions, bounds=(0, 1))  # nieuwe variabele
     m.adaptation_costs = Var(
         m.t, m.regions, units=quant.unit("fraction_of_GDP")
     )  # nieuwe variabele
@@ -71,39 +73,41 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
         [
             GlobalConstraint(
                 lambda m, t: m.damage_relative_global[t]
-                == (sum(m.gross_damage_costs[t, r] * m.GDP_gross[t, r] for r in m.regions) / m.global_GDP_gross[t]),
+                == (
+                    sum(
+                        m.gross_damage_costs[t, r] * m.GDP_gross[t, r]
+                        for r in m.regions
+                    )
+                    / m.global_GDP_gross[t]
+                ),
                 "damage_relative_global",
             ),
-
             RegionalInitConstraint(
                 lambda m, r: m.adaptation_level[0, r] == 0,
                 "init_adaptation_level",
-         )
+            ),
+            # Nieuwe constraint die de waarde van adaptation_costs bepaalt
+            RegionalConstraint(
+                lambda m, t, r: m.adaptation_costs[t, r]
+                == m.adaptation_level[t, r] ** 3,
+                "adaptation_costs",
+            ),
+            # Nieuwe constraint voor damage_costs
+            RegionalConstraint(
+                lambda m, t, r: m.damage_costs[t, r]
+                == (1 - m.adaptation_level[t, r]) * m.gross_damage_costs[t, r]
+                + m.adaptation_costs[t, r],
+            ),
         ]
     )
 
-    #Nieuwe constraint die als filler de waarde van adaptation_level tijdelijk vastzet op 0.75> Nog aan te passen.
+    # Nieuwe constraint die als filler de waarde van adaptation_level tijdelijk vastzet op 0.75> Nog aan te passen.
     # constraints.append(
     #     RegionalConstraint(
     #         lambda m, t, r: m.adaptation_level[t, r] == 0.75,
     #         "adaptation_level",
     #     )
     # )
-    #Nieuwe constraint die de waarde van adaptation_costs vastzet op 0.01. Nog aan te passen.
-    constraints.append(
-        RegionalConstraint(
-            lambda m, t, r: m.adaptation_costs[t, r] == m.adaptation_level[t, r] ** 3,
-            "adaptation_costs",
-        )
-    )
-    #Nieuwe constraint voor damage_costs
-    constraints.append(
-        RegionalConstraint(
-            lambda m, t, r: m.damage_costs[t, r]
-            == (1 - m.adaptation_level[t, r]) * m.gross_damage_costs[t, r] + m.adaptation_costs[t, r],
-        )
-    )
-
 
     # Get constraints for temperature dependent damages
     constraints.extend(_get_constraints_temperature_dependent(m))
