@@ -10,6 +10,7 @@ from mimosa.common import (
     Var,
     GeneralConstraint,
     RegionalConstraint,
+    RegionalInitConstraint,
     value,
     soft_max,
     Any,
@@ -66,25 +67,32 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     )
 
     # Absolute global damages
-    constraints.append(
-        GlobalConstraint(
-            lambda m, t: m.damage_relative_global[t]
-            == (sum(m.gross_damage_costs[t, r] * m.GDP_gross[t, r] for r in m.regions) / m.global_GDP_gross[t]),
-            "damage_relative_global",
-        )
+    constraints.extend(
+        [
+            GlobalConstraint(
+                lambda m, t: m.damage_relative_global[t]
+                == (sum(m.gross_damage_costs[t, r] * m.GDP_gross[t, r] for r in m.regions) / m.global_GDP_gross[t]),
+                "damage_relative_global",
+            ),
+
+            RegionalInitConstraint(
+                lambda m, r: m.adaptation_level[0, r] == 0,
+                "init_adaptation_level",
+         )
+        ]
     )
 
     #Nieuwe constraint die als filler de waarde van adaptation_level tijdelijk vastzet op 0.75> Nog aan te passen.
-    constraints.append(
-        RegionalConstraint(
-            lambda m, t, r: m.adaptation_level[t, r] == 0.75,
-            "adaptation_level",
-        )
-    )
+    # constraints.append(
+    #     RegionalConstraint(
+    #         lambda m, t, r: m.adaptation_level[t, r] == 0.75,
+    #         "adaptation_level",
+    #     )
+    # )
     #Nieuwe constraint die de waarde van adaptation_costs vastzet op 0.01. Nog aan te passen.
     constraints.append(
         RegionalConstraint(
-            lambda m, t, r: m.adaptation_costs[t, r] == 0.01,
+            lambda m, t, r: m.adaptation_costs[t, r] == m.adaptation_level[t, r] ** 3,
             "adaptation_costs",
         )
     )
