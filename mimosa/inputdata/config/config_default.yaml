@@ -93,7 +93,7 @@ economics:
       descr: Calibration level of the MAC (carbon price for 100% reduction)
       type: quantity
       unit: currency_unit/emissionsrate_unit
-      default: 2601 USD2005/tCO2
+      default: 2601 USD_2010/tCO2
 
     LBD_rate:
       descr: >-
@@ -547,9 +547,9 @@ input:
       default:
         variable: GDP|PPP
         unit: currency_unit
-        scenario: "{SSP}-Ref-SPA0-V17"
-        model: IMAGE
-        file: inputdata/data/data_IMAGE_SSP.csv
+        scenario: "{SSP}"
+        model: IMAGE 3.4
+        file: inputdata/data/Baseline_Results_ScenarioMIP_20250526.csv
 
     emissions:
       descr: Data source of baseline emissions
@@ -557,9 +557,9 @@ input:
       default:
         variable: Emissions|CO2
         unit: emissionsrate_unit
-        scenario: "{SSP}-Ref-SPA0-V17"
-        model: IMAGE
-        file: inputdata/data/data_IMAGE_SSP.csv
+        scenario: "{SSP}"
+        model: IMAGE 3.4
+        file: inputdata/data/Baseline_Results_ScenarioMIP_20250526.csv
 
     population:
       descr: Data source of population
@@ -567,9 +567,9 @@ input:
       default:
         variable: Population
         unit: population_unit
-        scenario: "{SSP}-Ref-SPA0-V17"
-        model: IMAGE
-        file: inputdata/data/data_IMAGE_SSP.csv
+        scenario: "{SSP}"
+        model: IMAGE 3.4
+        file: inputdata/data/Baseline_Results_ScenarioMIP_20250526.csv
 
 ##################
 

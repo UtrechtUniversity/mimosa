@@ -12,8 +12,8 @@ ton = metric_ton    # Was: ton = 2000 pound = 907.18474 kg
 
 # Add new units
 
-USD2005 = [currency] = usd = USD
-USD2010 = 1.11 USD2005
+USD_2010 = [currency] = usd = USD
+USD2010 = 1.11 USD_2010
 
 tCO2 = [CO2emissions]
 people = [people]
