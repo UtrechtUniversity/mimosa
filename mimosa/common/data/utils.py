@@ -14,6 +14,7 @@ class UnitValues:
 def extrapolate(input_values, years, extra_years, meta_info, stabilising_years=50):
     """
     To extrapolate: take growth rate 2090-2100, linearly bring it down to growth rate of 0 in 2150
+    Unless emissions are going down, then just keep going down at the same rate.
     """
 
     became_negative = False
@@ -27,11 +28,21 @@ def extrapolate(input_values, years, extra_years, meta_info, stabilising_years=5
 
     new_values = []
 
+    do_not_go_down = False
+    try:
+        if "emissions" in str(meta_info[0]).lower() and change_rate < 0:
+            do_not_go_down = True
+    except IndexError:
+        pass
+
     for t in extra_years:
-        change = minmax(
-            0.0, change_rate - change_rate * (t_prev - 2100.0) / stabilising_years
-        )
-        val = val_prev + change * (t - t_prev)
+        if change_rate < 0 and do_not_go_down:
+            val = val_prev
+        else:
+            change = minmax(
+                0.0, change_rate - change_rate * (t_prev - 2100.0) / stabilising_years
+            )
+            val = val_prev + change * (t - t_prev)
 
         # try:
         #     if meta_info[0] == "emissions":
