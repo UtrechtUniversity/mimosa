@@ -549,7 +549,7 @@ input:
         unit: currency_unit
         scenario: "{SSP}"
         model: IMAGE 3.4
-        file: inputdata/data/Baseline_Results_ScenarioMIP_2005-dollars_20250530.csv
+        file: inputdata/data/Baseline_Results_ScenarioMIP_20250526.csv
 
     emissions:
       descr: Data source of baseline emissions
@@ -559,7 +559,7 @@ input:
         unit: emissionsrate_unit
         scenario: "{SSP}"
         model: IMAGE 3.4
-        file: inputdata/data/Baseline_Results_ScenarioMIP_2005-dollars_20250530.csv
+        file: inputdata/data/Baseline_Results_ScenarioMIP_20250526.csv
 
     population:
       descr: Data source of population
@@ -569,7 +569,7 @@ input:
         unit: population_unit
         scenario: "{SSP}"
         model: IMAGE 3.4
-        file: inputdata/data/Baseline_Results_ScenarioMIP_2005-dollars_20250530.csv
+        file: inputdata/data/Baseline_Results_ScenarioMIP_20250526.csv
 
 ##################
 
