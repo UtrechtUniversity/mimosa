@@ -78,7 +78,9 @@ def _set_baseline_emissions(m: AbstractModel) -> None:
     m.baseline_carbon_intensity = Param(
         m.t,
         m.regions,
-        initialize=lambda m, t, r: (m.baseline_emissions[t, r] / m.baseline_GDP[t, r]),
+        initialize=lambda m, t, r: (
+            m.baseline_emissions[t, r] / m.baseline_GDP[t - 1 if t > 1 else t, r]
+        ),
         units=quant.unit("emissionsrate_unit/currency_unit"),
     )
 
@@ -195,7 +197,8 @@ def _get_emissions_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
                 lambda m, t, r: (
                     (
                         m.baseline[t, r]
-                        == m.baseline_carbon_intensity[t, r] * m.GDP_net[t, r]
+                        == m.baseline_carbon_intensity[t, r]
+                        * (m.GDP_net[t - 1, r] if t > 1 else m.GDP_gross[t, r])
                     )
                     if value(m.use_carbon_intensity_for_baseline)
                     else (m.baseline[t, r] == m.baseline_emissions[t, r])

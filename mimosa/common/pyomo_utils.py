@@ -228,9 +228,9 @@ class UsefulVar:
         self.var = getattr(m, name)
 
         self.name = name
-        self.is_regional = has_time_and_region_dim(self.var)
         self.unit = get_unit(self.var)
         self.indices = get_indices(self.var)
+        self.is_regional = len(self.indices) > 1
 
         self.index_values = {index: list(getattr(m, index)) for index in self.indices}
 

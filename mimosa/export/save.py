@@ -12,15 +12,20 @@ import pandas as pd
 from mimosa.common import get_all_variables, get_all_time_region_params, value
 
 
-def save_output(params, m, experiment=None, hash_suffix=False, folder="output"):
+def save_output_pyomo(params, m, experiment=None, hash_suffix=False, folder="output"):
+    # 2. Save the Pyomo variables and data functions
+    all_variables = get_all_variables(m) + get_all_time_region_params(m)
+    save_output(all_variables, params, m, experiment, hash_suffix, folder)
+
+
+def save_output(
+    all_variables, params, m, experiment=None, hash_suffix=False, folder="output"
+):
     # 1. Create a unique identifier
     if hash_suffix:
         settings_hash = hashlib.md5(json.dumps(params).encode()).hexdigest()[:9]
     else:
         settings_hash = ""
-
-    # 2. Save the Pyomo variables and data functions
-    all_variables = get_all_variables(m) + get_all_time_region_params(m)
 
     rows = []
     for useful_var in all_variables:

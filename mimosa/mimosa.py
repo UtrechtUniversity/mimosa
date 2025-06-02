@@ -25,7 +25,7 @@ from mimosa.common import (
     logger,
 )
 from mimosa.common.config.parseconfig import check_params, parse_param_values
-from mimosa.export import save_output  # , visualise_ipopt_output
+from mimosa.export import save_output_pyomo  # , visualise_ipopt_output
 from mimosa.abstract_model import create_abstract_model
 from mimosa.concrete_model.instantiate_params import InstantiatedModel
 from mimosa.concrete_model import simulation_mode
@@ -218,7 +218,7 @@ class MIMOSA:
 
     def save(self, filename=None, **kwargs):
         self.last_saved_filename = filename
-        save_output(self.params, self.concrete_model, filename, **kwargs)
+        save_output_pyomo(self.params, self.concrete_model, filename, **kwargs)
 
 
 ###########################

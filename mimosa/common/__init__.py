@@ -62,6 +62,8 @@ from .utils import first
 
 from .units import quant
 
+from ..export import save_output, save_output_pyomo
+
 # # Datastore
 # from .data import DataStore
 
