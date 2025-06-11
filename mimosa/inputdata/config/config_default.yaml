@@ -495,6 +495,21 @@ regional_parameter_files:
     COACCH:
       filename: inputdata/regionalparams/COACCH.csv
       regionstype: COACCH
+    Regional_adapt_parameters:
+      filename: inputdata/regionalparams/adapt_params_new.csv
+      regionstype: ADRICE2010
+      g1:
+        descr: Regional parameter one to differentiate adaptation level
+        type: float
+        min: -20
+        max: 20
+        default: 1
+      g2:
+        descr: Regional parameter two to differentiate adaptation level
+        type: float
+        min: -20
+        max: 20
+        default: 3
 
 ##################
 
