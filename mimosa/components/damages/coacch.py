@@ -59,6 +59,10 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
         m.t,
         units=quant.unit("fraction_of_GDP"),
     )
+    # Matthias - regionally differentiated damage parameters
+    m.g1 = Param(m.regions, doc="regional::Damage_regional_parameters.g1")
+    m.g2 = Param(m.regions, doc="regional::Damage_regional_parameters.g2")
+
     # Total damages are sum of non-SLR and SLR damages
     constraints.append(
         RegionalConstraint(
@@ -87,9 +91,10 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
                 "init_adaptation_level",
             ),
             # Nieuwe constraint die de waarde van adaptation_costs bepaalt
+            # hier invoeren regiospecifiek
             RegionalConstraint(
                 lambda m, t, r: m.adaptation_costs[t, r]
-                == m.adaptation_level[t, r] ** 3,
+                == m.g1 * m.adaptation_level[t, r] ** m.g2,
                 "adaptation_costs",
             ),
             # Nieuwe constraint voor damage_costs
