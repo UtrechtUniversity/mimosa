@@ -9,8 +9,8 @@ from mimosa.common import (
     Param,
     Var,
     GeneralConstraint,
-    RegionalConstraint,
-    GlobalConstraint,
+    GlobalEquation,
+    RegionalEquation,
 )
 from .utility_fct import calc_utility
 
@@ -58,15 +58,17 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
 
     constraints.extend(
         [
-            RegionalConstraint(
-                lambda m, t, r: m.utility[t, r]
-                == calc_utility(m.consumption[t, r], m.population[t, r], m.elasmu),
-                "utility",
+            RegionalEquation(
+                m.utility,
+                lambda m, t, r: calc_utility(
+                    m.consumption[t, r], m.population[t, r], m.elasmu
+                ),
             ),
-            GlobalConstraint(
-                lambda m, t: m.yearly_welfare[t]
-                == sum(m.population[t, r] * m.utility[t, r] for r in m.regions),
-                "yearly_welfare",
+            GlobalEquation(
+                m.yearly_welfare,
+                lambda m, t: sum(
+                    m.population[t, r] * m.utility[t, r] for r in m.regions
+                ),
             ),
         ]
     )

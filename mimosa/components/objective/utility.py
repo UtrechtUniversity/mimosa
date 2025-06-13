@@ -9,9 +9,7 @@ from mimosa.common import (
     Param,
     Var,
     GeneralConstraint,
-    GlobalConstraint,
-    GlobalInitConstraint,
-    Constraint,
+    GlobalEquation,
     Objective,
     exp,
     maximize,
@@ -40,19 +38,17 @@ def get_constraints(m: AbstractModel) -> Tuple[Objective, Sequence[GeneralConstr
     m.PRTP = Param(doc="::economics.PRTP")
     constraints.extend(
         [
-            GlobalConstraint(
+            GlobalEquation(
+                m.NPV,
                 lambda m, t: (
-                    m.NPV[t]
-                    == m.NPV[t - 1]
+                    m.NPV[t - 1]
                     + m.dt
                     * exp(-m.PRTP * (m.year(t) - m.beginyear))
                     * m.yearly_welfare[t]
                     if t > 0
-                    else Constraint.Skip
+                    else 0
                 ),
-                name="NPV",
             ),
-            GlobalInitConstraint(lambda m: m.NPV[0] == 0),
         ]
     )
 

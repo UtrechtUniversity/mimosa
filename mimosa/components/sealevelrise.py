@@ -10,9 +10,7 @@ from mimosa.common import (
     Param,
     Var,
     GeneralConstraint,
-    GlobalConstraint,
-    GlobalInitConstraint,
-    Constraint,
+    GlobalEquation,
     NonNegativeReals,
     quant,
 )
@@ -124,44 +122,36 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     # Constraints relating to SLR
     constraints = [
         # Thermal expansion
-        GlobalConstraint(
+        GlobalEquation(
+            m.slr_thermal,
             lambda m, t: (
-                m.slr_thermal[t]
-                == slr_thermal_expansion(m.slr_thermal[t - 1], m.temperature[t - 1], m)
+                slr_thermal_expansion(m.slr_thermal[t - 1], m.temperature[t - 1], m)
                 if t > 0
-                else Constraint.Skip
+                else slr_thermal_expansion_init(m)
             ),
-            name="SLR_thermal",
-        ),
-        GlobalInitConstraint(
-            lambda m: m.slr_thermal[0] == slr_thermal_expansion_init(m)
         ),
         # GSIC
-        GlobalConstraint(
+        GlobalEquation(
+            m.slr_cumgsic,
             lambda m, t: (
-                m.slr_cumgsic[t]
-                == slr_gsic(m.slr_cumgsic[t - 1], m.temperature[t - 1], m)
+                slr_gsic(m.slr_cumgsic[t - 1], m.temperature[t - 1], m)
                 if t > 0
-                else Constraint.Skip
+                else 0.015
             ),
-            name="SLR_GSIC",
         ),
-        GlobalInitConstraint(lambda m: m.slr_cumgsic[0] == 0.015),
         # GIS
-        GlobalConstraint(
+        GlobalEquation(
+            m.slr_cumgis,
             lambda m, t: (
-                m.slr_cumgis[t] == slr_gis(m.slr_cumgis[t - 1], m.temperature[t - 1], m)
+                slr_gis(m.slr_cumgis[t - 1], m.temperature[t - 1], m)
                 if t > 0
-                else Constraint.Skip
+                else 0.006
             ),
-            name="SLR_GIS",
         ),
-        GlobalInitConstraint(lambda m: m.slr_cumgis[0] == 0.006),
         # Total SLR is sum of each contributing factors
-        GlobalConstraint(
-            lambda m, t: m.total_SLR[t]
-            == m.slr_thermal[t] + m.slr_cumgsic[t] + m.slr_cumgis[t],
-            name="total_SLR",
+        GlobalEquation(
+            m.total_SLR,
+            lambda m, t: (m.slr_thermal[t] + m.slr_cumgsic[t] + m.slr_cumgis[t]),
         ),
     ]
 

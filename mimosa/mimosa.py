@@ -43,6 +43,7 @@ class MIMOSA:
         params (dict)
         regions (dict): taken from params
         abstract_model (AbstractModel): the AbstractModel created using the chosen damage/objective modules
+        equations (list): list of equations (not constraints) used for simulation mode
         data_store (DataStore): object used to access regional data from the input database
         m (ConcreteModel): concrete instance of `abstract_model`
 
@@ -56,7 +57,7 @@ class MIMOSA:
         self.param_parser_tree = parser_tree
         self.regions = params["regions"]
 
-        self.abstract_model = self.get_abstract_model()
+        self.abstract_model, self.equations = self.get_abstract_model()
         self.concrete_model = self.create_instance()
         self.status = None  # Not started yet
         self.last_saved_filename = None  # Nothing saved yes
@@ -155,6 +156,7 @@ class MIMOSA:
         neos_email=None,
         ipopt_output_file=None,
         ipopt_maxiter=None,
+        postprocess=True,
     ) -> None:
         """Sends the concrete model to a solver.
 
@@ -192,7 +194,8 @@ class MIMOSA:
             # if ipopt_output_file is not None:
             #     visualise_ipopt_output(ipopt_output_file)
 
-        self.postprocessing()
+        if postprocess:
+            self.postprocessing()
 
         logger.info("Status: {}".format(results.solver.status))
 

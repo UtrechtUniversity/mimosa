@@ -77,6 +77,111 @@ def soft_max(x, maxval, scale=1.0):
     return -soft_min(maxval - x, scale) + maxval
 
 
+####### Equations
+
+
+class Equation(ABC):
+
+    lhs: str
+    rhs: typing.Callable
+    name: str
+    dependencies: list[str] = []
+
+    def __init__(self, lhs, rhs, indices=None):
+        """
+        Represents an equation of the form lhs == rhs. Note that the lhs
+        can only be a single variable, while the rhs can be a function.
+
+        Use GlobalEquation for time dependent equations (e.g. global emissions) and
+        RegionalEquation for regional equations (e.g. regional emissions).
+
+        Args:
+            lhs (Union[str, Var]): The left-hand side variable name given as string or
+                as a Pyomo Var object.
+            rhs (Callable): A function that takes m and the indices (e.g. m, t or m, t, r) as
+                arguments and returns the right-hand side value.
+            indices (list, optional): List of indices for the equation. Defaults to ['t', 'r'].
+
+        Example:
+            GlobalEquation(
+                lhs="temperature",
+                rhs=lambda m, t: m.T0 + m.TCRE * m.cumulative_emissions[t]
+            )
+
+            which will be evaluated as:
+            m.temperature[t] == m.T0 + m.TCRE * m.cumulative_emissions[t]
+
+            or:
+
+            RegionalEquation(
+                lhs=m.regional_emissions,
+                rhs=lambda m, t, r: (1 - m.relative_abatement[t, r]) * m.baseline[t, r]
+            )
+
+            which will be evaluated as:
+            m.regional_emissions[t, r] == (1 - m.relative_abatement[t, r]) * m.baseline[t, r]
+
+        """
+
+        indices = indices or ["t", "r"]  # Default indices are time and region]
+
+        if isinstance(lhs, Var):
+            lhs = lhs.name
+
+        self.lhs = lhs
+        self.rhs = rhs
+
+        self.name = lhs
+
+    def __call__(self, m, *indices):
+        """
+        Evaluates the right-hand side of the equation with the given indices.
+
+        Example:
+            eq = GlobalEquation(lhs="temperature", rhs=lambda m, t: m.T0 + m.TCRE * m.cumulative_emissions[t])
+            eq(m, t)
+        """
+        return self.rhs(m, *indices)
+
+    @abstractmethod
+    def to_pyomo_constraint(self, m):
+        pass
+
+
+class GlobalEquation(Equation):
+    def __init__(self, lhs, rhs):
+        super().__init__(lhs, rhs, indices=["t", "r"])
+
+    __init__.__doc__ = Equation.__init__.__doc__
+
+    def to_pyomo_constraint(self, m):
+        """
+        Converts the equation to a Pyomo constraint.
+        """
+
+        def _rule(m, t, lhs_var_name=self.lhs, rhs_expr=self.rhs):
+            return getattr(m, lhs_var_name)[t] == rhs_expr(m, t)
+
+        return Constraint(m.t, rule=_rule)
+
+
+class RegionalEquation(Equation):
+    def __init__(self, lhs, rhs):
+        super().__init__(lhs, rhs, indices=["t", "r"])
+
+    __init__.__doc__ = Equation.__init__.__doc__
+
+    def to_pyomo_constraint(self, m):
+        """
+        Converts the equation to a Pyomo constraint.
+        """
+
+        def _rule(m, t, r, lhs_var_name=self.lhs, rhs_expr=self.rhs):
+            return getattr(m, lhs_var_name)[t, r] == rhs_expr(m, t, r)
+
+        return Constraint(m.t, m.regions, rule=_rule)
+
+
 ####### Constraints
 
 
