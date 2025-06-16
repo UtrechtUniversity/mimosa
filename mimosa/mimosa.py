@@ -74,7 +74,7 @@ class MIMOSA:
                 self.prepare_simulation()
                 self.prerun_simulation()
             except simulation.CircularDependencyError as e:
-                logger.info(
+                logger.warning(
                     "Model will not be pre-ran with best guess simulation run: %s",
                     str(e),
                 )

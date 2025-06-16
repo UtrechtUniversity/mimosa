@@ -87,6 +87,10 @@ class Equation(ABC):
     name: str
     dependencies: list[str] = []
 
+    # Soft dependencies are dependencies to the previous time step, which should
+    # not affect order of execution, but are important to plot
+    prev_time_dependencies: list[str] = []
+
     def __init__(self, lhs, rhs, indices=None):
         """
         Represents an equation of the form lhs == rhs. Note that the lhs
