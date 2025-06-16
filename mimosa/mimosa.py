@@ -29,6 +29,7 @@ from mimosa.export import save_output_pyomo  # , visualise_ipopt_output
 from mimosa.abstract_model import create_abstract_model
 from mimosa.concrete_model.instantiate_params import InstantiatedModel
 from mimosa.concrete_model import simulation_mode
+from mimosa import simulation
 
 
 class MIMOSA:
@@ -62,6 +63,8 @@ class MIMOSA:
         self.status = None  # Not started yet
         self.last_saved_filename = None  # Nothing saved yes
         self.preprocessing()
+        self.simulation_model = None  # Not created yet
+        self.equations_sorted = None  # Not created yet
 
     def get_abstract_model(self) -> AbstractModel:
         """
@@ -139,6 +142,60 @@ class MIMOSA:
             TransformationFactory("contrib.propagate_fixed_vars").apply_to(
                 self.concrete_model
             )
+
+    @utils.timer("Prerunning the model in simulation mode")
+    def prerun_simulation(self, plot_model_graph=False) -> None:
+        """
+        Creates a SimulationObjectModel from the concrete model.
+        This is used to run the simulation mode, where the equations are evaluated
+        without optimisation. This is used as initial guess for the optimisation
+        to speed up convergence.
+        """
+        # Create a SimulationObjectModel from the concrete model
+        self.simulation_model = simulation.SimulationObjectModel(self.concrete_model)
+
+        # Check the dependencies between variables and equations to test
+        # if there are circular dependencies. If there are, it is not possible
+        # to run in simulation mode.
+        equations_dict = {eq.name: eq for eq in self.equations}
+        simulation.calc_dependencies(equations_dict, self.concrete_model)
+        # Perform topological sort of equations based on dependencies
+        self.equations_sorted, graph = simulation.sort_equations(
+            equations_dict, return_graph=True
+        )
+
+        if plot_model_graph:
+            simulation.plot_dependency_graph(graph)
+
+        def find_linear_abatement(x):
+            return simulation.find_linear_abatement(
+                x, self.simulation_model, self.equations_sorted
+            )
+
+        x0, bounds = simulation.initial_guess(self.simulation_model)
+
+        # Perform first step of scipy optimisation to find a good initial guess:
+        from scipy.optimize import minimize
+
+        result = minimize(
+            find_linear_abatement,
+            x0=x0,
+            bounds=bounds,
+            options={"maxiter": 1},
+        )
+
+        sim_m_best_guess = simulation.SimulationObjectModel(self.concrete_model)
+        sim_m_best_guess = simulation.find_linear_abatement(
+            result.x,
+            sim_m_best_guess,
+            self.equations_sorted,
+            return_npv_only=False,
+        )
+        sim_m_best_guess.regions = sim_m_best_guess.regions_names
+        sim_m_best_guess.t = sim_m_best_guess.t_names
+
+        # Set the best guess as initial values for the concrete model
+        simulation.initialize_pyomo_model(self.concrete_model, sim_m_best_guess)
 
     def postprocessing(self) -> None:
         """Post-processing tasks to restore aggregate variables in pre-processing step"""
