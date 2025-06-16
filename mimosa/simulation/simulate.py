@@ -1,6 +1,9 @@
 import time
 import numpy as np
+from scipy.optimize import minimize
+
 from mimosa.common import RegionalEquation, GlobalEquation, Var
+from .objects import SimulationObjectModel
 
 
 def simulate(sim_m, equations_sorted, show_time=False):
@@ -62,6 +65,34 @@ def initial_guess(sim_m):
     x0 = np.array([p * b[0] + (1 - p) * b[1] for b in bounds])
 
     return x0, bounds
+
+
+def find_prerun_bestguess(m, equations_sorted):
+    # Create the simulation model that will be used in the initial guessing
+    sim_m = SimulationObjectModel(m)
+
+    # Get the initial guess for the optimisation
+    x0, bounds = initial_guess(sim_m)
+
+    # Perform first step of scipy optimisation to find a good initial guess:
+    result = minimize(
+        lambda x: find_linear_abatement(x, sim_m, equations_sorted),
+        x0=x0,
+        bounds=bounds,
+        options={"maxiter": 1},
+    )
+
+    # Evaluate the simulation model with the result of the optimisation
+    sim_m = find_linear_abatement(
+        result.x,
+        sim_m,
+        equations_sorted,
+        return_npv_only=False,
+    )
+    sim_m.regions = sim_m.regions_names
+    sim_m.t = sim_m.t_names
+
+    return sim_m
 
 
 def initialize_pyomo_model(pyomo_model, simulation_model):

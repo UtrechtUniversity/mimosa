@@ -125,6 +125,9 @@ class SimulationObjectModel:
         # Add custom elements
         self.year = concrete_model.year
 
+    def all_vars_for_export(self):
+        return [SimulationUsefulVar(self, name) for name in self.all_vars]
+
 
 class SimulationUsefulVar(UsefulVar):
     def __init__(self, sim_m: SimulationObjectModel, name: str):

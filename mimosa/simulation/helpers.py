@@ -73,16 +73,17 @@ def sort_equations(equations_dict, return_graph=False):
         error_msg = "Circular dependencies found:\n\n"
         for cycle in cycles:
             error_msg += " -> ".join(cycle) + "\n"
-        raise ValueError(error_msg)
+        raise CircularDependencyError(error_msg)
     else:
         # Topological sort
         ordered_nodes = list(nx.topological_sort(G))
         for node in ordered_nodes:
             try:
                 equations_sorted.append(equations_dict[node])
+                G.nodes[node]["has_equation"] = True
             except KeyError:
                 # print(f"Warning: no equation found for {node}, skipping.")
-                pass
+                G.nodes[node]["has_equation"] = False
 
     if return_graph:
         return equations_sorted, G
@@ -109,22 +110,39 @@ def plot_dependency_graph(G):
     formatted_labels = {node: _split_at_middle_underscore(node) for node in G.nodes}
 
     # Use graphviz layout (tree-style, top-down)
-    pos = graphviz_layout(G, prog="dot")
+    pos = graphviz_layout(
+        G,
+        prog="dot",
+        args="-Grankdir=LR -Gconcentrate=true",
+    )
+
+    node_colors = [
+        "#89a041" if G.nodes[node].get("has_equation", False) else "#ed6a2f"
+        for node in G.nodes
+    ]
 
     # Draw graph
-    plt.figure(figsize=(12, 15))
+    plt.figure(figsize=(13, 7))
     nx.draw(
         G,
         pos,
         labels=formatted_labels,
         with_labels=True,
         arrows=True,
-        node_size=2500,
-        node_color="lightblue",
-        font_size=10,
+        node_size=1000,
+        node_color=node_colors,
+        font_size=7,
         arrowstyle="->",
-        arrowsize=12,
+        arrowsize=8,
     )
     plt.title("MIMOSA variable dependency graph", fontsize=14)
     plt.axis("off")
     plt.show()
+
+    return plt
+
+
+class CircularDependencyError(Exception):
+    """Raised when circular dependencies are detected in the equations."""
+
+    pass
