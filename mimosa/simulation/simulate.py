@@ -95,6 +95,28 @@ def find_prerun_bestguess(m, equations_sorted):
     return sim_m
 
 
+def run_nopolicy_baseline(m, equations_sorted):
+    """
+    Run the simulation model without any policy, i.e. with the baseline emissions.
+    This is used to find a good initial guess for the optimisation.
+    """
+    # Create the simulation model
+    sim_m = SimulationObjectModel(m)
+
+    x0, _ = initial_guess(sim_m)
+
+    sim_m = find_linear_abatement(
+        x0 * 0.0,  # No abatement, i.e. baseline emissions
+        sim_m,
+        equations_sorted,
+        return_npv_only=False,
+    )
+    sim_m.regions = sim_m.regions_names
+    sim_m.t = sim_m.t_names
+
+    return sim_m
+
+
 def initialize_pyomo_model(pyomo_model, simulation_model):
     for var in pyomo_model.component_objects(Var):
         name = var.name

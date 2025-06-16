@@ -11,4 +11,5 @@ from .simulate import (
     initial_guess,
     initialize_pyomo_model,
     find_prerun_bestguess,
+    run_nopolicy_baseline,
 )

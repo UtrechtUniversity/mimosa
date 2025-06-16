@@ -41,8 +41,9 @@ def save_output(all_variables, params, m, filename, hash_suffix=False, folder="o
     print(f"Saved to {path}")
 
     # 3. Save the param file
-    with open(f"{path}.params.json", "w") as fh:
-        json.dump(params, fh)
+    if params is not None:
+        with open(f"{path}.params.json", "w") as fh:
+            json.dump(params, fh)
 
 
 def var_to_row(rows, m, var, is_regional, unit):

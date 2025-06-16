@@ -67,12 +67,14 @@ class MIMOSA:
 
         self.equations_sorted = None  # Not created yet
         self.equations_graph = None  # Not created yet
+        self.nopolicy_baseline = None
         if prerun:
             # Check if simulation mode is possible. If yes, perform a pre-run
             # simulation to get a good initial guess for the optimisation.
             try:
                 self.prepare_simulation()
                 self.prerun_simulation()
+                self.run_nopolicy_baseline()
             except simulation.CircularDependencyError as e:
                 logger.warning(
                     "Model will not be pre-ran with best guess simulation run: %s",
@@ -156,6 +158,21 @@ class MIMOSA:
                 self.concrete_model
             )
 
+    def prepare_simulation(self):
+        """Prepares the model for simulation mode: it gathers all the equations,
+        checks for circular dependencies, and sorts the equations based on their
+        dependencies."""
+
+        # Check the dependencies between variables and equations to test
+        # if there are circular dependencies. If there are, it is not possible
+        # to run in simulation mode.
+        equations_dict = {eq.name: eq for eq in self.equations}
+        simulation.calc_dependencies(equations_dict, self.concrete_model)
+        # Perform topological sort of equations based on dependencies
+        self.equations_sorted, self.equations_graph = simulation.sort_equations(
+            equations_dict, return_graph=True
+        )
+
     @utils.timer("Prerunning the model in simulation mode")
     def prerun_simulation(
         self,
@@ -178,19 +195,10 @@ class MIMOSA:
                 f"{filename}_simulation_prerun",
             )
 
-    def prepare_simulation(self):
-        """Prepares the model for simulation mode: it gathers all the equations,
-        checks for circular dependencies, and sorts the equations based on their
-        dependencies."""
-
-        # Check the dependencies between variables and equations to test
-        # if there are circular dependencies. If there are, it is not possible
-        # to run in simulation mode.
-        equations_dict = {eq.name: eq for eq in self.equations}
-        simulation.calc_dependencies(equations_dict, self.concrete_model)
-        # Perform topological sort of equations based on dependencies
-        self.equations_sorted, self.equations_graph = simulation.sort_equations(
-            equations_dict, return_graph=True
+    @utils.timer("Calculating no-policy baseline in simulation mode")
+    def run_nopolicy_baseline(self):
+        self.nopolicy_baseline = simulation.run_nopolicy_baseline(
+            self.concrete_model, self.equations_sorted
         )
 
     def plot_dependency_graph(self):
@@ -280,9 +288,17 @@ class MIMOSA:
             )
         )
 
-    def save(self, filename=None, **kwargs):
+    def save(self, filename=None, with_nopolicy_baseline=False, **kwargs):
         self.last_saved_filename = filename
         save_output_pyomo(self.params, self.concrete_model, filename, **kwargs)
+
+        if self.nopolicy_baseline is not None and with_nopolicy_baseline:
+            save_output(
+                self.nopolicy_baseline.all_vars_for_export(),
+                None,
+                self.nopolicy_baseline,
+                f"{filename}.nopolicy_baseline",
+            )
 
 
 ###########################
