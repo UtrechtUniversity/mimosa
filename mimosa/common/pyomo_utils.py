@@ -332,11 +332,11 @@ def add_constraint(m, constraints, names=None):
 
 
 class UsefulVar:
-    def __init__(self, m, name: str):
+    def __init__(self, m, var: typing.Union[Var, Param]):
         self.m = m
-        self.var = getattr(m, name)
+        self.var = var
 
-        self.name = name
+        self.name = var.name
         self.unit = get_unit(self.var)
         self.indices = get_indices(self.var)
         self.is_regional = len(self.indices) > 1
@@ -346,7 +346,7 @@ class UsefulVar:
 
 def get_all_variables(m):
     return [
-        UsefulVar(m, var.name)
+        UsefulVar(m, var)
         for var in m.component_objects(Var)
         if not var.name.startswith("_")
     ]
@@ -355,7 +355,7 @@ def get_all_variables(m):
 def get_all_time_region_params(m):
     """Returns all parameters with time and region dimensions"""
     return [
-        UsefulVar(m, param.name)
+        UsefulVar(m, param)
         for param in m.component_objects(Param)
         if has_time_and_region_dim(param) and not param.name.startswith("_")
     ]

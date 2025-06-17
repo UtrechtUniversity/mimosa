@@ -23,12 +23,14 @@ from mimosa.common import (
     regional_params,
     utils,
     logger,
+    add_constraint,
 )
 from mimosa.common.config.parseconfig import check_params, parse_param_values
 from mimosa.export import save_output_pyomo, save_output  # , visualise_ipopt_output
 from mimosa.abstract_model import create_abstract_model
 from mimosa.concrete_model.instantiate_params import InstantiatedModel
 from mimosa.concrete_model import simulation_mode
+from mimosa.components.after_initialisation import avoided_damages
 from mimosa import simulation
 
 
@@ -75,6 +77,7 @@ class MIMOSA:
                 self.prepare_simulation()
                 self.prerun_simulation()
                 self.run_nopolicy_baseline()
+                self._add_extra_avoided_damages_constraints()
             except simulation.CircularDependencyError as e:
                 logger.warning(
                     "Model will not be pre-ran with best guess simulation run: %s",
@@ -197,8 +200,21 @@ class MIMOSA:
 
     @utils.timer("Calculating no-policy baseline in simulation mode")
     def run_nopolicy_baseline(self):
+
+        m = self.concrete_model
         self.nopolicy_baseline = simulation.run_nopolicy_baseline(
-            self.concrete_model, self.equations_sorted
+            m, self.equations_sorted
+        )
+
+    def _add_extra_avoided_damages_constraints(self):
+
+        m = self.concrete_model
+        constraints = avoided_damages.get_constraints(m)
+        for constraint in constraints:
+            add_constraint(m, constraint.to_pyomo_constraint(m), constraint.name)
+
+        m.nopolicy_damage_costs.store_values(
+            self.nopolicy_baseline.damage_costs.get_all_indexed()
         )
 
     def plot_dependency_graph(self):

@@ -83,6 +83,10 @@ class SimVar:
         """Returns the value given the index value, not index position (e.g. 'USA' instead of 0)."""
         return self.values[self._position_index(index)]
 
+    def get_all_indexed(self):
+        """Returns all values as a dictionary with index values as keys."""
+        return {index: self.get_indexed(index) for index in self.index}
+
     def set_indexed(self, index, value):
         """Sets the value given the index value, not index position (e.g. 'USA' instead of 0)."""
         self.values[self._position_index(index)] = value
