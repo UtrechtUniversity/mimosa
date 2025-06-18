@@ -7,15 +7,7 @@ it creates an `instance` of the AbstractModel. This is then sent to the solver.
 Finally, the export functions are called here.
 """
 
-import os
-import warnings
-
 from mimosa.common import (
-    SolverFactory,
-    SolverManagerFactory,
-    SolverStatus,
-    value,
-    OptSolver,
     utils,
     logger,
     add_constraint,
@@ -169,22 +161,6 @@ class MIMOSA:
 
         self.preprocessor.postprocess(self.concrete_model)
 
-        status = results.solver.status
-
-        logger.info("Status: {}".format(status))
-
-        self.status = status
-
-        if status != SolverStatus.ok:
-            if status == SolverStatus.warning:
-                warning_message = "MIMOSA did not solve succesfully. Status: {}, termination condition: {}".format(
-                    status, results.solver.termination_condition
-                )
-                logger.error(warning_message)
-                raise SolverException(warning_message, utils.MimosaSolverWarning)
-            if status != SolverStatus.warning:
-                raise SolverException(f"Solver did not exit with status OK: {status}")
-
     def save(self, filename=None, with_nopolicy_baseline=False, **kwargs):
         self.last_saved_filename = filename
         save_output_pyomo(self.params, self.concrete_model, filename, **kwargs)
@@ -196,14 +172,3 @@ class MIMOSA:
                 self.nopolicy_baseline,
                 f"{filename}.nopolicy_baseline",
             )
-
-
-###########################
-##
-## Utils
-##
-###########################
-
-
-class SolverException(Exception):
-    """Raised when Pyomo solver does not exit with status OK"""
