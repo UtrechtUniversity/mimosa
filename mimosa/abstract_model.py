@@ -152,7 +152,6 @@ def create_abstract_model(
         raise NotImplementedError
 
     constraints.extend(objective_constraints)
-    # constraints = get_all_constraints(m)
 
     ######################
     # Add constraints to abstract model
