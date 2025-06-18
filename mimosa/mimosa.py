@@ -26,6 +26,7 @@ from mimosa.components.after_initialisation import avoided_damages
 from mimosa import simulation
 
 from mimosa.core.initializer import Preprocessor
+from mimosa.core.solver import Solver
 
 
 class MIMOSA:
@@ -54,6 +55,7 @@ class MIMOSA:
     def __init__(self, params: dict, prerun=True):
         # Check if input parameter dictionary is valid
         self.preprocessor = Preprocessor(params)
+        self.solver = Solver()
 
         self.build_model()
 
@@ -151,74 +153,37 @@ class MIMOSA:
         return simulation.plot_dependency_graph(self.equations_graph)
 
     @utils.timer("Model solve", True)
-    def solve(
-        self,
-        verbose=True,
-        halt_on_ampl_error="no",
-        use_neos=False,
-        neos_email=None,
-        ipopt_output_file=None,
-        ipopt_maxiter=None,
-    ) -> None:
-        """Sends the concrete model to a solver.
-
-        Args:
-            verbose (bool, optional): Prints intermediate IPOPT results. Defaults to True.
-            halt_on_ampl_error (str, optional): Lets IPOPT stop when invalid values are encountered. Defaults to "no".
-            use_neos (bool, optional): Uses the external NEOS server for solving. Defaults to False.
-            neos_email (str or None, optional): E-mail address for NEOS server. Defaults to None.
-            ipopt_output_file (str or None, optional): Filename for IPOPT intermediate output. Defaults to None.
-            ipopt_maxiter (int or None, optional): Maximum number of iterations for IPOPT. If None, use IPOPT defaults.
-
+    def solve(self, verbose=True, use_neos=False, **kwargs) -> None:
+        """Sends the model to a solver.
         Raises:
             SolverException: raised if solver did not exit with status OK
         """
         self.status = None  # Not started yet
 
         if use_neos:
-            # Send concrete model to external solver on NEOS server
-            # Requires authenticated email address
-            os.environ["NEOS_EMAIL"] = neos_email
-            solver_manager = SolverManagerFactory("neos")
-            solver = "ipopt"  # or "conopt'
-            results = solver_manager.solve(self.concrete_model, opt=solver)
+            results = self.solver.solve_neos(self.concrete_model, **kwargs)
         else:
-            # Solve locally using ipopt
-            opt: OptSolver = SolverFactory("ipopt")
-            opt.options["halt_on_ampl_error"] = halt_on_ampl_error
-            if ipopt_maxiter is not None:
-                opt.options["max_iter"] = ipopt_maxiter
-            if ipopt_output_file is not None:
-                opt.options["output_file"] = ipopt_output_file
-            results = opt.solve(
-                self.concrete_model, tee=verbose, symbolic_solver_labels=True
+            results = self.solver.solve_ipopt(
+                self.concrete_model, verbose=verbose, **kwargs
             )
-            # if ipopt_output_file is not None:
-            #     visualise_ipopt_output(ipopt_output_file)
 
         self.preprocessor.postprocess(self.concrete_model)
 
-        logger.info("Status: {}".format(results.solver.status))
+        status = results.solver.status
 
-        self.status = results.solver.status
+        logger.info("Status: {}".format(status))
 
-        if results.solver.status != SolverStatus.ok:
-            if results.solver.status == SolverStatus.warning:
+        self.status = status
+
+        if status != SolverStatus.ok:
+            if status == SolverStatus.warning:
                 warning_message = "MIMOSA did not solve succesfully. Status: {}, termination condition: {}".format(
-                    results.solver.status, results.solver.termination_condition
+                    status, results.solver.termination_condition
                 )
                 logger.error(warning_message)
                 raise SolverException(warning_message, utils.MimosaSolverWarning)
-            if results.solver.status != SolverStatus.warning:
-                raise SolverException(
-                    f"Solver did not exit with status OK: {results.solver.status}"
-                )
-
-        logger.info(
-            "Final NPV: {}".format(
-                value(self.concrete_model.NPV[self.concrete_model.tf])
-            )
-        )
+            if status != SolverStatus.warning:
+                raise SolverException(f"Solver did not exit with status OK: {status}")
 
     def save(self, filename=None, with_nopolicy_baseline=False, **kwargs):
         self.last_saved_filename = filename
