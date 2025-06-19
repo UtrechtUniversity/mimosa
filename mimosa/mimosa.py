@@ -56,7 +56,6 @@ class MIMOSA:
         self.status = None  # Not started yet
         self.last_saved_filename = None  # Nothing saved yes
 
-        self.nopolicy_baseline = None
         if prerun:
             # Check if simulation mode is possible. If yes, perform a pre-run
             # simulation to get a good initial guess for the optimisation.
@@ -99,21 +98,27 @@ class MIMOSA:
         # Set the best guess as initial values for the concrete model
         self.simulator.initialize_pyomo_model(self.concrete_model, sim_m_best_guess)
 
-    @utils.timer("Calculating no-policy baseline in simulation mode")
+        # Set a flag to indicate that extra constraints have not been added yet
+        self._extra_constraints_added = False
+
     def run_nopolicy_baseline(self):
         """Runs the no-policy baseline simulation with relative abatement set to 0."""
 
         # Run simulator with default relative abatement set to 0
-        self.nopolicy_baseline = self.simulator.run()
+        nopolicy_baseline = self.simulator.run()
 
         # Store the no-policy baseline damage costs in the concrete model
         m = self.concrete_model
-        for constraint in avoided_damages.get_constraints(m):
-            add_constraint(m, constraint.to_pyomo_constraint(m), constraint.name)
+        if not self._extra_constraints_added:
+            for constraint in avoided_damages.get_constraints(m):
+                add_constraint(m, constraint.to_pyomo_constraint(m), constraint.name)
+            self._extra_constraints_added = True
 
         m.nopolicy_damage_costs.store_values(
-            self.nopolicy_baseline.damage_costs.get_all_indexed()
+            nopolicy_baseline.damage_costs.get_all_indexed()
         )
+
+        return nopolicy_baseline
 
     @utils.timer("Model solve", True)
     def solve(self, verbose=True, use_neos=False, **kwargs) -> None:
@@ -133,14 +138,38 @@ class MIMOSA:
 
         self.preprocessor.postprocess(self.concrete_model)
 
-    def save(self, filename=None, with_nopolicy_baseline=False, **kwargs):
+    def save(self, filename=None, **kwargs):
+        """
+        Saves the MIMOSA optimisation results to a file.
+
+        Args:
+            filename (str): The filename to save the results to.
+
+        Example usage:
+            model = MIMOSA(params)
+            model.solve()
+            model.save("run1")
+        """
         self.last_saved_filename = filename
         save_output_pyomo(self.params, self.concrete_model, filename, **kwargs)
 
-        if self.nopolicy_baseline is not None and with_nopolicy_baseline:
-            save_output(
-                self.nopolicy_baseline.all_vars_for_export(),
-                None,
-                self.nopolicy_baseline,
-                f"{filename}.nopolicy_baseline",
-            )
+    def save_simulation(self, simulation_obj, filename, **kwargs):
+        """
+        Saves the simulation results to a file.
+
+        Args:
+            simulation_obj (SimulationObjectModel): The simulation results to save.
+            filename (str): The filename to save the results to.
+
+        Example usage:
+            model = MIMOSA(params)
+            simulation = model.run_nopolicy_baseline()
+            model.save_simulation(simulation, "nopolicy_baseline")
+        """
+        save_output(
+            simulation_obj.all_vars_for_export(),
+            self.params,
+            simulation_obj,
+            filename,
+            **kwargs
+        )
