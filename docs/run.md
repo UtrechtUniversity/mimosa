@@ -68,6 +68,8 @@ It can be useful to do a MIMOSA run with zero mitigation: a baseline run. We dis
 
 Contrary to other scenarios, these are not optimisation runs, but rather simulation runs: the mitigation is set to zero, and the model is solved for the given parameters. Therefore, the `solve()` function is not used, but rather the `run_simulation()` or `run_nopolicy_baseline()` function. 
 
+*Note: this requires MIMOSA version 0.2.0 or higher*
+
 === "No policy scenario with damages"
 
      ```python hl_lines="5 10 11 12"

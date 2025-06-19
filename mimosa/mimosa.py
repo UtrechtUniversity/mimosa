@@ -146,8 +146,6 @@ class MIMOSA:
             )
         self.status = results.solver.status
 
-        self.preprocessor.postprocess(self.concrete_model)
-
     def save(self, filename=None, **kwargs):
         """
         Saves the MIMOSA optimisation results to a file.

@@ -135,10 +135,6 @@ class Preprocessor:
         """
         more_than_one_region = len(self._params["regions"]) > 1
 
-        if more_than_one_region:
-            TransformationFactory("contrib.aggregate_vars").apply_to(
-                self.concrete_model
-            )
         TransformationFactory("contrib.init_vars_midpoint").apply_to(
             self.concrete_model
         )
@@ -146,15 +142,4 @@ class Preprocessor:
         if more_than_one_region:
             TransformationFactory("contrib.propagate_fixed_vars").apply_to(
                 self.concrete_model
-            )
-
-    def postprocess(self, concrete_model: ConcreteModel) -> None:
-        """
-        Post-processing tasks to restore aggregate variables in pre-processing step.
-        This is called after the model has been solved.
-        """
-        more_than_one_region = len(self._params["regions"]) > 1
-        if more_than_one_region:
-            TransformationFactory("contrib.aggregate_vars").update_variables(
-                concrete_model
             )
