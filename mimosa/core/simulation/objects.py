@@ -106,6 +106,7 @@ class SimVar:
 
 
 class SimulationObjectModel:
+
     def __init__(self, concrete_model):
         # Recreate all variables and
         self.all_vars = []
@@ -118,16 +119,32 @@ class SimulationObjectModel:
                 else:
                     setattr(self, var.name, var.value)
         # Recreate all sets
+        self.index_sets = []
         for index_set in concrete_model.component_objects(Set):
             if not index_set.name.startswith("_"):
-                setattr(self, index_set.name + "_names", index_set.ordered_data())
-                setattr(
-                    self,
-                    index_set.name,
-                    list(range(len(index_set.ordered_data()))),
-                )
+                self.index_sets.append(index_set.name)
+                index_set_names = index_set.ordered_data()
+                index_set_numpy_index = list(range(len(index_set_names)))
+                setattr(self, index_set.name + "_names", index_set_names)
+                setattr(self, index_set.name + "_numpy_index", index_set_numpy_index)
+        # By default, use numpy indices as sets:
+        self.set_index_numpy_index()
         # Add custom elements
         self.year = concrete_model.year
+
+    def set_index_numpy_index(self):
+        """
+        Sets the index sets (m.t, m.regions, ...) to numpy indices (0, 1, 2...)
+        """
+        for index_set in self.index_sets:
+            setattr(self, index_set, getattr(self, index_set + "_numpy_index"))
+
+    def set_index_names(self):
+        """
+        Sets the index sets (m.t, m.regions, ...) to their original names ('CAN', 'USA', ...)
+        """
+        for index_set in self.index_sets:
+            setattr(self, index_set, getattr(self, index_set + "_names"))
 
     def all_vars_for_export(self):
         return [SimulationUsefulVar(self, name) for name in self.all_vars]

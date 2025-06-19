@@ -22,10 +22,10 @@ class Preprocessor:
 
     concrete_model: ConcreteModel
     equations: list
+    parser_tree: dict
     _abstract_model: AbstractModel
     _data_store: data.DataStore
     _regional_param_store: regional_params.RegionalParamStore
-    _parser_tree: dict
 
     def __init__(self, params):
         self._params = params
@@ -69,7 +69,7 @@ class Preprocessor:
 
         # Save parsed params and parser tree
         self._params = params
-        self._parser_tree = parser_tree
+        self.parser_tree = parser_tree
 
     def _create_abstract_model(self) -> AbstractModel:
         """
@@ -100,7 +100,7 @@ class Preprocessor:
             tuple: (data_store, regional_param_store)
         """
         regional_param_store = regional_params.RegionalParamStore(
-            self._params, self._parser_tree
+            self._params, self.parser_tree
         )
         data_store = data.DataStore(self._params)
 

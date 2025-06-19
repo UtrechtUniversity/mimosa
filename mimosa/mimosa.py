@@ -15,10 +15,11 @@ from mimosa.common import (
 )
 from mimosa.export import save_output_pyomo, save_output  # , visualise_ipopt_output
 from mimosa.components.after_initialisation import avoided_damages
-from mimosa import simulation
+from mimosa.core import simulation
 
 from mimosa.core.initializer import Preprocessor
 from mimosa.core.solver import Solver
+from mimosa.core.simulation import Simulator
 
 
 class MIMOSA:
@@ -48,14 +49,13 @@ class MIMOSA:
         # Check if input parameter dictionary is valid
         self.preprocessor = Preprocessor(params)
         self.solver = Solver()
+        self.simulator = Simulator()
 
         self.build_model()
 
         self.status = None  # Not started yet
         self.last_saved_filename = None  # Nothing saved yes
 
-        self.equations_sorted = None  # Not created yet
-        self.equations_graph = None  # Not created yet
         self.nopolicy_baseline = None
         if prerun:
             # Check if simulation mode is possible. If yes, perform a pre-run
@@ -64,7 +64,6 @@ class MIMOSA:
                 self.prepare_simulation()
                 self.prerun_simulation()
                 self.run_nopolicy_baseline()
-                self._add_extra_avoided_damages_constraints()
             except simulation.CircularDependencyError as e:
                 logger.warning(
                     "Model will not be pre-ran with best guess simulation run: %s",
@@ -81,68 +80,40 @@ class MIMOSA:
         )
 
     def prepare_simulation(self):
-        """Prepares the model for simulation mode: it gathers all the equations,
+        """
+        Prepares the model for simulation mode: it gathers all the equations,
         checks for circular dependencies, and sorts the equations based on their
-        dependencies."""
+        dependencies.
 
-        # Check the dependencies between variables and equations to test
-        # if there are circular dependencies. If there are, it is not possible
-        # to run in simulation mode.
-        equations_dict = {eq.name: eq for eq in self.equations}
-        simulation.calc_dependencies(equations_dict, self.concrete_model)
-        # Perform topological sort of equations based on dependencies
-        self.equations_sorted, self.equations_graph = simulation.sort_equations(
-            equations_dict, return_graph=True
-        )
+        Note: run self.simulator.plot_dependency_graph() to visualise the dependencies
+        between equations.
+        """
+        self.simulator.prepare_simulation(self.equations, self.concrete_model)
 
     @utils.timer("Prerunning the model in simulation mode")
-    def prerun_simulation(
-        self,
-        save_simulation=False,
-        filename="run1_prerun_guess",
-    ) -> None:
+    def prerun_simulation(self):
+        """Runs a pre-run simulation to get a good initial guess for the optimisation."""
 
-        sim_m_best_guess = simulation.find_prerun_bestguess(
-            self.concrete_model, self.equations_sorted
-        )
+        sim_m_best_guess = self.simulator.find_prerun_bestguess()
+
         # Set the best guess as initial values for the concrete model
-        simulation.initialize_pyomo_model(self.concrete_model, sim_m_best_guess)
-
-        # Save the best guess to a file
-        if save_simulation:
-            save_output(
-                sim_m_best_guess.all_vars_for_export(),
-                self.params,
-                sim_m_best_guess,
-                f"{filename}_simulation_prerun",
-            )
+        self.simulator.initialize_pyomo_model(self.concrete_model, sim_m_best_guess)
 
     @utils.timer("Calculating no-policy baseline in simulation mode")
     def run_nopolicy_baseline(self):
+        """Runs the no-policy baseline simulation with relative abatement set to 0."""
 
+        # Run simulator with default relative abatement set to 0
+        self.nopolicy_baseline = self.simulator.run()
+
+        # Store the no-policy baseline damage costs in the concrete model
         m = self.concrete_model
-        self.nopolicy_baseline = simulation.run_nopolicy_baseline(
-            m, self.equations_sorted
-        )
-
-    def _add_extra_avoided_damages_constraints(self):
-
-        m = self.concrete_model
-        constraints = avoided_damages.get_constraints(m)
-        for constraint in constraints:
+        for constraint in avoided_damages.get_constraints(m):
             add_constraint(m, constraint.to_pyomo_constraint(m), constraint.name)
 
         m.nopolicy_damage_costs.store_values(
             self.nopolicy_baseline.damage_costs.get_all_indexed()
         )
-
-    def plot_dependency_graph(self):
-        """Plots the dependency graph of the equations."""
-        if self.equations_graph is None:
-            raise ValueError(
-                "Dependency graph not created yet. Call prepare_simulation() first."
-            )
-        return simulation.plot_dependency_graph(self.equations_graph)
 
     @utils.timer("Model solve", True)
     def solve(self, verbose=True, use_neos=False, **kwargs) -> None:
@@ -158,6 +129,7 @@ class MIMOSA:
             results = self.solver.solve_ipopt(
                 self.concrete_model, verbose=verbose, **kwargs
             )
+        self.status = results.solver.status
 
         self.preprocessor.postprocess(self.concrete_model)
 
