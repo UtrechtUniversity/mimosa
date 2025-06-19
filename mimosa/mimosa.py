@@ -32,18 +32,14 @@ class MIMOSA:
         prerun (bool): if True, runs a pre-run simulation to get a good initial guess for the optimisation.
 
     Attributes:
-        params (dict)
-        regions (dict): taken from params
-        abstract_model (AbstractModel): the AbstractModel created using the chosen damage/objective modules
+        concrete_model (ConcreteModel): initialised Pyomo model
         equations (list): list of equations (not constraints) used for simulation mode
-        data_store (DataStore): object used to access regional data from the input database
-        m (ConcreteModel): concrete instance of `abstract_model`
 
     """
 
-    params: dict
     concrete_model: ConcreteModel
     equations: list
+    _params: dict
 
     def __init__(self, params: dict, prerun=True):
         # Check if input parameter dictionary is valid
@@ -74,7 +70,7 @@ class MIMOSA:
         """
         Checks parameters for validity, creates the model and initializes it with data.
         """
-        self.concrete_model, self.params, self.equations = (
+        self.concrete_model, self._params, self.equations = (
             self.preprocessor.build_model()
         )
 
@@ -151,7 +147,7 @@ class MIMOSA:
             model.save("run1")
         """
         self.last_saved_filename = filename
-        save_output_pyomo(self.params, self.concrete_model, filename, **kwargs)
+        save_output_pyomo(self._params, self.concrete_model, filename, **kwargs)
 
     def save_simulation(self, simulation_obj, filename, **kwargs):
         """
@@ -168,8 +164,17 @@ class MIMOSA:
         """
         save_output(
             simulation_obj.all_vars_for_export(),
-            self.params,
+            self._params,
             simulation_obj,
             filename,
             **kwargs
         )
+
+    @property
+    def params(self):
+        """
+        Returns the parsed parameters used to create the model.
+
+        Note that the params cannot be changed after the model has been created.
+        """
+        return self._params

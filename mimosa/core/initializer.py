@@ -30,7 +30,7 @@ class Preprocessor:
     def __init__(self, params):
         self._params = params
 
-    def build_model(self, params=None):
+    def build_model(self):
         """
         Creates the MIMOSA concrete_model based on the provided parameters.
         This method performs the following steps:
@@ -42,8 +42,6 @@ class Preprocessor:
         Returns:
             ConcreteModel: The instantiated model ready for simulation.
         """
-        if params is not None:
-            self._params = params
         self._check_and_parse_params()
         self._abstract_model, self.equations = self._create_abstract_model()
         self._data_store, self._regional_param_store = self._load_data()
