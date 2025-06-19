@@ -1,6 +1,6 @@
 ## How to build pip package
 
-1. Update setup.py to latest version number
+1. Update setup.py to latest version number. Also make sure this is reflected in mimosa/__init__.py
 2. `pip install --upgrade build`
 3. `python -m build`
 4. `pip install --upgrade twine`

@@ -8,7 +8,7 @@ with open("LICENSE") as fh:
 
 setup(
     name="mimosa",
-    version="0.1.9",
+    version="0.2.0",
     author="Kaj-Ivar van der Wijst",
     author_email="k.vanderwijst@uu.nl",
     packages=["mimosa"],
