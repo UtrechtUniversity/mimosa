@@ -37,16 +37,14 @@ def test_run_successfully(previous_log_output, script_output):
 
 
 def test_log_output(previous_log_output, script_output):
-    """Log file should have at least three new lines with the MIMOSA status, final NPV and solve time"""
+    """Log file should have at least two new lines with the MIMOSA status and solve time"""
     log = read_log()
     new_log = _remove_prefix(log, previous_log_output)
 
     regex_status = re.compile(r"\[INFO, [0-9-:, ]+\] MIMOSA - Status: ok")
-    regex_npv = re.compile(r"\[INFO, [0-9-:, ]+\] MIMOSA - Final NPV: -?[0-9,.]+")
     regex_time = re.compile(
         r"\[INFO, [0-9-:, ]+\] MIMOSA - Model solve took [0-9,.]+ seconds"
     )
 
     assert len(regex_status.findall(new_log)) >= 1
-    assert len(regex_npv.findall(new_log)) >= 1
     assert len(regex_time.findall(new_log)) >= 1

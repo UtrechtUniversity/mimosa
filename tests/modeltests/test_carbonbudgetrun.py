@@ -24,7 +24,7 @@ def test_cumulative_emissions_carbon_budget(script_output):
 
     param_carbonbudget = quant(
         model.params["emissions"]["carbonbudget"],
-        model.param_parser_tree["emissions"]["carbonbudget"].unit,
+        model.preprocessor.parser_tree["emissions"]["carbonbudget"].unit,
     )
 
     cum_emissions = output_df_ind.loc[("cumulative_emissions", "Global")]
