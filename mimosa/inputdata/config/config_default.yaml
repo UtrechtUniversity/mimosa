@@ -159,6 +159,50 @@ economics:
         - kappa_rel_abatement_0.75_2100
       default: kappa_rel_abatement_0.75_2050
 
+    SSP_calibration_factor:
+      SSP2: &SSP_calibration_factor_default
+        descr: >-
+          Dictionary of year-value pairs giving time dependent multiplication
+          factor of the SSP2 MAC. Linear interpolation is taken in between keyframes.
+          Used for time-dependent changes between SSPs.
+        type: dict
+        keys:
+          descr: Year
+          type: float
+          min: 1900
+          max: 2200
+        values:
+          descr: >-
+            Multiplication factor for the MAC
+          type: float
+          min: 0
+          max: 10
+        default:
+          2020: 1
+      SSP1:
+        <<: *SSP_calibration_factor_default
+        default:
+          2020: 1
+          2100: 0.618
+      SSP3:
+        <<: *SSP_calibration_factor_default
+        default:
+          2020: 1
+          2050: 1.265
+          2100: 1.3184
+      SSP4:
+        <<: *SSP_calibration_factor_default
+        default:
+          2020: 1
+      SSP5:
+        <<: *SSP_calibration_factor_default
+        default:
+          2020: 1
+          2030: 1.0724
+          2040: 1.16
+          2050: 1.17
+          2100: 1.198
+
     rel_mitigation_costs_min_level:
       descr: >-
         Minimum level of mitigation costs (rel to GDP). By default, this is 0:

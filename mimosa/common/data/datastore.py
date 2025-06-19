@@ -117,6 +117,9 @@ class DataStore:
         values = self._data_values[variable][region]
         return np.interp(year, values.xvalues, values.yvalues)
 
+    def interp_data_from_dict(self, year, keyframes: dict):
+        return np.interp(year, list(keyframes.keys()), list(keyframes.values()))
+
     def __repr__(self):
         return "DataStore with data values {} calculated on the years {}-{} for the regions {} and {}".format(
             list(self._data_values.keys()),

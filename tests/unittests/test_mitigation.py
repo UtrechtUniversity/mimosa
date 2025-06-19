@@ -15,6 +15,7 @@ class MockAbstractModel:
 def m():
     model = MockAbstractModel()
     model.MAC_scaling_factor = {r: 1 for r in model.regions}
+    model.MAC_SSP_calibration_factor = {t: 1 for t in model.t}
     model.MAC_gamma = 100
     model.MAC_beta = 3
     return model

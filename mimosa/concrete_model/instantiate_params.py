@@ -118,8 +118,16 @@ class InstantiatedModel:
             "year2100": V(year2100),
             "regions": V(params["regions"].keys()),
         }
-
         parameter_mapping.update(parameter_mapping_manual)
+
+        # Set time-dependent MAC calibration factor, depending on the SSP:
+        parameter_mapping["MAC_SSP_calibration_factor"] = {
+            t: self.data_store.interp_data_from_dict(
+                self.abstract_model.year(t),
+                params["economics"]["MAC"]["SSP_calibration_factor"][params["SSP"]],
+            )
+            for t in range(num_years)
+        }
 
         if "custom_mapping" in params["simulation"]:
             parameter_mapping.update(params["simulation"]["custom_mapping"])
