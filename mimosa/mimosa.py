@@ -51,6 +51,7 @@ class MIMOSA:
 
         self.status = None  # Not started yet
         self.last_saved_filename = None  # Nothing saved yes
+        self.last_saved_simulation_filename = None  # Nothing saved yes
 
         if prerun:
             # Check if simulation mode is possible. If yes, perform a pre-run
@@ -175,6 +176,7 @@ class MIMOSA:
             simulation = model.run_nopolicy_baseline()
             model.save_simulation(simulation, "nopolicy_baseline")
         """
+        self.last_saved_simulation_filename = filename
         save_output(
             simulation_obj.all_vars_for_export(),
             self._params,

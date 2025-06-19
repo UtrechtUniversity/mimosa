@@ -4,6 +4,7 @@ import pandas as pd
 
 from mimosa.common.utils import MimosaSolverWarning
 from mimosa.common import SolverStatus
+from mimosa.core.simulation import SimulationObjectModel
 
 
 def exec_run(filename):
@@ -13,12 +14,16 @@ def exec_run(filename):
     return _globals
 
 
-def read_output(model=None, filename=None):
+def read_output(model=None, filename=None, simulation=False):
     if model is None and filename is None:
         raise ValueError("Either model or filename must be provided.")
 
     if model is not None:
-        filename = model.last_saved_filename
+        filename = (
+            model.last_saved_simulation_filename
+            if simulation
+            else model.last_saved_filename
+        )
         assert filename is not None
 
     # Read output file
