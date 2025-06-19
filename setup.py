@@ -17,6 +17,14 @@ setup(
     description="MIMOSA: Integrated Assessment Model for Cost-Benefit Analysis",
     long_description=description,
     long_description_content_type="text/markdown",
-    install_requires=["numpy<2.0", "pandas", "pyomo<=6.7.1", "pint", "pyyaml", "scipy"],
+    install_requires=[
+        "numpy<2.0",
+        "pandas",
+        "pyomo<=6.7.1",
+        "pint",
+        "pyyaml",
+        "scipy",
+        "networkx",
+    ],
     include_package_data=True,
 )

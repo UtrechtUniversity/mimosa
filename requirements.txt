@@ -4,6 +4,7 @@ pyomo
 pint
 pyyaml
 scipy
+networkx
 
 # For documentation:
 # mkdocs
