@@ -9,13 +9,13 @@ from mimosa.common import (
     Param,
     Var,
     GeneralConstraint,
-    RegionalConstraint,
+    RegionalEquation,
+    GlobalEquation,
     value,
     soft_max,
     Any,
     exp,
     quant,
-    GlobalConstraint,
 )
 
 
@@ -43,28 +43,27 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     """
     constraints = []
 
-    m.damage_costs = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP")) 
+    m.damage_costs = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
     m.damage_scale_factor = Param(doc="::economics.damages.scale factor")
     m.damage_relative_global = Var(
         m.t,
         units=quant.unit("fraction_of_GDP"),
     )
     # Total damages are sum of non-SLR and SLR damages
-    constraints.append(
-        RegionalConstraint(
-            lambda m, t, r: m.damage_costs[t, r]
-            == m.damage_costs_non_slr[t, r] + m.damage_costs_slr[t, r],
-            "damage_costs",
-        ),
-    )
-
-    # Absolute global damages
-    constraints.append(
-        GlobalConstraint(
-            lambda m, t: m.damage_relative_global[t]
-            == (sum(m.damage_costs[t, r] * m.GDP_gross[t, r] for r in m.regions) / m.global_GDP_gross[t]),
-            "damage_relative_global",
-        )
+    constraints.extend(
+        [
+            RegionalEquation(
+                m.damage_costs,
+                lambda m, t, r: m.damage_costs_non_slr[t, r] + m.damage_costs_slr[t, r],
+            ),
+            GlobalEquation(
+                m.damage_relative_global,
+                lambda m, t: (
+                    sum(m.damage_costs[t, r] * m.GDP_gross[t, r] for r in m.regions)
+                    / m.global_GDP_gross[t]
+                ),
+            ),
+        ]
     )
 
     # Get constraints for temperature dependent damages
@@ -135,11 +134,12 @@ def _get_constraints_temperature_dependent(
     # Quadratic damage function for non-SLR damages. Factor `a` represents
     # the damage quantile
     constraints.append(
-        RegionalConstraint(
-            lambda m, t, r: m.damage_costs_non_slr[t, r]
-            == m.damage_scale_factor
-            * damage_fct(m.temperature[t] - 0.6, m.T0 - 0.6, m, r, is_slr=False),
-            "damage_costs_non_slr",
+        RegionalEquation(
+            m.damage_costs_non_slr,
+            lambda m, t, r: (
+                m.damage_scale_factor
+                * damage_fct(m.temperature[t] - 0.6, m.T0 - 0.6, m, r, is_slr=False)
+            ),
         )
     )
 
@@ -237,11 +237,12 @@ def _get_constraints_slr(m: AbstractModel) -> Sequence[GeneralConstraint]:
 
     # Linear damage function for SLR damages, including adaptation costs
     constraints.append(
-        RegionalConstraint(
-            lambda m, t, r: m.damage_costs_slr[t, r]
-            == m.damage_scale_factor
-            * damage_fct(m.total_SLR[t], m.total_SLR[0], m, r, is_slr=True),
-            "damage_costs_slr",
+        RegionalEquation(
+            m.damage_costs_slr,
+            lambda m, t, r: (
+                m.damage_scale_factor
+                * damage_fct(m.total_SLR[t], m.total_SLR[0], m, r, is_slr=True)
+            ),
         )
     )
 

@@ -9,14 +9,12 @@ from mimosa.common import (
     Param,
     Var,
     GeneralConstraint,
-    RegionalConstraint,
-    RegionalInitConstraint,
-    Constraint,
+    RegionalEquation,
+    GlobalEquation,
     value,
     soft_min,
     economics,
     quant,
-    GlobalConstraint,
 )
 
 
@@ -130,65 +128,51 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     # Cobb-Douglas, GDP, investments, capital and consumption
     constraints.extend(
         [
-            RegionalConstraint(
+            RegionalEquation(
+                m.capital_stock,
                 lambda m, t, r: (
-                    m.GDP_gross[t, r]
-                    == economics.calc_GDP(
+                    m.capital_stock[t - 1, r]
+                    + m.dt
+                    * economics.calc_dKdt(
+                        m.capital_stock[t - 1, r], m.dk, m.investments[t - 1, r], m.dt
+                    )
+                    if t > 0
+                    else m.init_capitalstock_factor[r] * m.baseline_GDP[0, r]
+                ),
+            ),
+            RegionalEquation(
+                m.GDP_gross,
+                lambda m, t, r: (
+                    economics.calc_GDP(
                         m.TFP[t, r],
                         m.population[t, r],
                         soft_min(m.capital_stock[t, r], scale=10),
                         m.alpha,
                     )
                     if t > 0
-                    else Constraint.Skip
+                    else m.baseline_GDP[0, r]
                 ),
-                "GDP_gross",
             ),
-            RegionalInitConstraint(
-                lambda m, r: m.GDP_gross[0, r] == m.baseline_GDP[0, r], "GDP_gross_init"
+            GlobalEquation(
+                m.global_GDP_gross,
+                lambda m, t: sum(m.GDP_gross[t, r] for r in m.regions),
             ),
-            GlobalConstraint(
-                lambda m, t: (
-                    m.global_GDP_gross[t]
-                    == sum(m.GDP_gross[t, r] for r in m.regions)
-                ),
-                "global_GDP_gross",
-            ),
-
-            RegionalConstraint(
-                lambda m, t, r: m.GDP_net[t, r]
-                == m.GDP_gross[t, r]
-                * (1 - (m.damage_costs[t, r] if not value(m.ignore_damages) else 0))
-                - m.mitigation_costs[t, r]
-                - m.financial_transfer[t, r],
-                "GDP_net",
-            ),
-            RegionalConstraint(
-                lambda m, t, r: m.investments[t, r] == m.sr * m.GDP_net[t, r],
-                "investments",
-            ),
-            RegionalConstraint(
-                lambda m, t, r: m.consumption[t, r] == (1 - m.sr) * m.GDP_net[t, r],
-                "consumption",
-            ),
-            RegionalConstraint(
+            RegionalEquation(
+                m.GDP_net,
                 lambda m, t, r: (
-                    (
-                        m.capital_stock[t, r]
-                        == m.capital_stock[t - 1, r]
-                        + m.dt
-                        * economics.calc_dKdt(
-                            m.capital_stock[t, r], m.dk, m.investments[t, r], m.dt
-                        )
-                    )
-                    if t > 0
-                    else Constraint.Skip
+                    m.GDP_gross[t, r]
+                    * (1 - (m.damage_costs[t, r] if not value(m.ignore_damages) else 0))
+                    - m.mitigation_costs[t, r]
+                    - m.financial_transfer[t, r]
                 ),
-                "capital_stock",
             ),
-            RegionalInitConstraint(
-                lambda m, r: m.capital_stock[0, r]
-                == m.init_capitalstock_factor[r] * m.baseline_GDP[0, r]
+            RegionalEquation(
+                m.investments,
+                lambda m, t, r: (m.sr * m.GDP_net[t, r]),
+            ),
+            RegionalEquation(
+                m.consumption,
+                lambda m, t, r: ((1 - m.sr) * m.GDP_net[t, r]),
             ),
         ]
     )

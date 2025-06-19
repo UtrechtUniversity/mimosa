@@ -4,7 +4,7 @@ Damage and adaptation costs
 """
 
 from typing import Sequence
-from mimosa.common import AbstractModel, Var, GeneralConstraint, RegionalConstraint
+from mimosa.common import AbstractModel, Var, GeneralConstraint, RegionalEquation
 
 
 def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
@@ -25,12 +25,6 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     constraints = []
 
     m.damage_costs = Var(m.t, m.regions, initialize=0.0)
-    constraints.extend(
-        [
-            RegionalConstraint(
-                lambda m, t, r: m.damage_costs[t, r] == 0.0, "zero_damage_costs"
-            )
-        ]
-    )
+    constraints.extend([RegionalEquation(m.damage_costs, lambda m, t, r: 0.0)])
 
     return constraints

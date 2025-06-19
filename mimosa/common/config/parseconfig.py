@@ -72,11 +72,15 @@ def check_obsolete_params(user_yaml, parsed_params, parser_tree):
     # Check keys which are in user config, but not in parsed file
     # These are obsolete/unused/misspelled parameters
     num_obsolete = 0
+    obsolete_params = []
     for key in set(keys_user) - set(keys_parsed):
         num_obsolete += 1
-        print(f"Obsolete key: {key}")
+        obsolete_params.append(key)
     if num_obsolete > 0:
-        raise RuntimeWarning("Some config parameters are obsolete.")
+        raise RuntimeWarning(
+            "Some config parameters are obsolete or misspelled:\n"
+            + "\n".join(obsolete_params)
+        )
 
 
 def load_default_yaml():

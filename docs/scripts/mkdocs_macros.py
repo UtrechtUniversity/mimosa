@@ -13,7 +13,7 @@ import mimosa.components
 params = load_params()
 model = MIMOSA(params)
 
-all_constraints = list(model.abstract_model.component_objects(Constraint))
+all_constraints = list(model.concrete_model.component_objects(Constraint))
 
 components = []
 

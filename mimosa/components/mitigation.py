@@ -12,6 +12,8 @@ from mimosa.common import (
     GlobalConstraint,
     RegionalConstraint,
     RegionalInitConstraint,
+    RegionalEquation,
+    GlobalEquation,
     Constraint,
     log,
     soft_min,
@@ -201,13 +203,11 @@ def _get_mac_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     )
     constraints.extend(
         [
-            RegionalConstraint(
-                lambda m, t, r: m.carbonprice[t, r]
-                == MAC(m.relative_abatement[t, r], m, t, r),
-                "carbonprice",
-            ),
-            RegionalInitConstraint(
-                lambda m, r: m.carbonprice[0, r] == 0, "init_carbon_price"
+            RegionalEquation(
+                m.carbonprice,
+                lambda m, t, r: (
+                    MAC(m.relative_abatement[t, r], m, t, r) if t > 0 else 0
+                ),
             ),
         ]
     )
@@ -234,24 +234,23 @@ def _get_mac_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     )
     constraints.extend(
         [
-            RegionalConstraint(
-                lambda m, t, r: (m.mitigation_costs[t, r])
-                == AC(m.relative_abatement[t, r], m, t, r) * m.baseline[t, r]
-                + m.import_export_mitigation_cost_balance[t, r],
-                "mitigation_costs",
+            RegionalEquation(
+                m.mitigation_costs,
+                lambda m, t, r: (
+                    AC(m.relative_abatement[t, r], m, t, r) * m.baseline[t, r]
+                    + m.import_export_mitigation_cost_balance[t, r]
+                ),
             ),
             # Extra (dummy) constraint for the variable area_under_MAC, which is the same as the mitigation costs
             # when no emission trading is enabled
-            RegionalConstraint(
-                lambda m, t, r: m.area_under_MAC[t, r]
-                == AC(m.relative_abatement[t, r], m, t, r) * m.baseline[t, r],
-                "area_under_MAC",
+            RegionalEquation(
+                m.area_under_MAC,
+                lambda m, t, r: AC(m.relative_abatement[t, r], m, t, r)
+                * m.baseline[t, r],
             ),
-            RegionalConstraint(
-                lambda m, t, r: m.rel_mitigation_costs[t, r]
-                == m.mitigation_costs[t, r] / m.GDP_gross[t, r],
-                "rel_mitigation_costs",
-                doc="$$ \\text{rel_mitigation_costs}_{t,r} = \\frac{\\text{mitigation_costs}_{t,r}}{\\text{GDP_gross}_{t,r}} $$",
+            RegionalEquation(
+                m.rel_mitigation_costs,
+                lambda m, t, r: m.mitigation_costs[t, r] / m.GDP_gross[t, r],
             ),
             RegionalConstraint(
                 lambda m, t, r: m.rel_mitigation_costs[t, r]
@@ -265,12 +264,13 @@ def _get_mac_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     m.global_rel_mitigation_costs = Var(m.t, units=quant.unit("fraction_of_GDP"))
     constraints.extend(
         [
-            GlobalConstraint(
-                lambda m, t: m.global_rel_mitigation_costs[t]
-                == sum(m.mitigation_costs[t, r] for r in m.regions)
-                / m.global_GDP_gross[t],
-                "global_rel_mitigation_costs",
-            )
+            GlobalEquation(
+                m.global_rel_mitigation_costs,
+                lambda m, t: (
+                    sum(m.mitigation_costs[t, r] for r in m.regions)
+                    / m.global_GDP_gross[t]
+                ),
+            ),
         ]
     )
 
@@ -285,27 +285,25 @@ def _get_mac_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     )
     constraints.extend(
         [
-            GlobalConstraint(
+            GlobalEquation(
+                m.global_cost_per_emission_reduction_unit,
                 lambda m, t: (
-                    m.global_emission_reduction_per_cost_unit[t]
-                    == sum(m.regional_emission_reduction[t, r] for r in m.regions)
-                    / soft_min(sum(m.mitigation_costs[t, r] for r in m.regions))
-                    if t > 0
-                    else Constraint.Skip
-                ),
-                "global_emission_reduction_per_cost_unit",
-            ),
-            GlobalConstraint(
-                lambda m, t: (
-                    m.global_cost_per_emission_reduction_unit[t]
-                    == sum(m.mitigation_costs[t, r] for r in m.regions)
+                    sum(m.mitigation_costs[t, r] for r in m.regions)
                     / soft_min(
                         sum(m.regional_emission_reduction[t, r] for r in m.regions)
                     )
                     if t > 0
-                    else Constraint.Skip
+                    else 0
                 ),
-                "global_cost_per_emission_reduction_unit",
+            ),
+            GlobalEquation(
+                m.global_emission_reduction_per_cost_unit,
+                lambda m, t: (
+                    sum(m.regional_emission_reduction[t, r] for r in m.regions)
+                    / soft_min(sum(m.mitigation_costs[t, r] for r in m.regions))
+                    if t > 0
+                    else 0
+                ),
             ),
         ]
     )
@@ -372,15 +370,21 @@ def _get_learning_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     m.LBD_scaling = Param(doc="::economics.MAC.LBD_scaling")
     m.LBD_factor = Var(m.t)  # , bounds=(0,1), initialize=1)
     constraints.append(
-        GlobalConstraint(
-            lambda m, t: m.LBD_factor[t]
-            == soft_min(
-                (m.cumulative_global_baseline_emissions[t] - m.cumulative_emissions[t])
-                / m.LBD_scaling
-                + 1.0
-            )
-            ** m.log_LBD_rate,
-            name="LBD",
+        GlobalEquation(
+            m.LBD_factor,
+            lambda m, t: (
+                soft_min(
+                    (
+                        m.cumulative_global_baseline_emissions[t - 1]
+                        - m.cumulative_emissions[t - 1]  # Now changed to t-1, check
+                    )
+                    / m.LBD_scaling
+                    + 1.0
+                )
+                ** m.log_LBD_rate
+                if t > 0
+                else 1.0
+            ),
         )
     )
 
@@ -390,13 +394,13 @@ def _get_learning_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     m.learning_factor = Var(m.t)
     constraints.extend(
         [
-            GlobalConstraint(
-                lambda m, t: m.LOT_factor[t] == 1 / (1 + m.LOT_rate) ** t, "LOT"
+            GlobalEquation(
+                m.LOT_factor,
+                lambda m, t: (1 / (1 + m.LOT_rate) ** t),
             ),
-            GlobalConstraint(
-                lambda m, t: m.learning_factor[t]
-                == (m.LBD_factor[t] * m.LOT_factor[t]),
-                "learning",
+            GlobalEquation(
+                m.learning_factor,
+                lambda m, t: (m.LBD_factor[t] * m.LOT_factor[t]),
             ),
         ]
     )

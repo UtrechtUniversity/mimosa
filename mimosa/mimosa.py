@@ -7,28 +7,19 @@ it creates an `instance` of the AbstractModel. This is then sent to the solver.
 Finally, the export functions are called here.
 """
 
-import os
-import warnings
-
 from mimosa.common import (
-    AbstractModel,
-    ConcreteModel,
-    TransformationFactory,
-    SolverFactory,
-    SolverManagerFactory,
-    SolverStatus,
-    value,
-    OptSolver,
-    data,
-    regional_params,
     utils,
     logger,
+    add_constraint,
+    ConcreteModel,
 )
-from mimosa.common.config.parseconfig import check_params, parse_param_values
-from mimosa.export import save_output  # , visualise_ipopt_output
-from mimosa.abstract_model import create_abstract_model
-from mimosa.concrete_model.instantiate_params import InstantiatedModel
-from mimosa.concrete_model import simulation_mode
+from mimosa.export import save_output_pyomo, save_output  # , visualise_ipopt_output
+from mimosa.components.after_initialisation import avoided_damages
+from mimosa.core import simulation
+
+from mimosa.core.initializer import Preprocessor
+from mimosa.core.solver import Solver
+from mimosa.core.simulation import Simulator
 
 
 class MIMOSA:
@@ -38,195 +29,165 @@ class MIMOSA:
 
     Args:
         params (dict): contains all Param values, and is based on `input/config.yaml`
+        prerun (bool): if True, runs a pre-run simulation to get a good initial guess for the optimisation.
 
     Attributes:
-        params (dict)
-        regions (dict): taken from params
-        abstract_model (AbstractModel): the AbstractModel created using the chosen damage/objective modules
-        data_store (DataStore): object used to access regional data from the input database
-        m (ConcreteModel): concrete instance of `abstract_model`
+        concrete_model (ConcreteModel): initialised Pyomo model
+        equations (list): list of equations (not constraints) used for simulation mode
 
     """
 
-    def __init__(self, params: dict):
-        # Check if input parameter dictionary is valid
-        params, parser_tree = check_params(params, True)
-        params = parse_param_values(params)
-        self.params = params
-        self.param_parser_tree = parser_tree
-        self.regions = params["regions"]
+    concrete_model: ConcreteModel
+    equations: list
+    _params: dict
 
-        self.abstract_model = self.get_abstract_model()
-        self.concrete_model = self.create_instance()
+    def __init__(self, params: dict, prerun=True):
+        # Check if input parameter dictionary is valid
+        self.preprocessor = Preprocessor(params)
+        self.solver = Solver()
+        self.simulator = Simulator()
+
+        self.build_model()
+
         self.status = None  # Not started yet
         self.last_saved_filename = None  # Nothing saved yes
-        self.preprocessing()
+        self.last_saved_simulation_filename = None  # Nothing saved yes
 
-    def get_abstract_model(self) -> AbstractModel:
-        """
-        Returns:
-            AbstractModel: model corresponding to the damage/objective module combination
-        """
-        damage_module = self.params["model"]["damage module"]
-        emissiontrade_module = self.params["model"]["emissiontrade module"]
-        financialtransfer_module = self.params["model"]["financialtransfer module"]
-        welfare_module = self.params["model"]["welfare module"]
-        objective_module = self.params["model"]["objective module"]
+        if prerun:
+            # Check if simulation mode is possible. If yes, perform a pre-run
+            # simulation to get a good initial guess for the optimisation.
+            try:
+                self.prepare_simulation()
+                self.prerun_simulation()
+                self.run_nopolicy_baseline()
+            except simulation.CircularDependencyError as e:
+                logger.warning(
+                    "Model will not be pre-ran with best guess simulation run: %s",
+                    str(e),
+                )
 
-        return create_abstract_model(
-            damage_module,
-            emissiontrade_module,
-            financialtransfer_module,
-            welfare_module,
-            objective_module,
+    @utils.timer("Model creation")
+    def build_model(self):
+        """
+        Checks parameters for validity, creates the model and initializes it with data.
+        """
+        self.concrete_model, self._params, self.equations = (
+            self.preprocessor.build_model()
         )
 
-    @utils.timer("Concrete model creation")
-    def create_instance(self) -> ConcreteModel:
+    def prepare_simulation(self):
         """
-        Creates the objects necessary for the concrete model:
-          - Regional parameter store
-          - Data store
-        Using these, it transforms the AbstractModel into a ConcreteModel
+        Prepares the model for simulation mode: it gathers all the equations,
+        checks for circular dependencies, and sorts the equations based on their
+        dependencies.
 
-        Returns:
-            ConcreteModel: model instantiated with parameter values and data functions
+        Note: run self.simulator.plot_dependency_graph() to visualise the dependencies
+        between equations.
         """
+        self.simulator.prepare_simulation(self.equations, self.concrete_model)
 
-        # Create the regional parameter store
-        self.regional_param_store = regional_params.RegionalParamStore(
-            self.params, self.param_parser_tree
-        )
+        # Set a flag to indicate that extra constraints have not been added yet
+        self._extra_constraints_added = False
 
-        # Create the data store
-        self.data_store = data.DataStore(self.params)
+    @utils.timer("Prerunning the model in simulation mode")
+    def prerun_simulation(self):
+        """Runs a pre-run simulation to get a good initial guess for the optimisation."""
 
-        # Using these help objects, create the instantiated model
-        instantiated_model = InstantiatedModel(
-            self.abstract_model, self.regional_param_store, self.data_store
-        )
-        m = instantiated_model.concrete_model
+        sim_m_best_guess = self.simulator.find_prerun_bestguess()
 
-        # When using simulation mode, add extra constraints to variables and disable other constraints
-        if (
-            self.params.get("simulation") is not None
-            and self.params["simulation"]["simulationmode"]
-        ):
-            simulation_mode.set_simulation_mode(m, self.params)
+        # Set the best guess as initial values for the concrete model
+        self.simulator.initialize_pyomo_model(self.concrete_model, sim_m_best_guess)
 
-        return m
-
-    def preprocessing(self) -> None:
+    def run_simulation(self, relative_abatement=None):
         """
-        Pyomo can apply certain pre-processing steps before sending the model
-        to the solver. These include:
-          - Aggregate variables that are linked by equality constraints
-          - Initialise non-fixed variables to midpoint of their boundaries
-          - Fix variables that are de-facto fixed
-          - Propagate variable fixing for equalities of type x = y
-        """
+        Runs MIMOSA as simulation.
 
-        if len(self.regions) > 1:
-            TransformationFactory("contrib.aggregate_vars").apply_to(
-                self.concrete_model
-            )
-        TransformationFactory("contrib.init_vars_midpoint").apply_to(
-            self.concrete_model
-        )
-        TransformationFactory("contrib.detect_fixed_vars").apply_to(self.concrete_model)
-        if len(self.regions) > 1:
-            TransformationFactory("contrib.propagate_fixed_vars").apply_to(
-                self.concrete_model
-            )
-
-    def postprocessing(self) -> None:
-        """Post-processing tasks to restore aggregate variables in pre-processing step"""
-        if len(self.regions) > 1:
-            TransformationFactory("contrib.aggregate_vars").update_variables(
-                self.concrete_model
-            )
-
-    @utils.timer("Model solve", True)
-    def solve(
-        self,
-        verbose=True,
-        halt_on_ampl_error="no",
-        use_neos=False,
-        neos_email=None,
-        ipopt_output_file=None,
-        ipopt_maxiter=None,
-    ) -> None:
-        """Sends the concrete model to a solver.
+        It first sets the "free" variables (relative_abatement), then runs the simulation.
 
         Args:
-            verbose (bool, optional): Prints intermediate IPOPT results. Defaults to True.
-            halt_on_ampl_error (str, optional): Lets IPOPT stop when invalid values are encountered. Defaults to "no".
-            use_neos (bool, optional): Uses the external NEOS server for solving. Defaults to False.
-            neos_email (str or None, optional): E-mail address for NEOS server. Defaults to None.
-            ipopt_output_file (str or None, optional): Filename for IPOPT intermediate output. Defaults to None.
-            ipopt_maxiter (int or None, optional): Maximum number of iterations for IPOPT. If None, use IPOPT defaults.
+            relative_abatement (array of n_timesteps x n_regions):
+                Relative abatement values for each region and time step.
+                If None, it defaults to a zero abatement scenario.
+        """
+        return self.simulator.run(relative_abatement)
 
+    def run_nopolicy_baseline(self):
+        """Runs the no-policy baseline simulation with relative abatement set to 0."""
+
+        # Run simulator with default relative abatement set to 0
+        nopolicy_baseline = self.run_simulation()
+
+        # Store the no-policy baseline damage costs in the concrete model
+        m = self.concrete_model
+        if not self._extra_constraints_added:
+            for constraint in avoided_damages.get_constraints(m):
+                add_constraint(m, constraint.to_pyomo_constraint(m), constraint.name)
+            self._extra_constraints_added = True
+
+        m.nopolicy_damage_costs.store_values(
+            nopolicy_baseline.damage_costs.get_all_indexed()
+        )
+
+        return nopolicy_baseline
+
+    @utils.timer("Model solve", True)
+    def solve(self, verbose=True, use_neos=False, **kwargs) -> None:
+        """Sends the model to a solver.
         Raises:
             SolverException: raised if solver did not exit with status OK
         """
         self.status = None  # Not started yet
 
         if use_neos:
-            # Send concrete model to external solver on NEOS server
-            # Requires authenticated email address
-            os.environ["NEOS_EMAIL"] = neos_email
-            solver_manager = SolverManagerFactory("neos")
-            solver = "ipopt"  # or "conopt'
-            results = solver_manager.solve(self.concrete_model, opt=solver)
+            results = self.solver.solve_neos(self.concrete_model, **kwargs)
         else:
-            # Solve locally using ipopt
-            opt: OptSolver = SolverFactory("ipopt")
-            opt.options["halt_on_ampl_error"] = halt_on_ampl_error
-            if ipopt_maxiter is not None:
-                opt.options["max_iter"] = ipopt_maxiter
-            if ipopt_output_file is not None:
-                opt.options["output_file"] = ipopt_output_file
-            results = opt.solve(
-                self.concrete_model, tee=verbose, symbolic_solver_labels=True
+            results = self.solver.solve_ipopt(
+                self.concrete_model, verbose=verbose, **kwargs
             )
-            # if ipopt_output_file is not None:
-            #     visualise_ipopt_output(ipopt_output_file)
-
-        self.postprocessing()
-
-        logger.info("Status: {}".format(results.solver.status))
-
         self.status = results.solver.status
 
-        if results.solver.status != SolverStatus.ok:
-            if results.solver.status == SolverStatus.warning:
-                warning_message = "MIMOSA did not solve succesfully. Status: {}, termination condition: {}".format(
-                    results.solver.status, results.solver.termination_condition
-                )
-                logger.error(warning_message)
-                raise SolverException(warning_message, utils.MimosaSolverWarning)
-            if results.solver.status != SolverStatus.warning:
-                raise SolverException(
-                    f"Solver did not exit with status OK: {results.solver.status}"
-                )
+    def save(self, filename=None, **kwargs):
+        """
+        Saves the MIMOSA optimisation results to a file.
 
-        logger.info(
-            "Final NPV: {}".format(
-                value(self.concrete_model.NPV[self.concrete_model.tf])
-            )
+        Args:
+            filename (str): The filename to save the results to.
+
+        Example usage:
+            model = MIMOSA(params)
+            model.solve()
+            model.save("run1")
+        """
+        self.last_saved_filename = filename
+        save_output_pyomo(self._params, self.concrete_model, filename, **kwargs)
+
+    def save_simulation(self, simulation_obj, filename, **kwargs):
+        """
+        Saves the simulation results to a file.
+
+        Args:
+            simulation_obj (SimulationObjectModel): The simulation results to save.
+            filename (str): The filename to save the results to.
+
+        Example usage:
+            model = MIMOSA(params)
+            simulation = model.run_nopolicy_baseline()
+            model.save_simulation(simulation, "nopolicy_baseline")
+        """
+        self.last_saved_simulation_filename = filename
+        save_output(
+            simulation_obj.all_vars_for_export(),
+            self._params,
+            simulation_obj,
+            filename,
+            **kwargs
         )
 
-    def save(self, filename=None, **kwargs):
-        self.last_saved_filename = filename
-        save_output(self.params, self.concrete_model, filename, **kwargs)
+    @property
+    def params(self):
+        """
+        Returns the parsed parameters used to create the model.
 
-
-###########################
-##
-## Utils
-##
-###########################
-
-
-class SolverException(Exception):
-    """Raised when Pyomo solver does not exit with status OK"""
+        Note that the params cannot be changed after the model has been created.
+        """
+        return self._params

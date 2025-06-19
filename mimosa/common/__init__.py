@@ -44,6 +44,9 @@ from .pyomo_utils import (
     RegionalInitConstraint,
     GlobalSoftEqualityConstraint,
     RegionalSoftEqualityConstraint,
+    Equation,
+    GlobalEquation,
+    RegionalEquation,
     UsefulVar,
     soft_switch,
     soft_min,
@@ -61,6 +64,8 @@ from .pyomo_utils import (
 from .utils import first
 
 from .units import quant
+
+from ..export import save_output, save_output_pyomo
 
 # # Datastore
 # from .data import DataStore

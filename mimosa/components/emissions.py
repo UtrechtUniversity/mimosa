@@ -15,6 +15,8 @@ from mimosa.common import (
     GlobalInitConstraint,
     RegionalConstraint,
     RegionalInitConstraint,
+    RegionalEquation,
+    GlobalEquation,
     Constraint,
     value,
     quant,
@@ -78,7 +80,9 @@ def _set_baseline_emissions(m: AbstractModel) -> None:
     m.baseline_carbon_intensity = Param(
         m.t,
         m.regions,
-        initialize=lambda m, t, r: (m.baseline_emissions[t, r] / m.baseline_GDP[t, r]),
+        initialize=lambda m, t, r: (
+            m.baseline_emissions[t, r] / m.baseline_GDP[t - 1 if t > 1 else t, r]
+        ),
         units=quant.unit("emissionsrate_unit/currency_unit"),
     )
 
@@ -191,95 +195,69 @@ def _get_emissions_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     constraints.extend(
         [
             # Baseline emissions based on emissions or carbon intensity
-            RegionalConstraint(
+            RegionalEquation(
+                m.baseline,
                 lambda m, t, r: (
                     (
-                        m.baseline[t, r]
-                        == m.baseline_carbon_intensity[t, r] * m.GDP_net[t, r]
+                        m.baseline_carbon_intensity[t, r]
+                        * (m.GDP_net[t - 1, r] if t > 1 else m.GDP_gross[t, r])
                     )
                     if value(m.use_carbon_intensity_for_baseline)
-                    else (m.baseline[t, r] == m.baseline_emissions[t, r])
+                    else m.baseline_emissions[t, r]
                 ),
-                name="baseline_emissions",
             ),
             # Regional emissions from baseline and relative abatement
-            RegionalConstraint(
+            RegionalEquation(
+                m.regional_emissions,
                 lambda m, t, r: (
-                    m.regional_emissions[t, r]
-                    == (1 - m.relative_abatement[t, r])
+                    (1 - m.relative_abatement[t, r])
                     * (
                         m.baseline[t, r]
                         if value(m.use_carbon_intensity_for_baseline)
                         else m.baseline_emissions[t, r]
-                        # Note: this should simply be m.baseline[t,r], but this is numerically less stable
-                        # than m.baseline_emissions[t, r] whenever baseline intensity
-                        # is used instead of baseline emissions. In fact, m.baseline_emissions[t, r]
-                        # is just a fixed number, whereas m.baseline[t,r] is a variable depending on
-                        # GDP.
                     )
                     if t > 0
-                    else Constraint.Skip
+                    else m.baseline_emissions[0, r]
                 ),
-                "regional_abatement",
             ),
-            RegionalInitConstraint(
-                lambda m, r: m.regional_emissions[0, r] == m.baseline_emissions[0, r]
-            ),
-            RegionalConstraint(
-                lambda m, t, r: m.regional_emission_reduction[t, r]
-                == m.baseline[t, r] - m.regional_emissions[t, r],
-                "regional_emission_reduction",
+            RegionalEquation(
+                m.regional_emission_reduction,
+                lambda m, t, r: m.baseline[t, r] - m.regional_emissions[t, r],
             ),
             # Global emissions (sum from regional emissions)
-            GlobalConstraint(
-                lambda m, t: (
-                    m.global_emissions[t]
-                    == sum(m.regional_emissions[t, r] for r in m.regions)
-                    if t > 0
-                    else Constraint.Skip
-                ),
-                "global_emissions",
-            ),
-            GlobalInitConstraint(
-                lambda m: m.global_emissions[0]
-                == sum(m.baseline_emissions[0, r] for r in m.regions),
-                "global_emissions_init",
+            GlobalEquation(
+                m.global_emissions,
+                lambda m, t: sum(m.regional_emissions[t, r] for r in m.regions),
             ),
             # Cumulative global emissions
-            GlobalConstraint(
+            GlobalEquation(
+                m.cumulative_emissions,
                 lambda m, t: (
-                    m.cumulative_emissions[t]
-                    == m.cumulative_emissions[t - 1]
+                    m.cumulative_emissions[t - 1]
                     + (
                         (m.dt * (m.global_emissions[t] + m.global_emissions[t - 1]) / 2)
                         if value(m.cumulative_emissions_trapz)
                         else (m.dt * m.global_emissions[t])
                     )
                     if t > 0
-                    else Constraint.Skip
+                    else 0
                 ),
-                "cumulative_emissions",
             ),
-            GlobalInitConstraint(lambda m: m.cumulative_emissions[0] == 0),
         ]
     )
 
     m.emission_relative_cumulative = Var(m.t, initialize=1)
     constraints.extend(
         [
-            GlobalConstraint(
+            GlobalEquation(
+                m.emission_relative_cumulative,
                 lambda m, t: (
-                    (
-                        m.emission_relative_cumulative[t]
-                        == m.cumulative_emissions[t]
-                        / m.cumulative_global_baseline_emissions[t]
-                    )
+                    m.cumulative_emissions[t]
+                    / m.cumulative_global_baseline_emissions[t]
                     if t > 0
-                    else Constraint.Skip
+                    else 1
                 ),
-                name="relative_cumulative_emissions",
             ),
-            GlobalInitConstraint(lambda m: m.emission_relative_cumulative[0] == 1),
         ]
     )
 
@@ -362,12 +340,12 @@ def _get_temperature_constraints(m: AbstractModel) -> Sequence[GeneralConstraint
     m.temperature_target = Param(doc="::temperature.target")
     constraints.extend(
         [
-            GlobalConstraint(
-                lambda m, t: m.temperature[t]
-                == m.T0 + m.TCRE * m.cumulative_emissions[t],
-                "temperature",
+            GlobalEquation(
+                m.temperature,
+                lambda m, t: (
+                    m.T0 + m.TCRE * m.cumulative_emissions[t] if t > 0 else m.T0
+                ),
             ),
-            GlobalInitConstraint(lambda m: m.temperature[0] == m.T0),
             GlobalConstraint(
                 lambda m, t: (
                     m.temperature[t] <= m.temperature_target

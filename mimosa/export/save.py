@@ -12,15 +12,18 @@ import pandas as pd
 from mimosa.common import get_all_variables, get_all_time_region_params, value
 
 
-def save_output(params, m, experiment=None, hash_suffix=False, folder="output"):
+def save_output_pyomo(params, m, filename="run1", hash_suffix=False, folder="output"):
+    # 2. Save the Pyomo variables and data functions
+    all_variables = get_all_variables(m) + get_all_time_region_params(m)
+    save_output(all_variables, params, m, filename, hash_suffix, folder)
+
+
+def save_output(all_variables, params, m, filename, hash_suffix=False, folder="output"):
     # 1. Create a unique identifier
     if hash_suffix:
         settings_hash = hashlib.md5(json.dumps(params).encode()).hexdigest()[:9]
     else:
         settings_hash = ""
-
-    # 2. Save the Pyomo variables and data functions
-    all_variables = get_all_variables(m) + get_all_time_region_params(m)
 
     rows = []
     for useful_var in all_variables:
@@ -31,15 +34,16 @@ def save_output(params, m, experiment=None, hash_suffix=False, folder="output"):
 
     # 3. Save the CSV file
     os.makedirs(folder + "/", exist_ok=True)
-    filename = f"{experiment}_{settings_hash}" if hash_suffix else experiment
+    filename = f"{filename}_{settings_hash}" if hash_suffix else filename
 
     path = f"{folder}/{filename}.csv"
     dataframe.to_csv(path, float_format="%.6g", index=False)
     print(f"Saved to {path}")
 
     # 3. Save the param file
-    with open(f"{path}.params.json", "w") as fh:
-        json.dump(params, fh)
+    if params is not None:
+        with open(f"{path}.params.json", "w") as fh:
+            json.dump(params, fh)
 
 
 def var_to_row(rows, m, var, is_regional, unit):

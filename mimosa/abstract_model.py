@@ -4,7 +4,7 @@ Abstract representation of the model
 Contains all model equations and constraints
 """
 
-from mimosa.common import Param, AbstractModel, Set, add_constraint, quant
+from mimosa.common import Param, AbstractModel, Set, add_constraint, quant, Equation
 from mimosa.components import (
     effortsharing,
     emissions,
@@ -161,6 +161,11 @@ def create_abstract_model(
     for constraint in constraints:
         add_constraint(m, constraint.to_pyomo_constraint(m), constraint.name)
 
+    ######################
+    # Get all equations (not constraints) for simulation mode
+    ######################
+    equations = [eq for eq in constraints if isinstance(eq, Equation)]
+
     m.obj = objective_rule
 
-    return m
+    return m, equations
