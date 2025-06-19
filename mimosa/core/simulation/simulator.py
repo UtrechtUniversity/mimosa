@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 import networkx as nx
 from scipy.optimize import minimize
 
@@ -75,6 +76,11 @@ class Simulator:
             # If no relative abatement is provided, set it to zero
             relative_abatement = np.zeros((n_timesteps, n_regions))
         else:
+            # First check if it is given as a dictionary with (time, region) keys
+            if isinstance(relative_abatement, dict):
+                # Convert the dictionary to a numpy array
+                relative_abatement = self._dict_values_to_numpy(relative_abatement)
+            # Check that the dimensions are correct
             assert relative_abatement.shape == (n_timesteps, n_regions), (
                 f"relative_abatement must be of shape (n_timesteps, n_regions), "
                 f"but is {relative_abatement.shape}."
@@ -189,3 +195,16 @@ class Simulator:
                     )
         # Set indices back to original names ('CAN', 'WEU', ...)
         sim_m.set_index_names()
+
+    def _dict_values_to_numpy(self, d):
+        """
+        Converts a dictionary of values to a numpy array.
+        The keys of the dictionary should be tuples of (time, region).
+        """
+        arr = np.array(
+            [
+                [d[(t, r)] for r in self.concrete_model.regions]
+                for t in self.concrete_model.t
+            ]
+        )
+        return arr

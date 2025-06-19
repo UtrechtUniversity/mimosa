@@ -85,6 +85,9 @@ class MIMOSA:
         """
         self.simulator.prepare_simulation(self.equations, self.concrete_model)
 
+        # Set a flag to indicate that extra constraints have not been added yet
+        self._extra_constraints_added = False
+
     @utils.timer("Prerunning the model in simulation mode")
     def prerun_simulation(self):
         """Runs a pre-run simulation to get a good initial guess for the optimisation."""
@@ -94,14 +97,24 @@ class MIMOSA:
         # Set the best guess as initial values for the concrete model
         self.simulator.initialize_pyomo_model(self.concrete_model, sim_m_best_guess)
 
-        # Set a flag to indicate that extra constraints have not been added yet
-        self._extra_constraints_added = False
+    def run_simulation(self, relative_abatement=None):
+        """
+        Runs MIMOSA as simulation.
+
+        It first sets the "free" variables (relative_abatement), then runs the simulation.
+
+        Args:
+            relative_abatement (array of n_timesteps x n_regions):
+                Relative abatement values for each region and time step.
+                If None, it defaults to a zero abatement scenario.
+        """
+        return self.simulator.run(relative_abatement)
 
     def run_nopolicy_baseline(self):
         """Runs the no-policy baseline simulation with relative abatement set to 0."""
 
         # Run simulator with default relative abatement set to 0
-        nopolicy_baseline = self.simulator.run()
+        nopolicy_baseline = self.run_simulation()
 
         # Store the no-policy baseline damage costs in the concrete model
         m = self.concrete_model
