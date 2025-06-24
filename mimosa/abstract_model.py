@@ -30,6 +30,7 @@ def create_abstract_model(
     financialtransfer_module: str,
     welfare_module: str,
     objective_module: str,
+    effortsharing_regime: str,
 ) -> AbstractModel:
     """
     ## Building the abstract model
@@ -42,6 +43,7 @@ def create_abstract_model(
     - [`financialtransfer_module`](../parameters.md#model.financialtransfer%20module): The financial transfer module to use
     - [`welfare_module`](../parameters.md#model.welfare%20module): The welfare module to use
     - [`objective_module`](../parameters.md#model.objective%20module): The objective module to use
+    - [`effortsharing_regime`](../parameters.md#effort%20sharing.regime): The effort sharing regime to use
 
     """
     m = AbstractModel()
@@ -129,7 +131,20 @@ def create_abstract_model(
         )
 
     # Effort sharing regime
-    constraints.extend(effortsharing.get_constraints(m))
+    if effortsharing_regime == "noregime":
+        constraints.extend(effortsharing.noregime.get_constraints(m))
+    elif effortsharing_regime == "equal_mitigation_costs":
+        constraints.extend(effortsharing.equal_mitigation_costs.get_constraints(m))
+    elif effortsharing_regime == "equal_total_costs":
+        constraints.extend(effortsharing.equal_total_costs.get_constraints(m))
+    elif effortsharing_regime == "per_cap_convergence":
+        constraints.extend(effortsharing.per_cap_convergence.get_constraints(m))
+    elif effortsharing_regime == "ability_to_pay":
+        constraints.extend(effortsharing.ability_to_pay.get_constraints(m))
+    else:
+        raise NotImplementedError(
+            f"Effort sharing regime `{effortsharing_regime}` not implemented"
+        )
 
     # Cobb-Douglas and economics
     constraints.extend(cobbdouglas.get_constraints(m))

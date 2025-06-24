@@ -82,6 +82,7 @@ class Preprocessor:
         financialtransfer_module = self._params["model"]["financialtransfer module"]
         welfare_module = self._params["model"]["welfare module"]
         objective_module = self._params["model"]["objective module"]
+        effortsharing_regime = self._params["effort sharing"]["regime"]
 
         return create_abstract_model(
             damage_module,
@@ -89,6 +90,7 @@ class Preprocessor:
             financialtransfer_module,
             welfare_module,
             objective_module,
+            effortsharing_regime,
         )
 
     def _load_data(self):
