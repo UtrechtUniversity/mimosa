@@ -73,6 +73,11 @@ def create_abstract_model(
         doc="timeandregional::population",
         units=quant.unit("billion people"),
     )
+    m.global_population = Param(
+        m.t,
+        initialize=lambda m, t: sum(m.population[t, r] for r in m.regions),
+        units=quant.unit("billion people"),
+    )
     m.baseline_GDP = Param(
         m.t,
         m.regions,
@@ -141,6 +146,8 @@ def create_abstract_model(
         constraints.extend(effortsharing.per_cap_convergence.get_constraints(m))
     elif effortsharing_regime == "ability_to_pay":
         constraints.extend(effortsharing.ability_to_pay.get_constraints(m))
+    elif effortsharing_regime == "equal_cumulative_per_cap":
+        constraints.extend(effortsharing.equal_cumulative_per_cap.get_constraints(m))
     else:
         raise NotImplementedError(
             f"Effort sharing regime `{effortsharing_regime}` not implemented"

@@ -68,7 +68,7 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
             ),
             GlobalEquation(
                 m.yearly_welfare,
-                lambda m, t: sum(m.population[t, r] for r in m.regions)
+                lambda m, t: m.global_population[t]
                 * calc_utility(
                     sum(m.consumption[t, r] for r in m.regions),
                     sum(m.population[t, r] for r in m.regions),

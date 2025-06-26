@@ -49,7 +49,7 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
                 lambda m, t: sum(m.population[t, r] for r in m.regions)
                 * calc_global_utility(
                     sum(m.utility[t, r] for r in m.regions),
-                    sum(m.population[t, r] for r in m.regions),
+                    m.global_population[t],
                     m.elasmu,
                     m.inequal_aversion,
                 ),

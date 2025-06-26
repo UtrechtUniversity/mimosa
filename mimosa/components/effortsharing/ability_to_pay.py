@@ -42,8 +42,8 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     def ability_to_pay_rule(m, t, r):
         gdp_var = m.baseline_GDP  # or: m.GDP_net
         per_cap_gdp = gdp_var[t, r] / m.population[t, r]
-        global_per_cap_gdp = sum(gdp_var[t, s] for s in m.regions) / sum(
-            m.population[t, s] for s in m.regions
+        global_per_cap_gdp = (
+            sum(gdp_var[t, s] for s in m.regions) / m.global_population[t]
         )
         global_baseline_emissions = sum(m.baseline[t, s] for s in m.regions)
 

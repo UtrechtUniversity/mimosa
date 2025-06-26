@@ -65,7 +65,7 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
             GlobalConstraint(
                 lambda m, t: m.global_carbonprice[t]
                 == sum(m.carbonprice[t, r] * m.population[t, r] for r in m.regions)
-                / sum(m.population[t, r] for r in m.regions),
+                / m.global_population[t],
                 "global_carbonprice",
             ),
         ]
