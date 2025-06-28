@@ -15,6 +15,7 @@ from mimosa.common import (
     GeneralConstraint,
     Constraint,
     RegionalConstraint,
+    RegionalInitConstraint,
     RegionalEquation,
     GlobalEquation,
     RegionalSoftEqualityConstraint,
@@ -43,21 +44,53 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
         doc="::effort sharing.ecpc_discount_rate"
     )
     m.effort_sharing_ecpc_start_year = Param(doc="::effort sharing.ecpc_start_year")
-    m.effort_sharing_ecpc_debt = Param(
+    m.effort_sharing_ecpc_historical_debt = Param(
+        m.t,  # Constant over time
         m.regions,
-        initialize=lambda m, r: _calc_debt(
+        initialize=lambda m, t, r: _calc_debt(
             m, r, historical_emissions, historical_population
         ),
     )
 
-    m.effort_sharing_common_level = Var(m.t, units=quant.unit("fraction_of_GDP"))
+    m.cumulative_regional_emission_allowances = Var(
+        m.t, m.regions, units=quant.unit("emissions_unit")
+    )
+
+    m.effort_sharing_ecpc_cumulative_allowances = Var(
+        m.t, m.regions, units=quant.unit("emissions_unit")
+    )
+    m.cumulative_population_share = Param(
+        m.t,
+        m.regions,
+        initialize=lambda m, t, r: sum(m.population[s, r] for s in range(t + 1))
+        / sum(m.global_population[s] for s in range(t + 1)),
+    )
 
     return [
-        RegionalSoftEqualityConstraint(
-            lambda m, t, r: m.rel_mitigation_costs[t, r],
-            lambda m, t, r: m.effort_sharing_common_level[t],
-            "effort_sharing_regime_mitigation_costs",
+        # ECPC needs regional carbon budget, so calculate regional cumulative emissions
+        RegionalEquation(
+            m.cumulative_regional_emission_allowances,
+            lambda m, t, r: (
+                m.cumulative_regional_emission_allowances[t - 1, r] if t > 0 else 0
+            )
+            + m.dt * (m.baseline[t, r] - m.paid_for_emission_reductions[t, r]),
         ),
+        # # Then impose the effort sharing constraint
+        RegionalEquation(
+            m.effort_sharing_ecpc_cumulative_allowances,
+            lambda m, t, r: m.cumulative_population_share[t, r]
+            * m.cumulative_emissions[t]
+            + m.effort_sharing_ecpc_historical_debt[t, r],
+        ),
+        RegionalSoftEqualityConstraint(
+            # Note: add constant factor to LHS and RHS to make sure both sides are positive
+            lambda m, t, r: m.cumulative_regional_emission_allowances[t, r] + 500,
+            lambda m, t, r: m.effort_sharing_ecpc_cumulative_allowances[t, r] + 500,
+            "effort_sharing_ecpc",
+            ignore_if=lambda m, t, r: t != m.year2100,
+        ),
+        # Stability constraint to ensure that the relative mitigation costs do not exceed a certain threshold
+        RegionalConstraint(lambda m, t, r: m.rel_mitigation_costs[t, r] <= 0.5),
     ]
 
 

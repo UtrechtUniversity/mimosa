@@ -229,7 +229,7 @@ def _get_emissions_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
                 m.global_emissions,
                 lambda m, t: sum(m.regional_emissions[t, r] for r in m.regions),
             ),
-            # Cumulative global emissions
+            # Cumulative emissions
             GlobalEquation(
                 m.cumulative_emissions,
                 lambda m, t: (
