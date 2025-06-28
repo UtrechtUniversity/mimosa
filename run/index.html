@@ -784,6 +784,26 @@
   
   
   
+    <li class="md-nav__item">
+      <a href="https://dashboard-mimosa.onrender.com/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    MIMOSA Dashboard
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
     
     
       
@@ -806,7 +826,7 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
         
           
           
@@ -822,14 +842,14 @@
             </a>
             
               
-              <label class="md-nav__link " for="__nav_6" id="__nav_6_label" tabindex="0">
+              <label class="md-nav__link " for="__nav_7" id="__nav_7_label" tabindex="0">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_6">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
             <span class="md-nav__icon md-icon"></span>
             Extending MIMOSA
           </label>
@@ -1378,19 +1398,26 @@ through regular Python loops:</p>
 </span><span id="__span-6-6"><a href="#__codelineno-6-6" id="__codelineno-6-6" name="__codelineno-6-6"></a>    <span class="s2">"equal_mitigation_costs"</span><span class="p">,</span>
 </span><span id="__span-6-7"><a href="#__codelineno-6-7" id="__codelineno-6-7" name="__codelineno-6-7"></a>    <span class="s2">"equal_total_costs"</span><span class="p">,</span>
 </span><span id="__span-6-8"><a href="#__codelineno-6-8" id="__codelineno-6-8" name="__codelineno-6-8"></a>    <span class="s2">"per_cap_convergence"</span><span class="p">,</span>
-</span><span id="__span-6-9"><a href="#__codelineno-6-9" id="__codelineno-6-9" name="__codelineno-6-9"></a><span class="p">]:</span>
-</span><span id="__span-6-10"><a href="#__codelineno-6-10" id="__codelineno-6-10" name="__codelineno-6-10"></a>    <span class="n">params</span> <span class="o">=</span> <span class="n">load_params</span><span class="p">()</span>
-</span><span id="__span-6-11"><a href="#__codelineno-6-11" id="__codelineno-6-11" name="__codelineno-6-11"></a>    <span class="n">params</span><span class="p">[</span><span class="s2">"model"</span><span class="p">][</span><span class="s2">"emissiontrade module"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"emissiontrade"</span>
-</span><span id="__span-6-12"><a href="#__codelineno-6-12" id="__codelineno-6-12" name="__codelineno-6-12"></a>    <span class="n">params</span><span class="p">[</span><span class="s2">"model"</span><span class="p">][</span><span class="s2">"welfare module"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"cost_minimising"</span>
-</span><span id="__span-6-13"><a href="#__codelineno-6-13" id="__codelineno-6-13" name="__codelineno-6-13"></a>    <span class="n">params</span><span class="p">[</span><span class="s2">"emissions"</span><span class="p">][</span><span class="s2">"carbonbudget"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"700 GtCO2"</span>
-</span><span id="__span-6-14"><a href="#__codelineno-6-14" id="__codelineno-6-14" name="__codelineno-6-14"></a>    <span class="n">params</span><span class="p">[</span><span class="s2">"effort sharing"</span><span class="p">][</span><span class="s2">"regime"</span><span class="p">]</span> <span class="o">=</span> <span class="n">regime</span>
-</span><span id="__span-6-15"><a href="#__codelineno-6-15" id="__codelineno-6-15" name="__codelineno-6-15"></a>    <span class="n">params</span><span class="p">[</span><span class="s2">"economics"</span><span class="p">][</span><span class="s2">"MAC"</span><span class="p">][</span><span class="s2">"rel_mitigation_costs_min_level"</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.3</span>
-</span><span id="__span-6-16"><a href="#__codelineno-6-16" id="__codelineno-6-16" name="__codelineno-6-16"></a>    <span class="n">params</span><span class="p">[</span><span class="s2">"time"</span><span class="p">][</span><span class="s2">"end"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2100</span>
-</span><span id="__span-6-17"><a href="#__codelineno-6-17" id="__codelineno-6-17" name="__codelineno-6-17"></a>
-</span><span id="__span-6-18"><a href="#__codelineno-6-18" id="__codelineno-6-18" name="__codelineno-6-18"></a>    <span class="n">model1</span> <span class="o">=</span> <span class="n">MIMOSA</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
-</span><span id="__span-6-19"><a href="#__codelineno-6-19" id="__codelineno-6-19" name="__codelineno-6-19"></a>    <span class="n">model1</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span>
-</span><span id="__span-6-20"><a href="#__codelineno-6-20" id="__codelineno-6-20" name="__codelineno-6-20"></a>    <span class="n">model1</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="sa">f</span><span class="s2">"run_</span><span class="si">{</span><span class="n">regime</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</span><span id="__span-6-9"><a href="#__codelineno-6-9" id="__codelineno-6-9" name="__codelineno-6-9"></a>    <span class="s2">"ability_to_pay"</span><span class="p">,</span>
+</span><span id="__span-6-10"><a href="#__codelineno-6-10" id="__codelineno-6-10" name="__codelineno-6-10"></a>    <span class="s2">"equal_cumulative_per_cap"</span><span class="p">,</span>
+</span><span id="__span-6-11"><a href="#__codelineno-6-11" id="__codelineno-6-11" name="__codelineno-6-11"></a><span class="p">]:</span>
+</span><span id="__span-6-12"><a href="#__codelineno-6-12" id="__codelineno-6-12" name="__codelineno-6-12"></a>    <span class="n">params</span> <span class="o">=</span> <span class="n">load_params</span><span class="p">()</span>
+</span><span id="__span-6-13"><a href="#__codelineno-6-13" id="__codelineno-6-13" name="__codelineno-6-13"></a>    <span class="n">params</span><span class="p">[</span><span class="s2">"effort sharing"</span><span class="p">][</span><span class="s2">"regime"</span><span class="p">]</span> <span class="o">=</span> <span class="n">regime</span>
+</span><span id="__span-6-14"><a href="#__codelineno-6-14" id="__codelineno-6-14" name="__codelineno-6-14"></a>    <span class="n">params</span><span class="p">[</span><span class="s2">"model"</span><span class="p">][</span><span class="s2">"emissiontrade module"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"emissiontrade"</span>
+</span><span id="__span-6-15"><a href="#__codelineno-6-15" id="__codelineno-6-15" name="__codelineno-6-15"></a>    <span class="n">params</span><span class="p">[</span><span class="s2">"model"</span><span class="p">][</span><span class="s2">"welfare module"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"cost_minimising"</span>
+</span><span id="__span-6-16"><a href="#__codelineno-6-16" id="__codelineno-6-16" name="__codelineno-6-16"></a>    <span class="n">params</span><span class="p">[</span><span class="s2">"emissions"</span><span class="p">][</span><span class="s2">"carbonbudget"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"700 GtCO2"</span>
+</span><span id="__span-6-17"><a href="#__codelineno-6-17" id="__codelineno-6-17" name="__codelineno-6-17"></a>    <span class="n">params</span><span class="p">[</span><span class="s2">"emissions"</span><span class="p">][</span><span class="s2">"baseline carbon intensity"</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># (1)!</span>
+</span><span id="__span-6-18"><a href="#__codelineno-6-18" id="__codelineno-6-18" name="__codelineno-6-18"></a>    <span class="n">params</span><span class="p">[</span><span class="s2">"economics"</span><span class="p">][</span><span class="s2">"MAC"</span><span class="p">][</span><span class="s2">"rel_mitigation_costs_min_level"</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.5</span>  <span class="c1"># (2)!</span>
+</span><span id="__span-6-19"><a href="#__codelineno-6-19" id="__codelineno-6-19" name="__codelineno-6-19"></a>    <span class="n">params</span><span class="p">[</span><span class="s2">"time"</span><span class="p">][</span><span class="s2">"end"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2100</span>
+</span><span id="__span-6-20"><a href="#__codelineno-6-20" id="__codelineno-6-20" name="__codelineno-6-20"></a>
+</span><span id="__span-6-21"><a href="#__codelineno-6-21" id="__codelineno-6-21" name="__codelineno-6-21"></a>    <span class="n">model1</span> <span class="o">=</span> <span class="n">MIMOSA</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+</span><span id="__span-6-22"><a href="#__codelineno-6-22" id="__codelineno-6-22" name="__codelineno-6-22"></a>    <span class="n">model1</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span>
+</span><span id="__span-6-23"><a href="#__codelineno-6-23" id="__codelineno-6-23" name="__codelineno-6-23"></a>    <span class="n">model1</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="sa">f</span><span class="s2">"run_</span><span class="si">{</span><span class="n">regime</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </span></code></pre></div>
+<ol>
+<li>Some effort sharing regimes can lead to large financial transfers between regions. If baseline carbon intensities are used instead of just baseline emissions, the baseline emissions can vary significantly, leading to numerical instability. Especially for ECPC regime, this setting is important.</li>
+<li>Some effort sharing regimes require such large financial transfers that they are infeasible without allowing for some extra financial transfers beyond just emission trading. This is why we set the relative mitigation cost minimum level to a negative number.</li>
+</ol>
 <h3 id="advanced-logging">Advanced: logging</h3>
 <p>The solve status (optimal, impossible, etc), model solve time and the final maximised value can be logged to an external log file (along with the warnings or errors from the code). This can be very useful when doing many runs overnight. In this code example, the log is written to the file <code>mainlog.log</code>:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-7-1"><a href="#__codelineno-7-1" id="__codelineno-7-1" name="__codelineno-7-1"></a><span class="kn">import</span> <span class="nn">logging</span>
