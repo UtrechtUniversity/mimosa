@@ -24,13 +24,16 @@ from mimosa.common import (
 def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     """
     Usage:
-    ```python hl_lines="2 3 4 5 6"
+    ```python hl_lines="2 3 4 5 6 7 8 9"
     params = load_params()
     params["effort sharing"]["regime"] = "per_cap_convergence"
     params["effort sharing"]["percapconv_year"] = 2050
 
     # Per-capita convergence needs emission trading to avoid infeasibility
-    params["model"]["emissiontrade_module"] = "emissiontrade"
+    params["model"]["emissiontrade module"] = "emissiontrade"
+    # And financial transfers higher than just emission trading need to be enabled
+    # (therefore allowing for negative mitigation costs)
+    params["economics"]["MAC"]["rel_mitigation_costs_min_level"] = -0.5
     model = MIMOSA(params)
     ```
 
