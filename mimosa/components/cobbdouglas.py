@@ -118,6 +118,11 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
         units=quant.unit("currency_unit"),
         initialize=lambda m, t, r: m.baseline_GDP[0, r],
     )
+    m.global_GDP_net = Var(
+        m.t,
+        initialize=lambda m, t: sum(m.baseline_GDP[t, r] for r in m.regions),
+        units=quant.unit("currency_unit"),
+    )
     m.investments = Var(m.t, m.regions, units=quant.unit("currency_unit"))
     m.consumption = Var(m.t, m.regions, units=quant.unit("currency_unit"))
 
@@ -165,6 +170,10 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
                     - m.mitigation_costs[t, r]
                     - m.financial_transfer[t, r]
                 ),
+            ),
+            GlobalEquation(
+                m.global_GDP_net,
+                lambda m, t: sum(m.GDP_net[t, r] for r in m.regions),
             ),
             RegionalEquation(
                 m.investments,

@@ -10,6 +10,8 @@ from mimosa.common import (
     GeneralConstraint,
     Param,
     quant,
+    RegionalEquation,
+    Var,
 )
 
 
@@ -30,6 +32,16 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     )
     m.import_export_mitigation_cost_balance = Param(
         m.t, m.regions, units=quant.unit("currency_unit"), initialize=0
+    )
+    m.regional_emission_allowances = Var(
+        m.t, m.regions, units=quant.unit("emissionsrate_unit")
+    )
+
+    constraints.append(
+        # When there is no emission trading, emission allowances are simply equal to the emissions
+        RegionalEquation(
+            m.regional_emission_allowances, lambda m, t, r: m.regional_emissions[t, r]
+        )
     )
 
     return constraints

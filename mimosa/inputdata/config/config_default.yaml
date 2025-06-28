@@ -361,6 +361,8 @@ effort sharing:
       - equal_mitigation_costs
       - equal_total_costs
       - per_cap_convergence
+      - ability_to_pay
+      - equal_cumulative_per_cap
     default: noregime
   percapconv_year:
     descr: >-
@@ -372,6 +374,26 @@ effort sharing:
     max: 2200
     default: 2050
     can_be_false: True
+  ecpc_discount_rate:
+    descr: >-
+      Discount rate for historical debt in the ECPC effort sharing regime
+      (Equal Cumulative Per Capita regime).
+      Only used when effort sharing - regime is equal_cumulative_per_cap
+    type: float
+    min: 0
+    max: 1
+    default: 0.03
+    can_be_false: False
+  ecpc_start_year:
+    descr: >-
+      Start year for historical debt in the ECPC effort sharing regime
+      (Equal Cumulative Per Capita regime).
+      Only used when effort sharing - regime is equal_cumulative_per_cap
+    type: float
+    min: 1800
+    max: 2019
+    default: 1850
+    can_be_false: False
 
 ##################
 

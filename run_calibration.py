@@ -29,7 +29,7 @@ def npv(values, discount_rate):
     years = values.index.astype(float)
     t = years - years[0]
     discount_factor = np.exp(-discount_rate * t)
-    return np.trapz(values * discount_factor, t)
+    return np.trapezoid(values * discount_factor, t)
 
 
 for budget in carbon_budgets:

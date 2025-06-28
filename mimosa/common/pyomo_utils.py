@@ -256,7 +256,9 @@ class GeneralSoftEqualityConstraint(GeneralConstraint):
         self.absolute_epsilon = absolute_epsilon
 
         if ignore_if is None:
-            ignore_if = lambda m: False  # Never ignore when ignore_if is None
+            ignore_if = (
+                lambda m, *args, **kwargs: False
+            )  # Never ignore when ignore_if is None
         self.ignore_if = ignore_if
 
     def rhs_eps(self, rule_rhs, is_upper: bool, *args):

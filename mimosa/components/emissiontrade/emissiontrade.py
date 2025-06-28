@@ -6,6 +6,7 @@ from mimosa.common import (
     GeneralConstraint,
     GlobalConstraint,
     RegionalConstraint,
+    RegionalEquation,
     Constraint,
     NonNegativeReals,
     quant,
@@ -64,7 +65,7 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
             GlobalConstraint(
                 lambda m, t: m.global_carbonprice[t]
                 == sum(m.carbonprice[t, r] * m.population[t, r] for r in m.regions)
-                / sum(m.population[t, r] for r in m.regions),
+                / m.global_population[t],
                 "global_carbonprice",
             ),
         ]
@@ -118,13 +119,13 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
                 "paid_for_emission_reductions",
             ),
             # Constraint: regional emission allowances, equal to baseline minus paid for emission reductions
-            RegionalConstraint(
+            RegionalEquation(
+                m.regional_emission_allowances,
                 lambda m, t, r: (
-                    m.regional_emission_allowances[t, r]
-                    == m.baseline[t, r] - m.paid_for_emission_reductions[t, r]
+                    m.baseline[t, r] - m.paid_for_emission_reductions[t, r]
                     if t > 0
-                    else Constraint.Skip
-                )
+                    else m.baseline[t, r]
+                ),
             ),
         ]
     )
