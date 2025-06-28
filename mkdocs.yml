@@ -17,6 +17,7 @@ nav:
   - Parameter reference: parameters.md
   - Installing MIMOSA: installation.md
   - Running MIMOSA: run.md
+  - MIMOSA Dashboard: "https://dashboard-mimosa.onrender.com/"
   - Extending MIMOSA:
       - extending/index.md
       - New components: extending/components.md

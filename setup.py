@@ -8,7 +8,7 @@ with open("LICENSE") as fh:
 
 setup(
     name="mimosa",
-    version="0.2.0",
+    version="0.2.1",
     author="Kaj-Ivar van der Wijst",
     author_email="k.vanderwijst@uu.nl",
     packages=["mimosa"],
@@ -18,7 +18,7 @@ setup(
     long_description=description,
     long_description_content_type="text/markdown",
     install_requires=[
-        "numpy",
+        "numpy>=1.22",
         "pandas",
         "pyomo",
         "pint",
