@@ -87,7 +87,7 @@ class SCC:
         out["global_emissions"] = out["regional_emissions"].sum()
         cumulative_emissions = pd.Series(
             {
-                year: np.trapz(
+                year: np.trapezoid(
                     out["global_emissions"][:year],
                     x=out["global_emissions"][:year].index,
                 )
