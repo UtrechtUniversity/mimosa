@@ -145,7 +145,10 @@ class Equation(ABC):
             eq = GlobalEquation(lhs="temperature", rhs=lambda m, t: m.T0 + m.TCRE * m.cumulative_emissions[t])
             eq(m, t)
         """
-        return self.rhs(m, *indices)
+        value = self.rhs(m, *indices)
+        if value is Constraint.Skip:
+            return 0
+        return value
 
     @abstractmethod
     def to_pyomo_constraint(self, m):
@@ -164,7 +167,10 @@ class GlobalEquation(Equation):
         """
 
         def _rule(m, t, lhs_var_name=self.lhs, rhs_expr=self.rhs):
-            return getattr(m, lhs_var_name)[t] == rhs_expr(m, t)
+            rhs_value = rhs_expr(m, t)
+            if rhs_value == Constraint.Skip:
+                return Constraint.Skip
+            return getattr(m, lhs_var_name)[t] == rhs_value
 
         return Constraint(m.t, rule=_rule)
 
@@ -181,7 +187,10 @@ class RegionalEquation(Equation):
         """
 
         def _rule(m, t, r, lhs_var_name=self.lhs, rhs_expr=self.rhs):
-            return getattr(m, lhs_var_name)[t, r] == rhs_expr(m, t, r)
+            rhs_value = rhs_expr(m, t, r)
+            if rhs_value == Constraint.Skip:
+                return Constraint.Skip
+            return getattr(m, lhs_var_name)[t, r] == rhs_value
 
         return Constraint(m.t, m.regions, rule=_rule)
 

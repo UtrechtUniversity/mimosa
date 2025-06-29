@@ -46,6 +46,9 @@ def calc_dependencies(equations_dict, m: Union[ConcreteModel, AbstractModel]):
         prev_timestep_dependencies = _filter_out_params(
             set(_extract_variables(expr_rhs, timestep - 1))
         )
+        prev_timestep_dependencies = list(
+            set(prev_timestep_dependencies) - set(variables)
+        )
 
         # Save the dependencies to the equation:
         eq.dependencies = variables
