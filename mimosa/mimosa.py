@@ -180,6 +180,7 @@ class MIMOSA:
             self._params,
             simulation_obj,
             filename,
+            scenario_type="simulation",
             **kwargs
         )
 
