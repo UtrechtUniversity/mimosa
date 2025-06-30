@@ -363,12 +363,12 @@ def get_all_variables(m):
     ]
 
 
-def get_all_time_region_params(m):
+def get_all_time_dependent_params(m):
     """Returns all parameters with time and region dimensions"""
     return [
         UsefulVar(m, param)
         for param in m.component_objects(Param)
-        if has_time_and_region_dim(param) and not param.name.startswith("_")
+        if "t" in get_indices(param) and not param.name.startswith("_")
     ]
 
 
@@ -380,7 +380,7 @@ def has_time_and_region_dim(var):
 
 
 def get_indices(var):
-    return [index.local_name for index in var.index_set().subsets()]
+    return [index.name for index in var.index_set().subsets()]
 
 
 def get_unit(var):

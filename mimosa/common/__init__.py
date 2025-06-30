@@ -52,7 +52,7 @@ from .pyomo_utils import (
     soft_min,
     soft_max,
     get_all_variables,
-    get_all_time_region_params,
+    get_all_time_dependent_params,
     add_constraint,
     has_time_and_region_dim,
     get_indices,
