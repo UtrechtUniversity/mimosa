@@ -50,6 +50,7 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
         initialize=lambda m, t, r: _calc_debt(
             m, r, historical_emissions, historical_population
         ),
+        units=quant.unit("emissions_unit"),
     )
 
     m.cumulative_regional_emission_allowances = Var(

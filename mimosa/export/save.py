@@ -9,16 +9,25 @@ import hashlib
 import numpy as np
 import pandas as pd
 
-from mimosa.common import get_all_variables, get_all_time_region_params, value
+import mimosa
+from mimosa.common import get_all_variables, get_all_time_dependent_params, value
 
 
 def save_output_pyomo(params, m, filename="run1", hash_suffix=False, folder="output"):
     # 2. Save the Pyomo variables and data functions
-    all_variables = get_all_variables(m) + get_all_time_region_params(m)
-    save_output(all_variables, params, m, filename, hash_suffix, folder)
+    all_variables = get_all_variables(m) + get_all_time_dependent_params(m)
+    save_output(all_variables, params, m, filename, "optimisation", hash_suffix, folder)
 
 
-def save_output(all_variables, params, m, filename, hash_suffix=False, folder="output"):
+def save_output(
+    all_variables,
+    params,
+    m,
+    filename,
+    scenario_type="optimisation",
+    hash_suffix=False,
+    folder="output",
+):
     # 1. Create a unique identifier
     if hash_suffix:
         settings_hash = hashlib.md5(json.dumps(params).encode()).hexdigest()[:9]
@@ -42,8 +51,14 @@ def save_output(all_variables, params, m, filename, hash_suffix=False, folder="o
 
     # 3. Save the param file
     if params is not None:
+        # Add MIMOSA version
+        params_with_version = {
+            "MIMOSA version": mimosa.__version__,
+            "Scenario type": scenario_type,
+            **params,
+        }
         with open(f"{path}.params.json", "w") as fh:
-            json.dump(params, fh)
+            json.dump(params_with_version, fh)
 
 
 def var_to_row(rows, m, var, is_regional, unit):
