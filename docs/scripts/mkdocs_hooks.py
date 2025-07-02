@@ -1,6 +1,7 @@
 import re
 import yaml
 import sys, os
+import pandas as pd
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../../"))
 
@@ -101,10 +102,42 @@ def markdown_parse_parser_types(markdown):
     return markdown
 
 
+def markdown_parse_region_defs(markdown):
+    # Check if markdown has parameter reference
+    check_str = "{regions::definitions}"
+    if check_str not in markdown:
+        return markdown
+
+    path = os.path.join(
+        os.path.dirname(__file__),
+        "../../mimosa/inputdata/regions/ISO_IMAGE_regions_R5_regions.csv",
+    )
+    regions = (
+        pd.read_csv(path)
+        .sort_values("IMAGE region code")[
+            ["IMAGE region code", "Region", "Region name"]
+        ]
+        .drop_duplicates()
+    )
+    regions_markdown = """
+
+<div class="tiny_table" markdown>
+| #  | Region | Region name |
+| -- | -- | -- |
+"""
+    for _, (code, region, name) in regions.iterrows():
+        regions_markdown += f"| {code} | {region} | {name} |\n"
+
+    regions_markdown += "\n</div>"
+    markdown = markdown.replace(check_str, regions_markdown)
+    return markdown
+
+
 def on_page_markdown(markdown, **kwargs):
 
     markdown = markdown_parse_param_reference(markdown)
     markdown = markdown_parse_parser_types(markdown)
+    markdown = markdown_parse_region_defs(markdown)
 
     return markdown
 
