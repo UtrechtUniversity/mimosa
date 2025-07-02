@@ -4,24 +4,33 @@ Follow the instructions in the [installation guide](../../installation.md) to in
 
 ## Exercise 1: cost-benefit analysis: optimal temperature and benefit-cost ratio
 
+For this exercise, you will do two runs of MIMOSA: a no-policy baseline run, and a cost-benefit analysis (CBA) run. The no-policy baseline run will give a sense of the economic impacts of climate change if we don't do any policy, while the CBA run will allow you to find the optimal temperature target and get a sense of the residual damages and mitigation costs.
 
-#### Step 1: Do a no-policy baseline run
-Run the following code to do a no-policy baseline run with MIMOSA. The code is already provided, so you can just run it. The code will run a baseline run. Since there is nothing to optimise, the code will do a *simulation*, and not an *optimisation* run.
+#### Step 1: Running MIMOSA
 
-```python
---8<-- "docs/workshops/summerschool_prisma_2025/run_baseline.py"
-``` 
+=== "No-policy baseline run"
+
+    This code will do a baseline run. Since there is nothing to optimise, the code will do a *simulation*, and not an *optimisation* run.
+
+    ```python
+    --8<-- "docs/workshops/summerschool_prisma_2025/run_baseline.py"
+    ``` 
+
+=== "Cost-benefit run"
+
+    Now that you have run a no-policy baseline run, you can run MIMOSA in optimisation mode. This will allow you to find the optimal temperature and benefit-cost ratio for the given parameters.
+
+    ```python
+    --8<-- "docs/workshops/summerschool_prisma_2025/run_cba.py"
+    ```
+
+
 
 #### Step 2: Analyse the results
 The code will produce a CSV file with the results of the run. The file is saved in the `output` folder. Open the file `output/run_baseline_nopolicy.csv` to see the
-results of the simulation. The easiest way to visualise the results is to use the MIMOSA Dashboard. Open the [MIMOSA Dashboard](https://dashboard-mimosa.onrender.com/) and drag and drop the `output/run_baseline_nopolicy.csv` file into the dashboard. This will allow you to visualise the results of the simulation.
+results of the simulation. The easiest way to visualise the results is to use the MIMOSA Dashboard. Open the [MIMOSA Dashboard](https://dashboard-mimosa.onrender.com/) and drag and drop the `output/run_baseline_nopolicy.csv` file into the dashboard. This will allow you to visualise the results of the simulation. You can also drag and drop multiple files to compare the results of different runs: try dropping both `run_baseline_nopolicy.csv` and `run_cba.csv` to compare the results of the no-policy baseline run and the CBA run.
 
-#### Step 3: Running MIMOSA in optimisation mode
-Now that you have run a no-policy baseline run, you can run MIMOSA in optimisation mode. This will allow you to find the optimal temperature and benefit-cost ratio for the given parameters. The code is already provided, so you can just run it.
 
-```python
---8<-- "docs/workshops/summerschool_prisma_2025/run_cba.py"
-```
 
 #### Step 4: Analyse the damages, mitigation costs, avoided damages and calculate the benefit-cost ratio
 

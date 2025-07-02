@@ -2,11 +2,11 @@ from mimosa import MIMOSA, load_params
 
 params = load_params()
 
+# Make sure that the damages are not ignored. Set this to True if you want a true baseline run without impacts.
 params["economics"]["damages"]["ignore damages"] = False
-params["time"]["end"] = 2150
 
-model = MIMOSA(params)
+model1 = MIMOSA(params)
 
-simulation = model.run_nopolicy_baseline()
+simulation1 = model1.run_nopolicy_baseline()
 
-model.save_simulation(simulation, "run_baseline_nopolicy")
+model1.save_simulation(simulation1, "run_baseline_nopolicy")
