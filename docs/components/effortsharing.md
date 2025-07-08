@@ -26,3 +26,7 @@ set using the [`effort_sharing_regime`](../parameters.md#effort sharing.regime) 
 
     :::mimosa.components.effortsharing.per_cap_convergence.get_constraints
 
+=== "Ability to pay"
+
+    :::mimosa.components.effortsharing.ability_to_pay.get_constraints
+

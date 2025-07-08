@@ -24,7 +24,7 @@ from mimosa.common import (
 def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     """
     Usage:
-    ```python hl_lines="2 3 4 5 6 7 8 9"
+    ```python hl_lines="2-9"
     params = load_params()
     params["effort sharing"]["regime"] = "per_cap_convergence"
     params["effort sharing"]["percapconv_year"] = 2050
@@ -118,7 +118,25 @@ def percapconv_share_rule(m, t, r):
     x = \\frac{t - t_0}{\\text{convergence year} - t_0}.
     $$
 
+    #### Immediate per capita convergence
+
+    If the convergence year is set to the first year, the per capita convergence is applied immediately:
+
+    ```python hl_lines="3"
+    params = load_params()
+    params["effort sharing"]["regime"] = "per_cap_convergence"
+    params["effort sharing"]["percapconv_year"] = 2020  # Immediate per capita convergence
+    ```
+
+    #### Grandfathering
+
     If the convergence year is set to `false`, the grandfathering allowance distribution is used all the time.
+
+    ```python hl_lines="3"
+    params = load_params()
+    params["effort sharing"]["regime"] = "per_cap_convergence"
+    params["effort sharing"]["percapconv_year"] = False  # Grandfathering all the time
+    ```
     """
 
     year_0, year_t = m.year(0), m.year(t)
