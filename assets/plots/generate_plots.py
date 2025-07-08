@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 import plotly.express as px
 from plotly.subplots import make_subplots
+from plotly.utils import PlotlyJSONEncoder
 
 sys.path.insert(
     0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../"))
@@ -41,8 +42,8 @@ x = np.linspace(0.1, 10, 100)
 for elasmu, color in zip([0.5, 1.001, 1.5], COLORS):
     y = calc_utility(x, 1, elasmu)
     fig_utility.add_scatter(
-        x=x,
-        y=y,
+        x=list(x),
+        y=list(y),
         mode="lines",
         name=f"elasmu={elasmu}",
         line={
@@ -51,8 +52,8 @@ for elasmu, color in zip([0.5, 1.001, 1.5], COLORS):
         },
     )
 fig_utility.add_scatter(
-    x=x,
-    y=np.log(x),
+    x=list(x),
+    y=list(np.log(x)),
     mode="lines",
     name="log(x)",
     line={"color": "grey", "width": 2.5, "dash": "dot"},
@@ -136,7 +137,7 @@ data_emissions = data_emissions.unstack("Variable").reset_index().astype({"Year"
 data_emissions["Emissions|CO2"] /= 1000
 data_emissions["Scenario"] = data_emissions["Scenario"].str.split("-").str[0]
 
-fig_baseline_emissions = px.line(
+_fig_baseline_emissions = px.line(
     data_emissions[data_emissions["Year"] >= 2020],
     x="Year",
     y="Emissions|CO2",
@@ -147,6 +148,23 @@ fig_baseline_emissions = px.line(
     width=1200,
     render_mode="svg",
 )
+
+fig_baseline_emissions = make_subplots()
+for trace in _fig_baseline_emissions.data:
+    fig_baseline_emissions.add_scatter(
+        x=trace.x.tolist(),
+        y=trace.y.tolist(),
+        name=trace.name,
+        mode=trace.mode,
+        line=trace.line,
+        legendgroup=trace.legendgroup,
+        showlegend=trace.showlegend,
+        xaxis=trace.xaxis,
+        yaxis=trace.yaxis,
+        hovertemplate=trace.hovertemplate,
+    )
+
+fig_baseline_emissions.layout = _fig_baseline_emissions.layout
 
 fig_baseline_emissions.update_layout(
     legend={"orientation": "h", "x": 0.5, "xanchor": "center"},
@@ -196,8 +214,8 @@ for TCRE, name, xend, xshift in (
 ):
     x = np.linspace(1000, xend)
     fig_ar5_tcre.add_scatter(
-        x=x,
-        y=TCRE * x / 1000,
+        x=list(x),
+        y=list(TCRE * x / 1000),
         mode="lines",
         line={"color": "black", "dash": "dot", "width": 3},
         name=f"AR5 {name} (TCRE={TCRE} degC/TtCO2)",
@@ -287,8 +305,8 @@ for TCRE, name, yshift, xshift in (
 ):
     x = np.linspace(2200, 4380)
     fig_ar6_tcre.add_scatter(
-        x=x,
-        y=(x - 2200) * TCRE / 1000 + 1 + yshift,
+        x=list(x),
+        y=list((x - 2200) * TCRE / 1000 + 1 + yshift),
         mode="lines",
         line={"color": "black", "dash": "dot", "width": 3},
         name=f"AR6 {name} (TCRE={TCRE} degC/TtCO2)",
@@ -363,8 +381,8 @@ fig_mac.add_scatter(x=x, y=mitigcosts(x), name="MAC", showlegend=False)
 reduct = 0.8
 x2 = np.arange(0, reduct + 0.01, 0.01)
 fig_mac.add_scatter(
-    x=x2,
-    y=mitigcosts(x2),
+    x=list(x2),
+    y=list(mitigcosts(x2)),
     fill="tozeroy",
     showlegend=False,
     line_color="rgba(0,0,0,0)",
