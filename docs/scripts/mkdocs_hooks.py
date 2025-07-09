@@ -205,8 +205,9 @@ def on_page_content(html, **kwargs):
                 if param.doc.startswith("::"):
                     # Ignore the regional parameters for now
                     keys = param.doc.split("::")[1].split(".")
+                    keys_param_format = "".join([f'["{key}"]' for key in keys])
                     doc = get_nested(parser_tree, keys).to_string()
-                    formatted_text = f"<a href='../../parameters/#{param.doc.split('::')[1]}'><code>{param_name}</code></a>: {doc}"
+                    formatted_text = f"<a href='../../parameters/#{param.doc.split('::')[1]}'><code>params{keys_param_format}</code></a>: {doc}"
             html = html.replace(match, formatted_text)
 
         except AttributeError:
@@ -218,8 +219,9 @@ def on_page_content(html, **kwargs):
             formatted_text = f"<code>{param_title}</code>"
             # Ignore the regional parameters for now
             keys = param_key_str.split(".")
+            keys_param_format = "".join([f'["{key}"]' for key in keys])
             doc = get_nested(parser_tree, keys).to_string()
-            formatted_text = f"<a href='../../parameters/#{param_key_str}'><code>{param_title}</code></a>: {doc}"
+            formatted_text = f"<a href='../../parameters/#{param_key_str}'><code>params{keys_param_format}</code></a>: {doc}"
             html = html.replace(match, formatted_text)
 
         except AttributeError:

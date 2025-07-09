@@ -31,11 +31,33 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     Usage:
     ```python hl_lines="2"
     params = load_params()
-    params["effort sharing"]["regime"] = "equal_mitigation_costs"
+    params["effort sharing"]["regime"] = "equal_cumulative_per_capita"
     model = MIMOSA(params)
     ```
 
-    TODO
+    The equal cumulative per capita (ECPC) regime allocates emission allowances based on **historical and future** cumulative
+    emissions per capita. Contrary to the other effort sharing regimes, this regime considers only the cumulative emissions,
+    not the distribution over time: the only constraint will be on the cumulative emissions at the end of the time horizon.
+    MIMOSA is then free to allocate these reductions over time.
+
+    First, a historical debt is calculated for each region: how much more, or less, emissions did a region emit
+    compared to its fair share of cumulative emissions per capita since a start year (by default 1850).
+
+
+    :::mimosa.components.effortsharing.equal_cumulative_per_cap._calc_debt
+
+    #### Step 2: Regional cumulative emissions
+
+    Once the historical debt is calculated, the future cumulative regional allowances are calculated as:
+
+    $$
+    \\text{cumulative allowances}_{r} = \\frac{\\sum_{t=2020}^{2100} \\text{population}_{t,r}}{\\sum_{t=2020}^{2100} \\text{global population}_{t}} \\cdot \\text{cumulative emissions}_{2100} + \\text{debt}_{r},
+    $$
+
+    where $\\text{cumulative emissions}_{2100}$ is the total global emissions at the end of the time horizon.
+
+    *Note: if the time horizon is different than 2100, replace 2100 with the actual time horizon.*
+
 
     """
 
@@ -114,9 +136,27 @@ def _load_data():
 
 def _calc_debt(m, r, all_emissions, all_population):
     """
+
+    #### Step 1: historical debt calculation
+
     Calculate the debt for a region based on historical emissions and population.
-    The debt is calculated as the cumulative emissions per capita from 1850 to 2020,
-    discounted by a given rate.
+    The debt is calculated as the cumulative emissions per capita from a start year to 2020,
+    discounted by a given rate:
+
+    $$
+    \\text{debt}_{r} = \\sum_{t=\\text{start year}}^{2020} \\left(\\frac{\\text{population}_{r,t}}{\\text{global population}_{t}} \\cdot \\text{global emissions}_{t} - \\text{emissions}_{r,t}\\right) \\cdot e^{-\\text{discount rate} \\cdot (2020 - t)}.
+    $$
+
+    where you can set the following parameters:
+
+    * $\\text{start year}$ using [`params["effort sharing"]["ecpc_start_year"]`](../parameters.md#effort sharing.ecpc_start_year) (default: 1850),
+    * $\\text{discount rate}$ using [`params["effort sharing"]["ecpc_start_year"]`](../parameters.md#effort sharing.ecpc_discount_rate) (default: 3%/yr).
+
+    The historical debt is therefore positive for regions that emitted more than their fair share of cumulative emissions per capita, and negative for regions that emitted less than their fair share:
+
+    ``` plotly
+    {"file_path": "./assets/plots/ecpc_debt.json"}
+    ```
     """
     start_year = value(m.effort_sharing_ecpc_start_year)
     base_year = value(m.beginyear)

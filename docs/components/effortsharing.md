@@ -30,3 +30,7 @@ set using the [`effort_sharing_regime`](../parameters.md#effort sharing.regime) 
 
     :::mimosa.components.effortsharing.ability_to_pay.get_constraints
 
+=== "Equal cumulative per capita emissions"
+
+    :::mimosa.components.effortsharing.equal_cumulative_per_cap.get_constraints
+

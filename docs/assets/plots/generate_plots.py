@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 import plotly.express as px
 from plotly.subplots import make_subplots
+from plotly.utils import PlotlyJSONEncoder
 
 sys.path.insert(
     0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../"))
@@ -13,11 +14,14 @@ sys.path.insert(
 from mimosa import MIMOSA
 from mimosa.common.config.parseconfig import check_params
 from mimosa.components.welfare.utility_fct import calc_utility
+from mimosa.components.effortsharing import equal_cumulative_per_cap
 
 params, parser_tree = check_params({}, return_parser_tree=True)
 
+
 # Create an instance of the MIMOSA model to get the names of each parameter to be parsed
 model = MIMOSA(params)
+param_store = model.preprocessor._regional_param_store
 
 COLORS = [
     "#5492cd",
@@ -38,8 +42,8 @@ x = np.linspace(0.1, 10, 100)
 for elasmu, color in zip([0.5, 1.001, 1.5], COLORS):
     y = calc_utility(x, 1, elasmu)
     fig_utility.add_scatter(
-        x=x,
-        y=y,
+        x=list(x),
+        y=list(y),
         mode="lines",
         name=f"elasmu={elasmu}",
         line={
@@ -48,8 +52,8 @@ for elasmu, color in zip([0.5, 1.001, 1.5], COLORS):
         },
     )
 fig_utility.add_scatter(
-    x=x,
-    y=np.log(x),
+    x=list(x),
+    y=list(np.log(x)),
     mode="lines",
     name="log(x)",
     line={"color": "grey", "width": 2.5, "dash": "dot"},
@@ -78,7 +82,7 @@ for param_category, param_name, y_title in [
     ),
 ]:
     fig_init_capital_factor = make_subplots()
-    init_capital_factor = model.regional_param_store.get(param_category, param_name)
+    init_capital_factor = param_store.get(param_category, param_name)
     fig_init_capital_factor.add_bar(
         x=list(init_capital_factor.keys()),
         y=list(init_capital_factor.values()),
@@ -133,7 +137,7 @@ data_emissions = data_emissions.unstack("Variable").reset_index().astype({"Year"
 data_emissions["Emissions|CO2"] /= 1000
 data_emissions["Scenario"] = data_emissions["Scenario"].str.split("-").str[0]
 
-fig_baseline_emissions = px.line(
+_fig_baseline_emissions = px.line(
     data_emissions[data_emissions["Year"] >= 2020],
     x="Year",
     y="Emissions|CO2",
@@ -144,6 +148,23 @@ fig_baseline_emissions = px.line(
     width=1200,
     render_mode="svg",
 )
+
+fig_baseline_emissions = make_subplots()
+for trace in _fig_baseline_emissions.data:
+    fig_baseline_emissions.add_scatter(
+        x=trace.x.tolist(),
+        y=trace.y.tolist(),
+        name=trace.name,
+        mode=trace.mode,
+        line=trace.line,
+        legendgroup=trace.legendgroup,
+        showlegend=trace.showlegend,
+        xaxis=trace.xaxis,
+        yaxis=trace.yaxis,
+        hovertemplate=trace.hovertemplate,
+    )
+
+fig_baseline_emissions.layout = _fig_baseline_emissions.layout
 
 fig_baseline_emissions.update_layout(
     legend={"orientation": "h", "x": 0.5, "xanchor": "center"},
@@ -193,8 +214,8 @@ for TCRE, name, xend, xshift in (
 ):
     x = np.linspace(1000, xend)
     fig_ar5_tcre.add_scatter(
-        x=x,
-        y=TCRE * x / 1000,
+        x=list(x),
+        y=list(TCRE * x / 1000),
         mode="lines",
         line={"color": "black", "dash": "dot", "width": 3},
         name=f"AR5 {name} (TCRE={TCRE} degC/TtCO2)",
@@ -284,8 +305,8 @@ for TCRE, name, yshift, xshift in (
 ):
     x = np.linspace(2200, 4380)
     fig_ar6_tcre.add_scatter(
-        x=x,
-        y=(x - 2200) * TCRE / 1000 + 1 + yshift,
+        x=list(x),
+        y=list((x - 2200) * TCRE / 1000 + 1 + yshift),
         mode="lines",
         line={"color": "black", "dash": "dot", "width": 3},
         name=f"AR6 {name} (TCRE={TCRE} degC/TtCO2)",
@@ -360,8 +381,8 @@ fig_mac.add_scatter(x=x, y=mitigcosts(x), name="MAC", showlegend=False)
 reduct = 0.8
 x2 = np.arange(0, reduct + 0.01, 0.01)
 fig_mac.add_scatter(
-    x=x2,
-    y=mitigcosts(x2),
+    x=list(x2),
+    y=list(mitigcosts(x2)),
     fill="tozeroy",
     showlegend=False,
     line_color="rgba(0,0,0,0)",
@@ -409,8 +430,8 @@ def strip_prefix_form(form_dict):
     }
 
 
-form_slr_ad = model.regional_param_store.get("COACCH", "SLR-Ad_form")
-form_slr_noad = model.regional_param_store.get("COACCH", "SLR-NoAd_form")
+form_slr_ad = param_store.get("COACCH", "SLR-Ad_form")
+form_slr_noad = param_store.get("COACCH", "SLR-NoAd_form")
 form_slr = pd.DataFrame(
     {
         "SLR (with opt. adapt.)": strip_prefix_form(form_slr_ad),
@@ -418,3 +439,87 @@ form_slr = pd.DataFrame(
     }
 ).rename_axis("Region", axis=0)
 form_slr.to_csv("docs/assets/data/coacch_slr_form.csv")
+
+
+##############
+# ECPC effort sharing debt
+##############
+
+
+ecpc_hist_emissions, ecpc_hist_population = equal_cumulative_per_cap._load_data()
+
+ecpc_debts = {}
+
+
+class MockEcpcModel:
+    def __init__(self, start_year, begin_year, discount_rate):
+        self.effort_sharing_ecpc_start_year = start_year
+        self.beginyear = begin_year
+        self.effort_sharing_ecpc_discount_rate = discount_rate
+
+
+for discount_rate in 0.01, 0.03, 0.05:
+    mock_m = MockEcpcModel(1850, 2020, discount_rate)
+    ecpc_debts[f"r={discount_rate}"] = pd.Series(
+        {
+            r: equal_cumulative_per_cap._calc_debt(
+                mock_m, r, ecpc_hist_emissions, ecpc_hist_population
+            )
+            for r in model.concrete_model.regions
+        },
+    ).rename_axis("Region", axis=0)
+
+ecpc_debts = pd.DataFrame(ecpc_debts).reset_index()
+
+fig_ecpc_debt = make_subplots()
+
+for i, discount_rate in enumerate(ecpc_debts.columns[1:]):
+    fig_ecpc_debt.add_bar(
+        x=list(ecpc_debts["Region"]),
+        y=list(ecpc_debts[discount_rate]),
+        name=discount_rate,
+        marker_color=COLORS[i],
+        visible=i == 1,
+        orientation="v",
+    )
+
+
+def _legend(i, n):
+    visible = [False] * n
+    visible[i] = True
+    return visible
+
+
+fig_ecpc_debt.update_layout(
+    updatemenus=[
+        dict(
+            type="buttons",
+            buttons=[
+                dict(
+                    label=r,
+                    method="update",
+                    args=[
+                        {"visible": _legend(i, len(ecpc_debts.columns) - 1)},
+                        {"annotations": []},
+                    ],
+                )
+                for i, r in enumerate(ecpc_debts.columns[1:])
+            ],
+            direction="right",
+            showactive=True,
+            active=1,
+            x=0.5,
+            y=1.1,
+            xanchor="center",
+            yanchor="top",
+        )
+    ],
+    margin={"l": 20, "r": 0, "t": 50, "b": 20},
+    # width=800,
+).update_yaxes(
+    range=[ecpc_debts.iloc[:, 1:].min().min(), ecpc_debts.iloc[:, 1:].max().max()],
+    title="Debt (in GtCO<sub>2</sub>)",
+    title_standoff=0,
+)
+
+fig_ecpc_debt.write_json("docs/assets/plots/ecpc_debt.json")
