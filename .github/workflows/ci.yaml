@@ -67,20 +67,6 @@ jobs:
           activate-environment: test-env
           environment-file: environment.yml
           # use-only-tar-bz2: true
-      - name: Install specific IPOPT version (Windows)
-        if: matrix.os == 'windows-latest'
-        shell: bash -l {0}
-        run: |
-          conda config --env --add channels conda-forge
-          conda config --env --set channel_priority strict
-          conda install -n test-env ipopt=3.14.17 --yes
-      - name: Install specific IPOPT version (Mac/Linux)
-        if: matrix.os != 'windows-latest'
-        shell: bash -l {0}
-        run: |
-          conda config --env --add channels conda-forge
-          conda config --env --set channel_priority strict
-          conda install -n test-env ipopt --yes
       - name: Install your package
         shell: bash -l {0}
         run: |
