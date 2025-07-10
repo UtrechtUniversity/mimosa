@@ -2,6 +2,7 @@ import pytest
 import numpy as np
 
 from mimosa.components import mitigation
+from mimosa.common import trapezoid
 
 
 class MockAbstractModel:
@@ -40,7 +41,7 @@ def test_area_under_mac(a_end, request):
     # Test if AC is equal to the integral of MAC:
     a_values = np.linspace(0, a_end, 500)
     mac_values = mitigation.MAC(a_values, m, 0, "r1")
-    integral_mac = np.trapezoid(mac_values, x=a_values)
+    integral_mac = trapezoid(mac_values, x=a_values)
 
     abatement_costs = mitigation.AC(a_end, m, 0, "r1")
 

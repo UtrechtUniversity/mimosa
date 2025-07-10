@@ -20,6 +20,7 @@ from mimosa.common import (
     Constraint,
     value,
     quant,
+    trapezoid,
 )
 
 
@@ -59,7 +60,7 @@ def _set_baseline_emissions(m: AbstractModel) -> None:
         values_t = range(t + 1)
         values = [value(m.baseline_emissions[s, r]) for s in values_t]
         years = value(m.beginyear) + np.array(values_t) * value(m.dt)
-        return np.trapezoid(values, years)
+        return trapezoid(values, years)
 
     m.cumulative_baseline_emissions = Param(
         m.t,
