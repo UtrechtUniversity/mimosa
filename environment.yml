@@ -1,7 +1,6 @@
 name: test-env
 channels:
   - conda-forge
-channel_priority: strict
 dependencies:
   - python
   - ipopt >= 3.14.17
