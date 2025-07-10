@@ -1,7 +1,7 @@
 import pytest
 from tests.modeltests.utils import exec_run, SolverStatus, read_output
 
-pytestmark = pytest.mark.slow
+pytestmark = pytest.mark.ipopt
 
 
 @pytest.fixture(scope="module")
