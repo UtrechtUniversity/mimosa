@@ -51,7 +51,7 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     Finally, the allowances are calculated by subtracting the reductions from the baseline emissions, multiplied by the correction factor:
 
     $$
-    \\text{allowances}_{\\text{AP}; t,r} = \\text{baseline emissions}_{t,r} - \\text{reductions}_{\text{AP}; t,r} \\cdot \\text{correction factor}_{t}.
+    \\text{allowances}_{\\text{AP}; t,r} = \\text{baseline emissions}_{t,r} - \\text{reductions}_{\\text{AP}; t,r} \\cdot \\text{correction factor}_{t}.
     $$
 
 

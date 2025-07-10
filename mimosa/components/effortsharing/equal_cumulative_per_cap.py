@@ -103,7 +103,7 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
             m.effort_sharing_ecpc_cumulative_allowances,
             lambda m, t, r: m.cumulative_population_share[t, r]
             * m.cumulative_emissions[t]
-            + m.effort_sharing_ecpc_historical_debt[t, r],
+            - m.effort_sharing_ecpc_historical_debt[t, r],
         ),
         RegionalSoftEqualityConstraint(
             # Note: add constant factor to LHS and RHS to make sure both sides are positive
@@ -144,13 +144,19 @@ def _calc_debt(m, r, all_emissions, all_population):
     discounted by a given rate:
 
     $$
-    \\text{debt}_{r} = \\sum_{t=\\text{start year}}^{2020} \\left(\\frac{\\text{population}_{r,t}}{\\text{global population}_{t}} \\cdot \\text{global emissions}_{t} - \\text{emissions}_{r,t}\\right) \\cdot e^{-\\text{discount rate} \\cdot (2020 - t)}.
+    \\text{debt}_{r} = \\sum_{t=\\text{start year}}^{2020} \\left(\\text{emissions}_{r,t} - \\text{fair share}_{t,r}\\right) \\cdot e^{-\\text{discount rate} \\cdot (2020 - t)},
     $$
 
-    where you can set the following parameters:
+    where the yearly fair share is calculated as:
 
-    * $\\text{start year}$ using [`params["effort sharing"]["ecpc_start_year"]`](../parameters.md#effort sharing.ecpc_start_year) (default: 1850),
-    * $\\text{discount rate}$ using [`params["effort sharing"]["ecpc_start_year"]`](../parameters.md#effort sharing.ecpc_discount_rate) (default: 3%/yr).
+    $$
+    \\text{fair share}_{t,r} = \\frac{\\text{population}_{r,t}}{\\text{global population}_{t}} \\cdot \\text{global emissions}_{t}
+    $$
+
+    The following parameters can be set:
+
+    - manualparam::effort sharing::effort sharing.ecpc_start_year::
+    - manualparam::effort sharing::effort sharing.ecpc_discount_rate::
 
     The historical debt is therefore positive for regions that emitted more than their fair share of cumulative emissions per capita, and negative for regions that emitted less than their fair share:
 
@@ -173,6 +179,6 @@ def _calc_debt(m, r, all_emissions, all_population):
     )
 
     fair_share = population[r] / global_population * global_emissions
-    cumulative_discounted_debt = ((fair_share - emissions[r]) * discount_factor).sum()
+    cumulative_discounted_debt = ((emissions[r] - fair_share) * discount_factor).sum()
 
     return float(cumulative_discounted_debt)
