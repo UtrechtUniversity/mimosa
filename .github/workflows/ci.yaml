@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [master]
+    branches: ["*"]
     tags: ["v*.*.*"]
   pull_request:
     branches: [master]
@@ -59,10 +59,9 @@ jobs:
       - name: Set up Miniconda
         uses: conda-incubator/setup-miniconda@v3
         with:
-          auto-update-conda: true
+          # auto-update-conda: true
           python-version: ${{ matrix.python-version }}
           channels: conda-forge
-          channel-priority: strict
           activate-environment: test-env
           environment-file: environment.yml
           use-only-tar-bz2: true
