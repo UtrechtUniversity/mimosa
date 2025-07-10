@@ -50,6 +50,7 @@ jobs:
     name: Test with IPOPT on Python ${{ matrix.python-version }}, ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         os: ["ubuntu-latest", "macos-latest", "windows-latest"]
         python-version: ["3.10"]
@@ -70,12 +71,6 @@ jobs:
         if: matrix.os == 'windows-latest'
         shell: bash -l {0}
         run: conda install -n test-env ipopt=3.11.1 -c conda-forge
-
-      # - name: Install latest IPOPT version (Linux/macOS)
-      #   if: matrix.os != 'windows-latest'
-      #   shell: bash -l {0}
-      #   run: conda install -n test-env ipopt=3.14.12 -c conda-forge
-
       - name: Install your package
         shell: bash -l {0}
         run: |
