@@ -8,7 +8,7 @@ on:
     branches: [master]
 
 jobs:
-  test:
+  test_install:
     name: Test on Python ${{ matrix.python-version }}
     runs-on: ubuntu-latest
     strategy:
@@ -45,3 +45,40 @@ jobs:
         run: |
           pytest -m "not ipopt"
         continue-on-error: false
+
+  test_optimisation:
+    name: Test with IPOPT on Python ${{ matrix.python-version }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Miniconda
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          auto-update-conda: true
+          python-version: ${{ matrix.python-version }}
+          channels: conda-forge
+          channel-priority: strict
+          activate-environment: test-env
+          environment-file: environment.yml
+          use-only-tar-bz2: true
+
+      - name: Install your package
+        shell: bash -l {0}
+        run: |
+          pip install .
+
+      - name: Dependency check
+        shell: bash -l {0}
+        run: |
+          pip check
+
+      - name: Run tests
+        shell: bash -l {0}
+        run: |
+          pytest
+        continue-on-error: true
