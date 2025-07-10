@@ -66,6 +66,15 @@ jobs:
           activate-environment: test-env
           environment-file: environment.yml
           use-only-tar-bz2: true
+      - name: Install specific IPOPT version (Windows)
+        if: matrix.os == 'windows-latest'
+        shell: bash -l {0}
+        run: conda install -n test-env ipopt=3.11.1 -c conda-forge
+
+      # - name: Install latest IPOPT version (Linux/macOS)
+      #   if: matrix.os != 'windows-latest'
+      #   shell: bash -l {0}
+      #   run: conda install -n test-env ipopt=3.14.12 -c conda-forge
 
       - name: Install your package
         shell: bash -l {0}
@@ -80,5 +89,6 @@ jobs:
       - name: Run tests
         shell: bash -l {0}
         run: |
+          set -e
           pytest
-        continue-on-error: true
+        continue-on-error: false
