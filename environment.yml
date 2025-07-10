@@ -3,7 +3,7 @@ channels:
   - conda-forge
 dependencies:
   - python
-  - ipopt
+  - ipopt >= 3.14.17
   - pip
   - pip:
       - pytest

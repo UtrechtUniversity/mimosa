@@ -47,11 +47,19 @@ jobs:
         continue-on-error: false
 
   test_optimisation:
-    name: Test with IPOPT on Python ${{ matrix.python-version }}
-    runs-on: ubuntu-latest
+    # Run on version tags or when merging through PR to master
+    if: |
+      startsWith(github.ref, 'refs/tags/v') ||
+      (github.event_name == 'push' &&
+      github.ref == 'refs/heads/master' &&
+      contains(github.event.head_commit.message, 'Merge pull request'))
+    name: Test with IPOPT on Python ${{ matrix.python-version }}, ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        os: ["ubuntu-latest", "macos-latest", "windows-latest"]
+        python-version: ["3.11"]
 
     steps:
       - uses: actions/checkout@v4
@@ -59,14 +67,12 @@ jobs:
       - name: Set up Miniconda
         uses: conda-incubator/setup-miniconda@v3
         with:
-          auto-update-conda: true
+          # auto-update-conda: true
           python-version: ${{ matrix.python-version }}
           channels: conda-forge
-          channel-priority: strict
           activate-environment: test-env
           environment-file: environment.yml
-          use-only-tar-bz2: true
-
+          # use-only-tar-bz2: true
       - name: Install your package
         shell: bash -l {0}
         run: |
@@ -80,5 +86,6 @@ jobs:
       - name: Run tests
         shell: bash -l {0}
         run: |
+          set -e
           pytest
-        continue-on-error: true
+        continue-on-error: false
