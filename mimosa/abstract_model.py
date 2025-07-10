@@ -16,6 +16,7 @@ from mimosa.components import (
     objective,
     sealevelrise,
     welfare,
+    ecosystems,
 )
 
 
@@ -112,6 +113,8 @@ def create_abstract_model(
 
     # Abatement costs
     constraints.extend(mitigation.get_constraints(m))
+
+    constraints.extend(ecosystems.get_constraints(m))
 
     # Emission trading
     if emissiontrade_module == "notrade":

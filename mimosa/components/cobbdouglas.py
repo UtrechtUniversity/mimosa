@@ -181,7 +181,12 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
             ),
             RegionalEquation(
                 m.consumption,
-                lambda m, t, r: ((1 - m.sr) * m.GDP_net[t, r]),
+                lambda m, t, r: ((1 - m.sr) * m.GDP_net[t, r])
+                + (
+                    (m.ecosystem_value_tropical[t] - m.ecosystem_value_tropical[0]) / 7
+                    if r in ["BRA", "RSAM", "RCAM", "MEX", "WAF", "INDO", "SEAS"]
+                    else 0
+                ),
             ),
         ]
     )
