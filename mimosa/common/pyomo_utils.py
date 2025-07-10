@@ -85,11 +85,11 @@ class Equation(ABC):
     lhs: str
     rhs: typing.Callable
     name: str
-    dependencies: list[str] = []
+    dependencies: typing.List[str] = []
 
     # Soft dependencies are dependencies to the previous time step, which should
     # not affect order of execution, but are important to plot
-    prev_time_dependencies: list[str] = []
+    prev_time_dependencies: typing.List[str] = []
 
     def __init__(self, lhs, rhs, indices=None):
         """
