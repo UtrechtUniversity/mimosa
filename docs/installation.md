@@ -14,7 +14,7 @@ Since MIMOSA is an optimisation model, an optimisation engine needs to be specif
 === "On Windows"
 
     ```
-    conda install -c conda-forge ipopt=3.11.1
+    conda install -c conda-forge ipopt>=3.14.17
     ```
 
 === "On MacOS"
