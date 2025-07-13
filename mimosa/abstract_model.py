@@ -103,77 +103,44 @@ def create_abstract_model(
     constraints.extend(sealevelrise.get_constraints(m))
 
     # Damage costs
-    if damage_module == "COACCH":
-        constraints.extend(damages.coacch.get_constraints(m))
-    elif damage_module == "nodamage":
-        constraints.extend(damages.nodamage.get_constraints(m))
-    else:
-        raise NotImplementedError
+    get_damage_constraints = load_from_registry(damage_module, damages.DAMAGE_MODULES)
+    constraints.extend(get_damage_constraints(m))
 
     # Abatement costs
     constraints.extend(mitigation.get_constraints(m))
 
     # Emission trading
-    if emissiontrade_module == "notrade":
-        constraints.extend(emissiontrade.notrade.get_constraints(m))
-    elif emissiontrade_module == "globalcostpool":
-        constraints.extend(emissiontrade.globalcostpool.get_constraints(m))
-    elif emissiontrade_module == "emissiontrade":
-        constraints.extend(emissiontrade.emissiontrade.get_constraints(m))
-    else:
-        raise NotImplementedError(
-            f"Emission trading module `{emissiontrade_module}` not implemented"
-        )
+    get_emissiontrade_constraints = load_from_registry(
+        emissiontrade_module, emissiontrade.EMISSIONTRADE_MODULES
+    )
+    constraints.extend(get_emissiontrade_constraints(m))
 
     # Financial transfer
-    if financialtransfer_module == "notransfer":
-        constraints.extend(financialtransfer.notransfer.get_constraints(m))
-    elif financialtransfer_module == "globaldamagepool":
-        constraints.extend(financialtransfer.globaldamagepool.get_constraints(m))
-    else:
-        raise NotImplementedError(
-            f"Financial transfer module `{financialtransfer_module}` not implemented"
-        )
+    get_financialtransfer_constraints = load_from_registry(
+        financialtransfer_module, financialtransfer.FINANCIALTRANSFER_MODULES
+    )
+    constraints.extend(get_financialtransfer_constraints(m))
 
     # Effort sharing regime
-    if effortsharing_regime == "noregime":
-        constraints.extend(effortsharing.noregime.get_constraints(m))
-    elif effortsharing_regime == "equal_mitigation_costs":
-        constraints.extend(effortsharing.equal_mitigation_costs.get_constraints(m))
-    elif effortsharing_regime == "equal_total_costs":
-        constraints.extend(effortsharing.equal_total_costs.get_constraints(m))
-    elif effortsharing_regime == "per_cap_convergence":
-        constraints.extend(effortsharing.per_cap_convergence.get_constraints(m))
-    elif effortsharing_regime == "ability_to_pay":
-        constraints.extend(effortsharing.ability_to_pay.get_constraints(m))
-    elif effortsharing_regime == "equal_cumulative_per_cap":
-        constraints.extend(effortsharing.equal_cumulative_per_cap.get_constraints(m))
-    else:
-        raise NotImplementedError(
-            f"Effort sharing regime `{effortsharing_regime}` not implemented"
-        )
+    get_effortsharing_constraints = load_from_registry(
+        effortsharing_regime, effortsharing.EFFORTSHARING_MODULES
+    )
+    constraints.extend(get_effortsharing_constraints(m))
 
     # Cobb-Douglas and economics
     constraints.extend(cobbdouglas.get_constraints(m))
 
     # Utility and welfare
-    if welfare_module == "welfare_loss_minimising":
-        constraints.extend(welfare.welfare_loss_minimising.get_constraints(m))
-    elif welfare_module == "cost_minimising":
-        constraints.extend(welfare.cost_minimising.get_constraints(m))
-    elif welfare_module == "inequal_aversion_general":
-        constraints.extend(welfare.inequal_aversion_general.get_constraints(m))
-    else:
-        raise NotImplementedError(f"Welfare module `{welfare_module}` not implemented")
+    get_welfare_constraints = load_from_registry(
+        welfare_module, welfare.WELFARE_MODULES
+    )
+    constraints.extend(get_welfare_constraints(m))
 
     # Objective of optimisation
-    if objective_module == "utility":
-        objective_rule, objective_constraints = objective.utility.get_constraints(m)
-    elif objective_module == "globalcosts":
-        objective_rule, objective_constraints = objective.globalcosts.get_constraints(m)
-    else:
-        raise NotImplementedError
-
+    get_objective_constraints = load_from_registry(
+        objective_module, objective.OBJECTIVE_MODULES
+    )
+    model_objective, objective_constraints = get_objective_constraints(m)
     constraints.extend(objective_constraints)
 
     ######################
@@ -188,6 +155,19 @@ def create_abstract_model(
     ######################
     equations = [eq for eq in constraints if isinstance(eq, Equation)]
 
-    m.obj = objective_rule
+    m.objective = model_objective
 
     return m, equations
+
+
+def load_from_registry(name: str, registry: dict):
+    """
+    Load a component from the registry by name.
+    Raises NotImplementedError if the name is not found.
+    """
+    try:
+        return registry[name]
+    except KeyError:
+        raise NotImplementedError(
+            f"Module `{name}` not implemented. Available modules: {list(registry.keys())}"
+        )
