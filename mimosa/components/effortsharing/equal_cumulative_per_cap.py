@@ -61,19 +61,8 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
 
     """
 
-    historical_emissions, historical_population = _load_data()
-    m.effort_sharing_ecpc_discount_rate = Param(
-        doc="::effort sharing.ecpc_discount_rate"
-    )
-    m.effort_sharing_ecpc_start_year = Param(doc="::effort sharing.ecpc_start_year")
-    m.effort_sharing_ecpc_historical_debt = Param(
-        m.t,  # Constant over time
-        m.regions,
-        initialize=lambda m, t, r: _calc_debt(
-            m, r, historical_emissions, historical_population
-        ),
-        units=quant.unit("emissions_unit"),
-    )
+    # Initialize the historical debt for each region
+    _initialize_ecpc_debt(m)
 
     m.cumulative_regional_emission_allowances = Var(
         m.t, m.regions, units=quant.unit("emissions_unit")
@@ -176,3 +165,22 @@ def _calc_debt(m, r, all_emissions, all_population):
     cumulative_discounted_debt = ((fair_share - emissions[r]) * discount_factor).sum()
 
     return float(cumulative_discounted_debt)
+
+
+def _initialize_ecpc_debt(m: AbstractModel):
+    """
+    Initialize the historical debt for each region.
+    """
+    historical_emissions, historical_population = _load_data()
+    m.effort_sharing_ecpc_discount_rate = Param(
+        doc="::effort sharing.ecpc_discount_rate"
+    )
+    m.effort_sharing_ecpc_start_year = Param(doc="::effort sharing.ecpc_start_year")
+    m.effort_sharing_ecpc_historical_debt = Param(
+        m.t,  # Constant over time
+        m.regions,
+        initialize=lambda m, t, r: _calc_debt(
+            m, r, historical_emissions, historical_population
+        ),
+        units=quant.unit("emissions_unit"),
+    )

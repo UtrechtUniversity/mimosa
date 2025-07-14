@@ -363,6 +363,7 @@ effort sharing:
       - per_cap_convergence
       - ability_to_pay
       - equal_cumulative_per_cap
+      - equal_cumulative_per_cap_conv
     default: noregime
   percapconv_year:
     descr: >-
