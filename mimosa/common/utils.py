@@ -53,3 +53,16 @@ def load_yaml(filename):
 
 class MimosaSolverWarning(Warning):
     pass
+
+
+def load_from_registry(name: str, registry: dict):
+    """
+    Load a component for the abstract model from the registry by name.
+    Raises NotImplementedError if the name is not found.
+    """
+    try:
+        return registry[name]
+    except KeyError:
+        raise NotImplementedError(
+            f"Module `{name}` not implemented. Available modules: {list(registry.keys())}"
+        )

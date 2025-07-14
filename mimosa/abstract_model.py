@@ -5,6 +5,7 @@ Contains all model equations and constraints
 """
 
 from mimosa.common import Param, AbstractModel, Set, add_constraint, quant, Equation
+from mimosa.common.utils import load_from_registry
 from mimosa.components import (
     effortsharing,
     emissions,
@@ -158,16 +159,3 @@ def create_abstract_model(
     m.objective = model_objective
 
     return m, equations
-
-
-def load_from_registry(name: str, registry: dict):
-    """
-    Load a component from the registry by name.
-    Raises NotImplementedError if the name is not found.
-    """
-    try:
-        return registry[name]
-    except KeyError:
-        raise NotImplementedError(
-            f"Module `{name}` not implemented. Available modules: {list(registry.keys())}"
-        )
