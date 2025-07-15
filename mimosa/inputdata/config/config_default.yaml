@@ -363,7 +363,6 @@ effort sharing:
       - per_cap_convergence
       - ability_to_pay
       - equal_cumulative_per_cap
-      - equal_cumulative_per_cap_conv
     default: noregime
   percapconv_year:
     descr: >-
@@ -395,6 +394,19 @@ effort sharing:
     max: 2019
     default: 1850
     can_be_false: False
+  ecpc_repayment_endyear:
+    descr: >-
+      Year at which the repayment of the historical emission debt should be
+      finished in the ECPC effort sharing regime. Before this year, the debt 
+      repayment is lowered linearly.
+
+      Can also be false: then the historical debt repayment is spread out equally
+      over every time period.
+    type: float
+    min: 2030
+    max: 2150
+    default: 2100
+    can_be_false: True
 
 ##################
 

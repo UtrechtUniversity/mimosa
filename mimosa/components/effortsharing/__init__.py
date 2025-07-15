@@ -5,7 +5,6 @@ from . import (
     per_cap_convergence,
     ability_to_pay,
     equal_cumulative_per_cap,
-    equal_cumulative_per_cap_conv,
 )
 
 EFFORTSHARING_MODULES = {
@@ -15,5 +14,4 @@ EFFORTSHARING_MODULES = {
     "per_cap_convergence": per_cap_convergence.get_constraints,
     "ability_to_pay": ability_to_pay.get_constraints,
     "equal_cumulative_per_cap": equal_cumulative_per_cap.get_constraints,
-    "equal_cumulative_per_cap_conv": equal_cumulative_per_cap_conv.get_constraints,
 }
