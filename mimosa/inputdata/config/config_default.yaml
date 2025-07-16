@@ -405,7 +405,7 @@ effort sharing:
     type: float
     min: 2030
     max: 2150
-    default: 2100
+    default: 2050
     can_be_false: True
 
 ##################
