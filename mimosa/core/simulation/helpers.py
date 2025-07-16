@@ -33,11 +33,11 @@ def calc_dependencies(equations_dict, m: Union[ConcreteModel, AbstractModel]):
     timestep = 1
     for name, eq in equations_dict.items():
         if isinstance(eq, RegionalEquation):
-            index = [timestep, "CAN"]
+            index = (timestep, "CAN")
         else:
-            index = [timestep]
+            index = (timestep,)
 
-        expr = str(getattr(m, "constraint_" + name)[*index].expr)
+        expr = str(getattr(m, "constraint_" + name)[index].expr)
         expr_rhs = expr.split("==")[1]
         variables = set(_extract_variables(expr_rhs, timestep))
         # Only keep variables, not params:

@@ -85,11 +85,11 @@ class Equation(ABC):
     lhs: str
     rhs: typing.Callable
     name: str
-    dependencies: list[str] = []
+    dependencies: typing.List[str] = []
 
     # Soft dependencies are dependencies to the previous time step, which should
     # not affect order of execution, but are important to plot
-    prev_time_dependencies: list[str] = []
+    prev_time_dependencies: typing.List[str] = []
 
     def __init__(self, lhs, rhs, indices=None):
         """
@@ -146,7 +146,7 @@ class Equation(ABC):
             eq(m, t)
         """
         value = self.rhs(m, *indices)
-        if value is Constraint.Skip:
+        if ".Skip" in str(value):
             return 0
         return value
 
@@ -168,7 +168,7 @@ class GlobalEquation(Equation):
 
         def _rule(m, t, lhs_var_name=self.lhs, rhs_expr=self.rhs):
             rhs_value = rhs_expr(m, t)
-            if rhs_value == Constraint.Skip:
+            if ".Skip" in str(rhs_value):
                 return Constraint.Skip
             return getattr(m, lhs_var_name)[t] == rhs_value
 
@@ -188,7 +188,7 @@ class RegionalEquation(Equation):
 
         def _rule(m, t, r, lhs_var_name=self.lhs, rhs_expr=self.rhs):
             rhs_value = rhs_expr(m, t, r)
-            if rhs_value == Constraint.Skip:
+            if ".Skip" in str(rhs_value):
                 return Constraint.Skip
             return getattr(m, lhs_var_name)[t, r] == rhs_value
 

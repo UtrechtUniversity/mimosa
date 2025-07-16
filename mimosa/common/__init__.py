@@ -72,3 +72,11 @@ from ..export import save_output, save_output_pyomo
 
 # # Config
 # from .config import params
+
+# Compatibility imports
+import numpy as np
+
+try:
+    trapezoid = np.trapezoid
+except AttributeError:
+    trapezoid = np.trapz  # For compatibility with older numpy versions

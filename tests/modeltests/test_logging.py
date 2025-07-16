@@ -2,7 +2,7 @@ import pytest
 import re
 from tests.modeltests.utils import exec_run, SolverStatus, read_output
 
-pytestmark = pytest.mark.slow
+pytestmark = pytest.mark.ipopt
 
 
 def read_log():

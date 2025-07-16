@@ -1,0 +1,9 @@
+name: test-env
+channels:
+  - conda-forge
+dependencies:
+  - python
+  - ipopt >= 3.14.17
+  - pip
+  - pip:
+      - pytest

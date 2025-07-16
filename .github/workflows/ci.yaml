@@ -1,0 +1,93 @@
+name: Check installation and run MIMOSA tests
+
+on:
+  push:
+    branches: [master]
+    tags: ["v*.*.*"]
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+
+jobs:
+  test_install:
+    name: Test on Python ${{ matrix.python-version }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Upgrade pip and build tools
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
+
+      - name: Install mimosa
+        run: |
+          pip install .
+
+      - name: Dependency check
+        run: |
+          pip check
+
+      # Optional: run tests
+      - name: Install test dependencies
+        run: |
+          pip install pytest
+
+      - name: Run tests
+        shell: bash -l {0}
+        run: |
+          pytest -m "not ipopt"
+        continue-on-error: false
+
+  test_optimisation:
+    # Run on version tags or when merging through PR to master
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      startsWith(github.ref, 'refs/tags/v') ||
+      (github.event_name == 'push' &&
+      github.ref == 'refs/heads/master' &&
+      contains(github.event.head_commit.message, 'Merge pull request'))
+    name: Test with IPOPT on Python ${{ matrix.python-version }}, ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ["ubuntu-latest", "macos-latest", "windows-latest"]
+        python-version: ["3.8", "3.11"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Miniconda
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          # auto-update-conda: true
+          python-version: ${{ matrix.python-version }}
+          channels: conda-forge
+          activate-environment: test-env
+          environment-file: environment.yml
+          # use-only-tar-bz2: true
+      - name: Install your package
+        shell: bash -l {0}
+        run: |
+          pip install .
+
+      - name: Dependency check
+        shell: bash -l {0}
+        run: |
+          pip check
+
+      - name: Run tests
+        shell: bash -l {0}
+        run: |
+          set -e
+          pytest
+        continue-on-error: false
