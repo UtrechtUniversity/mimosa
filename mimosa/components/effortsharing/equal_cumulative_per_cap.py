@@ -35,11 +35,24 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     model = MIMOSA(params)
     ```
 
+    In the equal cumulative per capita (ECPC) regime, emission allowances are allocated based on an equal
+    per capita distribution of emissions, combining both *historical* and *future* emissions per capita.
+    The historical emission debt is then spread out over the future time steps, going linearly down to
+    zero in the repayment end year (default: 2050).
+
     First, a historical debt is calculated for each region: how much more, or less, emissions did a region emit
     compared to its fair share of cumulative emissions per capita since a start year (by default 1850).
 
 
     :::mimosa.components.effortsharing.equal_cumulative_per_cap._calc_debt
+
+    #### Step 2: future fair share (excluding historical debt repayment)
+
+    The future fair share for every region (excluding the historical debt) is equal to the immediate
+    per capita convergence regime: every year, a region gets allocated a share of the global emissions
+    based on their population share.
+
+
 
     """
 
@@ -110,12 +123,13 @@ def _calc_debt(m, r, all_emissions, all_population):
 
     #### Step 1: historical debt calculation
 
-    Calculate the debt for a region based on historical emissions and population.
-    The debt is calculated as the cumulative emissions per capita from a start year to 2020,
+    The historical debt is calculated as the cumulative difference between the historical
+    fair share (based on equal per capita emissions) and the actual emissions, starting from
+    a given start year (default: 1850) until the base year (default: 2020), and then
     discounted by a given rate:
 
     $$
-    \\text{debt}_{r} = \\sum_{t=\\text{start year}}^{2020} \\left(\\frac{\\text{population}_{r,t}}{\\text{global population}_{t}} \\cdot \\text{global emissions}_{t} - \\text{emissions}_{r,t}\\right) \\cdot e^{-\\text{discount rate} \\cdot (2020 - t)}.
+    \\text{debt}_{r} = \\sum_{t=\\text{start year}}^{2020} \\left(\\text{emissions}_{r,t} - \\frac{\\text{population}_{r,t}}{\\text{emissions}_{r,t}\\text{global population}_{t}} \\cdot \\text{global emissions}_{t}\\right) \\cdot e^{-\\text{discount rate} \\cdot (2020 - t)}.
     $$
 
     where you can set the following parameters:

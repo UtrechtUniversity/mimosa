@@ -37,7 +37,7 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
 
     ## Parameters defined in this module
     - param::damage_scale_factor
-    - manualparam::damage quantile::economics.damages.quantile
+    - manualparam::damage quantile::economics.damages.quantile::
 
 
     """
