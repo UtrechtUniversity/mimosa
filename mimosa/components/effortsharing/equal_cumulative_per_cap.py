@@ -31,7 +31,7 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     Usage:
     ```python hl_lines="2"
     params = load_params()
-    params["effort sharing"]["regime"] = "equal_cumulative_per_capita_conv"
+    params["effort sharing"]["regime"] = "equal_cumulative_per_cap"
     model = MIMOSA(params)
     ```
 
@@ -52,6 +52,9 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     per capita convergence regime: every year, a region gets allocated a share of the global emissions
     based on their population share.
 
+    ``` plotly
+    {"file_path": "./assets/plots/ecpc_allowances.json"}
+    ```
 
 
     """
@@ -77,8 +80,7 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     )
 
     m.effortsharing_ecpc_repayment_endyear = Param(
-        doc="::effort sharing.ecpc_repayment_endyear",
-        default=2100,
+        doc="::effort sharing.ecpc_repayment_endyear"
     )
 
     m.effortsharing_ecpc_annual_debt_repayment = Param(
@@ -178,12 +180,12 @@ def _calc_ecpc_annual_debt_repayment(m, t, r, corrected=True):
 
     def _uncorrected(t_idx):
         if conv_year is False or conv_year == 0:
-            return m.effortsharing_ecpc_historical_debt[t_idx, r] / (m.tf * m.dt)
+            return m.effortsharing_ecpc_historical_debt[0, r] / (m.tf * m.dt)
         if m.year(t_idx) >= conv_year or t_idx == 0:
             return 0.0
         s = t_idx - 1
         delta_years = conv_year - m.year(1)
-        start_level = 2 * m.effortsharing_ecpc_historical_debt[s, r] / delta_years
+        start_level = 2 * m.effortsharing_ecpc_historical_debt[0, r] / delta_years
         return start_level - start_level / delta_years * (m.year(s + 1) - m.year(0))
 
     uncorrected_value = _uncorrected(t)
@@ -193,5 +195,5 @@ def _calc_ecpc_annual_debt_repayment(m, t, r, corrected=True):
 
     sum_repayments = sum(_uncorrected(s) * m.dt for s in m.t)
     return (
-        uncorrected_value / sum_repayments * m.effortsharing_ecpc_historical_debt[t, r]
+        uncorrected_value / sum_repayments * m.effortsharing_ecpc_historical_debt[0, r]
     )

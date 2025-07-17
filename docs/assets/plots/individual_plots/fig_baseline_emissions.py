@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 from plotly.subplots import make_subplots
 import plotly.express as px
-from .common import mimosa, model, COLORS, params
+from .common import mimosa, model, COLORS, params, plotly_express_to_subplot
 
 
 def create_fig():
@@ -22,7 +22,7 @@ def create_fig():
     data_emissions["Emissions|CO2"] /= 1000
     data_emissions["Scenario"] = data_emissions["Scenario"].str.split("-").str[0]
 
-    _fig_baseline_emissions = px.line(
+    fig_baseline_emissions = px.line(
         data_emissions[data_emissions["Year"] >= 2020],
         x="Year",
         y="Emissions|CO2",
@@ -34,22 +34,7 @@ def create_fig():
         render_mode="svg",
     )
 
-    fig_baseline_emissions = make_subplots()
-    for trace in _fig_baseline_emissions.data:
-        fig_baseline_emissions.add_scatter(
-            x=trace.x.tolist(),
-            y=trace.y.tolist(),
-            name=trace.name,
-            mode=trace.mode,
-            line=trace.line,
-            legendgroup=trace.legendgroup,
-            showlegend=trace.showlegend,
-            xaxis=trace.xaxis,
-            yaxis=trace.yaxis,
-            hovertemplate=trace.hovertemplate,
-        )
-
-    fig_baseline_emissions.layout = _fig_baseline_emissions.layout
+    fig_baseline_emissions = plotly_express_to_subplot(fig_baseline_emissions)
 
     fig_baseline_emissions.update_layout(
         legend={"orientation": "h", "x": 0.5, "xanchor": "center"},

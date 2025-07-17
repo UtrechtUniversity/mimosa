@@ -10,9 +10,9 @@ from .common import mimosa, model, COLORS
 
 class MockEcpcModel:
     def __init__(self, start_year, begin_year, discount_rate):
-        self.effort_sharing_ecpc_start_year = start_year
+        self.effortsharing_ecpc_start_year = start_year
         self.beginyear = begin_year
-        self.effort_sharing_ecpc_discount_rate = discount_rate
+        self.effortsharing_ecpc_discount_rate = discount_rate
 
 
 def create_fig():

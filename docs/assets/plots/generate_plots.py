@@ -6,6 +6,7 @@ from plotly.subplots import make_subplots
 
 from individual_plots import (
     fig_ecpc_historical_debt,
+    fig_ecpc_allowances,
     fig_utility,
     fig_init_capital_and_kappa,
     fig_region_map,
@@ -18,6 +19,9 @@ from individual_plots import (
 
 figure_ecpc_debt = fig_ecpc_historical_debt.create_fig()
 figure_ecpc_debt.write_json("docs/assets/plots/ecpc_debt.json")
+
+figure_ecpc_allowances = fig_ecpc_allowances.create_fig()
+figure_ecpc_allowances.write_json("docs/assets/plots/ecpc_allowances.json")
 
 figure_utility = fig_utility.create_fig()
 figure_utility.write_json("docs/assets/plots/utility_fct.json")
