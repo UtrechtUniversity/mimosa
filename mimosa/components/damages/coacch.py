@@ -1,6 +1,6 @@
 """
 Model equations and constraints:
-Damage and adaptation costs, RICE specification
+Damage and adaptation costs, COACCH specification
 """
 
 from typing import Sequence

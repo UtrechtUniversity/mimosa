@@ -440,6 +440,7 @@ model:
     type: enum
     values:
       - COACCH
+      - ACCREU
       - nodamage
     default: COACCH
 
@@ -530,6 +531,9 @@ regional_parameter_files:
     COACCH:
       filename: inputdata/regionalparams/COACCH.csv
       regionstype: COACCH
+    ACCREU:
+      filename: inputdata/regionalparams/ACCREU.csv
+      regionstype: IMAGE26
 
 ##################
 

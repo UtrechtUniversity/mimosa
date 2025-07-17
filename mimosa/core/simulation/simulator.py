@@ -181,7 +181,7 @@ class Simulator:
                         r = slice(None)
                         value = equation(sim_m, t, r)
                         getattr(sim_m, equation.lhs)[t, r] = value
-                    except (TypeError, NotImplementedError):
+                    except (TypeError, NotImplementedError, ValueError):
                         # print(var_name, t)
                         for r in sim_m.regions:
                             value = equation(sim_m, t, r)
