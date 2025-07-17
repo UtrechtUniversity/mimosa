@@ -213,7 +213,7 @@ def on_page_content(html, **kwargs):
         except AttributeError:
             pass
     # Manual parameters
-    pattern = re.compile(r"(manualparam::([a-zA-Z0-9_ ]+)::([a-zA-Z0-9_.]+))")
+    pattern = re.compile(r"(manualparam::([a-zA-Z0-9_ ]+)::([a-zA-Z0-9_. ]+)::)")
     for match, param_title, param_key_str in re.findall(pattern, html):
         try:
             formatted_text = f"<code>{param_title}</code>"
