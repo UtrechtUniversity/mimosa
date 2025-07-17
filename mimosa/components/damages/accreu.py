@@ -65,7 +65,8 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
 
 def _get_constraints_slr(m):
     """
-    TODO
+    Defines the equations for the gross damages, residual damages, and
+    adaptation costs due to sea-level rise (SLR).
     """
     constraints = []
 
@@ -73,7 +74,11 @@ def _get_constraints_slr(m):
     m.damage_costs_slr = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
 
     # Get the coefficients for the SLR damage function from the CSV input file
-    # (inputdata/regionalparams/ACCREU.csv). Usage: "regional::ACCREU.{COLUMN_NAME_IN_CSV}"
+    # (inputdata/regionalparams/ACCREU.csv).
+    # Usage:
+    #   m.param_name = Param(m.regions, doc="regional::ACCREU.{COLUMN_NAME_IN_CSV}")
+    # Then, you can get its value using
+    #   lambda m, t, r: m.param_name[r] * ... ...
 
     m.slr_gross_damage_a = Param(m.regions, doc="regional::ACCREU.slr_gross_damage_a")
     m.slr_gross_damage_b = Param(m.regions, doc="regional::ACCREU.slr_gross_damage_b")
