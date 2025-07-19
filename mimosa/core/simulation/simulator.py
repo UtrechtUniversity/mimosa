@@ -177,15 +177,9 @@ class Simulator:
             for equation in self.equations_sorted:
                 # Check if it is a regional or global equation
                 if isinstance(equation, RegionalEquation):  # Regional:
-                    try:
-                        r = slice(None)
+                    for r in sim_m.regions:
                         value = equation(sim_m, t, r)
                         getattr(sim_m, equation.lhs)[t, r] = value
-                    except (TypeError, NotImplementedError):
-                        # print(var_name, t)
-                        for r in sim_m.regions:
-                            value = equation(sim_m, t, r)
-                            getattr(sim_m, equation.lhs)[t, r] = value
                 elif isinstance(equation, GlobalEquation):  # Global:
                     value = equation(sim_m, t)
                     getattr(sim_m, equation.lhs)[t] = value
