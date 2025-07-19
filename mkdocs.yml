@@ -21,7 +21,7 @@ nav:
   - Extending MIMOSA:
       - extending/index.md
       - New components: extending/components.md
-      - Variables and constraints: extending/variables_constraints.md
+      - Variables, equations, constraints: extending/variables_constraints.md
       - Parameters: extending/parameters.md
       - Units: extending/units.md
   - Model code: "https://github.com/UtrechtUniversity/mimosa"
