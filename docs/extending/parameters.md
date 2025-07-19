@@ -10,9 +10,13 @@ def get_constraints(m):
     # ... existing code ...
 ```
 
-This creates an abstract parameter (without a value). It still needs a value. This can be done for [scalars (non-regional parameters)](#config-params) using the default configuration file and for [regional parameters](#regional-params) using CSV input values.
+This creates an abstract parameter (without a value). It still needs a value. How to set this depends on the type of parameter. MIMOSA supports three types of parameters:
 
-## Parameters from config file: non-regional parameters {id="config-params"}
+1. [**Scalar parameters**](#config-params): Scalar parameters (that don't depend on region or time) are defined in the `config_default.yaml` file and can be modified at runtime by modifying the `params` dictionary. These parameters are typically used for model settings, such as the pure rate of time preference (PRTP), discount rates, etc.
+2. [**Regional parameters**](#regional-params): Regional parameters (that don't depend on time) are defined in a CSV file and can be linked to the `Param` using the `doc` field. These parameters are typically used for regional coefficients for damage functions, emissions factors, etc.
+3. [**Time and region dependent data**](#time-and-region-dependent-data): These parameters depend on both time and region, such as baseline population, baseline GDP, etc. Their data comes from CSV files in IAMC format.
+
+## 1. Parameters from config file: non-regional parameters {id="config-params"}
 
 All parameters that are not regional have an entry in the `config_default.yaml` file (located in the folder [`mimosa/inputdata/config/`]({{config.repo_url}}/tree/master/mimosa/inputdata/config/config_default.yaml)). This defines the type of the parameter (numerical, boolean, string, etc.), the default value, and the range of possible values. For example, the following entry defines the parameter [`economics - PRTP`](../parameters.md#economics.PRTP):
 
@@ -62,7 +66,7 @@ In the example above, the PRTP has a type [`float`](#parser-float). The followin
 
 {parsers::types}
 
-## Regional parameters {id="regional-params"}
+## 2. Regional parameters {id="regional-params"}
 
 The configuration file can be used to set *scalar* parameters. However, some parameters are regional. These are created like:
 
@@ -134,7 +138,7 @@ Initializing their value is done in three steps:
     m.new_regional_param = Param(m.regions, doc="regional::newparamgroup.newparam1")
     ```
 
-## Time and region dependent data
+## 3. Time and region dependent data {id="time-and-region-dependent-data"}
 
 The third type of parameters are time and region dependent parameters. This is typically used for baseline data, such as population, GDP, etc. 
 
@@ -188,7 +192,7 @@ The `file` field should point to the IAMC formatted data file. The IAMC format i
     scenario: "Scenario-with-{SSP}-and-{effort sharing - regime}"
     ```
 
-## Advanced: dynamic parameter settings
+## 4. Advanced: dynamic parameter settings
 
-## Advanced: complex parameter manipulations with `instantiate_params.py`
+## 5. Advanced: complex parameter manipulations with `instantiate_params.py`
 
