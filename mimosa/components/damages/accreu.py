@@ -100,6 +100,69 @@ def get_constraints_slr(m):
         )
     )
 
+    # Avoided damages and adaptation costs as a function of adaptation level
+    # The adaptation level is 0 for no adaptation, and 1 for optimal adaptation.
+    # It can be higher than 1.
+    # The avoided damages for optimal adaptation are SLR-dependent, just like the
+    # adaptation costs for optimal adaptation.
+
+    m.adaptation_level = Var(m.t, m.regions)
+    m.optimal_adapt_avoided_damages = Var(
+        m.t, m.regions, units=quant.unit("fraction_of_GDP")
+    )
+    m.optimal_adapt_costs = Var(m.t, m.regions, units=quant.unit("currency_unit"))
+
+    m.optimal_adapt_avoided_damages_param_a = Param(
+        m.t, m.regions, initialize=lambda m, t, r: 0.0123
+    )  # Function: a * SLR
+    m.optimal_adapt_costs_param_a = Param(
+        m.t, m.regions, initialize=lambda m, t, r: 0.093
+    )  # Function: a + b * SLR
+    m.optimal_adapt_costs_param_b = Param(
+        m.t, m.regions, initialize=lambda m, t, r: 0.059
+    )  # Function: a + b * SLR
+
+    constraints.extend(
+        [
+            # Equation to determine how much damages are avoided if adaptation were optimal
+            # These functions only determine the y-value of the function for level = 1.
+            RegionalEquation(
+                m.optimal_adapt_avoided_damages,
+                lambda m, t, r: (
+                    m.optimal_adapt_avoided_damages_param_a[t, r] * m.total_SLR[t]
+                ),
+            ),
+            # Equation to determine the adaptation costs for optimal adaptation
+            RegionalEquation(
+                m.optimal_adapt_costs,
+                lambda m, t, r: (
+                    m.optimal_adapt_costs_param_a[t, r]
+                    + m.optimal_adapt_costs_param_b[t, r] * m.total_SLR[t]
+                ),
+            ),
+        ]
+    )
+
+    m.avoided_damages = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
+    m.adaptation_costs = Var(m.t, m.regions, units=quant.unit("currency_unit"))
+
+    constraints.extend(
+        [
+            RegionalEquation(
+                m.avoided_damages,
+                lambda m, t, r: (
+                    m.optimal_adapt_avoided_damages[t, r] * m.adaptation_level[t, r]
+                ),
+            ),
+            RegionalEquation(
+                m.adaptation_costs,
+                lambda m, t, r: (
+                    m.optimal_adapt_costs[t, r] * m.adaptation_level[t, r] ** 2
+                ),
+            ),
+        ]
+    )
+
     return constraints
 
 
