@@ -16,6 +16,7 @@ networkx
 # mkdocs-table-reader-plugin
 # mkdocs-macros-plugin
 # mkdocs-glightbox
+# mike
 
 # For testing:
 # pytest
