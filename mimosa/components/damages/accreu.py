@@ -55,15 +55,15 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     )
 
     # Get constraints for temperature dependent damages
-    constraints.extend(coacch._get_constraints_temperature_dependent(m))
+    constraints.extend(coacch.get_constraints_temperature_dependent(m))
 
     # Get constraints for sea-level rise damages
-    constraints.extend(_get_constraints_slr(m))
+    constraints.extend(get_constraints_slr(m))
 
     return constraints
 
 
-def _get_constraints_slr(m):
+def get_constraints_slr(m):
     """
     Defines the equations for the gross damages, residual damages, and
     adaptation costs due to sea-level rise (SLR).
@@ -82,6 +82,7 @@ def _get_constraints_slr(m):
 
     m.slr_gross_damage_a = Param(m.regions, doc="regional::ACCREU.slr_gross_damage_a")
     m.slr_gross_damage_b = Param(m.regions, doc="regional::ACCREU.slr_gross_damage_b")
+    m.slr_gross_damage_c = Param(m.regions, doc="regional::ACCREU.slr_gross_damage_c")
 
     constraints.append(
         RegionalEquation(
@@ -93,6 +94,7 @@ def _get_constraints_slr(m):
                     m.total_SLR[0],
                     m.slr_gross_damage_a[r],
                     m.slr_gross_damage_b[r],
+                    m.slr_gross_damage_c[r],
                 )
             ),
         )
@@ -101,24 +103,24 @@ def _get_constraints_slr(m):
     return constraints
 
 
-def damage_fct_slr(slr, initial_slr, coeff_a, coeff_b):
+def damage_fct_slr(slr, initial_slr, a, b, c):
     """
     Function to calculate the damages due to sea-level rise (SLR).
 
     The damage function is quadratic, defined by:
-        a * slr + b * slr^2
-    (or linear when b is zero).
+        a + b * slr + c * slr^2
+    (or linear when c is zero).
 
     To make sure that the damages are zero in 2020, the damage at initial SLR
     is subtracted from the total damage:
 
-        damage = (a * slr + b * slr^2) - (a * initial_slr + b * initial_slr^2)
+        damage = (a + b * slr + c * slr^2) - (a + b * initial_slr + c * initial_slr^2)
     """
-    if coeff_b == 0:
-        damages = coeff_a * slr
-        initial_damages = coeff_a * initial_slr
+    if c == 0:
+        damages = a + b * slr
+        initial_damages = a + b * initial_slr
     else:
-        damages = coeff_a * slr + coeff_b * slr**2
-        initial_damages = coeff_a * initial_slr + coeff_b * initial_slr**2
+        damages = a + b * slr + c * slr**2
+        initial_damages = a + b * initial_slr + c * initial_slr**2
 
     return damages - initial_damages

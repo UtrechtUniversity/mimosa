@@ -67,15 +67,15 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     )
 
     # Get constraints for temperature dependent damages
-    constraints.extend(_get_constraints_temperature_dependent(m))
+    constraints.extend(get_constraints_temperature_dependent(m))
 
     # Get constraints for sea-level rise damages
-    constraints.extend(_get_constraints_slr(m))
+    constraints.extend(get_constraints_slr(m))
 
     return constraints
 
 
-def _get_constraints_temperature_dependent(
+def get_constraints_temperature_dependent(
     m: AbstractModel,
 ) -> Sequence[GeneralConstraint]:
     """
@@ -146,7 +146,7 @@ def _get_constraints_temperature_dependent(
     return constraints
 
 
-def _get_constraints_slr(m: AbstractModel) -> Sequence[GeneralConstraint]:
+def get_constraints_slr(m: AbstractModel) -> Sequence[GeneralConstraint]:
     """
 
     ## Sea-level rise damages
