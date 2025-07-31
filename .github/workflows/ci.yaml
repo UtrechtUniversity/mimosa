@@ -73,7 +73,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
           channels: conda-forge
           activate-environment: test-env
-          environment-file: environment.yml
+          environment-file: tests/environment.yml
           # use-only-tar-bz2: true
       - name: Install your package
         shell: bash -l {0}
