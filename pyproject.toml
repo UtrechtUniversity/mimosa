@@ -1,3 +1,60 @@
 [build-system]
 requires = ['setuptools>=42']
 build-backend = 'setuptools.build_meta'
+
+[project]
+name = "mimosa"
+version = "0.2.6"
+description = "MIMOSA: Integrated Assessment Model for Cost-Benefit Analysis"
+readme = "README.md"
+requires-python = ">=3.8"
+license = { file = "LICENSE" }
+authors = [
+  { name = "Kaj-Ivar van der Wijst", email = "k.vanderwijst@uu.nl" },
+]
+urls = { Homepage = "https://utrechtuniversity.github.io/mimosa/" }
+dependencies = [
+  "numpy>=1.22",
+  "pandas",
+  "pyomo",
+  "pint",
+  "pyyaml",
+  "scipy",
+  "networkx",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest"
+]
+
+docs = [
+  "mkdocs",
+  "mkdocs-open-in-new-tab",
+  "mkdocs-material",
+  "mkdocstrings",
+  "mkdocstrings-handlers",
+  "mkdocs-plotly-plugin",
+  "mkdocs-table-reader-plugin",
+  "mkdocs-macros-plugin",
+  "mkdocs-glightbox",
+  "mike"
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["mimosa"]
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.package-data]
+"mimosa" = ["**/*"]
+
+
+[tool.pytest.ini_options]
+markers = [
+  "ipopt: marks tests as requiring IPOPT for optimisation (deselect with '-m \"not ipopt\"')",
+  "simulation: marks tests as doing a simulation (deselect with '-m \"not simulation\"')",
+  "serial"
+]
