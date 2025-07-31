@@ -98,18 +98,19 @@ class MIMOSA:
         # Set the best guess as initial values for the concrete model
         self.simulator.initialize_pyomo_model(self.concrete_model, sim_m_best_guess)
 
-    def run_simulation(self, relative_abatement=None):
+    def run_simulation(self, **free_variables_kwargs):
         """
         Runs MIMOSA as simulation.
 
         It first sets the "free" variables (relative_abatement), then runs the simulation.
 
         Args:
-            relative_abatement (array of n_timesteps x n_regions):
-                Relative abatement values for each region and time step.
-                If None, it defaults to a zero abatement scenario.
+            free_variables_kwargs: A set of keyword arguments to optionally set free variables to a value. Can be:
+                * None (equivalent to 0)
+                * A float value: every region and time step will get this value
+                * A numpy array of shape (n_timesteps, n_regions): each region and time step will get the corresponding value
         """
-        return self.simulator.run(relative_abatement)
+        return self.simulator.run(**free_variables_kwargs)
 
     def run_nopolicy_baseline(self):
         """Runs the no-policy baseline simulation with relative abatement set to 0."""
