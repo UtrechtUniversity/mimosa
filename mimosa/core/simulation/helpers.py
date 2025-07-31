@@ -83,6 +83,7 @@ def sort_equations(equations_dict, return_graph=False):
             G_full.add_edge(prev_dep, node, type="prev_time_dependency")
 
     cycles = list(nx.simple_cycles(G))
+    free_variables = []
     if cycles:
         error_msg = "Circular dependencies found:\n\n"
         for cycle in cycles:
@@ -98,9 +99,10 @@ def sort_equations(equations_dict, return_graph=False):
             except KeyError:
                 # print(f"Warning: no equation found for {node}, skipping.")
                 G_full.nodes[node]["has_equation"] = False
+                free_variables.append(node)
 
     if return_graph:
-        return equations_sorted, G_full
+        return equations_sorted, G_full, free_variables
     return equations_sorted
 
 
