@@ -29,6 +29,7 @@ nav:
       - Summer school PRISMA 2025: workshops/summerschool_prisma_2025/main.md
 
 repo_url: https://github.com/UtrechtUniversity/mimosa
+site_url: https://utrechtuniversity.github.io/mimosa/
 
 theme:
   name: material
@@ -126,3 +127,7 @@ extra_javascript:
 
 extra_css:
   - assets/extra.css
+
+extra:
+  version:
+    provider: mike

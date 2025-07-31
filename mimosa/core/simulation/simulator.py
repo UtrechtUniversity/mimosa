@@ -26,6 +26,7 @@ class Simulator:
     equations: list
     equations_sorted: list
     equations_graph: nx.DiGraph
+    free_variables: list
 
     def __init__(self):
         pass
@@ -46,52 +47,65 @@ class Simulator:
         equations_dict = {eq.name: eq for eq in equations}
         calc_dependencies(equations_dict, concrete_model)
         # Perform topological sort of equations based on dependencies
-        self.equations_sorted, self.equations_graph = sort_equations(
-            equations_dict, return_graph=True
+        self.equations_sorted, self.equations_graph, self.free_variables = (
+            sort_equations(equations_dict, return_graph=True)
         )
 
-    def run(
-        self,
-        relative_abatement=None,
-        simulation_model=None,
-    ):
+    def run(self, simulation_model=None, **free_variables_kwargs):
         """
         Runs MIMOSA as simulation.
 
         It first sets the "free" variables (relative_abatement), then runs the simulation
 
         Args:
-            relative_abatement (array of n_timesteps x n_regions):
-                Relative abatement values for each region and time step.
-                If None, it defaults to a zero abatement scenario.
+        simulation_model (SimulationObjectModel): The simulation model to run.
+            If None, a new SimulationObjectModel will be created.
+        free_variables_kwargs: set of keyword arguments to optionally set free variables to a value. Can be:
+            * None (equivalent to 0)
+            * A float value: every region and time step will get this value
+            * A numpy array of shape (n_timesteps, n_regions): each region and time step will get the corresponding value
         """
-
-        n_timesteps = len(self.concrete_model.t)
-        n_regions = len(self.concrete_model.regions)
-
-        # TODO: make dynamic list of "free" variables
-        # For now, we only have relative_abatement as a free variable
-
-        if relative_abatement is None:
-            # If no relative abatement is provided, set it to zero
-            relative_abatement = np.zeros((n_timesteps, n_regions))
-        else:
-            # First check if it is given as a dictionary with (time, region) keys
-            if isinstance(relative_abatement, dict):
-                # Convert the dictionary to a numpy array
-                relative_abatement = self._dict_values_to_numpy(relative_abatement)
-            # Check that the dimensions are correct
-            assert relative_abatement.shape == (n_timesteps, n_regions), (
-                f"relative_abatement must be of shape (n_timesteps, n_regions), "
-                f"but is {relative_abatement.shape}."
-            )
 
         if simulation_model is None:
             # Create a SimulationObjectModel object that will be used to run the simulation
             simulation_model = SimulationObjectModel(self.concrete_model)
 
-        # Set the relative abatement for all regions and time periods
-        simulation_model.relative_abatement.values = relative_abatement
+        n_timesteps = len(self.concrete_model.t)
+        n_regions = len(self.concrete_model.regions)
+
+        # Check if there are no variables provided in kwargs that are not in the free variables:
+        for var in free_variables_kwargs:
+            if var not in self.free_variables:
+                raise ValueError(
+                    f"Variable '{var}' is not a free variable. "
+                    f"Available free variables: {self.free_variables}"
+                )
+
+        for var in self.free_variables:
+            # Check if the variable is provided in the kwargs, otherwise set to None
+            value = free_variables_kwargs.get(var, None)
+
+            if value is None:
+                # If no relative abatement is provided, set it to zero
+                value = 0
+
+            # TODO: check if variable is region/time dependent
+            # First check if it is given as a dictionary with (time, region) keys
+            if isinstance(value, dict):
+                # Convert the dictionary to a numpy array
+                value = self._dict_values_to_numpy(value)
+            # If it is a single float value, convert it to a numpy array
+            elif isinstance(value, (int, float)):
+                value = np.full((n_timesteps, n_regions), value)
+
+            # Check that the dimensions are correct
+            assert value.shape == (n_timesteps, n_regions), (
+                f"{var} must be of shape (n_timesteps, n_regions), "
+                f"but is {value.shape}."
+            )
+
+            # Set the relative abatement for all regions and time periods
+            getattr(simulation_model, var).values = value
 
         self._simulate(simulation_model)
 
@@ -118,7 +132,7 @@ class Simulator:
             # Set global relative abatement (x) to regional abatement in simulation
             relative_abatement = x.reshape((n_t, 1)).repeat(n_r, axis=1)
             # Do simulation
-            self.run(relative_abatement, sim_m)
+            self.run(sim_m, relative_abatement=relative_abatement)
             # Return the value to minimise (we try to maximise the final NPV)
             if objective_only:
                 return -sim_m.NPV[n_t - 1]
