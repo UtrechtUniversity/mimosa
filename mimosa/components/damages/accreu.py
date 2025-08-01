@@ -80,13 +80,14 @@ def get_constraints_slr(m):
     # Then, you can get its value using
     #   lambda m, t, r: m.param_name[r] * ... ...
 
+    m.slr_gross_damage_costs = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
     m.slr_gross_damage_a = Param(m.regions, doc="regional::ACCREU.slr_gross_damage_a")
     m.slr_gross_damage_b = Param(m.regions, doc="regional::ACCREU.slr_gross_damage_b")
     m.slr_gross_damage_c = Param(m.regions, doc="regional::ACCREU.slr_gross_damage_c")
 
     constraints.append(
         RegionalEquation(
-            m.damage_costs_slr,
+            m.slr_gross_damage_costs,
             lambda m, t, r: (
                 m.damage_scale_factor
                 * damage_fct_slr(
@@ -106,61 +107,87 @@ def get_constraints_slr(m):
     # The avoided damages for optimal adaptation are SLR-dependent, just like the
     # adaptation costs for optimal adaptation.
 
-    m.adaptation_level = Var(m.t, m.regions)
-    m.optimal_adapt_avoided_damages = Var(
+    m.slr_adaptation_level = Var(m.t, m.regions, bounds=(0, 1))
+    m.slr_optimal_adapt_avoided_damages = Var(
         m.t, m.regions, units=quant.unit("fraction_of_GDP")
     )
-    m.optimal_adapt_costs = Var(m.t, m.regions, units=quant.unit("currency_unit"))
+    m.slr_optimal_adapt_costs = Var(m.t, m.regions, units=quant.unit("currency_unit"))
 
-    m.optimal_adapt_avoided_damages_param_a = Param(
-        m.t, m.regions, initialize=lambda m, t, r: 0.0123
-    )  # Function: a * SLR
-    m.optimal_adapt_costs_param_a = Param(
-        m.t, m.regions, initialize=lambda m, t, r: 0.093
-    )  # Function: a + b * SLR
-    m.optimal_adapt_costs_param_b = Param(
-        m.t, m.regions, initialize=lambda m, t, r: 0.059
-    )  # Function: a + b * SLR
+    # Function for avoided damages: a * SLR
+    m.slr_optimal_adapt_avoided_damages_param_a = Param(
+        m.regions, doc="regional::ACCREU.slr_optimal_adapt_avoided_damages_a"
+    )
+    # Function for adaptation costs: a + b * SLR
+    m.slr_optimal_adapt_costs_param_a = Param(
+        m.regions, doc="regional::ACCREU.slr_optimal_adapt_costs_a"
+    )
+    m.slr_optimal_adapt_costs_param_b = Param(
+        m.regions, doc="regional::ACCREU.slr_optimal_adapt_costs_b"
+    )
 
     constraints.extend(
         [
             # Equation to determine how much damages are avoided if adaptation were optimal
             # These functions only determine the y-value of the function for level = 1.
             RegionalEquation(
-                m.optimal_adapt_avoided_damages,
+                m.slr_optimal_adapt_avoided_damages,
                 lambda m, t, r: (
-                    m.optimal_adapt_avoided_damages_param_a[t, r] * m.total_SLR[t]
+                    m.slr_optimal_adapt_avoided_damages_param_a[r] * m.total_SLR[t]
                 ),
             ),
             # Equation to determine the adaptation costs for optimal adaptation
             RegionalEquation(
-                m.optimal_adapt_costs,
+                m.slr_optimal_adapt_costs,
                 lambda m, t, r: (
-                    m.optimal_adapt_costs_param_a[t, r]
-                    + m.optimal_adapt_costs_param_b[t, r] * m.total_SLR[t]
+                    (
+                        m.slr_optimal_adapt_costs_param_a[r]
+                        + m.slr_optimal_adapt_costs_param_b[r] * m.total_SLR[t]
+                    )
+                    * m.population[t, r]
+                    / m.global_population[t]
                 ),
             ),
         ]
     )
 
-    m.avoided_damages = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
-    m.adaptation_costs = Var(m.t, m.regions, units=quant.unit("currency_unit"))
+    m.slr_avoided_damages = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
+    m.slr_adaptation_costs = Var(m.t, m.regions, units=quant.unit("currency_unit"))
+    m.slr_adaptation_costs_rel = Var(
+        m.t, m.regions, units=quant.unit("fraction_of_GDP")
+    )
 
     constraints.extend(
         [
             RegionalEquation(
-                m.avoided_damages,
+                m.slr_avoided_damages,
                 lambda m, t, r: (
-                    m.optimal_adapt_avoided_damages[t, r] * m.adaptation_level[t, r]
+                    m.slr_optimal_adapt_avoided_damages[t, r]
+                    * m.slr_adaptation_level[t, r]
                 ),
             ),
             RegionalEquation(
-                m.adaptation_costs,
+                m.slr_adaptation_costs,
                 lambda m, t, r: (
-                    m.optimal_adapt_costs[t, r] * m.adaptation_level[t, r] ** 2
+                    m.slr_optimal_adapt_costs[t, r] * m.slr_adaptation_level[t, r] ** 2
                 ),
             ),
+            RegionalEquation(
+                m.slr_adaptation_costs_rel,
+                lambda m, t, r: (m.slr_adaptation_costs[t, r] / m.GDP_gross[t, r]),
+            ),
         ]
+    )
+
+    # Total SLR damages are the sum of gross damages minus avoided damages plus adaptation costs
+    constraints.append(
+        RegionalEquation(
+            m.damage_costs_slr,
+            lambda m, t, r: (
+                m.slr_gross_damage_costs[t, r]
+                - (m.slr_avoided_damages[t, r] - m.slr_avoided_damages[0, r])
+                + m.slr_adaptation_costs_rel[t, r]
+            ),
+        )
     )
 
     return constraints

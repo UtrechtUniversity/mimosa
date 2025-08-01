@@ -179,7 +179,7 @@ def plot_dependency_graph(G):
     ax.margins(0)
 
     computed_patch = mpatches.Patch(color=mimosa_green, label="Computed variables")
-    input_patch = mpatches.Patch(color=mimosa_orange, label="Input variables")
+    input_patch = mpatches.Patch(color=mimosa_orange, label="Free variables")
 
     plt.legend(
         handles=[computed_patch, input_patch],
