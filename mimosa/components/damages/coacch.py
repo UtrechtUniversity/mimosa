@@ -29,9 +29,9 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     \\text{damages}_{t,r} = \\text{damages}_{\\text{non-SLR},t,r} + \\text{damages}_{\\text{SLR},t,r}
     $$
 
-    :::mimosa.components.damages.coacch._get_constraints_temperature_dependent
+    :::mimosa.components.damages.coacch.get_constraints_temperature_dependent
 
-    :::mimosa.components.damages.coacch._get_constraints_slr
+    :::mimosa.components.damages.coacch.get_constraints_slr
 
 
 

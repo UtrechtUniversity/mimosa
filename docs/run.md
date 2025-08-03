@@ -99,6 +99,14 @@ MIMOSA has some built-in effort sharing regimes. In this example, they are used 
 1. Some effort sharing regimes can lead to large financial transfers between regions. If baseline carbon intensities are used instead of just baseline emissions, the baseline emissions can vary significantly, leading to numerical instability. Especially for ECPC regime, this setting is important.
 2. Some effort sharing regimes require such large financial transfers that they are infeasible without allowing for some extra financial transfers beyond just emission trading. This is why we set the relative mitigation cost minimum level to a negative number.
 
+### Simulation: running MIMOSA without optimisation
+
+* Free variables
+* Default simulation: all free variables set to zero
+* Setting free variables to a value
+* Running a simulation using the values from an optimisation run
+
+
 ### Advanced: logging
 
 The solve status (optimal, impossible, etc), model solve time and the final maximised value can be logged to an external log file (along with the warnings or errors from the code). This can be very useful when doing many runs overnight. In this code example, the log is written to the file `mainlog.log`:
