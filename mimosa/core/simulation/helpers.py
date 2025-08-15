@@ -138,7 +138,7 @@ def plot_dependency_graph(G):
     pos = graphviz_layout(
         G_hard,
         prog="dot",
-        args="-Grankdir=LR -Gconcentrate=true",
+        args="-Grankdir=LR -Gconcentrate=true -Gnodesep=0.5 -Gminlen=1.5",
     )
 
     mimosa_green = "#89a041"
@@ -178,11 +178,11 @@ def plot_dependency_graph(G):
     )
     ax.margins(0)
 
-    computed_patch = mpatches.Patch(color=mimosa_green, label="Computed variables")
     input_patch = mpatches.Patch(color=mimosa_orange, label="Control variables")
+    computed_patch = mpatches.Patch(color=mimosa_green, label="Computed variables")
 
     plt.legend(
-        handles=[computed_patch, input_patch],
+        handles=[input_patch, computed_patch],
         loc="upper center",  # or 'lower left', 'best', etc.
         bbox_to_anchor=(0.5, -0.05),  # place legend outside plot
         ncol=2,
