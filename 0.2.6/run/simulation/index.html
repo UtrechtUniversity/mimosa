@@ -8,13 +8,13 @@
       
       
       
-        <link rel="canonical" href="https://utrechtuniversity.github.io/mimosa/0.2.6/extending/variables_constraints/">
+        <link rel="canonical" href="https://utrechtuniversity.github.io/mimosa/0.2.6/run/simulation/">
       
       
-        <link rel="prev" href="../components/">
+        <link rel="prev" href="../changingparams/">
       
       
-        <link rel="next" href="../parameters/">
+        <link rel="next" href="../baseline/">
       
       
       <link rel="icon" href="../../assets/logos/favicon.svg">
@@ -22,7 +22,7 @@
     
     
       
-        <title>Variables, equations, constraints - MIMOSA documentation</title>
+        <title>Simulation vs optimisation - MIMOSA documentation</title>
       
     
     
@@ -87,7 +87,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#1-variables" class="md-skip">
+        <a href="#simulation-running-mimosa-without-optimisation" class="md-skip">
           Skip to content
         </a>
       
@@ -126,7 +126,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Variables, equations, constraints
+              Simulation vs optimisation
             
           </span>
         </div>
@@ -641,6 +641,8 @@
       
   
   
+    
+  
   
   
     
@@ -665,16 +667,16 @@
     
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
         
           
           
           <div class="md-nav__link md-nav__container">
-            <a href="../../run/" class="md-nav__link ">
+            <a href="../" class="md-nav__link ">
               
   
   <span class="md-ellipsis">
@@ -691,7 +693,7 @@
             
           </div>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
             Running MIMOSA
@@ -707,7 +709,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../run/changingparams/" class="md-nav__link">
+      <a href="../changingparams/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -725,10 +727,28 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../../run/simulation/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Simulation vs optimisation
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   <span class="md-ellipsis">
@@ -737,6 +757,75 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#simulation-running-mimosa-without-optimisation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Simulation: running MIMOSA without optimisation
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Simulation: running MIMOSA without optimisation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#control-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      Control variables
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#default-simulation-all-control-variables-set-to-zero" class="md-nav__link">
+    <span class="md-ellipsis">
+      Default simulation: all control variables set to zero
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setting-control-variables-to-a-value" class="md-nav__link">
+    <span class="md-ellipsis">
+      Setting control variables to a value
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#running-a-simulation-using-the-values-from-an-optimisation-run" class="md-nav__link">
+    <span class="md-ellipsis">
+      Running a simulation using the values from an optimisation run
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -749,7 +838,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../run/baseline/" class="md-nav__link">
+      <a href="../baseline/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -770,7 +859,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../run/multipleruns/" class="md-nav__link">
+      <a href="../multipleruns/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -791,7 +880,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../run/effortsharing/" class="md-nav__link">
+      <a href="../effortsharing/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -812,7 +901,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../run/logging/" class="md-nav__link">
+      <a href="../logging/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -857,8 +946,6 @@
       
   
   
-    
-  
   
   
     
@@ -879,16 +966,16 @@
     
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
         
           
           
           <div class="md-nav__link md-nav__container">
-            <a href="../" class="md-nav__link ">
+            <a href="../../extending/" class="md-nav__link ">
               
   
   <span class="md-ellipsis">
@@ -905,7 +992,7 @@
             
           </div>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_7">
             <span class="md-nav__icon md-icon"></span>
             Extending MIMOSA
@@ -921,7 +1008,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../components/" class="md-nav__link">
+      <a href="../../extending/components/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -939,28 +1026,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  <span class="md-ellipsis">
-    Variables, equations, constraints
-  </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../extending/variables_constraints/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -969,108 +1038,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#1-variables" class="md-nav__link">
-    <span class="md-ellipsis">
-      1. Variables
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#2-equations" class="md-nav__link">
-    <span class="md-ellipsis">
-      2. Equations
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="2. Equations">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#circular-dependencies" class="md-nav__link">
-    <span class="md-ellipsis">
-      Circular dependencies
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#where-to-place-the-equations" class="md-nav__link">
-    <span class="md-ellipsis">
-      Where to place the equations
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#3-advanced-general-constraints" class="md-nav__link">
-    <span class="md-ellipsis">
-      3. Advanced: general constraints
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="3. Advanced: general constraints">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#conditionally-skip-constraints" class="md-nav__link">
-    <span class="md-ellipsis">
-      Conditionally skip constraints
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#4-advanced-soft-equality-constraints" class="md-nav__link">
-    <span class="md-ellipsis">
-      4. Advanced: soft-equality constraints
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#5-advanced-numerical-stability" class="md-nav__link">
-    <span class="md-ellipsis">
-      5. Advanced: numerical stability
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1083,7 +1050,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../parameters/" class="md-nav__link">
+      <a href="../../extending/parameters/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1104,7 +1071,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../units/" class="md-nav__link">
+      <a href="../../extending/units/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1237,37 +1204,46 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#1-variables" class="md-nav__link">
+  <a href="#simulation-running-mimosa-without-optimisation" class="md-nav__link">
     <span class="md-ellipsis">
-      1. Variables
+      Simulation: running MIMOSA without optimisation
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#2-equations" class="md-nav__link">
-    <span class="md-ellipsis">
-      2. Equations
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="2. Equations">
+    <nav class="md-nav" aria-label="Simulation: running MIMOSA without optimisation">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#circular-dependencies" class="md-nav__link">
+  <a href="#control-variables" class="md-nav__link">
     <span class="md-ellipsis">
-      Circular dependencies
+      Control variables
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#where-to-place-the-equations" class="md-nav__link">
+  <a href="#default-simulation-all-control-variables-set-to-zero" class="md-nav__link">
     <span class="md-ellipsis">
-      Where to place the equations
+      Default simulation: all control variables set to zero
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setting-control-variables-to-a-value" class="md-nav__link">
+    <span class="md-ellipsis">
+      Setting control variables to a value
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#running-a-simulation-using-the-values-from-an-optimisation-run" class="md-nav__link">
+    <span class="md-ellipsis">
+      Running a simulation using the values from an optimisation run
     </span>
   </a>
   
@@ -1275,48 +1251,6 @@
         
       </ul>
     </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#3-advanced-general-constraints" class="md-nav__link">
-    <span class="md-ellipsis">
-      3. Advanced: general constraints
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="3. Advanced: general constraints">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#conditionally-skip-constraints" class="md-nav__link">
-    <span class="md-ellipsis">
-      Conditionally skip constraints
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#4-advanced-soft-equality-constraints" class="md-nav__link">
-    <span class="md-ellipsis">
-      4. Advanced: soft-equality constraints
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#5-advanced-numerical-stability" class="md-nav__link">
-    <span class="md-ellipsis">
-      5. Advanced: numerical stability
-    </span>
-  </a>
   
 </li>
       
@@ -1338,142 +1272,74 @@
   
 
 
-  <h1>Variables, equations, constraints</h1>
+  <h1>Simulation vs optimisation</h1>
 
-<p>The MIMOSA model, like any model, consists of variables that are linked together by equations and constraints. </p>
-<h2 id="1-variables">1. Variables</h2>
-<p>Let's create a new variable that calculates the regional carbon intensity (emissions divided by GDP).
-You can add this variable to any of the components in the folder <code>mimosa/components</code>, but the most logical place is probably
-the file <a href="https://github.com/UtrechtUniversity/mimosa/blob/master/mimosa/components/cobbdouglas.py"><code>mimosa/components/cobbdouglas.py</code></a>, which contains
-all GDP-related variables and constraints. Each component has a function <code>get_constraints(...)</code>, which is called from the main
-<code>abstract_model.py</code> file.</p>
-<p>Inside the function <code>get_constraints()</code>, create the new variable <code>m.carbon_intensity</code>:</p>
-<div class="language-python highlight"><span class="filename">mimosa/components/cobbdouglas.py</span><pre><span></span><code><span id="__span-0-1"><a href="#__codelineno-0-1" id="__codelineno-0-1" name="__codelineno-0-1"></a><span class="k">def</span> <span class="nf">get_constraints</span><span class="p">(</span><span class="n">m</span><span class="p">):</span>
-</span><span id="__span-0-2"><a href="#__codelineno-0-2" id="__codelineno-0-2" name="__codelineno-0-2"></a>    <span class="c1"># ... existing code ...</span>
+<h3 id="simulation-running-mimosa-without-optimisation">Simulation: running MIMOSA without optimisation</h3>
+<p>MIMOSA can also be run in simulation mode, where the model is solved for a given set of parameters without optimisation. This is useful for scenarios where you beforehand choose the values of the control variables (the "input variables" of the model), such as a baseline scenario or sensitivity runs.</p>
+<h4 id="control-variables">Control variables</h4>
+<p>Control variables are the variables that MIMOSA is optimising for in optimisation mode, or that you can set to specific values in simulation mode. All other variables are computed based on the control variables and the equations of the model. How they depend on each other is shown with the command, which plots the dependency graph of the MIMOSA variables:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a href="#__codelineno-0-1" id="__codelineno-0-1" name="__codelineno-0-1"></a><span class="kn">from</span> <span class="nn">mimosa</span> <span class="kn">import</span> <span class="n">MIMOSA</span><span class="p">,</span> <span class="n">load_params</span>
+</span><span id="__span-0-2"><a href="#__codelineno-0-2" id="__codelineno-0-2" name="__codelineno-0-2"></a>
 </span><span id="__span-0-3"><a href="#__codelineno-0-3" id="__codelineno-0-3" name="__codelineno-0-3"></a>
-</span><span id="__span-0-4"><a href="#__codelineno-0-4" id="__codelineno-0-4" name="__codelineno-0-4"></a>    <span class="c1"># New variable</span>
-</span><span id="__span-0-5"><a href="#__codelineno-0-5" id="__codelineno-0-5" name="__codelineno-0-5"></a><span class="hll">    <span class="n">m</span><span class="o">.</span><span class="n">carbon_intensity</span> <span class="o">=</span> <span class="n">Var</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">t</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">regions</span><span class="p">)</span>
-</span></span><span id="__span-0-6"><a href="#__codelineno-0-6" id="__codelineno-0-6" name="__codelineno-0-6"></a>
-</span><span id="__span-0-7"><a href="#__codelineno-0-7" id="__codelineno-0-7" name="__codelineno-0-7"></a>    <span class="c1"># ... existing code ...</span>
+</span><span id="__span-0-4"><a href="#__codelineno-0-4" id="__codelineno-0-4" name="__codelineno-0-4"></a><span class="n">params</span> <span class="o">=</span> <span class="n">load_params</span><span class="p">()</span>
+</span><span id="__span-0-5"><a href="#__codelineno-0-5" id="__codelineno-0-5" name="__codelineno-0-5"></a><span class="c1"># Optionally, set your parameters here</span>
+</span><span id="__span-0-6"><a href="#__codelineno-0-6" id="__codelineno-0-6" name="__codelineno-0-6"></a>
+</span><span id="__span-0-7"><a href="#__codelineno-0-7" id="__codelineno-0-7" name="__codelineno-0-7"></a><span class="n">model1</span> <span class="o">=</span> <span class="n">MIMOSA</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+</span><span id="__span-0-8"><a href="#__codelineno-0-8" id="__codelineno-0-8" name="__codelineno-0-8"></a><span class="n">model1</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">plot_dependency_graph</span><span class="p">()</span>
 </span></code></pre></div>
-<p>If the variable is not dependent on either time or region, remove the <code>m.t</code> or <code>m.regions</code> from the variable definition:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a href="#__codelineno-1-1" id="__codelineno-1-1" name="__codelineno-1-1"></a><span class="n">m</span><span class="o">.</span><span class="n">variable_name1</span> <span class="o">=</span> <span class="n">Var</span><span class="p">()</span>        <span class="c1"># No time or region dependency</span>
-</span><span id="__span-1-2"><a href="#__codelineno-1-2" id="__codelineno-1-2" name="__codelineno-1-2"></a><span class="n">m</span><span class="o">.</span><span class="n">variable_name2</span> <span class="o">=</span> <span class="n">Var</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">t</span><span class="p">)</span>     <span class="c1"># Time dependent, not region dependent</span>
+<details class="info">
+<summary>Dependency graph of the MIMOSA variables</summary>
+<p>(Note that only equations are shown)</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="with-default-parameters" name="__tabbed_1" type="radio"/><input id="with-emission-trading-and-cost-minimisation" name="__tabbed_1" type="radio"/><div class="tabbed-labels"><label for="with-default-parameters">With default parameters</label><label for="with-emission-trading-and-cost-minimisation">With emission trading and cost-minimisation</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p><a class="glightbox" href="../../assets/fig/dependency_graph_default.png" data-type="image" data-width="auto" data-height="auto" data-desc-position="bottom"><img alt="" src="../../assets/fig/dependency_graph_default.png"/></a></p>
+</div>
+<div class="tabbed-block">
+<p><a class="glightbox" href="../../assets/fig/dependency_graph_effortsharing.png" data-type="image" data-width="auto" data-height="auto" data-desc-position="bottom"><img alt="" src="../../assets/fig/dependency_graph_effortsharing.png"/></a></p>
+</div>
+</div>
+</div>
+</details>
+<h4 id="default-simulation-all-control-variables-set-to-zero">Default simulation: all control variables set to zero</h4>
+<p>When you run a simulation without specifying values for the control variables, MIMOSA will use the default values, which are all set to zero. This allows you to see the baseline behavior of the model before making any adjustments. By default, the only control variable is <code>relative_abatement</code>, which is set to zero in the default simulation:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a href="#__codelineno-1-1" id="__codelineno-1-1" name="__codelineno-1-1"></a><span class="kn">from</span> <span class="nn">mimosa</span> <span class="kn">import</span> <span class="n">MIMOSA</span><span class="p">,</span> <span class="n">load_params</span>
+</span><span id="__span-1-2"><a href="#__codelineno-1-2" id="__codelineno-1-2" name="__codelineno-1-2"></a>
+</span><span id="__span-1-3"><a href="#__codelineno-1-3" id="__codelineno-1-3" name="__codelineno-1-3"></a><span class="n">params</span> <span class="o">=</span> <span class="n">load_params</span><span class="p">()</span>
+</span><span id="__span-1-4"><a href="#__codelineno-1-4" id="__codelineno-1-4" name="__codelineno-1-4"></a><span class="n">model</span> <span class="o">=</span> <span class="n">MIMOSA</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+</span><span id="__span-1-5"><a href="#__codelineno-1-5" id="__codelineno-1-5" name="__codelineno-1-5"></a><span class="hll"><span class="n">simulation</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">run_simulation</span><span class="p">()</span>  <span class="c1"># (1)!</span>
+</span></span><span id="__span-1-6"><a href="#__codelineno-1-6" id="__codelineno-1-6" name="__codelineno-1-6"></a><span class="hll"><span class="n">model</span><span class="o">.</span><span class="n">save_simulation</span><span class="p">(</span><span class="n">simulation</span><span class="p">,</span> <span class="s2">"run_sim_default"</span><span class="p">)</span>
+</span></span></code></pre></div>
+<ol>
+<li>This is equivalent to <code>model.run_simulation(relative_abatement=0)</code>.</li>
+</ol>
+<h4 id="setting-control-variables-to-a-value">Setting control variables to a value</h4>
+<h4 id="running-a-simulation-using-the-values-from-an-optimisation-run">Running a simulation using the values from an optimisation run</h4>
+<p>If you have previously run an optimisation and obtained values for the control variables, you can use these values as the starting point for your simulation. This allows you to see how the model behaves when the control variables are set to their optimal values, or to perform a sensitivity analysis by slightly changing one or more control variables.</p>
+<p>See <a href="#control-variables">Control variables</a> if you're unsure what the control variables are.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a href="#__codelineno-2-1" id="__codelineno-2-1" name="__codelineno-2-1"></a><span class="kn">from</span> <span class="nn">mimosa</span> <span class="kn">import</span> <span class="n">MIMOSA</span><span class="p">,</span> <span class="n">load_params</span>
+</span><span id="__span-2-2"><a href="#__codelineno-2-2" id="__codelineno-2-2" name="__codelineno-2-2"></a>
+</span><span id="__span-2-3"><a href="#__codelineno-2-3" id="__codelineno-2-3" name="__codelineno-2-3"></a><span class="c1"># First run MIMOSA in optimisation mode</span>
+</span><span id="__span-2-4"><a href="#__codelineno-2-4" id="__codelineno-2-4" name="__codelineno-2-4"></a>
+</span><span id="__span-2-5"><a href="#__codelineno-2-5" id="__codelineno-2-5" name="__codelineno-2-5"></a><span class="n">params</span> <span class="o">=</span> <span class="n">load_params</span><span class="p">()</span>
+</span><span id="__span-2-6"><a href="#__codelineno-2-6" id="__codelineno-2-6" name="__codelineno-2-6"></a>
+</span><span id="__span-2-7"><a href="#__codelineno-2-7" id="__codelineno-2-7" name="__codelineno-2-7"></a><span class="n">model1</span> <span class="o">=</span> <span class="n">MIMOSA</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+</span><span id="__span-2-8"><a href="#__codelineno-2-8" id="__codelineno-2-8" name="__codelineno-2-8"></a><span class="n">model1</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span>
+</span><span id="__span-2-9"><a href="#__codelineno-2-9" id="__codelineno-2-9" name="__codelineno-2-9"></a><span class="n">model1</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s2">"run_sim_from_opt_optimisation"</span><span class="p">)</span>
+</span><span id="__span-2-10"><a href="#__codelineno-2-10" id="__codelineno-2-10" name="__codelineno-2-10"></a>
+</span><span id="__span-2-11"><a href="#__codelineno-2-11" id="__codelineno-2-11" name="__codelineno-2-11"></a><span class="c1"># Then run in simulation mode</span>
+</span><span id="__span-2-12"><a href="#__codelineno-2-12" id="__codelineno-2-12" name="__codelineno-2-12"></a>
+</span><span id="__span-2-13"><a href="#__codelineno-2-13" id="__codelineno-2-13" name="__codelineno-2-13"></a><span class="c1"># Get the values from the control variables:</span>
+</span><span id="__span-2-14"><a href="#__codelineno-2-14" id="__codelineno-2-14" name="__codelineno-2-14"></a><span class="c1"># `relative_abatement` is the only control variable in default setting. If there are</span>
+</span><span id="__span-2-15"><a href="#__codelineno-2-15" id="__codelineno-2-15" name="__codelineno-2-15"></a><span class="c1"># other control variables, you can specify them here as well.</span>
+</span><span id="__span-2-16"><a href="#__codelineno-2-16" id="__codelineno-2-16" name="__codelineno-2-16"></a><span class="hll"><span class="n">relative_abatement</span> <span class="o">=</span> <span class="n">model1</span><span class="o">.</span><span class="n">concrete_model</span><span class="o">.</span><span class="n">relative_abatement</span><span class="o">.</span><span class="n">extract_values</span><span class="p">()</span>
+</span></span><span id="__span-2-17"><a href="#__codelineno-2-17" id="__codelineno-2-17" name="__codelineno-2-17"></a>
+</span><span id="__span-2-18"><a href="#__codelineno-2-18" id="__codelineno-2-18" name="__codelineno-2-18"></a><span class="c1"># If needed, the control variable values can be changed:</span>
+</span><span id="__span-2-19"><a href="#__codelineno-2-19" id="__codelineno-2-19" name="__codelineno-2-19"></a><span class="n">relative_abatement</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">value</span> <span class="o">*</span> <span class="mf">1.05</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">relative_abatement</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+</span><span id="__span-2-20"><a href="#__codelineno-2-20" id="__codelineno-2-20" name="__codelineno-2-20"></a>
+</span><span id="__span-2-21"><a href="#__codelineno-2-21" id="__codelineno-2-21" name="__codelineno-2-21"></a><span class="hll"><span class="n">simulation</span> <span class="o">=</span> <span class="n">model1</span><span class="o">.</span><span class="n">run_simulation</span><span class="p">(</span><span class="n">relative_abatement</span><span class="o">=</span><span class="n">relative_abatement</span><span class="p">)</span>
+</span></span><span id="__span-2-22"><a href="#__codelineno-2-22" id="__codelineno-2-22" name="__codelineno-2-22"></a><span class="n">model1</span><span class="o">.</span><span class="n">save_simulation</span><span class="p">(</span><span class="n">simulation</span><span class="p">,</span> <span class="s2">"run_sim_from_opt_simulation"</span><span class="p">)</span>
 </span></code></pre></div>
-<h2 id="2-equations">2. Equations</h2>
-<p>Most of the relationships between variables are in the form of <code>variable(t, r) = fct(other_var1, other_var2, ...)</code>.
-These equations are implemented in MIMOSA as Equations: either <code>GlobalEquation</code> (for time-dependent equations) or
-<code>RegionalEquation</code> (for time- and region-dependent equations). In our example, the carbon intensity equation</p>
-<div class="arithmatex">\[
-\text{carbon intensity}_{t,r} = \frac{\text{regional emissions}_{t,r}}{\text{GDP}_{t,r}}
-\]</div>
-<p>would be implemented as a <code>RegionalEquation</code>:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a href="#__codelineno-2-1" id="__codelineno-2-1" name="__codelineno-2-1"></a><span class="n">RegionalEquation</span><span class="p">(</span>
-</span><span id="__span-2-2"><a href="#__codelineno-2-2" id="__codelineno-2-2" name="__codelineno-2-2"></a><span class="hll">    <span class="n">m</span><span class="o">.</span><span class="n">carbon_intensity</span><span class="p">,</span>  <span class="c1"># Name of the left-hand-side variable</span>
-</span></span><span id="__span-2-3"><a href="#__codelineno-2-3" id="__codelineno-2-3" name="__codelineno-2-3"></a><span class="hll">    <span class="k">lambda</span> <span class="n">m</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">r</span><span class="p">:</span> <span class="n">m</span><span class="o">.</span><span class="n">regional_emissions</span><span class="p">[</span><span class="n">t</span><span class="p">,</span> <span class="n">r</span><span class="p">]</span> <span class="o">/</span> <span class="n">m</span><span class="o">.</span><span class="n">GDP_net</span><span class="p">[</span><span class="n">t</span><span class="p">,</span> <span class="n">r</span><span class="p">]</span>  <span class="c1"># Right-hand-side expression</span>
-</span></span><span id="__span-2-4"><a href="#__codelineno-2-4" id="__codelineno-2-4" name="__codelineno-2-4"></a><span class="p">)</span>
-</span></code></pre></div>
-<p><strong>Important note:</strong> the left-hand side should be specified <em>without</em> the indices (<code>t</code>, <code>r</code>): it should be just the variable (e.g. <code>m.carbon_intensity</code>, not <span markdown="" style="text-decoration: line-through; text-decoration-color: rgba(0,0,0,.25);"><code>m.carbon_intensity[t, r]</code></span>)</p>
-<p>Similarly, a global equation (not dependent on region) would be defined as:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a href="#__codelineno-3-1" id="__codelineno-3-1" name="__codelineno-3-1"></a><span class="n">GlobalEquation</span><span class="p">(</span>
-</span><span id="__span-3-2"><a href="#__codelineno-3-2" id="__codelineno-3-2" name="__codelineno-3-2"></a><span class="hll">    <span class="n">m</span><span class="o">.</span><span class="n">temperature</span><span class="p">,</span>  <span class="c1"># Name of the left-hand-side variable</span>
-</span></span><span id="__span-3-3"><a href="#__codelineno-3-3" id="__codelineno-3-3" name="__codelineno-3-3"></a><span class="hll">    <span class="k">lambda</span> <span class="n">m</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="n">m</span><span class="o">.</span><span class="n">T0</span> <span class="o">+</span> <span class="n">m</span><span class="o">.</span><span class="n">TCRE</span> <span class="o">*</span> <span class="n">m</span><span class="o">.</span><span class="n">global_emissions</span><span class="p">[</span><span class="n">t</span><span class="p">]</span>  <span class="c1"># Right-hand-side expression</span>
-</span></span><span id="__span-3-4"><a href="#__codelineno-3-4" id="__codelineno-3-4" name="__codelineno-3-4"></a><span class="p">)</span>
-</span></code></pre></div>
-<p><br/></p>
-<h5 id="circular-dependencies">Circular dependencies</h5>
-<p>Since these equations will also be used in simulation mode, it is important that the right-hand-side expression doesn't contain
-the variable from the left-hand-side, to avoid circular dependencies. It is, however, allowed to refer to a previous time step
-of the variable:</p>
-<div class="language-python highlight"><span class="filename">✅ Valid equation (reference to previous time step)</span><pre><span></span><code><span id="__span-4-1"><a href="#__codelineno-4-1" id="__codelineno-4-1" name="__codelineno-4-1"></a><span class="n">GlobalEquation</span><span class="p">(</span>
-</span><span id="__span-4-2"><a href="#__codelineno-4-2" id="__codelineno-4-2" name="__codelineno-4-2"></a>    <span class="n">m</span><span class="o">.</span><span class="n">cumulative_emissions</span><span class="p">,</span>
-</span><span id="__span-4-3"><a href="#__codelineno-4-3" id="__codelineno-4-3" name="__codelineno-4-3"></a>    <span class="k">lambda</span> <span class="n">m</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="p">(</span>
-</span><span id="__span-4-4"><a href="#__codelineno-4-4" id="__codelineno-4-4" name="__codelineno-4-4"></a><span class="hll">        <span class="n">m</span><span class="o">.</span><span class="n">cumulative_emissions</span><span class="p">[</span><span class="n">t</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">m</span><span class="o">.</span><span class="n">dt</span> <span class="o">*</span> <span class="n">m</span><span class="o">.</span><span class="n">global_emissions</span><span class="p">[</span><span class="n">t</span><span class="p">]</span>
-</span></span><span id="__span-4-5"><a href="#__codelineno-4-5" id="__codelineno-4-5" name="__codelineno-4-5"></a>        <span class="k">if</span> <span class="n">t</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">m</span><span class="o">.</span><span class="n">global_emissions</span><span class="p">[</span><span class="n">t</span><span class="p">]</span>
-</span><span id="__span-4-6"><a href="#__codelineno-4-6" id="__codelineno-4-6" name="__codelineno-4-6"></a>    <span class="p">)</span>
-</span><span id="__span-4-7"><a href="#__codelineno-4-7" id="__codelineno-4-7" name="__codelineno-4-7"></a><span class="p">)</span>
-</span></code></pre></div>
-<div class="language-python highlight"><span class="filename">❌ Invalid equation (reference to the variable itself)</span><pre><span></span><code><span id="__span-5-1"><a href="#__codelineno-5-1" id="__codelineno-5-1" name="__codelineno-5-1"></a><span class="n">GlobalEquation</span><span class="p">(</span>
-</span><span id="__span-5-2"><a href="#__codelineno-5-2" id="__codelineno-5-2" name="__codelineno-5-2"></a>    <span class="n">m</span><span class="o">.</span><span class="n">cumulative_emissions</span><span class="p">,</span>
-</span><span id="__span-5-3"><a href="#__codelineno-5-3" id="__codelineno-5-3" name="__codelineno-5-3"></a>    <span class="k">lambda</span> <span class="n">m</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="p">(</span>
-</span><span id="__span-5-4"><a href="#__codelineno-5-4" id="__codelineno-5-4" name="__codelineno-5-4"></a><span class="hll">        <span class="n">m</span><span class="o">.</span><span class="n">cumulative_emissions</span><span class="p">[</span><span class="n">t</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">m</span><span class="o">.</span><span class="n">global_emissions</span><span class="p">[</span><span class="n">t</span><span class="p">]</span>
-</span></span><span id="__span-5-5"><a href="#__codelineno-5-5" id="__codelineno-5-5" name="__codelineno-5-5"></a>    <span class="p">)</span>
-</span><span id="__span-5-6"><a href="#__codelineno-5-6" id="__codelineno-5-6" name="__codelineno-5-6"></a><span class="p">)</span>
-</span></code></pre></div>
-<p><br/></p>
-<h5 id="where-to-place-the-equations">Where to place the equations</h5>
-<p>Next, MIMOSA needs to know where the constraints are created. Every component therefore consists of a function called <code>get_constraints()</code> (see <a href="../components/">Components</a>). This function returns a list of equations/constraints. Add the new constraint to the list:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a href="#__codelineno-6-1" id="__codelineno-6-1" name="__codelineno-6-1"></a><span class="k">def</span> <span class="nf">get_constraints</span><span class="p">(</span><span class="n">m</span><span class="p">):</span>
-</span><span id="__span-6-2"><a href="#__codelineno-6-2" id="__codelineno-6-2" name="__codelineno-6-2"></a>    <span class="n">constraints</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="__span-6-3"><a href="#__codelineno-6-3" id="__codelineno-6-3" name="__codelineno-6-3"></a>    <span class="c1"># ... existing code ...</span>
-</span><span id="__span-6-4"><a href="#__codelineno-6-4" id="__codelineno-6-4" name="__codelineno-6-4"></a>
-</span><span id="__span-6-5"><a href="#__codelineno-6-5" id="__codelineno-6-5" name="__codelineno-6-5"></a><span class="hll">    <span class="n">constraints</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span>
-</span></span><span id="__span-6-6"><a href="#__codelineno-6-6" id="__codelineno-6-6" name="__codelineno-6-6"></a><span class="hll">        <span class="n">RegionalEquation</span><span class="p">(</span>
-</span></span><span id="__span-6-7"><a href="#__codelineno-6-7" id="__codelineno-6-7" name="__codelineno-6-7"></a><span class="hll">            <span class="n">m</span><span class="o">.</span><span class="n">carbon_intensity</span><span class="p">,</span>  <span class="c1"># Name of the left-hand-side variable</span>
-</span></span><span id="__span-6-8"><a href="#__codelineno-6-8" id="__codelineno-6-8" name="__codelineno-6-8"></a><span class="hll">            <span class="k">lambda</span> <span class="n">m</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">r</span><span class="p">:</span> <span class="n">m</span><span class="o">.</span><span class="n">regional_emissions</span><span class="p">[</span><span class="n">t</span><span class="p">,</span> <span class="n">r</span><span class="p">]</span> <span class="o">/</span> <span class="n">m</span><span class="o">.</span><span class="n">GDP_net</span><span class="p">[</span><span class="n">t</span><span class="p">,</span> <span class="n">r</span><span class="p">]</span>  <span class="c1"># Right-hand-side expression</span>
-</span></span><span id="__span-6-9"><a href="#__codelineno-6-9" id="__codelineno-6-9" name="__codelineno-6-9"></a><span class="hll">        <span class="p">),</span>
-</span></span><span id="__span-6-10"><a href="#__codelineno-6-10" id="__codelineno-6-10" name="__codelineno-6-10"></a><span class="hll">        <span class="o">...</span>
-</span></span><span id="__span-6-11"><a href="#__codelineno-6-11" id="__codelineno-6-11" name="__codelineno-6-11"></a><span class="hll">    <span class="p">])</span>
-</span></span><span id="__span-6-12"><a href="#__codelineno-6-12" id="__codelineno-6-12" name="__codelineno-6-12"></a>
-</span><span id="__span-6-13"><a href="#__codelineno-6-13" id="__codelineno-6-13" name="__codelineno-6-13"></a>    <span class="k">return</span> <span class="n">constraints</span>
-</span></code></pre></div>
-<h2 id="3-advanced-general-constraints">3. Advanced: general constraints</h2>
-<p>There are situations where the relationship between variables cannot be expressed as an equation:</p>
-<ul>
-<li>The relationship is not a simple equality, but an inequality (e.g. <code>x &gt;= y</code>).</li>
-<li>The left-hand-side and right-hand-side contain the same variable, but not in a way that can be expressed as an equation.</li>
-<li>The left-hand-side contains more than one variable (e.g. <code>sqrt(x + y) = sin(z)</code>).</li>
-</ul>
-<p>In these cases, you can use a general constraint. They do not have a left-hand-side and right-hand-sie explicitly, but
-are defined as a lambda function that returns a boolean value. The general constraint is then satisfied if the
-lambda function returns <code>True</code>. If it returns <code>False</code>, the constraint is violated.</p>
-<p>For example, to create a constraint to enforce a maximum carbon budget, you can use the following code:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-7-1"><a href="#__codelineno-7-1" id="__codelineno-7-1" name="__codelineno-7-1"></a><span class="n">GlobalConstraint</span><span class="p">(</span>
-</span><span id="__span-7-2"><a href="#__codelineno-7-2" id="__codelineno-7-2" name="__codelineno-7-2"></a>    <span class="k">lambda</span> <span class="n">m</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="n">m</span><span class="o">.</span><span class="n">cumulative_emissions</span><span class="p">[</span><span class="n">t</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">m</span><span class="o">.</span><span class="n">carbon_budget</span><span class="p">,</span>
-</span><span id="__span-7-3"><a href="#__codelineno-7-3" id="__codelineno-7-3" name="__codelineno-7-3"></a>    <span class="n">name</span><span class="o">=</span><span class="s2">"carbon_budget"</span>
-</span><span id="__span-7-4"><a href="#__codelineno-7-4" id="__codelineno-7-4" name="__codelineno-7-4"></a><span class="p">)</span>
-</span></code></pre></div>
-<p>There are four types of constraints, depending on whether they depend on regions, time, or both:</p>
-<ul>
-<li>
-<p>Region and time dependent:</p>
-<p><code>RegionalConstraint(lambda m, t, r: ..., name="...")</code></p>
-</li>
-<li>
-<p>Only region dependent:</p>
-<p><code>RegionalInitConstraint(lambda m, r: ..., name="...")</code></p>
-</li>
-<li>
-<p>Only time dependent, not on region:</p>
-<p><code>GlobalConstraint(lambda m, t: ..., name="...")</code></p>
-</li>
-<li>
-<p>Not dependent on time nor on region:</p>
-<p><code>GlobalInitConstraint(lambda m: ..., name="...")</code></p>
-</li>
-</ul>
-<p><strong>Note:</strong> as shown in this example, constraints do not need to be equality constraints. They can also be inequality constraints. Also, 
-constraints do need to be in the form of <code>m.variable == expression</code>: the left-hand-side and the right-hand-side can be non-linear combinations of variables and parameters.</p>
-<p><br/></p>
-<h5 id="conditionally-skip-constraints">Conditionally skip constraints</h5>
-<p>If a constraint should only be enforced under certain conditions, you can use an the <code>Constraint.Skip</code> statement. This can be for certain time periods, regions, or any condition based on parameters. It is not possible to skip constraints based on variable values.</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-8-1"><a href="#__codelineno-8-1" id="__codelineno-8-1" name="__codelineno-8-1"></a><span class="n">GlobalConstraint</span><span class="p">(</span>
-</span><span id="__span-8-2"><a href="#__codelineno-8-2" id="__codelineno-8-2" name="__codelineno-8-2"></a>    <span class="k">lambda</span> <span class="n">m</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="p">(</span>
-</span><span id="__span-8-3"><a href="#__codelineno-8-3" id="__codelineno-8-3" name="__codelineno-8-3"></a>        <span class="n">m</span><span class="o">.</span><span class="n">global_emissions</span><span class="p">[</span><span class="n">t</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">0</span>
-</span><span id="__span-8-4"><a href="#__codelineno-8-4" id="__codelineno-8-4" name="__codelineno-8-4"></a><span class="hll">        <span class="k">if</span> <span class="n">m</span><span class="o">.</span><span class="n">year</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2100</span>
-</span></span><span id="__span-8-5"><a href="#__codelineno-8-5" id="__codelineno-8-5" name="__codelineno-8-5"></a><span class="hll">        <span class="k">else</span> <span class="n">Constraint</span><span class="o">.</span><span class="n">Skip</span>
-</span></span><span id="__span-8-6"><a href="#__codelineno-8-6" id="__codelineno-8-6" name="__codelineno-8-6"></a>    <span class="p">),</span>
-</span><span id="__span-8-7"><a href="#__codelineno-8-7" id="__codelineno-8-7" name="__codelineno-8-7"></a>    <span class="n">name</span><span class="o">=</span><span class="s2">"net_zero_after_2100"</span><span class="p">,</span>
-</span><span id="__span-8-8"><a href="#__codelineno-8-8" id="__codelineno-8-8" name="__codelineno-8-8"></a><span class="p">)</span>
-</span></code></pre></div>
-<p><strong>Note:</strong> the variable <code>t</code> is a time index (starting at <code>t=0</code>), and <code>m.year(t)</code> returns the year of the time index <code>t</code>.</p>
-<h2 id="4-advanced-soft-equality-constraints">4. Advanced: soft-equality constraints</h2>
-<h2 id="5-advanced-numerical-stability">5. Advanced: numerical stability</h2>
-<ul>
-<li>Avoid division by zero: add a small number to the denominator</li>
-<li>Avoid large numbers: scale the variables by choosing appropriate units</li>
-<li>Avoid negative numbers in exponents and square roots by using the <code>soft_min</code> and <code>soft_max</code> functions</li>
-</ul>
 
 
 
@@ -1509,7 +1375,7 @@ constraints do need to be in the form of <code>m.variable == expression</code>: 
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../components/" class="md-footer__link md-footer__link--prev" aria-label="Previous: New components">
+          <a href="../changingparams/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Changing parameters">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
@@ -1519,20 +1385,20 @@ constraints do need to be in the form of <code>m.variable == expression</code>: 
                 Previous
               </span>
               <div class="md-ellipsis">
-                New components
+                Changing parameters
               </div>
             </div>
           </a>
         
         
           
-          <a href="../parameters/" class="md-footer__link md-footer__link--next" aria-label="Next: Parameters">
+          <a href="../baseline/" class="md-footer__link md-footer__link--next" aria-label="Next: Doing a baseline run">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Parameters
+                Doing a baseline run
               </div>
             </div>
             <div class="md-footer__button md-icon">
