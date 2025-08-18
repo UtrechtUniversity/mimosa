@@ -31,12 +31,24 @@ model1.simulator.plot_dependency_graph()
 
 #### Default simulation: all control variables set to zero
 
-When you run a simulation without specifying values for the control variables, MIMOSA will use the default values, which are all set to zero. This allows you to see the baseline behavior of the model before making any adjustments.
+When you run a simulation without specifying values for the control variables, MIMOSA will use the default values, which are all set to zero. This allows you to see the baseline behavior of the model before making any adjustments. By default, the only control variable is `relative_abatement`, which is set to zero in the default simulation:
+
+``` python hl_lines="5 6"
+--8<-- "tests/runs/run_sim_default.py"
+```
+
+1. This is equivalent to `model.run_simulation(relative_abatement=0)`.
 
 #### Setting control variables to a value
 
-You can set the control variables to specific values before running a simulation. This is useful for exploring different scenarios or testing the sensitivity of the model to changes in the input parameters.
+
 
 #### Running a simulation using the values from an optimisation run
 
-If you have previously run an optimisation and obtained values for the control variables, you can use these values as the starting point for your simulation. This allows you to see how the model behaves when the control variables are set to their optimal values.
+If you have previously run an optimisation and obtained values for the control variables, you can use these values as the starting point for your simulation. This allows you to see how the model behaves when the control variables are set to their optimal values, or to perform a sensitivity analysis by slightly changing one or more control variables.
+
+See [Control variables](#control-variables) if you're unsure what the control variables are.
+
+``` python hl_lines="16 21"
+--8<-- "tests/runs/run_sim_from_opt.py"
+```
