@@ -35,6 +35,7 @@ docs = [
   "mkdocstrings-handlers",
   "mkdocs-plotly-plugin",
   "mkdocs-table-reader-plugin",
+  "mkdocs-glichtbox",
   "mkdocs-macros-plugin",
   "mkdocs-glightbox",
   "mike",
