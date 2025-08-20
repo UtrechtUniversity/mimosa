@@ -102,7 +102,6 @@ def get_constraints_slr(m):
                 m.damage_scale_factor
                 * damage_fct_slr(
                     m.total_SLR[t],
-                    m.total_SLR[0],
                     m.slr_gross_damage_a[r],
                     m.slr_gross_damage_b[r],
                     m.slr_gross_damage_c[r],
@@ -245,7 +244,9 @@ def get_constraints_slr(m):
         RegionalEquation(
             m.damage_costs_slr,
             lambda m, t, r: (
-                m.slr_gross_damage_costs[t, r]
+                (
+                    m.slr_gross_damage_costs[t, r] - m.slr_gross_damage_costs[0, r]
+                )  # Normalize such that 2020 is zero
                 - (
                     m.slr_avoided_damages[t, r] - m.slr_avoided_damages[0, r]
                 )  # Normalize such that 2020 is zero
@@ -257,7 +258,7 @@ def get_constraints_slr(m):
     return constraints
 
 
-def damage_fct_slr(slr, initial_slr, a, b, c):
+def damage_fct_slr(slr, a, b, c):
     """
     Function to calculate the damages due to sea-level rise (SLR).
 
@@ -265,16 +266,8 @@ def damage_fct_slr(slr, initial_slr, a, b, c):
         a + b * slr + c * slr^2
     (or linear when c is zero).
 
-    To make sure that the damages are zero in 2020, the damage at initial SLR
-    is subtracted from the total damage:
-
-        damage = (a + b * slr + c * slr^2) - (a + b * initial_slr + c * initial_slr^2)
     """
     if c == 0:
-        damages = a + b * slr
-        initial_damages = a + b * initial_slr
-    else:
-        damages = a + b * slr + c * slr**2
-        initial_damages = a + b * initial_slr + c * initial_slr**2
+        return a + b * slr
 
-    return damages - initial_damages
+    return a + b * slr + c * slr**2
