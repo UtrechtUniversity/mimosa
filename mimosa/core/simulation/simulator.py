@@ -26,7 +26,7 @@ class Simulator:
     equations: list
     equations_sorted: list
     equations_graph: nx.DiGraph
-    free_variables: list
+    control_variables: list
 
     def __init__(self):
         pass
@@ -47,11 +47,11 @@ class Simulator:
         equations_dict = {eq.name: eq for eq in equations}
         calc_dependencies(equations_dict, concrete_model)
         # Perform topological sort of equations based on dependencies
-        self.equations_sorted, self.equations_graph, self.free_variables = (
+        self.equations_sorted, self.equations_graph, self.control_variables = (
             sort_equations(equations_dict, return_graph=True)
         )
 
-    def run(self, simulation_model=None, **free_variables_kwargs):
+    def run(self, simulation_model=None, **control_variables_kwargs):
         """
         Runs MIMOSA as simulation.
 
@@ -60,7 +60,7 @@ class Simulator:
         Args:
         simulation_model (SimulationObjectModel): The simulation model to run.
             If None, a new SimulationObjectModel will be created.
-        free_variables_kwargs: set of keyword arguments to optionally set free variables to a value. Can be:
+        control_variables_kwargs: set of keyword arguments to optionally set free variables to a value. Can be:
             * None (equivalent to 0)
             * A float value: every region and time step will get this value
             * A numpy array of shape (n_timesteps, n_regions): each region and time step will get the corresponding value
@@ -74,16 +74,16 @@ class Simulator:
         n_regions = len(self.concrete_model.regions)
 
         # Check if there are no variables provided in kwargs that are not in the free variables:
-        for var in free_variables_kwargs:
-            if var not in self.free_variables:
+        for var in control_variables_kwargs:
+            if var not in self.control_variables:
                 raise ValueError(
-                    f"Variable '{var}' is not a free variable. "
-                    f"Available free variables: {self.free_variables}"
+                    f"Variable '{var}' is not a control variable. "
+                    f"Available control variables: {self.control_variables}"
                 )
 
-        for var in self.free_variables:
+        for var in self.control_variables:
             # Check if the variable is provided in the kwargs, otherwise set to None
-            value = free_variables_kwargs.get(var, None)
+            value = control_variables_kwargs.get(var, None)
 
             if value is None:
                 # If no relative abatement is provided, set it to zero

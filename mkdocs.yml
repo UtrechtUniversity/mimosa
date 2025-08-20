@@ -16,7 +16,14 @@ nav:
       - Region definitions: components/regions.md
   - Parameter reference: parameters.md
   - Installing MIMOSA: installation.md
-  - Running MIMOSA: run.md
+  - Running MIMOSA:
+      - run/index.md
+      - Changing parameters: run/changingparams.md
+      - Simulation vs optimisation: run/simulation.md
+      - Doing a baseline run: run/baseline.md
+      - Doing multiple runs: run/multipleruns.md
+      - Doing an effort-sharing run: run/effortsharing.md
+      - "Advanced: logging": run/logging.md
   - MIMOSA Dashboard: "https://dashboard-mimosa.onrender.com/"
   - Extending MIMOSA:
       - extending/index.md
