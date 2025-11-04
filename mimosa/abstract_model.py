@@ -4,7 +4,7 @@ Abstract representation of the model
 Contains all model equations and constraints
 """
 
-from mimosa.common import Param, AbstractModel, Set, add_constraint, quant, Equation
+from mimosa.common import Param, AbstractModel, Set, add_constraint, quant, Equation, Var
 from mimosa.common.utils import load_from_registry
 from mimosa.components import (
     effortsharing,
@@ -17,6 +17,7 @@ from mimosa.components import (
     objective,
     sealevelrise,
     welfare,
+    inequality
 )
 
 
@@ -63,6 +64,11 @@ def create_abstract_model(
     m.year2100 = Param()
 
     m.regions = Set(ordered=True)
+
+    m.quintiles = Set(initialize=[1, 2, 3, 4, 5])
+    m.GINI = Param(m.regions, doc="regional::inequality.GINI")
+    m.average_income = Param(m.t, m.regions, units=quant.unit("currency_unit"))
+    m.income_quintile = Var(m.t, m.regions, m.quintiles, units=quant.unit("currency_unit"))
 
     ######################
     # Create data params for baseline values
