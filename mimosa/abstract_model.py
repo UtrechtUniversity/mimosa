@@ -67,7 +67,8 @@ def create_abstract_model(
 
     m.quintiles = Set(initialize=[1, 2, 3, 4, 5])
     m.GINI = Param(m.regions, doc="regional::inequality.GINI")
-    m.average_income = Param(m.t, m.regions, units=quant.unit("currency_unit"))
+    #m.GINI = Param(m.regions, initialize=lambda m, r: 0.45)  # DEBUG: Test zonder CSV
+    #m.average_income = Param(m.t, m.regions, units=quant.unit("currency_unit"))
     m.income_quintile = Var(m.t, m.regions, m.quintiles, units=quant.unit("currency_unit"))
 
     ######################
@@ -136,6 +137,9 @@ def create_abstract_model(
 
     # Cobb-Douglas and economics
     constraints.extend(cobbdouglas.get_constraints(m))
+
+    # Inequality
+    constraints.extend(inequality.get_constraints(m))
 
     # Utility and welfare
     get_welfare_constraints = load_from_registry(

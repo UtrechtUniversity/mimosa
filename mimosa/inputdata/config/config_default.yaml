@@ -530,6 +530,9 @@ regional_parameter_files:
     COACCH:
       filename: inputdata/regionalparams/COACCH.csv
       regionstype: COACCH
+    inequality:
+      filename: inputdata/regionalparams/20251104_GINI_big_county.csv
+      regionstype: IMAGE26
 
 ##################
 

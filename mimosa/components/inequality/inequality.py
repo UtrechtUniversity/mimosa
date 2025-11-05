@@ -5,6 +5,7 @@ from mimosa.common import (
     Param,
     Var,
     GeneralConstraint,
+    Constraint,
     RegionalEquation,
     GlobalEquation,
     value,
@@ -13,6 +14,10 @@ from mimosa.common import (
     exp,
     quant,
 )
+
+class RegionalQuintileConstraint(GeneralConstraint):
+    def to_pyomo_constraint(self, m):
+        return Constraint(m.t, m.regions, m.quintiles, rule=self.rule, doc=self.doc)
 
 def get_constraints(m: AbstractModel):
     """
@@ -49,8 +54,7 @@ def get_constraints(m: AbstractModel):
         return m.income_quintile[t, r, q] == expected_income
     
     constraints.extend([
-        RegionalEquation(
-            m.income_quintile,
+        RegionalQuintileConstraint(
             quintile_income_eq
         )
     ])

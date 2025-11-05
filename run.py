@@ -4,6 +4,14 @@ from mimosa import MIMOSA, load_params
 
 params = load_params()
 
+# DEBUG: Print alle regional parameter files
+"""
+print("=== REGIONAL PARAMETER FILES ===")
+for category, config in params.get("regional_parameter_files", {}).get("default", {}).items():
+    print(f"Category: {category}, File: {config.get('filename')}")
+print("================================")
+"""
+
 model1 = MIMOSA(params)
 model1.solve()
 model1.save("run_sim_from_opt_optimisation")
