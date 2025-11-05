@@ -70,11 +70,26 @@ def var_to_row(rows, m, var, is_regional, unit):
         name = var.name
 
     # Check if var is a function or a pyomo variable
-    if is_regional:
-        for r in m.regions:
-            rows.append([name, r, unit] + [value(var[t, r]) for t in m.t])
-    else:
-        rows.append([name, "Global", unit] + [value(var[t]) for t in m.t])
+    # Try if variable has quintile distribution
+    try:
+        if is_regional:
+            for r in m.regions:
+                for q in m.quintiles:
+                    rows.append(
+                        [name, f"{r}_Q{q}", unit] + [value(var[t, r, q]) for t in m.t]
+                    )
+        else:
+            for q in m.quintiles:
+                rows.append(
+                    [name, f"Global_Q{q}", unit] + [value(var[t, q]) for t in m.t]
+                )
+    except KeyError:
+        # Otherwise there is no quintile distribution
+        if is_regional:
+            for r in m.regions:
+                rows.append([name, r, unit] + [value(var[t, r]) for t in m.t])
+        else:
+            rows.append([name, "Global", unit] + [value(var[t]) for t in m.t])
 
 
 def rows_to_dataframe(rows, m):
