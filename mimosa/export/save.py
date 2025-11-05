@@ -76,12 +76,12 @@ def var_to_row(rows, m, var, is_regional, unit):
             for r in m.regions:
                 for q in m.quintiles:
                     rows.append(
-                        [name, f"{r}_Q{q}", unit] + [value(var[t, r, q]) for t in m.t]
+                        [f"{name}_Q{q}", r, unit] + [value(var[t, r, q]) for t in m.t]
                     )
         else:
             for q in m.quintiles:
                 rows.append(
-                    [name, f"Global_Q{q}", unit] + [value(var[t, q]) for t in m.t]
+                    [f"{name}_Q{q}", "Global", unit] + [value(var[t, q]) for t in m.t]
                 )
     except KeyError:
         # Otherwise there is no quintile distribution
