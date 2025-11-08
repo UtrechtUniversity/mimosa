@@ -91,7 +91,7 @@ class Equation(ABC):
     # not affect order of execution, but are important to plot
     prev_time_dependencies: typing.List[str] = []
 
-    def __init__(self, lhs, rhs, indices=None):
+    def __init__(self, lhs, rhs, indices):
         """
         Represents an equation of the form lhs == rhs. Note that the lhs
         can only be a single variable, while the rhs can be a function.
@@ -104,7 +104,12 @@ class Equation(ABC):
                 as a Pyomo Var object.
             rhs (Callable): A function that takes m and the indices (e.g. m, t or m, t, r) as
                 arguments and returns the right-hand side value.
-            indices (list, optional): List of indices for the equation. Defaults to ['t', 'r'].
+            indices (list): List of names of the indices for the equation. For example,
+                use ["t"] for global time-dependent equations and ["t", "regions"] for
+                regional time-dependent equations.
+
+                Note: the indices cannot be empty, since that would represent a static equation,
+                which is not supported. Use a constraint instead for static equations.
 
         Example:
             GlobalEquation(
@@ -127,7 +132,7 @@ class Equation(ABC):
 
         """
 
-        self.indices = indices or ["t", "r"]  # Default indices are time and region
+        self.indices = indices
 
         if isinstance(lhs, Var):
             lhs = lhs.name
@@ -150,9 +155,22 @@ class Equation(ABC):
             return 0
         return value
 
-    @abstractmethod
     def to_pyomo_constraint(self, m):
-        pass
+        """
+        Converts the equation to a Pyomo constraint over its indices.
+        Automatically supports any number of indices.
+        """
+
+        def _rule(m, *args, lhs_var_name=self.lhs, rhs_expr=self.rhs):
+            rhs_value = rhs_expr(m, *args)
+            if ".Skip" in str(rhs_value):
+                return Constraint.Skip
+            lhs_var = getattr(m, lhs_var_name)
+            return lhs_var[args] == rhs_value
+
+        # Build constraint domain dynamically
+        sets = [getattr(m, idx) for idx in self.indices]
+        return Constraint(*sets, rule=_rule)
 
 
 class GlobalEquation(Equation):
@@ -161,38 +179,12 @@ class GlobalEquation(Equation):
 
     __init__.__doc__ = Equation.__init__.__doc__
 
-    def to_pyomo_constraint(self, m):
-        """
-        Converts the equation to a Pyomo constraint.
-        """
-
-        def _rule(m, t, lhs_var_name=self.lhs, rhs_expr=self.rhs):
-            rhs_value = rhs_expr(m, t)
-            if ".Skip" in str(rhs_value):
-                return Constraint.Skip
-            return getattr(m, lhs_var_name)[t] == rhs_value
-
-        return Constraint(m.t, rule=_rule)
-
 
 class RegionalEquation(Equation):
     def __init__(self, lhs, rhs):
-        super().__init__(lhs, rhs, indices=["t", "r"])
+        super().__init__(lhs, rhs, indices=["t", "regions"])
 
     __init__.__doc__ = Equation.__init__.__doc__
-
-    def to_pyomo_constraint(self, m):
-        """
-        Converts the equation to a Pyomo constraint.
-        """
-
-        def _rule(m, t, r, lhs_var_name=self.lhs, rhs_expr=self.rhs):
-            rhs_value = rhs_expr(m, t, r)
-            if ".Skip" in str(rhs_value):
-                return Constraint.Skip
-            return getattr(m, lhs_var_name)[t, r] == rhs_value
-
-        return Constraint(m.t, m.regions, rule=_rule)
 
 
 ####### Constraints
