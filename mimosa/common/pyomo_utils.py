@@ -96,7 +96,7 @@ class Equation(ABC):
         Represents an equation of the form lhs == rhs. Note that the lhs
         can only be a single variable, while the rhs can be a function.
 
-        Use GlobalEquation for time dependent equations (e.g. global emissions) and
+        As shorthand, use GlobalEquation for time dependent equations (e.g. global emissions) and
         RegionalEquation for regional equations (e.g. regional emissions).
 
         Args:
