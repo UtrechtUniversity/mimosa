@@ -127,7 +127,7 @@ class Equation(ABC):
 
         """
 
-        indices = indices or ["t", "r"]  # Default indices are time and region]
+        self.indices = indices or ["t", "r"]  # Default indices are time and region
 
         if isinstance(lhs, Var):
             lhs = lhs.name
@@ -157,7 +157,7 @@ class Equation(ABC):
 
 class GlobalEquation(Equation):
     def __init__(self, lhs, rhs):
-        super().__init__(lhs, rhs, indices=["t", "r"])
+        super().__init__(lhs, rhs, indices=["t"])
 
     __init__.__doc__ = Equation.__init__.__doc__
 
