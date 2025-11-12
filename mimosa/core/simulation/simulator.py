@@ -1,3 +1,4 @@
+import itertools
 import numpy as np
 import pandas as pd
 import networkx as nx
@@ -189,18 +190,21 @@ class Simulator:
         sim_m.set_index_numpy_index()
         for t in sim_m.t:
             for equation in self.equations_sorted:
-                # Check if it is a regional or global equation
-                if isinstance(equation, RegionalEquation):  # Regional:
-                    for r in sim_m.regions:
-                        value = equation(sim_m, t, r)
-                        getattr(sim_m, equation.lhs)[t, r] = value
-                elif isinstance(equation, GlobalEquation):  # Global:
+                # Check if we also need to loop over other dimensions (e.g. regions)
+                indices = equation.indices
+                if len(indices) == 1:
                     value = equation(sim_m, t)
                     getattr(sim_m, equation.lhs)[t] = value
                 else:
-                    raise ValueError(
-                        f"Equation {equation.name} is neither Regional nor Global."
-                    )
+                    # Loop over other indices
+                    remaining_indices = indices[1:]
+                    remaining_index_values = [
+                        getattr(sim_m, index) for index in remaining_indices
+                    ]
+
+                    for remaining_idx in itertools.product(*remaining_index_values):
+                        value = equation(sim_m, t, *remaining_idx)
+                        getattr(sim_m, equation.lhs)[t, *remaining_idx] = value
         # Set indices back to original names ('CAN', 'WEU', ...)
         sim_m.set_index_names()
 
