@@ -108,6 +108,8 @@ class Equation(ABC):
                 use ["t"] for global time-dependent equations and ["t", "regions"] for
                 regional time-dependent equations.
 
+                It is also possible to give the sets directly, e.g. [m.t, m.regions].
+
                 Note: the indices cannot be empty, since that would represent a static equation,
                 which is not supported. Use a constraint instead for static equations.
 
@@ -132,7 +134,9 @@ class Equation(ABC):
 
         """
 
-        self.indices = indices
+        self.indices = [
+            index if isinstance(index, str) else index.name for index in indices
+        ]
 
         if isinstance(lhs, Var):
             lhs = lhs.name
@@ -169,7 +173,10 @@ class Equation(ABC):
             return lhs_var[args] == rhs_value
 
         # Build constraint domain dynamically
-        sets = [getattr(m, idx) for idx in self.indices]
+        # Each set can be either the name (string) or the set itself
+        sets = [
+            getattr(m, idx) if isinstance(idx, str) else idx for idx in self.indices
+        ]
         return Constraint(*sets, rule=_rule)
 
 
