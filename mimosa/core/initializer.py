@@ -1,9 +1,11 @@
+from typing import Tuple, List
 from mimosa.common import (
     AbstractModel,
     ConcreteModel,
     data,
     regional_params,
     TransformationFactory,
+    Equation,
 )
 from mimosa.common.config.parseconfig import check_params, parse_param_values
 from mimosa.abstract_model import create_abstract_model
@@ -30,7 +32,7 @@ class Preprocessor:
     def __init__(self, params):
         self._params = params
 
-    def build_model(self):
+    def build_model(self) -> Tuple[ConcreteModel, dict, List[Equation]]:
         """
         Creates the MIMOSA concrete_model based on the provided parameters.
         This method performs the following steps:
@@ -41,6 +43,10 @@ class Preprocessor:
         5. Preprocesses the Pyomo model by aggregating identical variables and more
         Returns:
             ConcreteModel: The instantiated model ready for simulation.
+
+            parsed_params: dictionary of all the parsed parameter values
+
+            equations: list of equations used in the model
         """
         self._check_and_parse_params()
         self._abstract_model, self.equations = self._create_abstract_model()
@@ -69,13 +75,15 @@ class Preprocessor:
         self._params = params
         self.parser_tree = parser_tree
 
-    def _create_abstract_model(self) -> AbstractModel:
+    def _create_abstract_model(self) -> Tuple[AbstractModel, List[Equation]]:
         """
         Loads all the equations and creates an abstract_model.
         `abstract` here means that the model is not yet instantiated with data.
 
         Returns:
             AbstractModel: model corresponding to the damage/objective module combination
+            equations_for_simulation: list of equations used in the model, for simulation mode
+
         """
         damage_module = self._params["model"]["damage module"]
         emissiontrade_module = self._params["model"]["emissiontrade module"]
@@ -84,7 +92,7 @@ class Preprocessor:
         objective_module = self._params["model"]["objective module"]
         effortsharing_regime = self._params["effort sharing"]["regime"]
 
-        return create_abstract_model(
+        abstract_model, equations_for_simulation = create_abstract_model(
             damage_module,
             emissiontrade_module,
             financialtransfer_module,
@@ -92,6 +100,8 @@ class Preprocessor:
             objective_module,
             effortsharing_regime,
         )
+
+        return abstract_model, equations_for_simulation
 
     def _load_data(self):
         """

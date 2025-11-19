@@ -4,6 +4,8 @@ Abstract representation of the model
 Contains all model equations and constraints
 """
 
+from typing import List, Tuple
+
 from mimosa.common import Param, AbstractModel, Set, add_constraint, quant, Equation
 from mimosa.common.utils import load_from_registry
 from mimosa.components import (
@@ -32,7 +34,7 @@ def create_abstract_model(
     welfare_module: str,
     objective_module: str,
     effortsharing_regime: str,
-) -> AbstractModel:
+) -> Tuple[AbstractModel, List[Equation]]:
     """
     ## Building the abstract model
 
