@@ -1,6 +1,6 @@
 import numpy as np
 
-from mimosa.common import get_indices, Var, Param, Set, UsefulVar
+from mimosa.common import get_indices, Var, Param, Set, ExportVar
 
 
 class SimVar:
@@ -147,10 +147,10 @@ class SimulationObjectModel:
             setattr(self, index_set, getattr(self, index_set + "_names"))
 
     def all_vars_for_export(self):
-        return [SimulationUsefulVar(self, name) for name in self.all_vars]
+        return [SimulationExportVar(self, name) for name in self.all_vars]
 
 
-class SimulationUsefulVar(UsefulVar):
+class SimulationExportVar(ExportVar):
     def __init__(self, sim_m: SimulationObjectModel, name: str):
         self.m = sim_m
         self.var = getattr(

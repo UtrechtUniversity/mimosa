@@ -47,7 +47,7 @@ from .pyomo_utils import (
     Equation,
     GlobalEquation,
     RegionalEquation,
-    UsefulVar,
+    ExportVar,
     soft_switch,
     soft_min,
     soft_max,

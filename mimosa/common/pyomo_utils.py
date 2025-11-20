@@ -341,7 +341,7 @@ def add_constraint(m, constraints, names=None):
 ####### Get all variables of a model
 
 
-class UsefulVar:
+class ExportVar:
     def __init__(self, m, var: typing.Union[Var, Param]):
         self.m = m
         self.var = var
@@ -356,7 +356,7 @@ class UsefulVar:
 
 def get_all_variables(m):
     return [
-        UsefulVar(m, var)
+        ExportVar(m, var)
         for var in m.component_objects(Var)
         if not var.name.startswith("_")
     ]
@@ -365,7 +365,7 @@ def get_all_variables(m):
 def get_all_time_dependent_params(m):
     """Returns all parameters with time and region dimensions"""
     return [
-        UsefulVar(m, param)
+        ExportVar(m, param)
         for param in m.component_objects(Param)
         if "t" in get_indices(param) and not param.name.startswith("_")
     ]

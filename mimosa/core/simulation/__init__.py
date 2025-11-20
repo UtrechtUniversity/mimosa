@@ -1,4 +1,4 @@
-from .objects import SimVar, SimulationObjectModel, SimulationUsefulVar
+from .objects import SimVar, SimulationObjectModel, SimulationExportVar
 from .helpers import (
     calc_dependencies,
     sort_equations,
