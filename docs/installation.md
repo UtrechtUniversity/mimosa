@@ -32,7 +32,7 @@ Since MIMOSA is an optimisation model, an optimisation engine needs to be specif
     ```
 
 
-Once IPOPT is installed, you can now solve your MIMOSA runs (see [Running MIMOSA](run.md)):
+Once IPOPT is installed, you can now solve your MIMOSA runs (see [Running MIMOSA](run/index.md)):
 ```python
 from mimosa import MIMOSA, load_params
 
@@ -78,4 +78,4 @@ model1.save("run1")
     Depending on the MIMOSA parameters chosen and on how busy the NEOS server is, running the model might take a while (typically a couple of minutes).
 
 
-[Next: Running MIMOSA :octicons-arrow-right-24:](run.md){.md-button}
+[Next: Running MIMOSA :octicons-arrow-right-24:](run/index.md){.md-button}
