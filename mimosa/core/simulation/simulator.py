@@ -204,7 +204,8 @@ class Simulator:
 
                     for remaining_idx in itertools.product(*remaining_index_values):
                         value = equation(sim_m, t, *remaining_idx)
-                        getattr(sim_m, equation.lhs)[t, *remaining_idx] = value
+                        idx_with_t = (t,) + tuple(remaining_idx)
+                        getattr(sim_m, equation.lhs)[idx_with_t] = value
         # Set indices back to original names ('CAN', 'WEU', ...)
         sim_m.set_index_names()
 
