@@ -28,6 +28,13 @@ def get_constraints(m: AbstractModel):
 
     constraints = []
 
+    m.GINI = Param(m.regions, doc="regional::inequality.GINI")
+    # m.GINI = Param(m.regions, initialize=lambda m, r: 0.45)  # DEBUG: Test zonder CSV
+    # m.average_income = Param(m.t, m.regions, units=quant.unit("currency_unit"))
+    m.income_quintile = Var(
+        m.t, m.regions, m.quintiles, units=quant.unit("currency_unit")
+    )
+
     # 1. Calculate standard deviation (sigma) from GINI for each region
     # σ = √2 × Φ⁻¹((GINI + 1)/2)
     def calculate_sigma(m, r):
