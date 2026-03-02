@@ -129,8 +129,8 @@ class InstantiatedModel:
             for t in range(num_years)
         }
 
-        if "custom_mapping" in params["simulation"]:
-            parameter_mapping.update(params["simulation"]["custom_mapping"])
+        if "custom_mapping" in params["custom_constraints"]:
+            parameter_mapping.update(params["custom_constraints"]["custom_mapping"])
 
         instance_data[None].update(parameter_mapping)
 

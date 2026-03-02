@@ -2,7 +2,7 @@
 
 ### Base run
 A basic run of MIMOSA requires 4 steps: loading the parameters, building the model instance, solving the model and finally saving the output.
-With this code, the default parameter values are used (see [Parameter reference](parameters.md)).
+With this code, the default parameter values are used (see [Parameter reference](../parameters.md)).
 
 ``` python
 --8<-- "tests/runs/run_base.py"

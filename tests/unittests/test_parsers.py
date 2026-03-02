@@ -260,15 +260,15 @@ def test_datasource_missing_info(key):
         p.parse(value)
 
 
-def test_stringorplaindict_parser():
-    p = PARSER_FACTORY.create_parser({"type": "str_or_plain_dict"}, quant)
+def test_stringornumorplaindict_parser():
+    p = PARSER_FACTORY.create_parser({"type": "str_or_num_or_plain_dict"}, quant)
     assert p.parse("test") == "test"
     assert p.parse({"a": 1}) == {"a": 1}
-    assert p.parse(1) == "1"
+    assert p.parse(1) == 1
 
     assert p.parse(False) == "False"
 
     p2 = PARSER_FACTORY.create_parser(
-        {"type": "str_or_plain_dict", "can_be_false": True}, quant
+        {"type": "str_or_num_or_plain_dict", "can_be_false": True}, quant
     )
     assert p2.parse(False) is False

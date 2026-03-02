@@ -8,7 +8,7 @@ from mimosa.common import (
 from mimosa.common.config.parseconfig import check_params, parse_param_values
 from mimosa.abstract_model import create_abstract_model
 from mimosa.concrete_model.instantiate_params import InstantiatedModel
-from mimosa.concrete_model import simulation_mode
+from mimosa.concrete_model import custom_constraints
 
 
 class Preprocessor:
@@ -117,12 +117,9 @@ class Preprocessor:
         )
         m = instantiated_model.concrete_model
 
-        # When using simulation mode, add extra constraints to variables and disable other constraints
-        if (
-            self._params.get("simulation") is not None
-            and self._params["simulation"]["simulationmode"]
-        ):
-            simulation_mode.set_simulation_mode(m, self._params)
+        # Optionally, custom extra constraints to variables can be added, and disable other constraints
+        if self._params.get("custom_constraints") is not None:
+            custom_constraints.set_custom_constraints(m, self._params)
 
         return m
 
