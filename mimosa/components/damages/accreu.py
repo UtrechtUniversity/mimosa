@@ -127,7 +127,7 @@ def get_constraints_slr(m):
         m.t, m.regions, units=quant.unit("fraction_of_GDP"), bounds=(0, 1)
     )
     m.slr_adaptation_costs_rel = Var(
-        m.t, m.regions, units=quant.unit("fraction_of_GDP"), within=NonNegativeReals
+        m.t, m.regions, units=quant.unit("fraction_of_GDP")
     )
 
     constraints.append(RegionalEquation(m.slr_avoided_damages, avoided_damages_eq))
