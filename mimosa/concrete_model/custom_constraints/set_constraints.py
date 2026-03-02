@@ -14,13 +14,15 @@ from .utils import InterpolatingData, read_csv
 
 
 def set_constraints_fixed_variables(m, params):
+    if params["custom_constraints"]["constraint_variables"] is None:
+        return
     data_cache = {}
     extra_constraints = []
 
-    for variable_name, filepath_or_data in params["simulation"][
+    for variable_name, filepath_or_data in params["custom_constraints"][
         "constraint_variables"
     ].items():
-        interp_data = _get_interp_data(filepath_or_data, data_cache, variable_name)
+        interp_data = _get_interp_data(m, filepath_or_data, data_cache, variable_name)
         extra_constraints.extend(_fixed_data_constraint(m, variable_name, interp_data))
 
     # Add constraints to concrete model
@@ -28,7 +30,13 @@ def set_constraints_fixed_variables(m, params):
         add_constraint(m, constraint.to_pyomo_constraint(m), constraint.name)
 
 
-def _get_interp_data(filepath_or_data, data_cache, variable_name):
+def _get_interp_data(m, filepath_or_data, data_cache, variable_name):
+    # If filepath_or_data is a single number:
+    if isinstance(filepath_or_data, (int, float)):
+        filepath_or_data = {
+            m.year(t): {r: filepath_or_data for r in list(m.regions) + ["Global"]}
+            for t in m.t
+        }
     if isinstance(filepath_or_data, dict):
         data = pd.DataFrame(filepath_or_data)
         # Important: data should be a dataframe with years as columns and regions as row indices

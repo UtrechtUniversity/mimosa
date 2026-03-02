@@ -610,15 +610,7 @@ input:
 
 ##################
 
-simulation:
-  simulationmode:
-    descr: >-
-      If true, the model is run in simulation mode: then some variables will
-      be imposed exogenously and fixed.
-      If false, `constraint_variables` and `deactivated_constraints` are ignored.
-    type: bool
-    default: False
-
+custom_constraints:
   constraint_variables:
     descr: >-
       Dictionary of variable names with associated path to file containing values for
@@ -631,10 +623,10 @@ simulation:
       descr: >-
         path to output file containing values for this file or dictionary with 
         regions as rows and years as columns. NOTE: a Dataframe is not supported yet.
-      type: str_or_plain_dict
+      type: str_or_num_or_plain_dict
     default:
 
-  deactivated_constraints:
+  disabled_constraints:
     descr: List of constraint names to be disabled
     type: list
     values:
