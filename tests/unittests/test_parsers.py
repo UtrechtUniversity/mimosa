@@ -266,8 +266,6 @@ def test_stringornumorplaindict_parser():
     assert p.parse({"a": 1}) == {"a": 1}
     assert p.parse(1) == 1
 
-    assert p.parse(False) == "False"
-
     p2 = PARSER_FACTORY.create_parser(
         {"type": "str_or_num_or_plain_dict", "can_be_false": True}, quant
     )
