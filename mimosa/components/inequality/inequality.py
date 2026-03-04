@@ -148,9 +148,7 @@ def get_constraints(m: AbstractModel):
     # ============================================================================
 
     def sum_damage_distribution_eq(m, t, r):
-        return m.sum_damage_distribution[t, r] == sum(
-            m.damage_distribution[t, r, q] for q in m.quintiles
-        )
+        return sum(m.damage_distribution[t, r, q] for q in m.quintiles)
 
     constraints.extend([
         Equation(
@@ -169,11 +167,8 @@ def get_constraints(m: AbstractModel):
         total_damage_fraction = m.damage_costs[t, r] # fraction og GDP, from coacch.py
         total_damage_absolute = total_damage_fraction * m.GDP_net[t, r] # absolute damage in currency unit
 
-        # Sum damage_distribution over all quintiles for a certain region and timestep
-        sum_distribution = sum(m.damage_distribution[t, r, q] for q in m.quintiles)
-
         # C = total_damage / sum(damage_distribution)
-        return total_damage_absolute / sum_distribution
+        return total_damage_absolute / (m.sum_damage_distribution[t, r])
     
     constraints.extend([
         Equation(
@@ -202,7 +197,7 @@ def get_constraints(m: AbstractModel):
     # ============================================================================
 
     def income_after_damages_eq(m, t, r, q):
-        return m.income_after_damages[t, r, q] == m.income_quintile[t, r, q] - m.damage_quintile[t, r, q]
+        return m.income_quintile[t, r, q] - m.damage_quintile[t, r, q]
     
     constraints.extend([
         Equation(
