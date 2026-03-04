@@ -282,6 +282,17 @@ economics:
 
 ##################
 
+inequality:
+  damage_elasticity:
+    descr: Elasticity parameter for damage distribution across quintiles (ε). 
+           If ε < 1, poorer quintiles are hit harder. If ε > 1, richer quintiles are hit harder.
+    type: float
+    min: 0.0
+    max: 2.0
+    default: 0.64
+
+##################
+
 emissions:
   carbonbudget:
     descr: >-
