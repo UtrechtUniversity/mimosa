@@ -5,6 +5,7 @@ from mimosa import MIMOSA, load_params
 params = load_params()
 params["emissions"]["carbonbudget"] = False
 params["model"]["damage module"] = "ACCREU"
+# params["custom_constraints"]["constraint_variables"] = {"slr_avoided_damages": 0}
 model1 = MIMOSA(params)
 model1.solve()
 model1.save("run_accreu_new1")
