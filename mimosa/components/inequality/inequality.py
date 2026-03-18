@@ -169,12 +169,8 @@ def get_constraints(m: AbstractModel):
     # ============================================================================
 
     def damage_scaling_factor_eq(m, t, r):
-        # Using total damage from COACCH component (in fraction of GDP) to calculate absolute damage
-        total_damage_fraction = m.damage_costs[t, r] # fraction og GDP, from coacch.py
-        total_damage_absolute = total_damage_fraction * m.GDP_net[t, r] # absolute damage in currency unit
-
         # C = total_damage / sum(damage_distribution)
-        return total_damage_absolute / (m.sum_damage_distribution[t, r])
+        return m.damage_costs_abs[t, r] / (m.sum_damage_distribution[t, r])
     
     constraints.extend([
         Equation(
