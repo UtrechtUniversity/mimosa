@@ -8,4 +8,4 @@ params = load_params()
 
 model1 = MIMOSA(params)
 model1.solve()
-model1.save("run_inequality_6")
+model1.save("run_inequality_8")
