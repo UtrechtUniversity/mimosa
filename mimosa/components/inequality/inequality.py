@@ -55,7 +55,7 @@ def get_constraints(m: AbstractModel):
     m.income_quintile = Var(
         m.t, m.regions, m.quintiles, units=quant.unit("currency_unit")
     )
-
+    
     # Distribution of damages per quintile (without scaling): income_quintile^ε
     m.damage_distribution = Var(
         m.t, m.regions, m.quintiles, units=quant.unit("currency_unit")
@@ -80,6 +80,12 @@ def get_constraints(m: AbstractModel):
     m.income_after_damages = Var(
         m.t, m.regions, m.quintiles, units=quant.unit("currency_unit")
     )
+
+    # Relative income loss per quintile (percentage)
+    m.relative_income_loss = Var(
+        m.t, m.regions, m.quintiles, units=quant.unit("percent")
+    )
+    
 
     # ============================================================================
     # INCOME PER QUINTILE
@@ -106,7 +112,7 @@ def get_constraints(m: AbstractModel):
     # income of percentile = mean_income × e^(σ × Φ⁻¹(p) - 0.5 × σ²)
     def quintile_income_eq(m, t, r, q):
         # Retrieve underlying data
-        gdp_per_capita = m.GDP_net[t, r] / m.population[t, r]
+        gdp_per_capita = (m.GDP_net[t, r]+ m.damage_costs[t, r] * m.GDP_gross[t, r]) / m.population[t, r]
         # Standard deviation for this region
         sigma = m.inequality_sigma[r]
         # Z-score for midpoint
@@ -203,6 +209,24 @@ def get_constraints(m: AbstractModel):
         Equation(
             m.income_after_damages,
             income_after_damages_eq,
+            [m.t, m.regions, m.quintiles],
+        )
+    ])
+
+    # ============================================================================
+    # Relative income loss per quintile (percentage)
+    # ============================================================================
+
+    def relative_income_loss_eq(m, t, r, q):
+        income_before = m.income_quintile[t, r, q]
+        income_after = m.income_after_damages[t, r, q]
+        # Avoid division by zero
+        return (income_before - income_after) / (income_before + 1e-10) * 100
+    
+    constraints.extend([
+        Equation(
+            m.relative_income_loss,
+            relative_income_loss_eq,
             [m.t, m.regions, m.quintiles],
         )
     ])
