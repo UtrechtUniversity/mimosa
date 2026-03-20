@@ -16,7 +16,7 @@ from mimosa.common import (
     quant,
 )
 
-#e = 0.64
+# e = 0.64
 
 # class RegionalQuintileConstraint(GeneralConstraint):
 #     def to_pyomo_constraint(self, m):
@@ -37,14 +37,14 @@ def get_constraints(m: AbstractModel):
     # ============================================================================
     # PARAMETERS
     # ============================================================================
-    
+
     # GINI-coefficient per region (from CSV)
     m.GINI = Param(m.regions, doc="regional::inequality.GINI")
     # m.GINI = Param(m.regions, initialize=lambda m, r: 0.45)  # DEBUG: Test zonder CSV
 
     # Elasticity parameter for damage distribution (ε)
     m.damage_elasticity = Param(doc="::inequality.damage_elasticity")
-    
+
     # ============================================================================
     # VARIABLES
     # ============================================================================
@@ -60,7 +60,7 @@ def get_constraints(m: AbstractModel):
     m.income_quintile_average = Var(
         m.t, m.regions, m.quintiles, units=quant.unit("currency_unit")
     )
-    
+
     # Distribution of damages per quintile (without scaling) fer median point: income_quintile^ε
     m.damage_distribution_median = Var(
         m.t, m.regions, m.quintiles, units=quant.unit("currency_unit")
@@ -82,17 +82,15 @@ def get_constraints(m: AbstractModel):
     )
 
     # Scaling factor C for each region and timestep: total_damage / sum(damage_distribution)
-    #median and average values can both be used. Average is most correct.
-    m.damage_scaling_factor = Var(
-        m.t, m.regions, units=quant.unit("currency_unit")
-    )
+    # median and average values can both be used. Average is most correct.
+    m.damage_scaling_factor = Var(m.t, m.regions, units=quant.unit("currency_unit"))
 
     # Actual damage per quintile: C * income_quintile^ε
     m.damage_quintile = Var(
         m.t, m.regions, m.quintiles, units=quant.unit("currency_unit")
     )
 
-    # Income after damages per quintile 
+    # Income after damages per quintile
     m.income_after_damages = Var(
         m.t, m.regions, m.quintiles, units=quant.unit("currency_unit")
     )
@@ -101,7 +99,6 @@ def get_constraints(m: AbstractModel):
     m.relative_income_loss = Var(
         m.t, m.regions, m.quintiles, units=quant.unit("percent")
     )
-    
 
     # ============================================================================
     # INCOME PER QUINTILE
@@ -119,48 +116,34 @@ def get_constraints(m: AbstractModel):
     m.inequality_sigma = Param(m.regions, initialize=calculate_sigma)
 
     # Z-SCORES FOR QUINTILE BOUNDARIES AND MIDPOINTS
-    
+
     # Midpoints for each quintile (0.1, 0.3, 0.5, 0.7, 0.9)
     m.inequality_z_score_midpoint = Param(
         m.quintiles,
-        initialize={
-            1: stats.norm.ppf(0.1),
-            2: stats.norm.ppf(0.3),
-            3: stats.norm.ppf(0.5),
-            4: stats.norm.ppf(0.7),
-            5: stats.norm.ppf(0.9)
-        }
+        initialize=lambda m, q: stats.norm.ppf((q - 0.5) / len(m.quintiles)),
     )
-    
+
     # Lower bounds for each quintile (0.0, 0.2, 0.4, 0.6, 0.8)
     m.inequality_z_score_lower = Param(
         m.quintiles,
-        initialize={
-            1: -np.inf,
-            2: stats.norm.ppf(0.2),
-            3: stats.norm.ppf(0.4),
-            4: stats.norm.ppf(0.6),
-            5: stats.norm.ppf(0.8)
-        }
+        initialize=lambda m, q: (
+            stats.norm.ppf((q - 1) / len(m.quintiles)) if q > 1 else -np.inf
+        ),
     )
-    
+
     # Upper bounds for each quintile (0.2, 0.4, 0.6, 0.8, 1.0)
     m.inequality_z_score_upper = Param(
         m.quintiles,
-        initialize={
-            1: stats.norm.ppf(0.2),
-            2: stats.norm.ppf(0.4),
-            3: stats.norm.ppf(0.6),
-            4: stats.norm.ppf(0.8),
-            5: stats.norm.ppf(1.0 - 1e-10)  # Avoid infinity, use large value
-        }
+        initialize=lambda m, q: stats.norm.ppf(q / len(m.quintiles)),
     )
 
     # 2. Equation for expected, median incomes per quintile
     # income of percentile = mean_income × e^(σ × Φ⁻¹(p) - 0.5 × σ²)
     def quintile_income_eq(m, t, r, q):
         # Retrieve underlying data
-        gdp_per_capita = (m.GDP_net[t, r]+ m.damage_costs[t, r] * m.GDP_gross[t, r]) / m.population[t, r]
+        gdp_per_capita = (
+            m.GDP_net[t, r] + m.damage_costs[t, r] * m.GDP_gross[t, r]
+        ) / m.population[t, r]
         # Standard deviation for this region
         sigma = m.inequality_sigma[r]
         # Z-score for midpoint
@@ -171,26 +154,30 @@ def get_constraints(m: AbstractModel):
         expected_income = gdp_per_capita * np.exp(log_income)
 
         return expected_income
-    
-    constraints.extend([
-        Equation(
-            m.income_quintile_median,
-            quintile_income_eq,
-            [m.t, m.regions, m.quintiles],
-        )
-    ])
+
+    constraints.extend(
+        [
+            Equation(
+                m.income_quintile_median,
+                quintile_income_eq,
+                [m.t, m.regions, m.quintiles],
+            )
+        ]
+    )
 
     # ============================================================================
     # AVERAGE INCOME PER QUINTILE
     # ============================================================================
-    
+
     def quintile_average_income_eq(m, t, r, q):
-        gdp_per_capita = (m.GDP_net[t, r] + m.damage_costs[t, r] * m.GDP_gross[t, r]) / m.population[t, r]
+        gdp_per_capita = (
+            m.GDP_net[t, r] + m.damage_costs[t, r] * m.GDP_gross[t, r]
+        ) / m.population[t, r]
         sigma = m.inequality_sigma[r]
-        
+
         z_lower = m.inequality_z_score_lower[q]
         z_upper = m.inequality_z_score_upper[q]
-        
+
         if q == 1:
             # Q1: from -∞ to 20th percentile
             p_upper = 0.2
@@ -205,20 +192,24 @@ def get_constraints(m: AbstractModel):
             # Q2, Q3, Q4: interior quintiles
             p_lower = (q - 1) * 0.2
             p_upper = q * 0.2
-            numerator = stats.norm.cdf(sigma - z_lower) - stats.norm.cdf(sigma - z_upper)
+            numerator = stats.norm.cdf(sigma - z_lower) - stats.norm.cdf(
+                sigma - z_upper
+            )
             denominator = p_upper - p_lower
             truncation_factor = numerator / denominator
-        
+
         avg_income = gdp_per_capita * truncation_factor
         return avg_income
-    
-    constraints.extend([
-        Equation(
-            m.income_quintile_average,
-            quintile_average_income_eq,
-            [m.t, m.regions, m.quintiles],
-        )
-    ])
+
+    constraints.extend(
+        [
+            Equation(
+                m.income_quintile_average,
+                quintile_average_income_eq,
+                [m.t, m.regions, m.quintiles],
+            )
+        ]
+    )
 
     # ============================================================================
     # DAMAGE DISTRIBUTION PER QUINTILE (median)
@@ -229,14 +220,16 @@ def get_constraints(m: AbstractModel):
         income = m.income_quintile_median[t, r, q]
         epsilon = m.damage_elasticity
         return income**epsilon
-    
-    constraints.extend([
-        Equation(
-            m.damage_distribution_median,
-            damage_distribution_me_eq,
-            [m.t, m.regions, m.quintiles],
-        )
-    ])
+
+    constraints.extend(
+        [
+            Equation(
+                m.damage_distribution_median,
+                damage_distribution_me_eq,
+                [m.t, m.regions, m.quintiles],
+            )
+        ]
+    )
 
     # ============================================================================
     # DAMAGE DISTRIBUTION PER QUINTILE (average - as intermediate step for calculating scaling factor later)
@@ -247,14 +240,16 @@ def get_constraints(m: AbstractModel):
         income = m.income_quintile_average[t, r, q]
         epsilon = m.damage_elasticity
         return income**epsilon
-    
-    constraints.extend([
-        Equation(
-            m.damage_distribution_average,
-            damage_distribution_av_eq,
-            [m.t, m.regions, m.quintiles],
-        )
-    ])
+
+    constraints.extend(
+        [
+            Equation(
+                m.damage_distribution_average,
+                damage_distribution_av_eq,
+                [m.t, m.regions, m.quintiles],
+            )
+        ]
+    )
 
     # ============================================================================
     # SUM OF DAMAGE DISTRIBUTION (median) (for scaling factor)
@@ -263,13 +258,15 @@ def get_constraints(m: AbstractModel):
     def sum_damage_distribution_eq(m, t, r):
         return sum(m.damage_distribution_median[t, r, q] for q in m.quintiles)
 
-    constraints.extend([
-        Equation(
-            m.sum_damage_distribution_median,
-            sum_damage_distribution_eq,
-            [m.t, m.regions],
-        )
-    ])
+    constraints.extend(
+        [
+            Equation(
+                m.sum_damage_distribution_median,
+                sum_damage_distribution_eq,
+                [m.t, m.regions],
+            )
+        ]
+    )
 
     # ============================================================================
     # SUM OF DAMAGE DISTRIBUTION (average) (for scaling factor)
@@ -278,13 +275,15 @@ def get_constraints(m: AbstractModel):
     def sum_damage_distribution_eq(m, t, r):
         return sum(m.damage_distribution_average[t, r, q] for q in m.quintiles)
 
-    constraints.extend([
-        Equation(
-            m.sum_damage_distribution_average,
-            sum_damage_distribution_eq,
-            [m.t, m.regions],
-        )
-    ])
+    constraints.extend(
+        [
+            Equation(
+                m.sum_damage_distribution_average,
+                sum_damage_distribution_eq,
+                [m.t, m.regions],
+            )
+        ]
+    )
 
     # ============================================================================
     # SCALING FACTOR C: total_damage / sum(damage_distribution)
@@ -292,29 +291,36 @@ def get_constraints(m: AbstractModel):
 
     def damage_scaling_factor_eq(m, t, r):
         # C = total_damage / sum(damage_distribution)
-        return m.damage_costs_abs[t, r] / ((m.sum_damage_distribution_average[t, r]) * (m.population[t, r] / 5))
-    
-    constraints.extend([
-        Equation(
-            m.damage_scaling_factor,
-            damage_scaling_factor_eq,
-            [m.t, m.regions],
+        return m.damage_costs_abs[t, r] / (
+            (m.sum_damage_distribution_average[t, r])
+            * (m.population[t, r] / len(m.quintiles))
         )
-    ])
+
+    constraints.extend(
+        [
+            Equation(
+                m.damage_scaling_factor,
+                damage_scaling_factor_eq,
+                [m.t, m.regions],
+            )
+        ]
+    )
     # ============================================================================
     # ACTUAL DAMAGE PER QUINTILE: damage_quintile = C * damage_distribution
     # ============================================================================
 
     def damage_quintile_eq(m, t, r, q):
         return m.damage_scaling_factor[t, r] * m.damage_distribution_median[t, r, q]
-    
-    constraints.extend([
-        Equation(
-            m.damage_quintile,
-            damage_quintile_eq,
-            [m.t, m.regions, m.quintiles],
-        )
-    ])
+
+    constraints.extend(
+        [
+            Equation(
+                m.damage_quintile,
+                damage_quintile_eq,
+                [m.t, m.regions, m.quintiles],
+            )
+        ]
+    )
 
     # ============================================================================
     # INCOME AFTER DAMAGES PER QUINTILE
@@ -322,14 +328,16 @@ def get_constraints(m: AbstractModel):
 
     def income_after_damages_eq(m, t, r, q):
         return m.income_quintile_median[t, r, q] - m.damage_quintile[t, r, q]
-    
-    constraints.extend([
-        Equation(
-            m.income_after_damages,
-            income_after_damages_eq,
-            [m.t, m.regions, m.quintiles],
-        )
-    ])
+
+    constraints.extend(
+        [
+            Equation(
+                m.income_after_damages,
+                income_after_damages_eq,
+                [m.t, m.regions, m.quintiles],
+            )
+        ]
+    )
 
     # ============================================================================
     # Relative income loss per quintile (percentage)
@@ -340,14 +348,16 @@ def get_constraints(m: AbstractModel):
         income_after = m.income_after_damages[t, r, q]
         # Avoid division by zero
         return (income_before - income_after) / (income_before + 1e-10) * 100
-    
-    constraints.extend([
-        Equation(
-            m.relative_income_loss,
-            relative_income_loss_eq,
-            [m.t, m.regions, m.quintiles],
-        )
-    ])
+
+    constraints.extend(
+        [
+            Equation(
+                m.relative_income_loss,
+                relative_income_loss_eq,
+                [m.t, m.regions, m.quintiles],
+            )
+        ]
+    )
 
     # Return the list of constraints
     return constraints
