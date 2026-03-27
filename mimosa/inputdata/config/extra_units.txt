@@ -22,3 +22,4 @@ degC_above_PI = [temperature_above_pre_industrial]
 
 fraction_of_GDP = []
 fraction_of_baseline_emissions = []
+fraction_of_gross_damages = []

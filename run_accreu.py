@@ -37,14 +37,14 @@ sim_run1 = model1.run_simulation(slr_adaptation_costs_rel=0.0, relative_abatemen
 model1.save_simulation(sim_run1, "run_accreu_3_no_policy_no_adapt")
 
 
-#### Run 4: no-policy baseline with optimal adaptation
-params = load_params()
-params["emissions"]["carbonbudget"] = False
-params["model"]["damage module"] = "ACCREU"
-params["custom_constraints"]["constraint_variables"] = {"relative_abatement": 0}
-model4 = MIMOSA(params)
-model4.solve()
-model4.save("run_accreu_4_no_policy_opt_adapt")
+#### Run 4: no-policy baseline with optimal adaptation (doesn't work yet, skip for now)
+# params = load_params()
+# params["emissions"]["carbonbudget"] = False
+# params["model"]["damage module"] = "ACCREU"
+# params["custom_constraints"]["constraint_variables"] = {"relative_abatement": 0}
+# model4 = MIMOSA(params)
+# model4.solve()
+# model4.save("run_accreu_4_no_policy_opt_adapt")
 
 
 #### Run 5: Take a MIMOSA optimisation run and just change the adaptation level:

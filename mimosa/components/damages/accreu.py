@@ -88,9 +88,9 @@ def get_constraints_slr(m):
 
     m.slr_gross_damage_costs = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
 
-    m.slr_gross_damage_a = Param(m.regions, doc="regional::ACCREU.slr_gross_damage_a")
-    m.slr_gross_damage_b = Param(m.regions, doc="regional::ACCREU.slr_gross_damage_b")
-    m.slr_gross_damage_c = Param(m.regions, doc="regional::ACCREU.slr_gross_damage_c")
+    m.slr_gross_damage_a = Param(m.regions, doc="regional::ACCREU.slr_gross_dmg_a_p50")
+    m.slr_gross_damage_b1 = Param(m.regions, doc="regional::ACCREU.slr_gross_dmg_b1")
+    m.slr_gross_damage_b2 = Param(m.regions, doc="regional::ACCREU.slr_gross_dmg_b2")
 
     ##################
     ### Step 1: gross damages
@@ -98,9 +98,13 @@ def get_constraints_slr(m):
 
     # Define the gross damages as a function of SLR:
     #
-    #       a + b * SLR + c * SLR^2 - (a + b * initial_SLR + c * initial_SLR^2)
-    # If c is zero, the function is linear:
-    #       a + b * SLR - (a + b * initial_SLR)
+    #       a * (b1 * SLR + b2 * SLR^2) - (a * (b1 * initial_SLR + b2 * initial_SLR^2))
+    # If b2 is zero, the function is linear:
+    #       a * (b1 * SLR) - (a * (b1 * initial_SLR))
+
+    # SLR damages are as function of SLR relative to 1995-2014. TODO: fix this better.
+    temp_fix_slr_1995_2014 = 0.08
+
     constraints.append(
         RegionalEquation(
             m.slr_gross_damage_costs,
@@ -108,16 +112,16 @@ def get_constraints_slr(m):
                 m.damage_scale_factor
                 * (
                     damage_fct_slr(
-                        m.total_SLR[t],
+                        m.total_SLR[t] - temp_fix_slr_1995_2014,
                         m.slr_gross_damage_a[r],
-                        m.slr_gross_damage_b[r],
-                        m.slr_gross_damage_c[r],
+                        m.slr_gross_damage_b1[r],
+                        m.slr_gross_damage_b2[r],
                     )
                     - damage_fct_slr(
-                        m.total_SLR[0],
+                        m.total_SLR[0] - temp_fix_slr_1995_2014,
                         m.slr_gross_damage_a[r],
-                        m.slr_gross_damage_b[r],
-                        m.slr_gross_damage_c[r],
+                        m.slr_gross_damage_b1[r],
+                        m.slr_gross_damage_b2[r],
                     )
                 )
             ),
@@ -129,7 +133,7 @@ def get_constraints_slr(m):
     ##################
 
     m.slr_avoided_damages = Var(
-        m.t, m.regions, units=quant.unit("fraction_of_GDP"), bounds=(0, 1)
+        m.t, m.regions, units=quant.unit("fraction_of_gross_damages"), bounds=(0, 1)
     )
     m.slr_adaptation_costs_rel = Var(
         m.t, m.regions, units=quant.unit("fraction_of_GDP")
@@ -156,19 +160,19 @@ def get_constraints_slr(m):
     return constraints
 
 
-def damage_fct_slr(slr, a, b, c):
+def damage_fct_slr(slr, a, b1, b2):
     """
     Function to calculate the damages due to sea-level rise (SLR).
 
     The damage function is quadratic, defined by:
-        a + b * slr + c * slr^2
-    (or linear when c is zero).
+        a * (b1 * slr + b2 * slr^2)
+    (or linear when b2 is zero).
 
     """
-    if c == 0:
-        return a + b * slr
+    if b2 == 0:
+        return a * (b1 * slr) / 100.0
 
-    return a + b * slr + c * slr**2
+    return a * (b1 * slr + b2 * slr**2) / 100.0
 
 
 def avoided_damages_eq(m, t, r):
