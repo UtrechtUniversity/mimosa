@@ -1,64 +1,82 @@
 from mimosa import MIMOSA, load_params
 
-#### Run 1: CBA with adaptation optimised by MIMOSA
+#### Run "mit_ada" (Tier 1): CBA with adaptation optimised by MIMOSA
 
 params = load_params()
 params["emissions"]["carbonbudget"] = False
 params["model"]["damage module"] = "ACCREU"
-model1 = MIMOSA(params)
-model1.solve()
-model1.save("run_accreu_1_cba_opt_adapt")
+model_mit_ada = MIMOSA(params)
+# Plot the dependency graph for the equations and variables in the model:
+# model1.simulator.plot_dependency_graph()
+model_mit_ada.solve()
+model_mit_ada.save("run_accreu_tier1_mit_ada")
 
-#### Run 2a: CBA with no adaptation
+#### Run "mit" (Tier 1): CBA with no adaptation
 
 params = load_params()
 params["emissions"]["carbonbudget"] = False
 params["model"]["damage module"] = "ACCREU"
 params["custom_constraints"]["constraint_variables"] = {"slr_avoided_damages": 0}
-model2a = MIMOSA(params)
-model2a.solve()
-model2a.save("run_accreu_2a_cba_no_adapt")
+model_mit = MIMOSA(params)
+model_mit.solve()
+model_mit.save("run_accreu_tier1_mit")
 
-#### Run 2b: Given mitigation from run 2a, optimise adaptation
 
+#### Run "baseline" (Tier 1): no-policy baseline with no adaptation
 params = load_params()
-params["emissions"]["carbonbudget"] = False
 params["model"]["damage module"] = "ACCREU"
-params["custom_constraints"]["constraint_variables"] = {
-    "relative_abatement": "output/run_accreu_2a_cba_no_adapt.csv"
-}
-model2b = MIMOSA(params)
-model2b.solve()
-model2b.save("run_accreu_2b_cba_opt_adapt")
+model_baseline = MIMOSA(params)
+sim_run_baseline = model_baseline.run_simulation(
+    slr_adaptation_costs_rel=0.0, relative_abatement=0.0
+)
+model_baseline.save_simulation(sim_run_baseline, "run_accreu_tier1_baseline")
 
 
-#### Run 3: no-policy baseline with no adaptation
-sim_run1 = model1.run_simulation(slr_adaptation_costs_rel=0.0, relative_abatement=0.0)
-model1.save_simulation(sim_run1, "run_accreu_3_no_policy_no_adapt")
-
-
-#### Run 4: no-policy baseline with optimal adaptation (doesn't work yet, skip for now)
-# params = load_params()
-# params["emissions"]["carbonbudget"] = False
-# params["model"]["damage module"] = "ACCREU"
-# params["custom_constraints"]["constraint_variables"] = {"relative_abatement": 0}
-# model4 = MIMOSA(params)
-# model4.solve()
-# model4.save("run_accreu_4_no_policy_opt_adapt")
-
-
-#### Run 5: Take a MIMOSA optimisation run and just change the adaptation level:
+#### Run "mit_ada_unplanned" (Tier 2): Take a MIMOSA optimisation run and just change the adaptation level:
 
 # Relative abatement is the only free variable in the model besides the adaptation level.
 # By fixing this to the same values as in run 1, you obtain the same results in simulation
 # mode, but now you can easily change the adaptation level
-relative_abatement = model1.concrete_model.relative_abatement.extract_values()
-sim_run5 = model1.run_simulation(
-    relative_abatement=relative_abatement,
-    slr_adaptation_costs_rel=0.00002,  # Example value
+
+params_mit_ada_unplanned = load_params()
+params_mit_ada_unplanned["emissions"]["carbonbudget"] = False
+params_mit_ada_unplanned["model"]["damage module"] = "ACCREU"
+params_mit_ada_unplanned["economics"]["adaptation"]["slr_effectiveness_limit"] = 0.5
+model_mit_ada_unplanned = MIMOSA(params_mit_ada_unplanned)
+
+relative_abatement = model_mit_ada.concrete_model.relative_abatement.extract_values()
+slr_adaptation_costs_rel = (
+    model_mit_ada.concrete_model.slr_adaptation_costs_rel.extract_values()
 )
-model1.save_simulation(sim_run5, "run_accreu_5_changed_adaptation")
+sim_run_ada_unplanned = model_mit_ada_unplanned.run_simulation(
+    relative_abatement=relative_abatement,
+    slr_adaptation_costs_rel=slr_adaptation_costs_rel,
+)
+model_mit_ada_unplanned.save_simulation(
+    sim_run_ada_unplanned, "run_accreu_tier2_mit_ada_unplanned"
+)
 
 
-# Plot the dependency graph for the equations and variables in the model:
-model1.simulator.plot_dependency_graph()
+#### Run "first_opt_mit_then_opt_adapt" (Tierfinity): Given mitigation from run 2a, optimise adaptation
+
+params_first_mit_then_adapt = load_params()
+params_first_mit_then_adapt["emissions"]["carbonbudget"] = False
+params_first_mit_then_adapt["model"]["damage module"] = "ACCREU"
+params_first_mit_then_adapt["custom_constraints"]["constraint_variables"] = {
+    "relative_abatement": "output/run_accreu_tier1_mit.csv"
+}
+model_first_mit_then_adapt = MIMOSA(params_first_mit_then_adapt)
+model_first_mit_then_adapt.solve()
+model_first_mit_then_adapt.save("run_accreu_tierfinity_first_opt_mit_then_opt_adapt")
+
+exit()
+
+
+#### Run "ada" (Tier 1): no-policy baseline with optimal adaptation (doesn't work yet, skip for now)
+params = load_params()
+params["emissions"]["carbonbudget"] = False
+params["model"]["damage module"] = "ACCREU"
+params["custom_constraints"]["constraint_variables"] = {"relative_abatement": 0}
+model4 = MIMOSA(params)
+model4.solve()
+model4.save("run_accreu_tier1_ada")

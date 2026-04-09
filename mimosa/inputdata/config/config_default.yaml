@@ -280,6 +280,13 @@ economics:
       type: bool
       default: False
 
+  adaptation:
+    slr_effectiveness_limit:
+      descr: Maximum effectiveness of adaptation for SLR damages
+      type: float
+      default: 0.879
+      can_be_false: False
+
 ##################
 
 emissions:

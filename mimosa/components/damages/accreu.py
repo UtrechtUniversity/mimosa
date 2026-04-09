@@ -92,6 +92,10 @@ def get_constraints_slr(m):
     m.slr_gross_damage_b1 = Param(m.regions, doc="regional::ACCREU.slr_gross_dmg_b1")
     m.slr_gross_damage_b2 = Param(m.regions, doc="regional::ACCREU.slr_gross_dmg_b2")
 
+    m.slr_adapt_effectiveness_limit = Param(
+        doc="::economics.adaptation.slr_effectiveness_limit"
+    )
+
     ##################
     ### Step 1: gross damages
     ##################
@@ -181,7 +185,7 @@ def avoided_damages_eq(m, t, r):
     Avoided damages = L * (1 - exp(-beta * adaptation_costs))
     """
     # These parameters should be made regional
-    L = 0.879
+    L = m.slr_adapt_effectiveness_limit
     beta = 0.304093
 
     # The fitted function had absolute adaptation costs as x-axis for its global function. To apply
