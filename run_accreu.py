@@ -22,12 +22,24 @@ model_mit.solve()
 model_mit.save("run_accreu_tier1_mit")
 
 
+#### Run "ada" (Tier 1): no-policy baseline with optimal adaptation
+params_ada = load_params()
+params_ada["emissions"]["carbonbudget"] = False
+params_ada["model"]["damage module"] = "ACCREU"
+params_ada["custom_constraints"]["constraint_variables"] = {"carbonprice": 0}
+model_ada = MIMOSA(params_ada)
+model_ada.solve()
+model_ada.save("run_accreu_tier1_ada")
+
+
 #### Run "baseline" (Tier 1): no-policy baseline with no adaptation
 params = load_params()
 params["model"]["damage module"] = "ACCREU"
 model_baseline = MIMOSA(params)
+
+relative_abatement_ada = model_ada.concrete_model.relative_abatement.extract_values()
 sim_run_baseline = model_baseline.run_simulation(
-    slr_adaptation_costs_rel=0.0, relative_abatement=0.0
+    slr_adaptation_costs_rel=0.0, relative_abatement=relative_abatement_ada
 )
 model_baseline.save_simulation(sim_run_baseline, "run_accreu_tier1_baseline")
 
@@ -57,7 +69,7 @@ model_mit_ada_unplanned.save_simulation(
 )
 
 
-#### Run "first_opt_mit_then_opt_adapt" (Tierfinity): Given mitigation from run 2a, optimise adaptation
+#### Run "first_opt_mit_then_opt_adapt" (Tier 4): Given mitigation from run 2a, optimise adaptation
 
 params_first_mit_then_adapt = load_params()
 params_first_mit_then_adapt["emissions"]["carbonbudget"] = False
@@ -67,16 +79,4 @@ params_first_mit_then_adapt["custom_constraints"]["constraint_variables"] = {
 }
 model_first_mit_then_adapt = MIMOSA(params_first_mit_then_adapt)
 model_first_mit_then_adapt.solve()
-model_first_mit_then_adapt.save("run_accreu_tierfinity_first_opt_mit_then_opt_adapt")
-
-exit()
-
-
-#### Run "ada" (Tier 1): no-policy baseline with optimal adaptation (doesn't work yet, skip for now)
-params = load_params()
-params["emissions"]["carbonbudget"] = False
-params["model"]["damage module"] = "ACCREU"
-params["custom_constraints"]["constraint_variables"] = {"relative_abatement": 0}
-model4 = MIMOSA(params)
-model4.solve()
-model4.save("run_accreu_tier1_ada")
+model_first_mit_then_adapt.save("run_accreu_tier4_first_opt_mit_then_opt_adapt")
