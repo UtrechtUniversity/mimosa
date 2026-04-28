@@ -4,7 +4,7 @@ time:
     type: int
     min: 1900
     max: 2100
-    default: 2020
+    default: 2025
 
   end:
     descr: Last year of the model run
@@ -412,10 +412,10 @@ effort sharing:
 
 temperature:
   initial:
-    descr: Temperature in initial year of model run (2020 by default).
+    descr: Temperature in initial year of model run (2025 by default).
     type: quantity
     unit: temperature_unit
-    default: 1.16 delta_degC
+    default: 1.27 delta_degC
 
   TCRE:
     descr: Transient Climate Response to CO2 Emissions
@@ -582,9 +582,9 @@ input:
       default:
         variable: GDP|PPP
         unit: currency_unit
-        scenario: "{SSP}-Ref-SPA0-V17"
-        model: IMAGE
-        file: inputdata/data/data_IMAGE_SSP.csv
+        scenario: "{SSP}-Baseline"
+        model: IMAGE 3.4
+        file: inputdata/data/data_IMAGE_SSP_updated.csv
 
     emissions:
       descr: Data source of baseline emissions
@@ -592,9 +592,9 @@ input:
       default:
         variable: Emissions|CO2
         unit: emissionsrate_unit
-        scenario: "{SSP}-Ref-SPA0-V17"
-        model: IMAGE
-        file: inputdata/data/data_IMAGE_SSP.csv
+        scenario: "{SSP}-Baseline"
+        model: IMAGE 3.4
+        file: inputdata/data/data_IMAGE_SSP_updated.csv
 
     population:
       descr: Data source of population
@@ -602,9 +602,9 @@ input:
       default:
         variable: Population
         unit: population_unit
-        scenario: "{SSP}-Ref-SPA0-V17"
-        model: IMAGE
-        file: inputdata/data/data_IMAGE_SSP.csv
+        scenario: "{SSP}-Baseline"
+        model: IMAGE 3.4
+        file: inputdata/data/data_IMAGE_SSP_updated.csv
 
 ##################
 
