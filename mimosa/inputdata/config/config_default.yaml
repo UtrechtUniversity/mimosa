@@ -93,7 +93,7 @@ economics:
       descr: Calibration level of the MAC (carbon price for 100% reduction)
       type: quantity
       unit: currency_unit/emissionsrate_unit
-      default: 2601 USD2005/tCO2
+      default: 2887 USD2010/tCO2
 
     LBD_rate:
       descr: >-
