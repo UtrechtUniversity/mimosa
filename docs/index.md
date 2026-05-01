@@ -4,7 +4,7 @@
 
 [Documentation :octicons-arrow-right-24:](components/index.md){.md-button}
 [Installation :octicons-arrow-right-24:](installation.md){.md-button}
-[Running :octicons-arrow-right-24:](run.md){.md-button}
+[Running :octicons-arrow-right-24:](run/index.md){.md-button}
 [Dashboard :octicons-arrow-up-right-24:](https://dashboard-mimosa.onrender.com/){.md-button}
 
 MIMOSA is an Integrated Assessment Model (IAM) part of the [IMAGE family](https://www.pbl.nl/en/image/home), with 26 regions covering the whole world. It is a relatively simple Cost-Benefit IAM that still covers the relevant technological and socio-economic dynamics. The climate impacts are calculated using state-of-the-art COACCH damage functions, and the mitigation costs have been directly calibrated to the IPCC AR6 WGIII database.

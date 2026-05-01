@@ -4,7 +4,7 @@ time:
     type: int
     min: 1900
     max: 2100
-    default: 2020
+    default: 2025
 
   end:
     descr: Last year of the model run
@@ -93,7 +93,7 @@ economics:
       descr: Calibration level of the MAC (carbon price for 100% reduction)
       type: quantity
       unit: currency_unit/emissionsrate_unit
-      default: 2601 USD2005/tCO2
+      default: 2887 USD2010/tCO2
 
     LBD_rate:
       descr: >-
@@ -423,10 +423,10 @@ effort sharing:
 
 temperature:
   initial:
-    descr: Temperature in initial year of model run (2020 by default).
+    descr: Temperature in initial year of model run (2025 by default).
     type: quantity
     unit: temperature_unit
-    default: 1.16 delta_degC
+    default: 1.27 delta_degC
 
   TCRE:
     descr: Transient Climate Response to CO2 Emissions
@@ -597,9 +597,9 @@ input:
       default:
         variable: GDP|PPP
         unit: currency_unit
-        scenario: "{SSP}-Ref-SPA0-V17"
-        model: IMAGE
-        file: inputdata/data/data_IMAGE_SSP.csv
+        scenario: "{SSP}-Baseline"
+        model: IMAGE 3.4
+        file: inputdata/data/data_IMAGE_SSP_updated.csv
 
     emissions:
       descr: Data source of baseline emissions
@@ -607,9 +607,9 @@ input:
       default:
         variable: Emissions|CO2
         unit: emissionsrate_unit
-        scenario: "{SSP}-Ref-SPA0-V17"
-        model: IMAGE
-        file: inputdata/data/data_IMAGE_SSP.csv
+        scenario: "{SSP}-Baseline"
+        model: IMAGE 3.4
+        file: inputdata/data/data_IMAGE_SSP_updated.csv
 
     population:
       descr: Data source of population
@@ -617,23 +617,15 @@ input:
       default:
         variable: Population
         unit: population_unit
-        scenario: "{SSP}-Ref-SPA0-V17"
-        model: IMAGE
-        file: inputdata/data/data_IMAGE_SSP.csv
+        scenario: "{SSP}-Baseline"
+        model: IMAGE 3.4
+        file: inputdata/data/data_IMAGE_SSP_updated.csv
 
 ##################
 
 ##################
 
-simulation:
-  simulationmode:
-    descr: >-
-      If true, the model is run in simulation mode: then some variables will
-      be imposed exogenously and fixed.
-      If false, `constraint_variables` and `deactivated_constraints` are ignored.
-    type: bool
-    default: False
-
+custom_constraints:
   constraint_variables:
     descr: >-
       Dictionary of variable names with associated path to file containing values for
@@ -646,10 +638,10 @@ simulation:
       descr: >-
         path to output file containing values for this file or dictionary with 
         regions as rows and years as columns. NOTE: a Dataframe is not supported yet.
-      type: str_or_plain_dict
+      type: str_or_num_or_plain_dict
     default:
 
-  deactivated_constraints:
+  disabled_constraints:
     descr: List of constraint names to be disabled
     type: list
     values:

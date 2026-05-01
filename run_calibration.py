@@ -34,10 +34,10 @@ def npv(values, discount_rate):
 
 for budget in carbon_budgets:
     outp = pd.read_csv(f"output/calibration/cb_{budget}.csv")
-    global_mitig_costs = outp.loc[outp["Variable"] == "mitigation_costs", "2020":].sum(
+    global_mitig_costs = outp.loc[outp["Variable"] == "mitigation_costs", "2025":].sum(
         axis=0
     )
-    global_gdp_gross = outp.loc[outp["Variable"] == "GDP_gross", "2020":].sum(axis=0)
+    global_gdp_gross = outp.loc[outp["Variable"] == "GDP_gross", "2025":].sum(axis=0)
     r = 0.03
     npv_costs = npv(global_mitig_costs, r) / npv(global_gdp_gross, r)
     print(f"NPV of mitigation costs for {budget} GtCO2: {npv_costs:.1%}")

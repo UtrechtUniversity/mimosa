@@ -108,7 +108,7 @@ class StringParser(GeneralParser):
         return str(value)
 
 
-class StringOrPlainDictParser(GeneralParser):
+class StringOrNumOrPlainDictParser(GeneralParser):
     """
     Either a string or a dictionary. The keys/values of the dictionary are not checked or parsed separately.
     """
@@ -117,7 +117,7 @@ class StringOrPlainDictParser(GeneralParser):
         if self.check_false(value):
             return False
 
-        if isinstance(value, dict):
+        if isinstance(value, (dict, int, float)):
             return value
 
         return str(value)
@@ -412,4 +412,4 @@ PARSER_FACTORY.register_parser("list", ListParser)
 PARSER_FACTORY.register_parser("dict", DictParser)
 PARSER_FACTORY.register_parser("datasource", DatasourceParser)
 PARSER_FACTORY.register_parser("filepath", FilepathParser)
-PARSER_FACTORY.register_parser("str_or_plain_dict", StringOrPlainDictParser)
+PARSER_FACTORY.register_parser("str_or_num_or_plain_dict", StringOrNumOrPlainDictParser)

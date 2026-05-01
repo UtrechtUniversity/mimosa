@@ -24,7 +24,7 @@ def test_equal_mitigation_costs(script_output):
     """
     output_df_ind = read_output(filename="run_equal_mitigation_costs")
 
-    mitigation_costs = output_df_ind.loc["rel_mitigation_costs", "2025":]
+    mitigation_costs = output_df_ind.loc["rel_mitigation_costs", "2030":]
 
     relative_standard_deviation = mitigation_costs.std() / mitigation_costs.mean()
 
@@ -42,9 +42,9 @@ def test_equal_total_costs(script_output):
     output_df_ind = read_output(filename="run_equal_total_costs")
 
     total_costs = (
-        output_df_ind.loc["rel_mitigation_costs", "2025":]
-        + output_df_ind.loc["damage_costs", "2025":]
-        + output_df_ind.loc["rel_financial_transfer", "2025":]
+        output_df_ind.loc["rel_mitigation_costs", "2030":]
+        + output_df_ind.loc["damage_costs", "2030":]
+        + output_df_ind.loc["rel_financial_transfer", "2030":]
     )
 
     relative_standard_deviation = total_costs.std() / total_costs.mean()
@@ -61,7 +61,7 @@ def test_per_cap_convergence(script_output):
     Note that the emissions are after emission trade, so they are not equal
     to the direct variable regional_emissions.
     """
-    output_df_ind = read_output(filename="run_per_cap_convergence").loc[:, "2020":]
+    output_df_ind = read_output(filename="run_per_cap_convergence").loc[:, "2025":]
 
     per_capita_emissions = (
         output_df_ind.loc["regional_emission_allowances"]
@@ -89,10 +89,10 @@ def test_equal_cumulative_per_cap(script_output):
     Effort-sharing regime: equal_cumulative_per_cap
 
     """
-    output_df_ind = read_output(filename="run_equal_cumulative_per_cap").loc[:, "2020":]
+    output_df_ind = read_output(filename="run_equal_cumulative_per_cap").loc[:, "2025":]
 
     # Historical debt should add up to zero:
-    historical_debt = output_df_ind.loc["effortsharing_ecpc_historical_debt", "2020"]
+    historical_debt = output_df_ind.loc["effortsharing_ecpc_historical_debt", "2025"]
     assert historical_debt.sum() == pytest.approx(0.0, abs=0.001)
 
     # Debt repayment should sum up to zero at every time step:
@@ -127,4 +127,4 @@ def test_equal_cumulative_per_cap(script_output):
 
     assert (
         (future_fair_share - historical_debt) - cumulative_regional_allowances
-    ).abs().max() < 0.1  # Less than 0.1 GtCO2 for the total period 2020-2100
+    ).abs().max() < 0.1  # Less than 0.1 GtCO2 for the total period 2025-2100
