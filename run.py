@@ -4,8 +4,8 @@ from mimosa import MIMOSA, load_params
 
 params = load_params()
 
-# DEBUG: Print alle regional parameter files
+params["model"]["welfare module"] = "welfare_loss_minimising_quintiles"
 
 model1 = MIMOSA(params)
 model1.solve()
-model1.save("run_inequality_8")
+model1.save("run_inequality_1")

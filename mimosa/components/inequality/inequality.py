@@ -53,7 +53,10 @@ def get_constraints(m: AbstractModel):
 
     # Income for each median person in a quintile
     m.income_quintile_median = Var(
-        m.t, m.regions, m.quintiles, units=quant.unit("currency_unit")
+        m.t,
+        m.regions,
+        m.quintiles,
+        units=quant.unit("currency_unit / (billion people)"),
     )
 
     # Average income per quintile

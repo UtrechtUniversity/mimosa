@@ -476,6 +476,7 @@ model:
     type: enum
     values:
       - welfare_loss_minimising
+      - welfare_loss_minimising_quintiles
       - cost_minimising
       - inequal_aversion_general
     default: welfare_loss_minimising
