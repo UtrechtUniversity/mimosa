@@ -89,7 +89,7 @@ def create_abstract_model(
         initialize=lambda m, t: sum(m.baseline_GDP[t, r] for r in m.regions),
         units=quant.unit("currency_unit"),
     )
-    m.baseline_emissions = Param(
+    m.ssp_baseline_emissions = Param(
         m.t,
         m.regions,
         doc="timeandregional::emissions",

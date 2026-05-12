@@ -239,7 +239,7 @@ def _get_mac_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
             RegionalEquation(
                 m.domestic_mitigation_costs,
                 lambda m, t, r: AC(m.relative_abatement[t, r], m, t, r)
-                * m.baseline[t, r],
+                * m.baseline_emissions[t, r],
             ),
             # Total mitigation costs: domestic mitigation costs plus import/export of mitigation costs (if emission trading is enabled)
             RegionalEquation(

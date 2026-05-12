@@ -50,7 +50,7 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
         [
             RegionalConstraint(
                 lambda m, t, r: m.domestic_mitigation_costs[t, r]
-                == AC(m.relative_abatement[t, r], m, t, r) * m.baseline[t, r],
+                == AC(m.relative_abatement[t, r], m, t, r) * m.baseline_emissions[t, r],
                 "mitigation_costs",
             ),
             GlobalConstraint(

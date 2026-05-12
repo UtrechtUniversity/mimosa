@@ -119,9 +119,9 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
             RegionalEquation(
                 m.regional_emission_allowances,
                 lambda m, t, r: (
-                    m.baseline[t, r] - m.attributed_emission_reductions[t, r]
+                    m.baseline_emissions[t, r] - m.attributed_emission_reductions[t, r]
                     if t > 0
-                    else m.baseline[t, r]
+                    else m.baseline_emissions[t, r]
                 ),
             ),
         ]
