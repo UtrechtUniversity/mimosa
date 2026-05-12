@@ -222,7 +222,7 @@ def _get_mac_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
         initialize=0,
         units=quant.unit("currency_unit"),
     )
-    m.area_under_MAC = Var(
+    m.domestic_mitigation_costs = Var(
         m.t,
         m.regions,
         initialize=0,
@@ -234,19 +234,20 @@ def _get_mac_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     )
     constraints.extend(
         [
+            # Domestic mitigation costs: area under the MAC times baseline emissions,
+            # so the costs of mitigation in a region without taking into account emission trading
+            RegionalEquation(
+                m.domestic_mitigation_costs,
+                lambda m, t, r: AC(m.relative_abatement[t, r], m, t, r)
+                * m.baseline[t, r],
+            ),
+            # Total mitigation costs: domestic mitigation costs plus import/export of mitigation costs (if emission trading is enabled)
             RegionalEquation(
                 m.mitigation_costs,
                 lambda m, t, r: (
-                    AC(m.relative_abatement[t, r], m, t, r) * m.baseline[t, r]
+                    m.domestic_mitigation_costs[t, r]
                     + m.import_export_mitigation_cost_balance[t, r]
                 ),
-            ),
-            # Extra (dummy) constraint for the variable area_under_MAC, which is the same as the mitigation costs
-            # when no emission trading is enabled
-            RegionalEquation(
-                m.area_under_MAC,
-                lambda m, t, r: AC(m.relative_abatement[t, r], m, t, r)
-                * m.baseline[t, r],
             ),
             RegionalEquation(
                 m.rel_mitigation_costs,
