@@ -74,32 +74,32 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
 
     ## Extra reporting variables:
 
-    m.paid_for_emission_reductions = Var(
+    m.attributed_emission_reductions = Var(
         m.t, m.regions, units=quant.unit("emissionsrate_unit")
     )
     m.regional_emission_allowances = Var(
         m.t, m.regions, units=quant.unit("emissionsrate_unit")
     )
-    m.import_export_emission_reduction_balance = Var(
+    m.emission_reduction_trading_balance = Var(
         m.t, m.regions, units=quant.unit("emissionsrate_unit")
     )
-    m.import_export_mitigation_cost_balance = Var(
+    m.mitigation_cost_trading_balance = Var(
         m.t, m.regions, units=quant.unit("currency_unit")
     )
     constraints.extend(
         [
             GlobalConstraint(
                 lambda m, t: sum(
-                    m.import_export_mitigation_cost_balance[t, r] for r in m.regions
+                    m.mitigation_cost_trading_balance[t, r] for r in m.regions
                 )
                 == 0.0,
                 "sum_mitigation_equals_sum_area_under_mac",
             ),
             # Constraint: from import/export mitigation costs to import/export of emissions using the global carbon price
             RegionalEquation(
-                m.import_export_emission_reduction_balance,
+                m.emission_reduction_trading_balance,
                 lambda m, t, r: (
-                    m.import_export_mitigation_cost_balance[t, r]
+                    m.mitigation_cost_trading_balance[t, r]
                     / soft_min(m.global_carbonprice[t])
                     if t > 0
                     else 0
@@ -107,10 +107,10 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
             ),
             # Constraint: paid for emission reductions
             RegionalEquation(
-                m.paid_for_emission_reductions,
+                m.attributed_emission_reductions,
                 lambda m, t, r: (
                     m.regional_emission_reduction[t, r]
-                    + m.import_export_emission_reduction_balance[t, r]
+                    + m.emission_reduction_trading_balance[t, r]
                     if t > 0
                     else Constraint.Skip
                 ),
@@ -119,9 +119,9 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
             RegionalEquation(
                 m.regional_emission_allowances,
                 lambda m, t, r: (
-                    m.baseline[t, r] - m.paid_for_emission_reductions[t, r]
+                    m.baseline_emissions[t, r] - m.attributed_emission_reductions[t, r]
                     if t > 0
-                    else m.baseline[t, r]
+                    else m.baseline_emissions[t, r]
                 ),
             ),
         ]

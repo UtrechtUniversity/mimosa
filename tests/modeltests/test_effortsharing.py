@@ -78,8 +78,8 @@ def test_per_cap_convergence(script_output):
     # Check that regional emission allowances are equal to baseline emissions minus paid for emission reductions
     # (emissions after trade)
     allowances_diff = output_df_ind.loc["regional_emission_allowances"] - (
-        output_df_ind.loc["baseline"]
-        - output_df_ind.loc["paid_for_emission_reductions"]
+        output_df_ind.loc["baseline_emissions"]
+        - output_df_ind.loc["attributed_emission_reductions"]
     )
     assert allowances_diff.max().max() < 0.001
 
