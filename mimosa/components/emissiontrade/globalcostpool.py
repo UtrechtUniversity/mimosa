@@ -37,7 +37,7 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     """
     constraints = []
 
-    m.area_under_MAC = Var(
+    m.domestic_mitigation_costs = Var(
         m.t,
         m.regions,
         within=NonNegativeReals,
@@ -49,14 +49,14 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     constraints.extend(
         [
             RegionalConstraint(
-                lambda m, t, r: m.area_under_MAC[t, r]
+                lambda m, t, r: m.domestic_mitigation_costs[t, r]
                 == AC(m.relative_abatement[t, r], m, t, r) * m.baseline[t, r],
                 "mitigation_costs",
             ),
             GlobalConstraint(
                 lambda m, t: sum(m.mitigation_costs[t, r] for r in m.regions)
-                == sum(m.area_under_MAC[t, r] for r in m.regions),
-                "sum_abatement_equals_sum_area_under_mac",
+                == sum(m.domestic_mitigation_costs[t, r] for r in m.regions),
+                "sum_mitigation_costs_equals_sum_domestic_mitigation_costs",
             ),
         ]
     )
