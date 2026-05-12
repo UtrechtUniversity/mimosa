@@ -246,7 +246,7 @@ def _get_mac_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
                 m.mitigation_costs,
                 lambda m, t, r: (
                     m.domestic_mitigation_costs[t, r]
-                    + m.import_export_mitigation_cost_balance[t, r]
+                    + m.mitigation_cost_trading_balance[t, r]
                 ),
             ),
             RegionalEquation(

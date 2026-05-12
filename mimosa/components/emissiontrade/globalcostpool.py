@@ -63,20 +63,20 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
 
     ## Extra reporting variables:
 
-    m.paid_for_emission_reductions = Var(
+    m.attributed_emission_reductions = Var(
         m.t, m.regions, units=quant.unit("emissionsrate_unit")
     )
-    m.import_export_emission_reduction_balance = Var(
+    m.emission_reduction_trading_balance = Var(
         m.t, m.regions, units=quant.unit("emissionsrate_unit")
     )
-    m.import_export_mitigation_cost_balance = Var(
+    m.mitigation_cost_trading_balance = Var(
         m.t, m.regions, units=quant.unit("currency_unit")
     )
     constraints.extend(
         [
             RegionalConstraint(
                 lambda m, t, r: (
-                    m.paid_for_emission_reductions[t, r]
+                    m.attributed_emission_reductions[t, r]
                     == m.mitigation_costs[t, r]
                     * m.global_emission_reduction_per_cost_unit[t]
                     if t > 0
@@ -87,8 +87,8 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
             # Import export of emission reduction balance: if positive: , if negative:
             RegionalConstraint(
                 lambda m, t, r: (
-                    m.import_export_emission_reduction_balance[t, r]
-                    == m.paid_for_emission_reductions[t, r]
+                    m.emission_reduction_trading_balance[t, r]
+                    == m.attributed_emission_reductions[t, r]
                     - m.regional_emission_reduction[t, r]
                     if t > 0
                     else Constraint.Skip
@@ -96,8 +96,8 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
                 "import_export_emission_reduction_balance",
             ),
             RegionalConstraint(
-                lambda m, t, r: m.import_export_mitigation_cost_balance[t, r]
-                == m.mitigation_costs[t, r] - m.area_under_MAC[t, r],
+                lambda m, t, r: m.mitigation_cost_trading_balance[t, r]
+                == m.mitigation_costs[t, r] - m.domestic_mitigation_costs[t, r],
                 "import_export_mitigation_cost_balance",
             ),
         ]

@@ -27,10 +27,10 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     """
     constraints = []  # No constraints here
 
-    m.import_export_emission_reduction_balance = Param(
+    m.emission_reduction_trading_balance = Param(
         m.t, m.regions, units=quant.unit("emissionsrate_unit"), initialize=0
     )
-    m.import_export_mitigation_cost_balance = Param(
+    m.mitigation_cost_trading_balance = Param(
         m.t, m.regions, units=quant.unit("currency_unit"), initialize=0
     )
     m.regional_emission_allowances = Var(
