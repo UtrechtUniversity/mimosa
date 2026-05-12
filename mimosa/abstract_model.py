@@ -19,7 +19,6 @@ from mimosa.components import (
     welfare,
 )
 
-
 ######################
 # Create model
 ######################
@@ -83,6 +82,11 @@ def create_abstract_model(
         m.t,
         m.regions,
         doc="timeandregional::GDP",
+        units=quant.unit("currency_unit"),
+    )
+    m.global_baseline_GDP = Param(
+        m.t,
+        initialize=lambda m, t: sum(m.baseline_GDP[t, r] for r in m.regions),
         units=quant.unit("currency_unit"),
     )
     m.baseline_emissions = Param(
