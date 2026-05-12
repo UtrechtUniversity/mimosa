@@ -40,7 +40,7 @@ def test_emissions_equal_to_baseline_emissions(script_output):
     model = script_output["model"]
     output_df_ind = read_output(model, simulation=True)
 
-    baseline = output_df_ind.loc["baseline", "2025":]
+    baseline = output_df_ind.loc["baseline_emissions", "2025":]
     emissions = output_df_ind.loc["regional_emissions", "2025":]
 
     diff = (baseline - emissions) / baseline
