@@ -141,20 +141,20 @@ def _get_mac_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     ```
 
     Since the MAC is expressed in terms of relative abatement, we still need to multiply by the baseline emissions to obtain
-    mitigation costs in currency unit (dollars). The area under the MAC is therefore calculated as:
+    mitigation costs in currency unit (dollars). The area under the MAC, also called the domestic mitigation costs, is therefore calculated as:
     
     $$
     \\begin{align}
-    \\text{area under MAC}_{t,r} &= \\left(\\int_0^{a_{t,r}} \\text{MAC}_{\\text{regional},t,r}(a)\\ da \\right) \\cdot \\text{baseline emissions}_{t,r}\\\\
+    \\text{domestic mitigation costs}_{t,r} &= \\left(\\int_0^{a_{t,r}} \\text{MAC}_{\\text{regional},t,r}(a)\\ da \\right) \\cdot \\text{baseline emissions}_{t,r}\\\\
     &= \\text{factor}_{t,r} \\cdot \\frac{\\gamma \\cdot a_{t,r}^{\\beta+1}}{\\beta+1} \\cdot \\text{baseline emissions}_{t,r}
     \\end{align}
     $$
 
-    Finally, the mitigation costs used in MIMOSA are equal to the area under the MAC, plus potentially import/export of mitigation
+    Finally, the mitigation costs used in MIMOSA are equal to the domestic mitigation costs, plus potentially import/export of mitigation
     costs if [emission trading](emissiontrading.md) is enabled:
 
     $$
-    \\text{mitigation costs}_{t,r} = \\text{area under MAC}_{t,r} + \\text{import/export mitigation cost balance}_{t,r}.
+    \\text{mitigation costs}_{t,r} = \\text{domestic mitigation costs}_{t,r} + \\text{import/export mitigation cost balance}_{t,r}.
     $$
 
 

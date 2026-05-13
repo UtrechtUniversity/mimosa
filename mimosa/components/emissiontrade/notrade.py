@@ -20,7 +20,7 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     Without emission trading, the import/export of emission reductions and mitigation costs is always zero:
 
     $$
-    \\text{import/export mitigation cost balance}_{t,r} = 0
+    \\text{mitigation_cost_trading_balance}_{t,r} = 0
     $$
 
     This means that the mitigation costs and the area under the MAC are exactly the same for each region (see [Mitigation costs](mitigation.md#mitigation-costs)).

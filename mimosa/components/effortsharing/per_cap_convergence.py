@@ -60,11 +60,11 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
 
     Finally, the allowances per region are added as constraint on the regional emissions. Since this regime needs
     [emission trading](emissiontrading.md) to avoid infeasibility, the regional emissions can be expressed as the baseline emissions
-    minus the reductions that this region needs to pay for (this is not necessarily equal to the regional emissions
+    minus the reductions that this region needs to pay for: the attributed emission reductions (this is not necessarily equal to the regional emissions
     in physical terms, as the region can buy or sell allowances from other regions):
 
     $$
-    \\text{allowances}_{t,r} = \\text{baseline emissions}_{t,r} - \\text{paid for emission reductions}_{t,r}
+    \\text{allowances}_{t,r} = \\text{baseline emissions}_{t,r} - \\text{attributed emission reductions}_{t,r}
     $$
 
 
