@@ -541,6 +541,9 @@ regional_parameter_files:
     ACCREU:
       filename: inputdata/regionalparams/ACCREU.csv
       regionstype: IMAGE26
+    ACCREU_sectoral:
+      filename: inputdata/regionalparams/ACCREU_sectoral.csv
+      regionstype: IMAGE26
 
 ##################
 

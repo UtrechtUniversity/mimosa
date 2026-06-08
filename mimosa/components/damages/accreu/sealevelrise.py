@@ -25,18 +25,13 @@ def get_constraints(m):
     # SLR damages
     m.damage_costs_slr = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
 
-    # Get the coefficients for the SLR damage function from the CSV input file
-    # (inputdata/regionalparams/ACCREU.csv).
-    # Usage:
-    #   m.param_name = Param(m.regions, doc="regional::ACCREU.{COLUMN_NAME_IN_CSV}")
-    # Then, you can get its value using
-    #   lambda m, t, r: m.param_name[r] * ... ...
-
     m.slr_gross_damage_costs = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
 
-    m.slr_gross_damage_a = Param(m.regions, doc="regional::ACCREU.slr_gross_dmg_a_p50")
-    m.slr_gross_damage_b1 = Param(m.regions, doc="regional::ACCREU.slr_gross_dmg_b1")
-    m.slr_gross_damage_b2 = Param(m.regions, doc="regional::ACCREU.slr_gross_dmg_b2")
+    # m.slr_gross_damage_a = Param(m.regions, doc="regional::ACCREU.slr_gross_dmg_a_p50")
+    m.slr_gross_damage_b1 = Param(m.regions, doc="regional::ACCREU_sectoral.SLR_linear")
+    m.slr_gross_damage_b2 = Param(
+        m.regions, doc="regional::ACCREU_sectoral.SLR_quadratic"
+    )
 
     m.slr_adapt_effectiveness_limit = Param(
         doc="::economics.adaptation.slr_effectiveness_limit"
@@ -62,14 +57,14 @@ def get_constraints(m):
                 m.damage_scale_factor
                 * (
                     damage_fct_slr(
-                        m.total_SLR[t] - temp_fix_slr_1995_2014,
-                        m.slr_gross_damage_a[r],
+                        m.total_SLR[t] - m.total_SLR[0],
+                        1,
                         m.slr_gross_damage_b1[r],
                         m.slr_gross_damage_b2[r],
                     )
                     - damage_fct_slr(
-                        m.total_SLR[0] - temp_fix_slr_1995_2014,
-                        m.slr_gross_damage_a[r],
+                        0,
+                        1,
                         m.slr_gross_damage_b1[r],
                         m.slr_gross_damage_b2[r],
                     )
