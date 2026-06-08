@@ -28,9 +28,9 @@ def get_constraints(m):
     m.slr_gross_damage_costs = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
 
     # m.slr_gross_damage_a = Param(m.regions, doc="regional::ACCREU.slr_gross_dmg_a_p50")
-    m.slr_gross_damage_b1 = Param(m.regions, doc="regional::ACCREU_sectoral.SLR_linear")
+    m.slr_gross_damage_b1 = Param(m.regions, doc="regional::ACCREU_sectoral.slr_linear")
     m.slr_gross_damage_b2 = Param(
-        m.regions, doc="regional::ACCREU_sectoral.SLR_quadratic"
+        m.regions, doc="regional::ACCREU_sectoral.slr_quadratic"
     )
 
     m.slr_adapt_effectiveness_limit = Param(
@@ -69,6 +69,7 @@ def get_constraints(m):
                         m.slr_gross_damage_b2[r],
                     )
                 )
+                / m.GDP_gross[t, r]
             ),
         )
     )
@@ -115,9 +116,9 @@ def damage_fct_slr(slr, a, b1, b2):
 
     """
     if b2 == 0:
-        return a * (b1 * slr) / 100.0
+        return a * (b1 * slr)
 
-    return a * (b1 * slr + b2 * slr**2) / 100.0
+    return a * (b1 * slr + b2 * slr**2)
 
 
 def avoided_damages_eq(m, t, r):
