@@ -25,7 +25,7 @@ def get_constraints(m):
     # SLR damages
     m.damage_costs_slr = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
 
-    m.slr_gross_damage_costs = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
+    m.damage_costs_slr_gross = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
 
     # m.slr_gross_damage_a = Param(m.regions, doc="regional::ACCREU.slr_gross_dmg_a_p50")
     m.slr_gross_damage_b1 = Param(m.regions, doc="regional::ACCREU_sectoral.slr_linear")
@@ -47,12 +47,9 @@ def get_constraints(m):
     # If b2 is zero, the function is linear:
     #       a * (b1 * SLR) - (a * (b1 * initial_SLR))
 
-    # SLR damages are as function of SLR relative to 1995-2014. TODO: fix this better.
-    temp_fix_slr_1995_2014 = 0.08
-
     constraints.append(
         RegionalEquation(
-            m.slr_gross_damage_costs,
+            m.damage_costs_slr_gross,
             lambda m, t, r: (
                 m.damage_scale_factor
                 * (
@@ -96,7 +93,7 @@ def get_constraints(m):
         RegionalEquation(
             m.damage_costs_slr,
             lambda m, t, r: (
-                m.slr_gross_damage_costs[t, r]
+                m.damage_costs_slr_gross[t, r]
                 * (1 - m.slr_avoided_damages[t, r])  # Residual damages after adaptation
                 + m.slr_adaptation_costs_rel[t, r]
             ),
