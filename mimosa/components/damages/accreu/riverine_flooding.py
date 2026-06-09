@@ -14,6 +14,8 @@ from mimosa.common import (
     NonNegativeReals,
 )
 
+from .utils import adaptation_effectiveness_fct
+
 
 def get_constraints(m):
     """TODO"""
@@ -109,12 +111,3 @@ def gross_dmg_fct_riverine(m, t, r):
     return fct(m.year(t) - 2020, m.temperature[t]) - fct(
         m.year(0) - 2020, m.temperature[0]
     )
-
-
-def adaptation_effectiveness_fct(adapt_costs, max_effectiveness, cost_param):
-    """
-    Adaptation effectiveness function, based on the fitted function in ACCREU:
-    Avoided damages = max_effectiveness * (1 - exp(-cost_param * adapt_costs))
-    """
-
-    return max_effectiveness * (1 - exp(-cost_param * adapt_costs))

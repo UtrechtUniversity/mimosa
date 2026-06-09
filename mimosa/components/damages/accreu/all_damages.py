@@ -63,7 +63,7 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
         [
             RegionalEquation(
                 m.damage_costs_non_slr,
-                lambda m, t, r: m.damage_costs_labourprod_gross[t, r]
+                lambda m, t, r: m.damage_costs_labourprod[t, r]
                 + m.damage_costs_riverine[t, r],
             ),
             RegionalEquation(
