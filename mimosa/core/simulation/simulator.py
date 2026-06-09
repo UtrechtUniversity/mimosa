@@ -5,7 +5,7 @@ import networkx as nx
 from scipy.optimize import minimize
 
 from mimosa.common import RegionalEquation, GlobalEquation, Var, ConcreteModel
-from .objects import SimulationObjectModel
+from .objects import SimulationObjectModel, SimVar
 from .helpers import calc_dependencies, sort_equations, plot_dependency_graph
 
 
@@ -65,14 +65,12 @@ class Simulator:
             * None (equivalent to 0)
             * A float value: every region and time step will get this value
             * A numpy array of shape (n_timesteps, n_regions): each region and time step will get the corresponding value
+              (or shape (n_timesteps,) for global variables)
         """
 
         if simulation_model is None:
             # Create a SimulationObjectModel object that will be used to run the simulation
             simulation_model = SimulationObjectModel(self.concrete_model)
-
-        n_timesteps = len(self.concrete_model.t)
-        n_regions = len(self.concrete_model.regions)
 
         # Check if there are no variables provided in kwargs that are not in the free variables:
         for var in control_variables_kwargs:
@@ -87,26 +85,28 @@ class Simulator:
             value = control_variables_kwargs.get(var, None)
 
             if value is None:
-                # If no relative abatement is provided, set it to zero
+                # If no value is provided, set it to zero
                 value = 0
 
-            # TODO: check if variable is region/time dependent
+            # Get the variable in the simulation model to know its dimensions (e.g. if it is region/time dependent)
+            sim_var = getattr(simulation_model, var)
+
             # First check if it is given as a dictionary with (time, region) keys
             if isinstance(value, dict):
                 # Convert the dictionary to a numpy array
-                value = self._dict_values_to_numpy(value)
+                value = self._dict_to_array(value, sim_var)
             # If it is a single float value, convert it to a numpy array
             elif isinstance(value, (int, float)):
-                value = np.full((n_timesteps, n_regions), value)
+                value = np.full(sim_var.dims, value)
 
             # Check that the dimensions are correct
-            assert value.shape == (n_timesteps, n_regions), (
-                f"{var} must be of shape (n_timesteps, n_regions), "
-                f"but is {value.shape}."
+            expected_shape = tuple(sim_var.dims)
+            assert value.shape == expected_shape, (
+                f"{var} must be of shape {expected_shape}, " f"but is {value.shape}."
             )
 
-            # Set the relative abatement for all regions and time periods
-            getattr(simulation_model, var).values = value
+            # Set the value for the control variable
+            sim_var.values = value
 
         self._simulate(simulation_model)
 
@@ -209,15 +209,23 @@ class Simulator:
         # Set indices back to original names ('CAN', 'WEU', ...)
         sim_m.set_index_names()
 
-    def _dict_values_to_numpy(self, d):
+    def _dict_to_array(self, d: dict, sim_var: SimVar):
         """
         Converts a dictionary of values to a numpy array.
-        The keys of the dictionary should be tuples of (time, region).
+        The keys of the dictionary should be index items.
+        For global variables, this is time (0, 1, ...).
+        For regional variables, this is tuples of (time, region) ((0, 'CAN'), ..., (15, 'WEU'), ...).
         """
-        arr = np.array(
-            [
-                [d[(t, r)] for r in self.concrete_model.regions]
-                for t in self.concrete_model.t
-            ]
-        )
+        indices = sim_var.indices_values
+
+        shape = tuple(len(idx) for idx in indices)
+        arr = np.empty(shape)
+
+        for pos, key in zip(
+            itertools.product(*(range(n) for n in shape)), itertools.product(*indices)
+        ):
+            # For 1D dictionaries, keys may be scalars rather than 1-tuples
+            lookup_key = key[0] if len(key) == 1 else key
+            arr[pos] = d[lookup_key]
+
         return arr
