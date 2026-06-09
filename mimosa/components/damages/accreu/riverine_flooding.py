@@ -50,7 +50,7 @@ def get_constraints(m):
         m.t, m.regions, units=quant.unit("fraction_of_GDP")
     )
     m.adaptation_riverine_avoided_damages = Var(
-        m.t, m.regions, units=quant.unit("fraction_of_gross_damages")
+        m.t, m.regions, units=quant.unit("fraction_of_gross_damages"), bounds=(0, 1)
     )
     m.damage_costs_riverine_residual = Var(
         m.t, m.regions, units=quant.unit("fraction_of_GDP")
@@ -106,7 +106,9 @@ def gross_dmg_fct_riverine(m, t, r):
     def fct(time, temp):
         return a + b * (time / 100) + c * (time / 100) ** 2 + d * temp**2
 
-    return fct(m.year(t) - 2020, m.temperature[t]) - fct(0, m.temperature[0])
+    return fct(m.year(t) - 2020, m.temperature[t]) - fct(
+        m.year(0) - 2020, m.temperature[0]
+    )
 
 
 def adaptation_effectiveness_fct(adapt_costs, max_effectiveness, cost_param):
