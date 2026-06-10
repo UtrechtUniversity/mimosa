@@ -43,7 +43,7 @@ def get_constraints(m: AbstractModel):
     # m.GINI = Param(m.regions, initialize=lambda m, r: 0.45)  # DEBUG: Test zonder CSV
 
     # Elasticity parameter for damage distribution (ε)
-    m.damage_elasticity = Param(doc="::inequality.damage_elasticity")
+    m.damage_elasticity = Param(m.t, m.regions, doc="timeandregional::damage_elasticity")
 
     # ============================================================================
     # VARIABLES
@@ -141,7 +141,7 @@ def get_constraints(m: AbstractModel):
     )
 
     # 2. Equation for expected, median incomes per quintile
-    # income of percentile = mean_income × e^(σ × Φ⁻¹(p) - 0.5 × σ²)
+    # median income of percentile = mean_income × e^(σ × Φ⁻¹(p) - 0.5 × σ²)
     def quintile_income_eq(m, t, r, q):
         # Retrieve underlying data
         gdp_per_capita = (
@@ -217,11 +217,12 @@ def get_constraints(m: AbstractModel):
     # ============================================================================
     # DAMAGE DISTRIBUTION PER QUINTILE (median)
     # ============================================================================
+    # Zit hier een fout?
 
     def damage_distribution_me_eq(m, t, r, q):
         # calculate income_quintile^ε
         income = m.income_quintile_median[t, r, q]
-        epsilon = m.damage_elasticity
+        epsilon = m.damage_elasticity[t, r]
         return income**epsilon
 
     constraints.extend(
@@ -241,7 +242,7 @@ def get_constraints(m: AbstractModel):
     def damage_distribution_av_eq(m, t, r, q):
         # calculate income_quintile^ε
         income = m.income_quintile_average[t, r, q]
-        epsilon = m.damage_elasticity
+        epsilon = m.damage_elasticity[t, r]
         return income**epsilon
 
     constraints.extend(

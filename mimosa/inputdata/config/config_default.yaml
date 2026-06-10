@@ -612,7 +612,7 @@ input:
         file: inputdata/data/data_IMAGE_SSP_updated.csv
 
     population:
-      descr: Data source of population
+      descr:  population
       type: datasource
       default:
         variable: Population
@@ -620,6 +620,16 @@ input:
         scenario: "{SSP}-Baseline"
         model: IMAGE 3.4
         file: inputdata/data/data_IMAGE_SSP_updated.csv
+    
+    damage_elasticity:
+      descr: Data source of elasticity per country & region - regional and time specific overrides
+      type: datasource
+      default:
+        variable: damage_elasticity
+        unit: dimensionless
+        scenario: "{SSP}-Baseline"
+        model: IMAGE 3.4
+        file: inputdata/data/damage_elasticity.csv
 
 ##################
 
