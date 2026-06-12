@@ -24,6 +24,9 @@ def get_constraints(m):
 
     ## Gross damages:
 
+    m.riverine_damage_costs_gross_abs = Var(
+        m.t, m.regions, units=quant.unit("currency_unit")
+    )
     m.riverine_damage_costs_gross = Var(
         m.t, m.regions, units=quant.unit("fraction_of_GDP")
     )
@@ -41,14 +44,21 @@ def get_constraints(m):
         m.regions, doc="regional::ACCREU_sectoral.riverine_temp_squared"
     )
 
-    constraints.append(
-        RegionalEquation(m.riverine_damage_costs_gross, gross_dmg_fct_riverine)
+    constraints.extend(
+        [
+            RegionalEquation(m.riverine_damage_costs_gross_abs, gross_dmg_fct_riverine),
+            RegionalEquation(
+                m.riverine_damage_costs_gross,
+                lambda m, t, r: m.riverine_damage_costs_gross_abs[t, r]
+                / m.GDP_gross[t, r],
+            ),
+        ]
     )
 
     ## Adaptation (for now global costs, but should be regional in the future):
 
     m.riverine_adaptation_costs_abs = Var(
-        m.t, m.regions, units=quant.unit("currency_unit")
+        m.t, m.regions, units=quant.unit("currency_unit"), bounds=(0, 1)
     )
     m.riverine_adaptation_costs = Var(
         m.t, m.regions, units=quant.unit("fraction_of_GDP")
