@@ -112,40 +112,87 @@ def sort_equations(equations_dict, return_graph=False):
     return equations_sorted
 
 
-def plot_dependency_graph(G):
+def plot_dependency_graph(G, group_depth=2):
 
     import matplotlib.pyplot as plt
     import matplotlib.patches as mpatches
+    import networkx as nx
 
     try:
-        from networkx.drawing.nx_agraph import graphviz_layout
+        from networkx.drawing.nx_agraph import to_agraph
     except ImportError:
         raise ImportError("Please install pygraphviz: pip install pygraphviz")
 
     def _split_at_middle_underscore(s):
         underscores = [i for i, c in enumerate(s) if c == "_"]
         if not underscores:
-            return s  # No underscore
+            return s
         middle = underscores[len(underscores) // 2]
-        return s[:middle] + "\n" + s[middle:]  # omit the underscore itself
+        return s[:middle] + "\n" + s[middle + 1 :]
 
-    # Build label mapping for nodes
+    def _group_key(node):
+        """
+        Groups variables by their first `group_depth` underscore-separated parts.
+
+        Example:
+        adaptation_costs_abs_riverine  -> adaptation_costs_abs
+        adaptation_costs_abs_labourprod -> adaptation_costs_abs
+        damage_costs_gross_riverine     -> damage_costs_gross
+        damage_costs_gross_labourprod   -> damage_costs_gross
+        """
+        parts = node.split("_")
+        if len(parts) <= group_depth:
+            return None
+        return "_".join(parts[:group_depth])
+
     formatted_labels = {node: _split_at_middle_underscore(node) for node in G.nodes}
 
-    # Create one graph for hard dependencies, used to calculate the layout. The edges for previous time
-    # step dependencies will be added later separately.
-
+    # Only hard dependencies are used for the layout
     G_hard = nx.DiGraph()
-    G_hard.add_nodes_from(G.nodes())
+    G_hard.add_nodes_from(G.nodes(data=True))
+
     hard_edges = [(u, v) for u, v, d in G.edges(data=True) if d["type"] == "dependency"]
     G_hard.add_edges_from(hard_edges)
 
-    # Use graphviz layout (tree-style, top-down)
-    pos = graphviz_layout(
-        G_hard,
-        prog="dot",
-        args="-Grankdir=LR -Gconcentrate=true -Gnodesep=0.5 -Gminlen=1.5",
+    # Convert to pygraphviz AGraph so we can add clusters
+    A = to_agraph(G_hard)
+
+    A.graph_attr.update(
+        rankdir="LR",
+        concentrate="true",
+        nodesep="0.5",
+        ranksep="1.2",
+        compound="true",
     )
+
+    # Build clusters based on variable names
+    groups = {}
+    for node in G_hard.nodes:
+        key = _group_key(node)
+        if key is not None:
+            groups.setdefault(key, []).append(node)
+
+    # Only create clusters with at least 2 nodes
+    for key, nodes in groups.items():
+        if len(nodes) < 2:
+            continue
+
+        A.add_subgraph(
+            nodes,
+            name=f"cluster_{key}",
+            label=key,
+            color="lightgrey",
+            style="dashed",
+        )
+
+    # Run Graphviz layout
+    A.layout(prog="dot")
+
+    # Extract positions back into a dict for NetworkX drawing
+    pos = {}
+    for node in A.nodes():
+        x, y = node.attr["pos"].split(",")
+        pos[str(node)] = (float(x), float(y))
 
     mimosa_green = "#89a041"
     mimosa_orange = "#ed6a2f"
@@ -155,24 +202,39 @@ def plot_dependency_graph(G):
         for node in G.nodes
     ]
 
-    # Draw graph
-    fig, ax = plt.subplots(figsize=(13, 7))
+    fig, ax = plt.subplots(figsize=(13, 9))
 
     node_size = 1000
     edge_style = dict(arrows=True, arrowsize=12, node_size=node_size)
 
-    nx.draw_networkx_nodes(G, pos, node_color=node_colors, node_size=node_size)
-    nx.draw_networkx_labels(G, pos, labels=formatted_labels, font_size=7)
+    nx.draw_networkx_nodes(
+        G,
+        pos,
+        node_color=node_colors,
+        node_size=node_size,
+        ax=ax,
+    )
+
+    nx.draw_networkx_labels(
+        G,
+        pos,
+        labels=formatted_labels,
+        font_size=7,
+        ax=ax,
+    )
+
     nx.draw_networkx_edges(
         G_hard,
         pos,
         edge_color="black",
+        ax=ax,
         **edge_style,
     )
 
     soft_edges = [
         (u, v) for u, v, d in G.edges(data=True) if d["type"] == "prev_time_dependency"
     ]
+
     nx.draw_networkx_edges(
         G,
         pos,
@@ -180,23 +242,25 @@ def plot_dependency_graph(G):
         edge_color=(0.5, 0.5, 0.5, 0.4),
         style="dotted",
         connectionstyle="arc3,rad=0.5",
+        ax=ax,
         **edge_style,
     )
-    ax.margins(0)
 
     input_patch = mpatches.Patch(color=mimosa_orange, label="Control variables")
     computed_patch = mpatches.Patch(color=mimosa_green, label="Computed variables")
 
-    plt.legend(
+    ax.legend(
         handles=[input_patch, computed_patch],
-        loc="upper center",  # or 'lower left', 'best', etc.
-        bbox_to_anchor=(0.5, -0.05),  # place legend outside plot
+        loc="upper center",
+        bbox_to_anchor=(0.5, -0.05),
         ncol=2,
         frameon=False,
     )
 
-    plt.title("MIMOSA variable dependency graph", fontsize=14)
-    plt.axis("off")
+    ax.set_title("MIMOSA variable dependency graph", fontsize=14)
+    ax.axis("off")
+    ax.margins(0)
+
     plt.tight_layout()
     plt.show()
 
