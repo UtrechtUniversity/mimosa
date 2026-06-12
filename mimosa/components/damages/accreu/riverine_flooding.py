@@ -24,7 +24,7 @@ def get_constraints(m):
 
     ## Gross damages:
 
-    m.damage_costs_riverine_gross = Var(
+    m.damage_costs_gross_riverine = Var(
         m.t, m.regions, units=quant.unit("fraction_of_GDP")
     )
 
@@ -42,54 +42,61 @@ def get_constraints(m):
     )
 
     constraints.append(
-        RegionalEquation(m.damage_costs_riverine_gross, gross_dmg_fct_riverine)
+        RegionalEquation(m.damage_costs_gross_riverine, gross_dmg_fct_riverine)
     )
 
     ## Adaptation (for now global costs, but should be regional in the future):
 
-    m.adaptation_costs_riverine_abs = Var(m.t, units=quant.unit("currency_unit"))
+    m.adaptation_costs_abs_riverine = Var(
+        m.t, m.regions, units=quant.unit("currency_unit")
+    )
     m.adaptation_costs_riverine = Var(
         m.t, m.regions, units=quant.unit("fraction_of_GDP")
     )
-    m.adaptation_riverine_avoided_damages = Var(
+    m.avoided_damages_adapt_riverine = Var(
         m.t, m.regions, units=quant.unit("fraction_of_gross_damages"), bounds=(0, 1)
     )
-    m.damage_costs_riverine_residual = Var(
+    m.damage_costs_residual_riverine = Var(
         m.t, m.regions, units=quant.unit("fraction_of_GDP")
     )
     m.damage_costs_riverine = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
 
     # Parameters are now hardcoded, but should be regionalised
-    m.adaptation_riverine_max_effectiveness = Param(initialize=0.864429)
-    m.adaptation_riverine_cost_param = Param(initialize=10.262109)
+    m.adaptation_riverine_max_effectiveness = Param(
+        m.regions, doc="regional::ACCREU_sectoral.riverine_adapt_max_effectiveness"
+    )
+    m.adaptation_riverine_cost_param = Param(
+        m.regions,
+        doc="regional::ACCREU_sectoral.riverine_adapt_cost_param_trillion_usd",
+    )
 
     constraints.extend(
         [
             # Adaptation effectiveness function
             RegionalEquation(
-                m.adaptation_riverine_avoided_damages,
+                m.avoided_damages_adapt_riverine,
                 lambda m, t, r: adaptation_effectiveness_fct(
-                    m.adaptation_costs_riverine_abs[t],
-                    m.adaptation_riverine_max_effectiveness,
-                    m.adaptation_riverine_cost_param,
+                    m.adaptation_costs_abs_riverine[t, r],
+                    m.adaptation_riverine_max_effectiveness[r],
+                    m.adaptation_riverine_cost_param[r],
                 ),
             ),
-            # Adaptation costs as a fraction of GDP. Now every region gets same costs as % GDP
+            # Adaptation costs as a fraction of GDP
             RegionalEquation(
                 m.adaptation_costs_riverine,
-                lambda m, t, r: m.adaptation_costs_riverine_abs[t]
-                / m.global_GDP_gross[t],
+                lambda m, t, r: m.adaptation_costs_abs_riverine[t, r]
+                / m.GDP_gross[t, r],
             ),
             # Residual damages after adaptation
             RegionalEquation(
-                m.damage_costs_riverine_residual,
-                lambda m, t, r: m.damage_costs_riverine_gross[t, r]
-                * (1 - m.adaptation_riverine_avoided_damages[t, r]),
+                m.damage_costs_residual_riverine,
+                lambda m, t, r: m.damage_costs_gross_riverine[t, r]
+                * (1 - m.avoided_damages_adapt_riverine[t, r]),
             ),
             # Total damages after adaptation
             RegionalEquation(
                 m.damage_costs_riverine,
-                lambda m, t, r: m.damage_costs_riverine_residual[t, r]
+                lambda m, t, r: m.damage_costs_residual_riverine[t, r]
                 + m.adaptation_costs_riverine[t, r],
             ),
         ]
