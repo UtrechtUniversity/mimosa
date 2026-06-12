@@ -23,9 +23,9 @@ def get_constraints(m):
     constraints = []
 
     # SLR damages
-    m.damage_costs_slr = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
+    m.slr_damage_costs = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
 
-    m.damage_costs_slr_gross = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
+    m.slr_damage_costs_gross = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
 
     # m.slr_gross_damage_a = Param(m.regions, doc="regional::ACCREU.slr_gross_dmg_a_p50")
     m.slr_gross_damage_b1 = Param(m.regions, doc="regional::ACCREU_sectoral.slr_linear")
@@ -49,7 +49,7 @@ def get_constraints(m):
 
     constraints.append(
         RegionalEquation(
-            m.damage_costs_slr_gross,
+            m.slr_damage_costs_gross,
             lambda m, t, r: (
                 m.damage_scale_factor
                 * (
@@ -78,9 +78,7 @@ def get_constraints(m):
     m.slr_avoided_damages = Var(
         m.t, m.regions, units=quant.unit("fraction_of_gross_damages"), bounds=(0, 1)
     )
-    m.slr_adaptation_costs_rel = Var(
-        m.t, m.regions, units=quant.unit("fraction_of_GDP")
-    )
+    m.slr_adaptation_costs = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
 
     constraints.append(RegionalEquation(m.slr_avoided_damages, avoided_damages_eq))
 
@@ -91,11 +89,11 @@ def get_constraints(m):
     # Total SLR damages are the sum of gross damages minus avoided damages plus adaptation costs
     constraints.append(
         RegionalEquation(
-            m.damage_costs_slr,
+            m.slr_damage_costs,
             lambda m, t, r: (
-                m.damage_costs_slr_gross[t, r]
+                m.slr_damage_costs_gross[t, r]
                 * (1 - m.slr_avoided_damages[t, r])  # Residual damages after adaptation
-                + m.slr_adaptation_costs_rel[t, r]
+                + m.slr_adaptation_costs[t, r]
             ),
         )
     )
@@ -132,4 +130,4 @@ def avoided_damages_eq(m, t, r):
     # This is temporary and should be replaced when we have regional functions.
     factor = 120_000
 
-    return L * (1 - exp(-beta * m.slr_adaptation_costs_rel[t, r] * factor))
+    return L * (1 - exp(-beta * m.slr_adaptation_costs[t, r] * factor))

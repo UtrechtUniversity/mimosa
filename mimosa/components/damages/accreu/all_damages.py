@@ -51,7 +51,7 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     # Add all non-SLR sectors together
 
     m.damage_costs = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
-    m.damage_costs_non_slr = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
+    m.non_slr_damage_costs = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
     m.damage_costs_abs = Var(m.t, m.regions, units=quant.unit("currency_unit"))
     m.damage_scale_factor = Param(doc="::economics.damages.scale factor")
     m.damage_relative_global = Var(
@@ -62,13 +62,13 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     constraints.extend(
         [
             RegionalEquation(
-                m.damage_costs_non_slr,
-                lambda m, t, r: m.damage_costs_labourprod[t, r]
-                + m.damage_costs_riverine[t, r],
+                m.non_slr_damage_costs,
+                lambda m, t, r: m.labourprod_damage_costs[t, r]
+                + m.riverine_damage_costs[t, r],
             ),
             RegionalEquation(
                 m.damage_costs,
-                lambda m, t, r: m.damage_costs_non_slr[t, r] + m.damage_costs_slr[t, r],
+                lambda m, t, r: m.non_slr_damage_costs[t, r] + m.slr_damage_costs[t, r],
             ),
             RegionalEquation(
                 m.damage_costs_abs,
