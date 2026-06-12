@@ -24,7 +24,7 @@ def get_constraints(m):
 
     ## Gross damages:
 
-    m.damage_costs_labourprod_gross = Var(
+    m.damage_costs_gross_labourprod = Var(
         m.t, m.regions, units=quant.unit("fraction_of_GDP")
     )
     m.damages_gross_labourprod_constant = Param(
@@ -35,18 +35,18 @@ def get_constraints(m):
     )
 
     constraints.append(
-        RegionalEquation(m.damage_costs_labourprod_gross, gross_dmg_fct_labourprod)
+        RegionalEquation(m.damage_costs_gross_labourprod, gross_dmg_fct_labourprod)
     )
 
     ## Adaptation (for now global costs, but should be regional in the future):
-    m.adaptation_costs_labourprod_abs = Var(m.t, units=quant.unit("currency_unit"))
+    m.adaptation_costs_abs_labourprod = Var(m.t, units=quant.unit("currency_unit"))
     m.adaptation_costs_labourprod = Var(
         m.t, m.regions, units=quant.unit("fraction_of_GDP")
     )
-    m.adaptation_labourprod_avoided_damages = Var(
+    m.avoided_damages_adapt_labourprod = Var(
         m.t, m.regions, units=quant.unit("fraction_of_gross_damages"), bounds=(0, 1)
     )
-    m.damage_costs_labourprod_residual = Var(
+    m.damage_costs_residual_labourprod = Var(
         m.t, m.regions, units=quant.unit("fraction_of_GDP")
     )
     m.damage_costs_labourprod = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
@@ -59,9 +59,9 @@ def get_constraints(m):
         [
             # Adaptation effectiveness function
             RegionalEquation(
-                m.adaptation_labourprod_avoided_damages,
+                m.avoided_damages_adapt_labourprod,
                 lambda m, t, r: adaptation_effectiveness_fct(
-                    m.adaptation_costs_labourprod_abs[t],
+                    m.adaptation_costs_abs_labourprod[t],
                     m.adaptation_labourprod_max_effectiveness,
                     m.adaptation_labourprod_cost_param,
                 ),
@@ -69,19 +69,19 @@ def get_constraints(m):
             # Adaptation costs as a fraction of GDP. Now every region gets same costs as % GDP
             RegionalEquation(
                 m.adaptation_costs_labourprod,
-                lambda m, t, r: m.adaptation_costs_labourprod_abs[t]
+                lambda m, t, r: m.adaptation_costs_abs_labourprod[t]
                 / m.global_GDP_gross[t],
             ),
             # Residual damages after adaptation
             RegionalEquation(
-                m.damage_costs_labourprod_residual,
-                lambda m, t, r: m.damage_costs_labourprod_gross[t, r]
-                * (1 - m.adaptation_labourprod_avoided_damages[t, r]),
+                m.damage_costs_residual_labourprod,
+                lambda m, t, r: m.damage_costs_gross_labourprod[t, r]
+                * (1 - m.avoided_damages_adapt_labourprod[t, r]),
             ),
             # Total damages after adaptation
             RegionalEquation(
                 m.damage_costs_labourprod,
-                lambda m, t, r: m.damage_costs_labourprod_residual[t, r]
+                lambda m, t, r: m.damage_costs_residual_labourprod[t, r]
                 + m.adaptation_costs_labourprod[t, r],
             ),
         ]
