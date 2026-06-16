@@ -4,130 +4,113 @@ from mimosa.common import (
     Param,
     Var,
     GeneralConstraint,
+    RegionalConstraint,
     RegionalEquation,
     GlobalEquation,
     value,
     soft_max,
+    soft_min,
     Any,
     exp,
+    log,
     quant,
     NonNegativeReals,
 )
 
+from .utils import adaptation_effectiveness_fct
+
 
 def get_constraints(m):
-    """
-    Defines the equations for the gross damages, residual damages, and
-    adaptation costs due to sea-level rise (SLR).
-    """
+    """TODO"""
+
     constraints = []
 
-    # SLR damages
-    m.slr_damage_costs = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
+    ## Gross damages:
 
     m.slr_damage_costs_gross = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
 
-    # m.slr_gross_damage_a = Param(m.regions, doc="regional::ACCREU.slr_gross_dmg_a_p50")
-    m.slr_gross_damage_b1 = Param(m.regions, doc="regional::ACCREU_sectoral.slr_linear")
-    m.slr_gross_damage_b2 = Param(
-        m.regions, doc="regional::ACCREU_sectoral.slr_quadratic"
+    m.slr_damages_gross_constant = Param(
+        m.regions, doc="regional::ACCREU_sectoral.slr_noadapt_ead_constant"
+    )
+    m.slr_damages_gross_prod = Param(
+        m.regions, doc="regional::ACCREU_sectoral.slr_noadapt_ead_prod"
+    )
+    m.slr_damages_gross_power = Param(
+        m.regions, doc="regional::ACCREU_sectoral.slr_noadapt_ead_power"
     )
 
-    m.slr_adapt_effectiveness_limit = Param(
-        doc="::economics.adaptation.slr_effectiveness_limit"
+    constraints.append(RegionalEquation(m.slr_damage_costs_gross, gross_dmg_fct_slr))
+
+    ## Adaptation:
+
+    m.slr_adaptation_costs_abs = Var(
+        m.t,
+        m.regions,
+        units=quant.unit("currency_unit"),
+        bounds=lambda m, t, r: (0, 0.1 * m.baseline_GDP[t, r]),
     )
-
-    ##################
-    ### Step 1: gross damages
-    ##################
-
-    # Define the gross damages as a function of SLR:
-    #
-    #       a * (b1 * SLR + b2 * SLR^2) - (a * (b1 * initial_SLR + b2 * initial_SLR^2))
-    # If b2 is zero, the function is linear:
-    #       a * (b1 * SLR) - (a * (b1 * initial_SLR))
-
-    constraints.append(
-        RegionalEquation(
-            m.slr_damage_costs_gross,
-            lambda m, t, r: (
-                m.damage_scale_factor
-                * (
-                    damage_fct_slr(
-                        m.total_SLR[t] - m.total_SLR[0],
-                        1,
-                        m.slr_gross_damage_b1[r],
-                        m.slr_gross_damage_b2[r],
-                    )
-                    - damage_fct_slr(
-                        0,
-                        1,
-                        m.slr_gross_damage_b1[r],
-                        m.slr_gross_damage_b2[r],
-                    )
-                )
-                / m.GDP_gross[t, r]
-            ),
-        )
-    )
-
-    ##################
-    ### Step 2: Avoided damages
-    ##################
-
-    m.slr_avoided_damages = Var(
-        m.t, m.regions, units=quant.unit("fraction_of_gross_damages"), bounds=(0, 1)
+    m.slr_adaptation_costs_abs_optimal = Var(
+        m.t, m.regions, units=quant.unit("currency_unit")
     )
     m.slr_adaptation_costs = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
+    m.slr_avoided_damages_adapt = Var(
+        m.t, m.regions, units=quant.unit("fraction_of_gross_damages"), bounds=(0, 1)
+    )
+    m.slr_damage_costs_residual = Var(
+        m.t, m.regions, units=quant.unit("fraction_of_GDP")
+    )
+    m.slr_damage_costs = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
 
-    constraints.append(RegionalEquation(m.slr_avoided_damages, avoided_damages_eq))
+    m.slr_adaptation_max_effectiveness = Param(
+        m.regions,
+        doc="regional::ACCREU_sectoral.slr_adapt_eff_max_effectiveness",
+    )
+    m.slr_adaptation_cost_param = Param(
+        m.regions,
+        doc="regional::ACCREU_sectoral.slr_adapt_eff_cost_param",
+    )
 
-    ##################
-    ### Step 3: residual damages and adaptation costs
-    ##################
-
-    # Total SLR damages are the sum of gross damages minus avoided damages plus adaptation costs
-    constraints.append(
-        RegionalEquation(
-            m.slr_damage_costs,
-            lambda m, t, r: (
-                m.slr_damage_costs_gross[t, r]
-                * (1 - m.slr_avoided_damages[t, r])  # Residual damages after adaptation
-                + m.slr_adaptation_costs[t, r]
+    constraints.extend(
+        [
+            # Adaptation effectiveness function
+            RegionalEquation(
+                m.slr_avoided_damages_adapt,
+                lambda m, t, r: adaptation_effectiveness_fct(
+                    m.slr_adaptation_costs_abs[t, r],
+                    m.slr_adaptation_max_effectiveness[r],
+                    m.slr_adaptation_cost_param[r],
+                ),
             ),
-        )
+            # Adaptation costs as a fraction of GDP
+            RegionalEquation(
+                m.slr_adaptation_costs,
+                lambda m, t, r: m.slr_adaptation_costs_abs[t, r] / m.GDP_gross[t, r],
+            ),
+            # Residual damages after adaptation
+            RegionalEquation(
+                m.slr_damage_costs_residual,
+                lambda m, t, r: m.slr_damage_costs_gross[t, r]
+                * (1 - m.slr_avoided_damages_adapt[t, r]),
+            ),
+            # Total damages after adaptation
+            RegionalEquation(
+                m.slr_damage_costs,
+                lambda m, t, r: m.slr_damage_costs_residual[t, r]
+                + m.slr_adaptation_costs[t, r],
+            ),
+        ]
     )
 
     return constraints
 
 
-def damage_fct_slr(slr, a, b1, b2):
-    """
-    Function to calculate the damages due to sea-level rise (SLR).
+def gross_dmg_fct_slr(m, t, r):
 
-    The damage function is quadratic, defined by:
-        a * (b1 * slr + b2 * slr^2)
-    (or linear when b2 is zero).
+    a = m.slr_damages_gross_constant[r]
+    b = m.slr_damages_gross_prod[r]
+    c = m.slr_damages_gross_power[r]
 
-    """
-    if b2 == 0:
-        return a * (b1 * slr)
+    def fct(x):
+        return a + b * x**c
 
-    return a * (b1 * slr + b2 * slr**2)
-
-
-def avoided_damages_eq(m, t, r):
-    """
-    Adaptation effectiveness function for sea-level rise (SLR) damages, based on the fitted function in ACCREU:
-    Avoided damages = L * (1 - exp(-beta * adaptation_costs))
-    """
-    # These parameters should be made regional
-    L = m.slr_adapt_effectiveness_limit
-    beta = 0.304093
-
-    # The fitted function had absolute adaptation costs as x-axis for its global function. To apply
-    # it regionally, we switch to relative adaptation costs by multiplying the x-axis with the world GDP
-    # This is temporary and should be replaced when we have regional functions.
-    factor = 120_000
-
-    return L * (1 - exp(-beta * m.slr_adaptation_costs[t, r] * factor))
+    return fct(m.total_SLR[t]) - fct(m.total_SLR[0])

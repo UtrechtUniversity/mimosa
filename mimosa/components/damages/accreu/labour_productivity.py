@@ -4,12 +4,15 @@ from mimosa.common import (
     Param,
     Var,
     GeneralConstraint,
+    RegionalConstraint,
     RegionalEquation,
     GlobalEquation,
     value,
     soft_max,
+    soft_min,
     Any,
     exp,
+    log,
     quant,
     NonNegativeReals,
 )
@@ -27,19 +30,29 @@ def get_constraints(m):
     m.labourprod_damage_costs_gross = Var(
         m.t, m.regions, units=quant.unit("fraction_of_GDP")
     )
+
     m.labourprod_damages_gross_constant = Param(
-        m.regions, doc="regional::ACCREU_sectoral.labourprod_constant"
+        m.regions, doc="regional::ACCREU_sectoral.labourprod_noadapt_ead_constant"
     )
-    m.labourprod_damages_gross_temp_linear = Param(
-        m.regions, doc="regional::ACCREU_sectoral.labourprod_temp_linear"
+    m.labourprod_damages_gross_linear = Param(
+        m.regions, doc="regional::ACCREU_sectoral.labourprod_noadapt_ead_linear"
     )
 
     constraints.append(
         RegionalEquation(m.labourprod_damage_costs_gross, gross_dmg_fct_labourprod)
     )
 
-    ## Adaptation (for now global costs, but should be regional in the future):
-    m.labourprod_adaptation_costs_abs = Var(m.t, units=quant.unit("currency_unit"))
+    ## Adaptation:
+
+    m.labourprod_adaptation_costs_abs = Var(
+        m.t,
+        m.regions,
+        units=quant.unit("currency_unit"),
+        bounds=lambda m, t, r: (0, 0.1 * m.baseline_GDP[t, r]),
+    )
+    m.labourprod_adaptation_costs_abs_optimal = Var(
+        m.t, m.regions, units=quant.unit("currency_unit")
+    )
     m.labourprod_adaptation_costs = Var(
         m.t, m.regions, units=quant.unit("fraction_of_GDP")
     )
@@ -51,9 +64,14 @@ def get_constraints(m):
     )
     m.labourprod_damage_costs = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
 
-    # Parameters are now hardcoded, but should be regionalised:
-    m.labourprod_adaptation_max_effectiveness = Param(initialize=0.33624)
-    m.labourprod_adaptation_cost_param = Param(initialize=3.9144517)
+    m.labourprod_adaptation_max_effectiveness = Param(
+        m.regions,
+        doc="regional::ACCREU_sectoral.labourprod_adapt_eff_max_effectiveness",
+    )
+    m.labourprod_adaptation_cost_param = Param(
+        m.regions,
+        doc="regional::ACCREU_sectoral.labourprod_adapt_eff_cost_param",
+    )
 
     constraints.extend(
         [
@@ -61,16 +79,16 @@ def get_constraints(m):
             RegionalEquation(
                 m.labourprod_avoided_damages_adapt,
                 lambda m, t, r: adaptation_effectiveness_fct(
-                    m.labourprod_adaptation_costs_abs[t],
-                    m.labourprod_adaptation_max_effectiveness,
-                    m.labourprod_adaptation_cost_param,
+                    m.labourprod_adaptation_costs_abs[t, r],
+                    m.labourprod_adaptation_max_effectiveness[r],
+                    m.labourprod_adaptation_cost_param[r],
                 ),
             ),
-            # Adaptation costs as a fraction of GDP. Now every region gets same costs as % GDP
+            # Adaptation costs as a fraction of GDP
             RegionalEquation(
                 m.labourprod_adaptation_costs,
-                lambda m, t, r: m.labourprod_adaptation_costs_abs[t]
-                / m.global_GDP_gross[t],
+                lambda m, t, r: m.labourprod_adaptation_costs_abs[t, r]
+                / m.GDP_gross[t, r],
             ),
             # Residual damages after adaptation
             RegionalEquation(
@@ -93,9 +111,9 @@ def get_constraints(m):
 def gross_dmg_fct_labourprod(m, t, r):
 
     a = m.labourprod_damages_gross_constant[r]
-    b = m.labourprod_damages_gross_temp_linear[r]
+    b = m.labourprod_damages_gross_linear[r]
 
-    def fct(temp):
-        return a + b * temp
+    def fct(x):
+        return a + b * x
 
     return fct(m.temperature[t]) - fct(m.temperature[0])
