@@ -30,13 +30,13 @@ def get_constraints(m):
     m.slr_damage_costs_gross = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
 
     m.slr_damages_gross_constant = Param(
-        m.regions, doc="regional::ACCREU_sectoral.slr_noadapt_ead_constant"
+        m.regions, doc="regional::ACCREU.slr_noadapt_ead_constant"
     )
     m.slr_damages_gross_prod = Param(
-        m.regions, doc="regional::ACCREU_sectoral.slr_noadapt_ead_prod"
+        m.regions, doc="regional::ACCREU.slr_noadapt_ead_prod"
     )
     m.slr_damages_gross_power = Param(
-        m.regions, doc="regional::ACCREU_sectoral.slr_noadapt_ead_power"
+        m.regions, doc="regional::ACCREU.slr_noadapt_ead_power"
     )
 
     constraints.append(RegionalEquation(m.slr_damage_costs_gross, gross_dmg_fct_slr))
@@ -63,11 +63,11 @@ def get_constraints(m):
 
     m.slr_adaptation_max_effectiveness = Param(
         m.regions,
-        doc="regional::ACCREU_sectoral.slr_adapt_eff_max_effectiveness",
+        doc="regional::ACCREU.slr_adapt_eff_max_effectiveness",
     )
     m.slr_adaptation_cost_param = Param(
         m.regions,
-        doc="regional::ACCREU_sectoral.slr_adapt_eff_cost_param",
+        doc="regional::ACCREU.slr_adapt_eff_cost_param",
     )
 
     constraints.extend(

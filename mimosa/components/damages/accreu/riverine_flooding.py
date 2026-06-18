@@ -35,13 +35,13 @@ def get_constraints(m):
     )
 
     m.riverine_damages_gross_constant = Param(
-        m.regions, doc="regional::ACCREU_sectoral.riverine_noadapt_ead_constant"
+        m.regions, doc="regional::ACCREU.riverine_noadapt_ead_constant"
     )
     m.riverine_damages_gross_linear = Param(
-        m.regions, doc="regional::ACCREU_sectoral.riverine_noadapt_ead_linear"
+        m.regions, doc="regional::ACCREU.riverine_noadapt_ead_linear"
     )
     m.riverine_damages_gross_quadr = Param(
-        m.regions, doc="regional::ACCREU_sectoral.riverine_noadapt_ead_quadr"
+        m.regions, doc="regional::ACCREU.riverine_noadapt_ead_quadr"
     )
 
     constraints.append(
@@ -71,11 +71,11 @@ def get_constraints(m):
     m.riverine_damage_costs = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
 
     m.riverine_adaptation_max_effectiveness = Param(
-        m.regions, doc="regional::ACCREU_sectoral.riverine_adapt_eff_max_effectiveness"
+        m.regions, doc="regional::ACCREU.riverine_adapt_eff_max_effectiveness"
     )
     m.riverine_adaptation_cost_param = Param(
         m.regions,
-        doc="regional::ACCREU_sectoral.riverine_adapt_eff_cost_param",
+        doc="regional::ACCREU.riverine_adapt_eff_cost_param",
     )
 
     constraints.extend(

@@ -32,10 +32,10 @@ def get_constraints(m):
     )
 
     m.labourprod_damages_gross_constant = Param(
-        m.regions, doc="regional::ACCREU_sectoral.labourprod_noadapt_ead_constant"
+        m.regions, doc="regional::ACCREU.labourprod_noadapt_ead_constant"
     )
     m.labourprod_damages_gross_linear = Param(
-        m.regions, doc="regional::ACCREU_sectoral.labourprod_noadapt_ead_linear"
+        m.regions, doc="regional::ACCREU.labourprod_noadapt_ead_linear"
     )
 
     constraints.append(
@@ -66,11 +66,11 @@ def get_constraints(m):
 
     m.labourprod_adaptation_max_effectiveness = Param(
         m.regions,
-        doc="regional::ACCREU_sectoral.labourprod_adapt_eff_max_effectiveness",
+        doc="regional::ACCREU.labourprod_adapt_eff_max_effectiveness",
     )
     m.labourprod_adaptation_cost_param = Param(
         m.regions,
-        doc="regional::ACCREU_sectoral.labourprod_adapt_eff_cost_param",
+        doc="regional::ACCREU.labourprod_adapt_eff_cost_param",
     )
 
     constraints.extend(
