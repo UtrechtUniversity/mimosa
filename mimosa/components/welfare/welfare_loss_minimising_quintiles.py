@@ -62,7 +62,9 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
             Equation(
                 m.utility,
                 lambda m, t, r, q: calc_utility(
-                    m.income_after_damages[t, r, q], 1, m.elasmu
+                    #m.income_after_damages[t, r, q], 1, m.elasmu
+                    #(m.income_quintile_average[t, r, q] - m.damage_quintile[t, r, q]), 1, m.elasmu
+                    m.income_for_utility_calc[t, r, q], 1, m.elasmu
                 ),
                 [m.t, m.regions, m.quintiles],
             ),

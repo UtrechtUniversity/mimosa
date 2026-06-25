@@ -103,6 +103,11 @@ def get_constraints(m: AbstractModel):
         m.t, m.regions, m.quintiles, units=quant.unit("percent")
     )
 
+    # Loss of the average (not median) person in a quintile (for welfare calculation)
+    m.income_for_utility_calc = Var(
+        m.t, m.regions, m.quintiles, units=quant.unit("currency_unit")
+    )
+
     # ============================================================================
     # INCOME PER QUINTILE
     # ============================================================================
@@ -358,6 +363,23 @@ def get_constraints(m: AbstractModel):
             Equation(
                 m.relative_income_loss,
                 relative_income_loss_eq,
+                [m.t, m.regions, m.quintiles],
+            )
+        ]
+    )
+
+    # ============================================================================
+    # Average income loss per quintile (for welfare calculation)
+    # ============================================================================
+
+    def income_for_utility_calc_eq(m, t, r, q):
+        return m.income_quintile_average[t, r, q] - m.damage_quintile[t, r, q]
+    
+    constraints.extend(
+        [
+            Equation(
+                m.income_for_utility_calc,
+                income_for_utility_calc_eq,
                 [m.t, m.regions, m.quintiles],
             )
         ]
