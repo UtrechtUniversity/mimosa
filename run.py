@@ -8,4 +8,4 @@ params["model"]["welfare module"] = "welfare_loss_minimising_quintiles"
 
 model1 = MIMOSA(params)
 model1.solve()
-model1.save("run_inequality_1")
+model1.save("run_inequality_1_test_units")

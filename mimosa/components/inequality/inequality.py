@@ -61,41 +61,41 @@ def get_constraints(m: AbstractModel):
 
     # Average income per quintile
     m.income_quintile_average = Var(
-        m.t, m.regions, m.quintiles, units=quant.unit("currency_unit")
+        m.t, m.regions, m.quintiles, units=quant.unit("currency_unit / (billion people)")
     )
 
     # Distribution of damages per quintile (without scaling) fer median point: income_quintile^ε
     m.damage_distribution_median = Var(
-        m.t, m.regions, m.quintiles, units=quant.unit("currency_unit")
+        m.t, m.regions, m.quintiles, units=quant.unit("currency_unit / (billion people)")
     )
 
     # Distribution of damages per quintile (without scaling) for average of quintile: income_quintile^ε
     m.damage_distribution_average = Var(
-        m.t, m.regions, m.quintiles, units=quant.unit("currency_unit")
+        m.t, m.regions, m.quintiles, units=quant.unit("currency_unit / (billion people)")
     )
 
     # Sum of damage_distributio_median over all quintiles (intermediate step for scaling factor)
     m.sum_damage_distribution_median = Var(
-        m.t, m.regions, units=quant.unit("currency_unit")
+        m.t, m.regions, units=quant.unit("currency_unit / (billion people)")
     )
 
     # Sum of damage_distribution_average over all quintiles (intermediate step for scaling factor)
     m.sum_damage_distribution_average = Var(
-        m.t, m.regions, units=quant.unit("currency_unit")
+        m.t, m.regions, units=quant.unit("currency_unit / (billion people)")
     )
 
     # Scaling factor C for each region and timestep: total_damage / sum(damage_distribution)
     # median and average values can both be used. Average is most correct.
-    m.damage_scaling_factor = Var(m.t, m.regions, units=quant.unit("currency_unit"))
+    m.damage_scaling_factor = Var(m.t, m.regions, units=quant.unit("currency_unit / (billion people)"))
 
     # Actual damage per quintile: C * income_quintile^ε
     m.damage_quintile = Var(
-        m.t, m.regions, m.quintiles, units=quant.unit("currency_unit")
+        m.t, m.regions, m.quintiles, units=quant.unit("currency_unit / (billion people)")
     )
 
     # Income after damages per quintile
     m.income_after_damages = Var(
-        m.t, m.regions, m.quintiles, units=quant.unit("currency_unit")
+        m.t, m.regions, m.quintiles, units=quant.unit("currency_unit / (billion people)")
     )
 
     # Relative income loss per quintile (percentage)
@@ -105,7 +105,7 @@ def get_constraints(m: AbstractModel):
 
     # Loss of the average (not median) person in a quintile (for welfare calculation)
     m.income_for_utility_calc = Var(
-        m.t, m.regions, m.quintiles, units=quant.unit("currency_unit")
+        m.t, m.regions, m.quintiles, units=quant.unit("currency_unit / (billion people)")
     )
 
     # ============================================================================
