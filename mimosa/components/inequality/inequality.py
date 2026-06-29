@@ -43,8 +43,8 @@ def get_constraints(m: AbstractModel):
     # m.GINI = Param(m.regions, initialize=lambda m, r: 0.45)  # DEBUG: Test zonder CSV
 
     # Elasticity parameter for damage distribution (ε)
-    #m.damage_elasticity = Param(m.t, m.regions, doc="timeandregional::damage_elasticity") #Version with damage_elasticity from CSV
-    m.damage_elasticity = Param(doc="::inequality.damage_elasticity") # Version with damage_elasticity == 0.64
+    m.damage_elasticity = Param(m.t, m.regions, doc="timeandregional::damage_elasticity") #Version with damage_elasticity from CSV
+    #m.damage_elasticity = Param(doc="::inequality.damage_elasticity") # Version with damage_elasticity == 0.64
 
     # ============================================================================
     # VARIABLES
@@ -228,7 +228,7 @@ def get_constraints(m: AbstractModel):
     def damage_distribution_me_eq(m, t, r, q):
         # calculate income_quintile^ε
         income = m.income_quintile_median[t, r, q]
-        epsilon = m.damage_elasticity
+        epsilon = m.damage_elasticity[t, r]
         return income**epsilon
 
     constraints.extend(
@@ -248,7 +248,7 @@ def get_constraints(m: AbstractModel):
     def damage_distribution_av_eq(m, t, r, q):
         # calculate income_quintile^ε
         income = m.income_quintile_average[t, r, q]
-        epsilon = m.damage_elasticity
+        epsilon = m.damage_elasticity[t, r]
         return income**epsilon
 
     constraints.extend(
