@@ -17,7 +17,7 @@ from mimosa.common import (
     NonNegativeReals,
 )
 
-from .utils import adaptation_effectiveness_fct
+from .utils import adaptation_effectiveness_fct, dmg_fct_linear
 
 
 def get_constraints(m):
@@ -42,7 +42,26 @@ def get_constraints(m):
         RegionalEquation(m.labourprod_damage_costs_gross, gross_dmg_fct_labourprod)
     )
 
-    ## Adaptation:
+    ## Benefits from less cooling demand due to higher temperatures (negative damages):
+
+    m.labourprod_damage_costs_benefits = Var(
+        m.t, m.regions, units=quant.unit("fraction_of_GDP")
+    )
+
+    m.labourprod_damages_benefits_constant = Param(
+        m.regions, doc="regional::ACCREU.labourprod_benefit_cdd_constant"
+    )
+    m.labourprod_damages_benefits_linear = Param(
+        m.regions, doc="regional::ACCREU.labourprod_benefit_cdd_linear"
+    )
+
+    constraints.append(
+        RegionalEquation(
+            m.labourprod_damage_costs_benefits, benefits_dmg_fct_labourprod
+        )
+    )
+
+    ## Adaptation (only for costs, doesn't apply to benefits):
 
     m.labourprod_adaptation_costs_abs = Var(
         m.t,
@@ -100,6 +119,7 @@ def get_constraints(m):
             RegionalEquation(
                 m.labourprod_damage_costs,
                 lambda m, t, r: m.labourprod_damage_costs_residual[t, r]
+                + m.labourprod_damage_costs_benefits[t, r]
                 + m.labourprod_adaptation_costs[t, r],
             ),
         ]
@@ -112,8 +132,11 @@ def gross_dmg_fct_labourprod(m, t, r):
 
     a = m.labourprod_damages_gross_constant[r]
     b = m.labourprod_damages_gross_linear[r]
+    return dmg_fct_linear(m, t, a, b)
 
-    def fct(x):
-        return a + b * x
 
-    return fct(m.temperature[t]) - fct(m.temperature[0])
+def benefits_dmg_fct_labourprod(m, t, r):
+
+    a = m.labourprod_damages_benefits_constant[r]
+    b = m.labourprod_damages_benefits_linear[r]
+    return dmg_fct_linear(m, t, a, b)
