@@ -450,6 +450,17 @@ model:
       - ACCREU
       - nodamage
     default: COACCH
+  
+  damage module options:
+    ACCREU adaptation:
+      descr: >-
+        Whether adaptation should be on combined labour productivity and riverine flooding,
+        or separately
+      type: enum
+      values:
+        - combined
+        - separate
+      default: combined
 
   emissiontrade module:
     descr: Emission trade module to be used

@@ -27,7 +27,9 @@ from . import labour_productivity
 from . import mortality
 
 
-def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
+def get_constraints(
+    m: AbstractModel, options: dict = None
+) -> Sequence[GeneralConstraint]:
     """
     ACCREU damage specification
 
@@ -35,6 +37,7 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     specification.
 
     """
+    print("OPTIONS: ", options)
     constraints = []
 
     # # Get constraints for temperature dependent damages

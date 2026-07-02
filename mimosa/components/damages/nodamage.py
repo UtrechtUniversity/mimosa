@@ -7,7 +7,9 @@ from typing import Sequence
 from mimosa.common import AbstractModel, Var, GeneralConstraint, RegionalEquation
 
 
-def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
+def get_constraints(
+    m: AbstractModel, options: dict = None
+) -> Sequence[GeneralConstraint]:
     """Damage and adaptation costs equations and constraints
     (no-damage specification)
 

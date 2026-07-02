@@ -113,7 +113,7 @@ def create_abstract_model(
     get_damage_constraints = load_from_registry(
         damage_module.module, damages.DAMAGE_MODULES
     )
-    constraints.extend(get_damage_constraints(m))
+    constraints.extend(get_damage_constraints(m, damage_module.options))
 
     # Abatement costs
     constraints.extend(mitigation.get_constraints(m))

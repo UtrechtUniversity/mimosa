@@ -8,6 +8,7 @@ params["model"]["damage module"] = "ACCREU"
 
 model = MIMOSA(params)
 
+model.simulator.plot_dependency_graph()
 simulation = model.run_nopolicy_baseline()
 
 model.save_simulation(simulation, "baseline_nopolicy_accreu_newslr")
