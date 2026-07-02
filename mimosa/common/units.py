@@ -2,10 +2,14 @@
 Uses the Pint package to parse quantities with units.
 The custom units are loaded from a text file.
 """
-import os
-from pyomo.environ import units as pyomo_units
 
+import os
+import logging
+from pyomo.environ import units as pyomo_units
 from .utils import load_yaml
+
+# Disable the "pint.util:Redefining 'Tt'" warning
+logging.getLogger("pint.util").setLevel(logging.ERROR)
 
 
 pyomo_units.load_definitions_from_file(

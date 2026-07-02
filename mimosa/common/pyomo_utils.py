@@ -126,11 +126,11 @@ class Equation(ABC):
 
             RegionalEquation(
                 lhs=m.regional_emissions,
-                rhs=lambda m, t, r: (1 - m.relative_abatement[t, r]) * m.baseline[t, r]
+                rhs=lambda m, t, r: (1 - m.relative_abatement[t, r]) * m.baseline_emissions[t, r]
             )
 
             which will be evaluated as:
-            m.regional_emissions[t, r] == (1 - m.relative_abatement[t, r]) * m.baseline[t, r]
+            m.regional_emissions[t, r] == (1 - m.relative_abatement[t, r]) * m.baseline_emissions[t, r]
 
         """
 

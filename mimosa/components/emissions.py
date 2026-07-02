@@ -58,7 +58,7 @@ def _set_baseline_emissions(m: AbstractModel) -> None:
     # Create a param for the regional cumulative baseline emissions
     def _calc_cum_baseline_emissions(m, t, r):
         values_t = range(t + 1)
-        values = [value(m.baseline_emissions[s, r]) for s in values_t]
+        values = [value(m.ssp_baseline_emissions[s, r]) for s in values_t]
         years = value(m.beginyear) + np.array(values_t) * value(m.dt)
         return trapezoid(values, years)
 
@@ -82,7 +82,7 @@ def _set_baseline_emissions(m: AbstractModel) -> None:
         m.t,
         m.regions,
         initialize=lambda m, t, r: (
-            m.baseline_emissions[t, r] / m.baseline_GDP[t - 1 if t > 1 else t, r]
+            m.ssp_baseline_emissions[t, r] / m.baseline_GDP[t - 1 if t > 1 else t, r]
         ),
         units=quant.unit("emissionsrate_unit/currency_unit"),
     )
@@ -168,10 +168,10 @@ def _get_emissions_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     constraints = []
 
     m.regional_emissions = Var(m.t, m.regions, units=quant.unit("emissionsrate_unit"))
-    m.baseline = Var(
+    m.baseline_emissions = Var(
         m.t,
         m.regions,
-        initialize=lambda m, t, r: m.baseline_emissions[t, r],
+        initialize=lambda m, t, r: m.ssp_baseline_emissions[t, r],
         units=quant.unit("emissionsrate_unit"),
     )
     m.use_carbon_intensity_for_baseline = Param(
@@ -197,14 +197,14 @@ def _get_emissions_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
         [
             # Baseline emissions based on emissions or carbon intensity
             RegionalEquation(
-                m.baseline,
+                m.baseline_emissions,
                 lambda m, t, r: (
                     (
                         m.baseline_carbon_intensity[t, r]
                         * (m.GDP_net[t - 1, r] if t > 1 else m.GDP_gross[t, r])
                     )
                     if value(m.use_carbon_intensity_for_baseline)
-                    else m.baseline_emissions[t, r]
+                    else m.ssp_baseline_emissions[t, r]
                 ),
             ),
             # Regional emissions from baseline and relative abatement
@@ -213,17 +213,17 @@ def _get_emissions_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
                 lambda m, t, r: (
                     (1 - m.relative_abatement[t, r])
                     * (
-                        m.baseline[t, r]
+                        m.baseline_emissions[t, r]
                         if value(m.use_carbon_intensity_for_baseline)
-                        else m.baseline_emissions[t, r]
+                        else m.ssp_baseline_emissions[t, r]
                     )
                     if t > 0
-                    else m.baseline_emissions[0, r]
+                    else m.ssp_baseline_emissions[0, r]
                 ),
             ),
             RegionalEquation(
                 m.regional_emission_reduction,
-                lambda m, t, r: m.baseline[t, r] - m.regional_emissions[t, r],
+                lambda m, t, r: m.baseline_emissions[t, r] - m.regional_emissions[t, r],
             ),
             # Global emissions (sum from regional emissions)
             GlobalEquation(
@@ -527,7 +527,7 @@ def _get_inertia_and_budget_constraints(
                     m.global_emissions[t] - m.global_emissions[t - 1]
                     >= m.dt
                     * m.inertia_global
-                    * sum(m.baseline_emissions[0, r] for r in m.regions)
+                    * sum(m.ssp_baseline_emissions[0, r] for r in m.regions)
                     if value(m.inertia_global) is not False and t > 0
                     else Constraint.Skip
                 ),
@@ -536,7 +536,7 @@ def _get_inertia_and_budget_constraints(
             RegionalConstraint(
                 lambda m, t, r: (
                     m.regional_emissions[t, r] - m.regional_emissions[t - 1, r]
-                    >= m.dt * m.inertia_regional * m.baseline_emissions[0, r]
+                    >= m.dt * m.inertia_regional * m.ssp_baseline_emissions[0, r]
                     if value(m.inertia_regional) is not False and t > 0
                     else Constraint.Skip
                 ),

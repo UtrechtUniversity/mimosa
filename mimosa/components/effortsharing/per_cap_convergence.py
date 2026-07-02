@@ -60,11 +60,11 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
 
     Finally, the allowances per region are added as constraint on the regional emissions. Since this regime needs
     [emission trading](emissiontrading.md) to avoid infeasibility, the regional emissions can be expressed as the baseline emissions
-    minus the reductions that this region needs to pay for (this is not necessarily equal to the regional emissions
+    minus the reductions that this region needs to pay for: the attributed emission reductions (this is not necessarily equal to the regional emissions
     in physical terms, as the region can buy or sell allowances from other regions):
 
     $$
-    \\text{allowances}_{t,r} = \\text{baseline emissions}_{t,r} - \\text{paid for emission reductions}_{t,r}
+    \\text{allowances}_{t,r} = \\text{baseline emissions}_{t,r} - \\text{attributed emission reductions}_{t,r}
     $$
 
 
@@ -75,8 +75,8 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     # )
     m.percapconv_share_init = Param(
         m.regions,
-        initialize=lambda m, r: m.baseline_emissions[0, r]
-        / sum(m.baseline_emissions[0, s] for s in m.regions),
+        initialize=lambda m, r: m.ssp_baseline_emissions[0, r]
+        / sum(m.ssp_baseline_emissions[0, s] for s in m.regions),
     )
     m.percapconv_year = Param(initialize=2050, doc="::effort sharing.percapconv_year")
     m.percapconv_share_pop = Param(

@@ -19,6 +19,7 @@ from mimosa.components import (
     welfare,
 )
 
+from mimosa.core.helpers import ComponentConfig
 
 ######################
 # Create model
@@ -26,12 +27,12 @@ from mimosa.components import (
 
 
 def create_abstract_model(
-    damage_module: str,
-    emissiontrade_module: str,
-    financialtransfer_module: str,
-    welfare_module: str,
-    objective_module: str,
-    effortsharing_regime: str,
+    damage_module: ComponentConfig,
+    emissiontrade_module: ComponentConfig,
+    financialtransfer_module: ComponentConfig,
+    welfare_module: ComponentConfig,
+    objective_module: ComponentConfig,
+    effortsharing_regime: ComponentConfig,
 ) -> AbstractModel:
     """
     ## Building the abstract model
@@ -85,7 +86,12 @@ def create_abstract_model(
         doc="timeandregional::GDP",
         units=quant.unit("currency_unit"),
     )
-    m.baseline_emissions = Param(
+    m.global_baseline_GDP = Param(
+        m.t,
+        initialize=lambda m, t: sum(m.baseline_GDP[t, r] for r in m.regions),
+        units=quant.unit("currency_unit"),
+    )
+    m.ssp_baseline_emissions = Param(
         m.t,
         m.regions,
         doc="timeandregional::emissions",
@@ -104,7 +110,9 @@ def create_abstract_model(
     constraints.extend(sealevelrise.get_constraints(m))
 
     # Damage costs
-    get_damage_constraints = load_from_registry(damage_module, damages.DAMAGE_MODULES)
+    get_damage_constraints = load_from_registry(
+        damage_module.module, damages.DAMAGE_MODULES
+    )
     constraints.extend(get_damage_constraints(m))
 
     # Abatement costs
@@ -112,19 +120,19 @@ def create_abstract_model(
 
     # Emission trading
     get_emissiontrade_constraints = load_from_registry(
-        emissiontrade_module, emissiontrade.EMISSIONTRADE_MODULES
+        emissiontrade_module.module, emissiontrade.EMISSIONTRADE_MODULES
     )
     constraints.extend(get_emissiontrade_constraints(m))
 
     # Financial transfer
     get_financialtransfer_constraints = load_from_registry(
-        financialtransfer_module, financialtransfer.FINANCIALTRANSFER_MODULES
+        financialtransfer_module.module, financialtransfer.FINANCIALTRANSFER_MODULES
     )
     constraints.extend(get_financialtransfer_constraints(m))
 
     # Effort sharing regime
     get_effortsharing_constraints = load_from_registry(
-        effortsharing_regime, effortsharing.EFFORTSHARING_MODULES
+        effortsharing_regime.module, effortsharing.EFFORTSHARING_MODULES
     )
     constraints.extend(get_effortsharing_constraints(m))
 
@@ -133,13 +141,13 @@ def create_abstract_model(
 
     # Utility and welfare
     get_welfare_constraints = load_from_registry(
-        welfare_module, welfare.WELFARE_MODULES
+        welfare_module.module, welfare.WELFARE_MODULES
     )
     constraints.extend(get_welfare_constraints(m))
 
     # Objective of optimisation
     get_objective_constraints = load_from_registry(
-        objective_module, objective.OBJECTIVE_MODULES
+        objective_module.module, objective.OBJECTIVE_MODULES
     )
     model_objective, objective_constraints = get_objective_constraints(m)
     constraints.extend(objective_constraints)

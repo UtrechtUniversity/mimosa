@@ -186,4 +186,33 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
         ]
     )
 
+    # GDP loss: takes into account indirect effects of reduced GDP growth due to damages and mitigation costs
+    m.GDP_loss = Var(
+        m.t,
+        m.regions,
+        units=quant.unit("fraction_of_baseline_GDP"),
+        initialize=0,
+    )
+    m.global_GDP_loss = Var(
+        m.t, units=quant.unit("fraction_of_baseline_GDP"), initialize=0
+    )
+
+    constraints.extend(
+        [
+            RegionalEquation(
+                m.GDP_loss,
+                lambda m, t, r: (
+                    (m.baseline_GDP[t, r] - m.GDP_net[t, r]) / m.baseline_GDP[t, r]
+                ),
+            ),
+            GlobalEquation(
+                m.global_GDP_loss,
+                lambda m, t: (
+                    (m.global_baseline_GDP[t] - m.global_GDP_net[t])
+                    / m.global_baseline_GDP[t]
+                ),
+            ),
+        ]
+    )
+
     return constraints

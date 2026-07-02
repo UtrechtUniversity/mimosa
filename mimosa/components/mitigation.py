@@ -141,20 +141,20 @@ def _get_mac_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     ```
 
     Since the MAC is expressed in terms of relative abatement, we still need to multiply by the baseline emissions to obtain
-    mitigation costs in currency unit (dollars). The area under the MAC is therefore calculated as:
+    mitigation costs in currency unit (dollars). The area under the MAC, also called the domestic mitigation costs, is therefore calculated as:
     
     $$
     \\begin{align}
-    \\text{area under MAC}_{t,r} &= \\left(\\int_0^{a_{t,r}} \\text{MAC}_{\\text{regional},t,r}(a)\\ da \\right) \\cdot \\text{baseline emissions}_{t,r}\\\\
+    \\text{domestic mitigation costs}_{t,r} &= \\left(\\int_0^{a_{t,r}} \\text{MAC}_{\\text{regional},t,r}(a)\\ da \\right) \\cdot \\text{baseline emissions}_{t,r}\\\\
     &= \\text{factor}_{t,r} \\cdot \\frac{\\gamma \\cdot a_{t,r}^{\\beta+1}}{\\beta+1} \\cdot \\text{baseline emissions}_{t,r}
     \\end{align}
     $$
 
-    Finally, the mitigation costs used in MIMOSA are equal to the area under the MAC, plus potentially import/export of mitigation
+    Finally, the mitigation costs used in MIMOSA are equal to the domestic mitigation costs, plus potentially import/export of mitigation
     costs if [emission trading](emissiontrading.md) is enabled:
 
     $$
-    \\text{mitigation costs}_{t,r} = \\text{area under MAC}_{t,r} + \\text{import/export mitigation cost balance}_{t,r}.
+    \\text{mitigation costs}_{t,r} = \\text{domestic mitigation costs}_{t,r} + \\text{import/export mitigation cost balance}_{t,r}.
     $$
 
 
@@ -222,7 +222,7 @@ def _get_mac_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
         initialize=0,
         units=quant.unit("currency_unit"),
     )
-    m.area_under_MAC = Var(
+    m.domestic_mitigation_costs = Var(
         m.t,
         m.regions,
         initialize=0,
@@ -234,19 +234,20 @@ def _get_mac_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     )
     constraints.extend(
         [
+            # Domestic mitigation costs: area under the MAC times baseline emissions,
+            # so the costs of mitigation in a region without taking into account emission trading
+            RegionalEquation(
+                m.domestic_mitigation_costs,
+                lambda m, t, r: AC(m.relative_abatement[t, r], m, t, r)
+                * m.baseline_emissions[t, r],
+            ),
+            # Total mitigation costs: domestic mitigation costs plus import/export of mitigation costs (if emission trading is enabled)
             RegionalEquation(
                 m.mitigation_costs,
                 lambda m, t, r: (
-                    AC(m.relative_abatement[t, r], m, t, r) * m.baseline[t, r]
-                    + m.import_export_mitigation_cost_balance[t, r]
+                    m.domestic_mitigation_costs[t, r]
+                    + m.mitigation_cost_trading_balance[t, r]
                 ),
-            ),
-            # Extra (dummy) constraint for the variable area_under_MAC, which is the same as the mitigation costs
-            # when no emission trading is enabled
-            RegionalEquation(
-                m.area_under_MAC,
-                lambda m, t, r: AC(m.relative_abatement[t, r], m, t, r)
-                * m.baseline[t, r],
             ),
             RegionalEquation(
                 m.rel_mitigation_costs,

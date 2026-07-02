@@ -68,7 +68,10 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
         GlobalEquation(
             m.effortsharing_AP_inv_correction_factor,
             lambda m, t: (
-                (sum(m.baseline[t, r] for r in m.regions) - m.global_emissions[t])
+                (
+                    sum(m.baseline_emissions[t, r] for r in m.regions)
+                    - m.global_emissions[t]
+                )
                 / soft_min(
                     sum(
                         m.effortsharing_AP_reductions_before_correction[t, r]
@@ -82,7 +85,7 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
         RegionalEquation(
             m.effortsharing_AP_allowances,
             lambda m, t, r: (
-                m.baseline[t, r]
+                m.baseline_emissions[t, r]
                 - m.effortsharing_AP_reductions_before_correction[t, r]
                 * m.effortsharing_AP_inv_correction_factor[t]
             ),
@@ -119,13 +122,13 @@ def ability_to_pay_rule(m, t, r):
     gdp_var = m.baseline_GDP  # or: m.GDP_net
     per_cap_gdp = gdp_var[t, r] / m.population[t, r]
     global_per_cap_gdp = sum(gdp_var[t, s] for s in m.regions) / m.global_population[t]
-    global_baseline_emissions = sum(m.baseline[t, s] for s in m.regions)
+    global_baseline_emissions = sum(m.baseline_emissions[t, s] for s in m.regions)
 
     reductions_before_correction = (
         (per_cap_gdp / global_per_cap_gdp) ** (1 / 3)
         * (global_baseline_emissions - m.global_emissions[t])
         / global_baseline_emissions
-        * m.baseline[t, r]
+        * m.baseline_emissions[t, r]
     )
 
     return reductions_before_correction
