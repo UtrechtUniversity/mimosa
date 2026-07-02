@@ -24,6 +24,7 @@ from .. import coacch
 from . import sealevelrise
 from . import riverine_flooding
 from . import labour_productivity
+from . import mortality
 
 
 def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
@@ -47,6 +48,9 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
 
     # Get constraints for labour productivity damages
     constraints.extend(labour_productivity.get_constraints(m))
+
+    # Get constraints for mortality
+    constraints.extend(mortality.get_constraints(m))
 
     # Add all non-SLR sectors together
 
