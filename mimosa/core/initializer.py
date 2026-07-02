@@ -10,6 +10,8 @@ from mimosa.abstract_model import create_abstract_model
 from mimosa.concrete_model.instantiate_params import InstantiatedModel
 from mimosa.concrete_model import custom_constraints
 
+from .helpers import ComponentConfig
+
 
 class Preprocessor:
     """
@@ -77,20 +79,23 @@ class Preprocessor:
         Returns:
             AbstractModel: model corresponding to the damage/objective module combination
         """
-        damage_module = self._params["model"]["damage module"]
-        emissiontrade_module = self._params["model"]["emissiontrade module"]
-        financialtransfer_module = self._params["model"]["financialtransfer module"]
-        welfare_module = self._params["model"]["welfare module"]
-        objective_module = self._params["model"]["objective module"]
-        effortsharing_regime = self._params["effort sharing"]["regime"]
+
+        def get_component_config(name):
+            """
+            Gets the module name in the parameter file, and any options for that module.
+            """
+            return ComponentConfig(
+                module=self._params["model"][f"{name} module"],
+                options=self._params["model"].get(f"{name} module options", {}),
+            )
 
         return create_abstract_model(
-            damage_module,
-            emissiontrade_module,
-            financialtransfer_module,
-            welfare_module,
-            objective_module,
-            effortsharing_regime,
+            get_component_config("damage"),
+            get_component_config("emissiontrade"),
+            get_component_config("financialtransfer"),
+            get_component_config("welfare"),
+            get_component_config("objective"),
+            ComponentConfig(self._params["effort sharing"]["regime"]),
         )
 
     def _load_data(self):
