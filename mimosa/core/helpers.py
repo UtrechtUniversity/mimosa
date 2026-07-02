@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Any
+from typing import Any, Dict
 
 
 @dataclass(frozen=True)
@@ -9,6 +9,6 @@ class ComponentConfig:
     """
 
     module: str
-    options: dict[str, Any] = field(
+    options: Dict[str, Any] = field(
         default_factory=dict
     )  # Use field to avoid shared dictionary between instances
