@@ -17,7 +17,7 @@ from mimosa.common import (
     NonNegativeReals,
 )
 
-from .utils import adaptation_effectiveness_fct
+from .utils import adaptation_effectiveness_fct, dmg_fct_power
 
 
 def get_constraints(m):
@@ -39,7 +39,19 @@ def get_constraints(m):
         m.regions, doc="regional::ACCREU.slr_noadapt_ead_power"
     )
 
-    constraints.append(RegionalEquation(m.slr_damage_costs_gross, gross_dmg_fct_slr))
+    constraints.append(
+        RegionalEquation(
+            m.slr_damage_costs_gross,
+            lambda m, t, r: dmg_fct_power(
+                m,
+                t,
+                m.slr_damages_gross_constant[r],
+                m.slr_damages_gross_prod[r],
+                m.slr_damages_gross_power[r],
+                x="total_SLR",
+            ),
+        )
+    )
 
     ## Adaptation:
 
@@ -102,15 +114,3 @@ def get_constraints(m):
     )
 
     return constraints
-
-
-def gross_dmg_fct_slr(m, t, r):
-
-    a = m.slr_damages_gross_constant[r]
-    b = m.slr_damages_gross_prod[r]
-    c = m.slr_damages_gross_power[r]
-
-    def fct(x):
-        return a + b * x**c
-
-    return fct(m.total_SLR[t]) - fct(m.total_SLR[0])
