@@ -555,6 +555,9 @@ regional_parameter_files:
     ACCREU_params_MIMOSA:
       filename: inputdata/regionalparams/ACCREU_params_MIMOSA.csv
       regionstype: IMAGE26
+    inequality:
+      filename: inputdata/regionalparams/20251104_GINI_big_county.csv
+      regionstype: IMAGE26
 
 ##################
 
