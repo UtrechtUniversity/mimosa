@@ -20,7 +20,7 @@ from mimosa.common import (
 from .utils import adaptation_effectiveness_fct
 
 
-def get_constraints(m):
+def get_constraints(m, with_combined_adaptation=True):
     """TODO"""
 
     constraints = []
@@ -50,74 +50,78 @@ def get_constraints(m):
 
     ## Adaptation:
 
-    m.riverine_adaptation_costs_abs = Var(
-        m.t,
-        m.regions,
-        units=quant.unit("currency_unit"),
-        bounds=lambda m, t, r: (0, 0.1 * m.baseline_GDP[t, r]),
-    )
-    m.riverine_adaptation_costs_abs_optimal = Var(
-        m.t, m.regions, units=quant.unit("currency_unit")
-    )
-    m.riverine_adaptation_costs = Var(
-        m.t, m.regions, units=quant.unit("fraction_of_GDP")
-    )
-    m.riverine_avoided_damages_adapt = Var(
-        m.t, m.regions, units=quant.unit("fraction_of_gross_damages"), bounds=(0, 1)
-    )
-    m.riverine_damage_costs_residual = Var(
-        m.t, m.regions, units=quant.unit("fraction_of_GDP")
-    )
-    m.riverine_damage_costs = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
+    if not with_combined_adaptation:
 
-    m.riverine_adaptation_max_effectiveness = Param(
-        m.regions, doc="regional::ACCREU.riverine_adapt_eff_max_effectiveness"
-    )
-    m.riverine_adaptation_cost_param = Param(
-        m.regions,
-        doc="regional::ACCREU.riverine_adapt_eff_cost_param",
-    )
+        m.riverine_adaptation_costs_abs = Var(
+            m.t,
+            m.regions,
+            units=quant.unit("currency_unit"),
+            bounds=lambda m, t, r: (0, 0.1 * m.baseline_GDP[t, r]),
+        )
+        m.riverine_adaptation_costs_abs_optimal = Var(
+            m.t, m.regions, units=quant.unit("currency_unit")
+        )
+        m.riverine_adaptation_costs = Var(
+            m.t, m.regions, units=quant.unit("fraction_of_GDP")
+        )
+        m.riverine_avoided_damages_adapt = Var(
+            m.t, m.regions, units=quant.unit("fraction_of_gross_damages"), bounds=(0, 1)
+        )
+        m.riverine_damage_costs_residual = Var(
+            m.t, m.regions, units=quant.unit("fraction_of_GDP")
+        )
+        m.riverine_damage_costs = Var(
+            m.t, m.regions, units=quant.unit("fraction_of_GDP")
+        )
 
-    constraints.extend(
-        [
-            # Adaptation effectiveness function
-            RegionalEquation(
-                m.riverine_avoided_damages_adapt,
-                lambda m, t, r: adaptation_effectiveness_fct(
-                    m.riverine_adaptation_costs_abs[t, r],
-                    m.riverine_adaptation_max_effectiveness[r],
-                    m.riverine_adaptation_cost_param[r],
+        m.riverine_adaptation_max_effectiveness = Param(
+            m.regions, doc="regional::ACCREU.riverine_adapt_eff_max_effectiveness"
+        )
+        m.riverine_adaptation_cost_param = Param(
+            m.regions,
+            doc="regional::ACCREU.riverine_adapt_eff_cost_param",
+        )
+
+        constraints.extend(
+            [
+                # Adaptation effectiveness function
+                RegionalEquation(
+                    m.riverine_avoided_damages_adapt,
+                    lambda m, t, r: adaptation_effectiveness_fct(
+                        m.riverine_adaptation_costs_abs[t, r],
+                        m.riverine_adaptation_max_effectiveness[r],
+                        m.riverine_adaptation_cost_param[r],
+                    ),
                 ),
-            ),
-            # Calculate analytically the optimal level of adaptation
-            # RegionalConstraint(
-            #     lambda m, t, r: m.riverine_adaptation_costs_abs[t, r]
-            #     <= optimal_adaptation_costs_fct(
-            #         m.riverine_damage_costs_gross_abs[t, r],
-            #         m.riverine_adaptation_max_effectiveness[r],
-            #         m.riverine_adaptation_cost_param[r],
-            #     ),
-            # ),
-            # Adaptation costs as a fraction of GDP
-            RegionalEquation(
-                m.riverine_adaptation_costs,
-                lambda m, t, r: m.riverine_adaptation_costs_abs[t, r]
-                / m.GDP_gross[t, r],
-            ),
-            # Residual damages after adaptation
-            RegionalEquation(
-                m.riverine_damage_costs_residual,
-                lambda m, t, r: m.riverine_damage_costs_gross[t, r]
-                * (1 - m.riverine_avoided_damages_adapt[t, r]),
-            ),
-            # Total damages after adaptation
-            RegionalEquation(
-                m.riverine_damage_costs,
-                lambda m, t, r: m.riverine_damage_costs_residual[t, r]
-                + m.riverine_adaptation_costs[t, r],
-            ),
-        ]
-    )
+                # Calculate analytically the optimal level of adaptation
+                # RegionalConstraint(
+                #     lambda m, t, r: m.riverine_adaptation_costs_abs[t, r]
+                #     <= optimal_adaptation_costs_fct(
+                #         m.riverine_damage_costs_gross_abs[t, r],
+                #         m.riverine_adaptation_max_effectiveness[r],
+                #         m.riverine_adaptation_cost_param[r],
+                #     ),
+                # ),
+                # Adaptation costs as a fraction of GDP
+                RegionalEquation(
+                    m.riverine_adaptation_costs,
+                    lambda m, t, r: m.riverine_adaptation_costs_abs[t, r]
+                    / m.GDP_gross[t, r],
+                ),
+                # Residual damages after adaptation
+                RegionalEquation(
+                    m.riverine_damage_costs_residual,
+                    lambda m, t, r: m.riverine_damage_costs_gross[t, r]
+                    * (1 - m.riverine_avoided_damages_adapt[t, r]),
+                ),
+                # Total damages after adaptation
+                RegionalEquation(
+                    m.riverine_damage_costs,
+                    lambda m, t, r: m.riverine_damage_costs_residual[t, r]
+                    + m.riverine_adaptation_costs[t, r],
+                ),
+            ]
+        )
 
     return constraints
 
