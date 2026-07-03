@@ -186,8 +186,7 @@ class Simulator:
         """
         Given a SimulationModel object, evaluates all equations for every timestep
         """
-        # First make sure simulation uses numpy-indices:
-        sim_m.set_index_numpy_index()
+
         for t in sim_m.t:
             for equation in self.equations_sorted:
                 # Check if we also need to loop over other dimensions (e.g. regions)
@@ -206,8 +205,6 @@ class Simulator:
                         value = equation(sim_m, t, *remaining_idx)
                         idx_with_t = (t,) + tuple(remaining_idx)
                         getattr(sim_m, equation.lhs)[idx_with_t] = value
-        # Set indices back to original names ('CAN', 'WEU', ...)
-        sim_m.set_index_names()
 
     def _dict_values_to_numpy(self, d):
         """
