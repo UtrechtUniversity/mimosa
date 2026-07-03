@@ -4,7 +4,7 @@ from mimosa.common import get_indices, Var, Param, Set, UsefulVar
 
 
 class SimVar:
-    def __init__(self, var, default_use_indexed=False):
+    def __init__(self, var):
 
         self._var = var
         index_set = var.index_set()
@@ -29,8 +29,6 @@ class SimVar:
             type_var = float
         self.values = np.empty(self.dims, dtype=type_var)
 
-        self.use_indexed = default_use_indexed
-
         # Get the values from the Pyomo Var or Param object:
         for i in self.index:
             # Most of the time, var[i] is a Var object. Get its value
@@ -48,36 +46,33 @@ class SimVar:
         except AttributeError:
             self.unit = None
 
-    def _index_or_slice(self, i, index):
+    def _position_index(self, key):
         """
-        If index is a slice, return it. Otherwise, return the position in the index.
-        This way, you can access a value using x['USA'] for one element, or x[:] for all items
-        """
-        if isinstance(index, slice):
-            return index
-        return self.index_to_position_map[i][index]
+        Convert external Pyomo-style index values to internal NumPy positions.
 
-    def _position_index(self, indices):
+        Examples:
+            "CAN" -> 0
+            (2020, "CAN") -> (0, 0)
         """
-        Converts indices (like 'USA') to position in the index (like 0).
-        If the index is a slice, it returns the slice as is.
-        """
-        if not isinstance(indices, tuple):
-            indices = (indices,)
-        return tuple(self._index_or_slice(i, index) for i, index in enumerate(indices))
+        if isinstance(key, tuple):
+            if len(key) == 2:
+                # Often, we have two indices: time and region. In that case, we can use a faster lookup.
+                return (
+                    self.index_to_position_map[0][key[0]],
+                    self.index_to_position_map[1][key[1]],
+                )
+            return tuple(self.index_to_position_map[i][k] for i, k in enumerate(key))
+        return self.index_to_position_map[0][key]
 
     def __getitem__(self, key):
-        if self.use_indexed:
-            # If use_indexed is True, we use the indexed method
-            return self.get_indexed(key)
-        return self.values[key]
+        return self.values[self._position_index(key)]
 
     def __setitem__(self, key, value):
-        if self.use_indexed:
-            # If use_indexed is True, we use the indexed method
-            self.set_indexed(key, value)
-            return
-        self.values[key] = value
+        self.values[self._position_index(key)] = value
+
+    def get_positional(self, key):
+        """Returns the value given the index position (e.g. 0 instead of 'USA')."""
+        return self.values[key]
 
     def get_indexed(self, index):
         """Returns the value given the index value, not index position (e.g. 'USA' instead of 0)."""
@@ -91,6 +86,10 @@ class SimVar:
         """Sets the value given the index value, not index position (e.g. 'USA' instead of 0)."""
         self.values[self._position_index(index)] = value
 
+    def set_positional(self, key, value):
+        """Sets the value given the index position (e.g. 0 instead of 'USA')."""
+        self.values[key] = value
+
     def __repr__(self):
         values_str = str(self.values)
         if len(values_str) > 50:
@@ -100,7 +99,7 @@ class SimVar:
 
     def copy(self):
         """Returns a copy of the SimVar object."""
-        new_var = SimVar(self._var, self.use_indexed)
+        new_var = SimVar(self._var)
         new_var.values = np.copy(self.values)
         return new_var
 
@@ -124,27 +123,10 @@ class SimulationObjectModel:
             if not index_set.name.startswith("_"):
                 self.index_sets.append(index_set.name)
                 index_set_names = index_set.ordered_data()
-                index_set_numpy_index = list(range(len(index_set_names)))
-                setattr(self, index_set.name + "_names", index_set_names)
-                setattr(self, index_set.name + "_numpy_index", index_set_numpy_index)
-        # By default, use numpy indices as sets:
-        self.set_index_numpy_index()
+                setattr(self, index_set.name, index_set_names)
+
         # Add custom elements
         self.year = concrete_model.year
-
-    def set_index_numpy_index(self):
-        """
-        Sets the index sets (m.t, m.regions, ...) to numpy indices (0, 1, 2...)
-        """
-        for index_set in self.index_sets:
-            setattr(self, index_set, getattr(self, index_set + "_numpy_index"))
-
-    def set_index_names(self):
-        """
-        Sets the index sets (m.t, m.regions, ...) to their original names ('CAN', 'USA', ...)
-        """
-        for index_set in self.index_sets:
-            setattr(self, index_set, getattr(self, index_set + "_names"))
 
     def all_vars_for_export(self):
         return [SimulationUsefulVar(self, name) for name in self.all_vars]
