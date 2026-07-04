@@ -75,4 +75,35 @@ def get_constraints(m):
         )
     )
 
+    # Calculate the monetary damages from mortality, using the value of a statistical life (VSL)
+    m.mortality_svl_rel_gdp_per_cap = Param(
+        doc="::economics.damages.accreu.mortality_svl_rel_gdp_cap"
+    )
+    m.monetise_mortality = Param(doc="::economics.damages.accreu.monetise_mortality")
+
+    m.mortality_svl = Var(
+        m.t, m.regions, units=quant.unit("currency_unit/population_unit")
+    )
+    m.mortality_damage_costs_abs = Var(
+        m.t, m.regions, units=quant.unit("currency_unit")
+    )
+
+    constraints.extend(
+        [
+            RegionalEquation(
+                m.mortality_svl,
+                lambda m, t, r: (
+                    m.mortality_svl_rel_gdp_per_cap if m.monetise_mortality else 0
+                )
+                * m.GDP_gross[t, r]
+                / m.population[t, r],
+            ),
+            RegionalEquation(
+                m.mortality_damage_costs_abs,
+                lambda m, t, r: m.mortality_svl[t, r]
+                * (m.mortality_heat_related[t, r] + m.mortality_cold_related[t, r]),
+            ),
+        ]
+    )
+
     return constraints
