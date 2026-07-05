@@ -85,7 +85,13 @@ def get_constraints(m, monetise_mortality=False):
             m.t, m.regions, units=quant.unit("currency_unit/population_unit")
         )
         m.mortality_damage_costs_abs = Var(
-            m.t, m.regions, units=quant.unit("currency_unit")
+            m.t,
+            m.regions,
+            units=quant.unit("currency_unit"),
+            bounds=lambda m, t, r: (
+                -0.1 * m.baseline_GDP[t, r],
+                0.5 * m.baseline_GDP[t, r],
+            ),
         )
         constraints.extend(
             [
