@@ -281,17 +281,11 @@ economics:
       default: False
     
     accreu:
-      monetise_mortality:
-        descr: >-
-          Flag for whether the mortality should be monetised using the SVL
-          (Statistical Value of Life)
-        type: bool
-        default: False
-        
+
       mortality_svl_rel_gdp_cap:
         descr: >-
-          If accreu_monetise_mortality, use this value for the Statistical Value of
-          Life (SVL), expressed as multiple of the GDP per capita.
+          If params['model']['damage module options']['ACCREU_monetise_mortality'], use this
+          value for the Statistical Value of Life (SVL), expressed as multiple of the GDP per capita.
           Note: while this assumes a global value of the SVL in relative terms,
           the dollar value of the SVL differs per country. This has ethical implications.
         type: float
@@ -479,6 +473,13 @@ model:
         - combined
         - separate
       default: combined
+    
+    ACCREU_monetise_mortality:
+        descr: >-
+          Flag for whether the mortality should be monetised using the SVL
+          (Statistical Value of Life)
+        type: bool
+        default: False
 
   emissiontrade module:
     descr: Emission trade module to be used

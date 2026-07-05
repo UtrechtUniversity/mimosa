@@ -177,11 +177,12 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
             ),
             RegionalEquation(
                 m.investments,
-                lambda m, t, r: (m.sr * m.GDP_net[t, r]),
+                lambda m, t, r: m.sr * m.GDP_net[t, r],
             ),
             RegionalEquation(
                 m.consumption,
-                lambda m, t, r: ((1 - m.sr) * m.GDP_net[t, r]),
+                lambda m, t, r: (1 - m.sr) * m.GDP_net[t, r]
+                - m.non_market_damage_costs_abs[t, r],
             ),
         ]
     )

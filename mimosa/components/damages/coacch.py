@@ -48,6 +48,9 @@ def get_constraints(
     m.damage_costs = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
     m.damage_costs_abs = Var(m.t, m.regions, units=quant.unit("currency_unit"))
     m.damage_scale_factor = Param(doc="::economics.damages.scale factor")
+    m.non_market_damage_costs_abs = Param(
+        m.t, m.regions, initialize=0.0, units=quant.unit("currency_unit")
+    )
     m.damage_relative_global = Var(
         m.t,
         units=quant.unit("fraction_of_GDP"),

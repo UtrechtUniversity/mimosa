@@ -69,7 +69,10 @@ def get_constraints(
         constraints.extend(combined_nslr_adaptation.get_constraints(m))
 
     # Get constraints for mortality
-    constraints.extend(mortality.get_constraints(m))
+    monetise_mortality = options.get("ACCREU_monetise_mortality")
+    constraints.extend(
+        mortality.get_constraints(m, monetise_mortality=monetise_mortality)
+    )
 
     # Add all non-SLR sectors together
 

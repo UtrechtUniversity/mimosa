@@ -20,7 +20,7 @@ from mimosa.common import (
 from .utils import adaptation_effectiveness_fct, dmg_fct_linear, dmg_fct_power
 
 
-def get_constraints(m):
+def get_constraints(m, monetise_mortality=False):
     """TODO"""
 
     constraints = []
@@ -79,31 +79,37 @@ def get_constraints(m):
     m.mortality_svl_rel_gdp_per_cap = Param(
         doc="::economics.damages.accreu.mortality_svl_rel_gdp_cap"
     )
-    m.monetise_mortality = Param(doc="::economics.damages.accreu.monetise_mortality")
 
-    m.mortality_svl = Var(
-        m.t, m.regions, units=quant.unit("currency_unit/population_unit")
-    )
+    if monetise_mortality:
+        m.mortality_svl = Var(
+            m.t, m.regions, units=quant.unit("currency_unit/population_unit")
+        )
+        constraints.append(
+            RegionalEquation(
+                m.mortality_svl,
+                lambda m, t, r: m.mortality_svl_rel_gdp_per_cap
+                * m.GDP_gross[t, r]
+                / m.population[t, r],
+            )
+        )
+    else:
+        m.mortality_svl = Param(
+            m.t,
+            m.regions,
+            units=quant.unit("currency_unit/population_unit"),
+            initialize=0.0,
+        )
+
     m.mortality_damage_costs_abs = Var(
         m.t, m.regions, units=quant.unit("currency_unit")
     )
 
-    constraints.extend(
-        [
-            RegionalEquation(
-                m.mortality_svl,
-                lambda m, t, r: (
-                    m.mortality_svl_rel_gdp_per_cap if m.monetise_mortality else 0
-                )
-                * m.GDP_gross[t, r]
-                / m.population[t, r],
-            ),
-            RegionalEquation(
-                m.mortality_damage_costs_abs,
-                lambda m, t, r: m.mortality_svl[t, r]
-                * (m.mortality_heat_related[t, r] + m.mortality_cold_related[t, r]),
-            ),
-        ]
+    constraints.append(
+        RegionalEquation(
+            m.mortality_damage_costs_abs,
+            lambda m, t, r: m.mortality_svl[t, r]
+            * (m.mortality_heat_related[t, r] + m.mortality_cold_related[t, r]),
+        )
     )
 
     return constraints
