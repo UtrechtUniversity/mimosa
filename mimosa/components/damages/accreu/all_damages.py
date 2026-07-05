@@ -117,9 +117,20 @@ def get_constraints(
     )
 
     ## Non-market damages:
-    m.non_market_damage_costs_abs = Var(
-        m.t, m.regions, units=quant.unit("currency_unit")
-    )
+    if monetise_mortality:
+        m.non_market_damage_costs_abs = Var(
+            m.t, m.regions, units=quant.unit("currency_unit")
+        )
+        constraints.append(
+            RegionalEquation(
+                m.non_market_damage_costs_abs,
+                lambda m, t, r: m.mortality_damage_costs_abs[t, r],
+            )
+        )
+    else:
+        m.non_market_damage_costs_abs = Param(
+            m.t, m.regions, units=quant.unit("currency_unit"), initialize=0.0
+        )
     m.market_and_non_market_damage_costs_abs = Var(
         m.t, m.regions, units=quant.unit("currency_unit")
     )
@@ -129,10 +140,6 @@ def get_constraints(
 
     constraints.extend(
         [
-            RegionalEquation(
-                m.non_market_damage_costs_abs,
-                lambda m, t, r: m.mortality_damage_costs_abs[t, r],
-            ),
             RegionalEquation(
                 m.market_and_non_market_damage_costs_abs,
                 lambda m, t, r: m.damage_costs_abs[t, r]

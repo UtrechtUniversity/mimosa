@@ -84,32 +84,23 @@ def get_constraints(m, monetise_mortality=False):
         m.mortality_svl = Var(
             m.t, m.regions, units=quant.unit("currency_unit/population_unit")
         )
-        constraints.append(
-            RegionalEquation(
-                m.mortality_svl,
-                lambda m, t, r: m.mortality_svl_rel_gdp_per_cap
-                * m.GDP_gross[t, r]
-                / m.population[t, r],
-            )
+        m.mortality_damage_costs_abs = Var(
+            m.t, m.regions, units=quant.unit("currency_unit")
         )
-    else:
-        m.mortality_svl = Param(
-            m.t,
-            m.regions,
-            units=quant.unit("currency_unit/population_unit"),
-            initialize=0.0,
+        constraints.extend(
+            [
+                RegionalEquation(
+                    m.mortality_svl,
+                    lambda m, t, r: m.mortality_svl_rel_gdp_per_cap
+                    * m.GDP_gross[t, r]
+                    / m.population[t, r],
+                ),
+                RegionalEquation(
+                    m.mortality_damage_costs_abs,
+                    lambda m, t, r: m.mortality_svl[t, r]
+                    * (m.mortality_heat_related[t, r] + m.mortality_cold_related[t, r]),
+                ),
+            ]
         )
-
-    m.mortality_damage_costs_abs = Var(
-        m.t, m.regions, units=quant.unit("currency_unit")
-    )
-
-    constraints.append(
-        RegionalEquation(
-            m.mortality_damage_costs_abs,
-            lambda m, t, r: m.mortality_svl[t, r]
-            * (m.mortality_heat_related[t, r] + m.mortality_cold_related[t, r]),
-        )
-    )
 
     return constraints
