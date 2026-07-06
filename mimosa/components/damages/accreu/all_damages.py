@@ -17,6 +17,7 @@ from mimosa.common import (
     exp,
     quant,
     NonNegativeReals,
+    ModelContext,
 )
 
 
@@ -30,7 +31,7 @@ from . import (
 
 
 def get_constraints(
-    m: AbstractModel, options: dict = None
+    m: AbstractModel, context: ModelContext
 ) -> Sequence[GeneralConstraint]:
     """
     ACCREU damage specification
@@ -42,7 +43,7 @@ def get_constraints(
 
     # In the config, the user can choose whether to use the separate adaptation module for ACCREU or not.
     # This is done using the parameter params["model"]["damage module options"]["ACCREU adaptation"] = "separate" or "combined"
-    combined_adaptation = options.get("ACCREU adaptation") == "combined"
+    combined_adaptation = context.option("damage", "ACCREU adaptation") == "combined"
 
     constraints = []
 
@@ -69,7 +70,7 @@ def get_constraints(
         constraints.extend(combined_nslr_adaptation.get_constraints(m))
 
     # Get constraints for mortality
-    monetise_mortality = options.get("ACCREU_monetise_mortality")
+    monetise_mortality = context.option("damage", "ACCREU_monetise_mortality")
     constraints.extend(
         mortality.get_constraints(m, monetise_mortality=monetise_mortality)
     )
