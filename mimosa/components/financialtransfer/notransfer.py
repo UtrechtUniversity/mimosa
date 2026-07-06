@@ -5,10 +5,12 @@ Type: no transfer
 """
 
 from typing import Sequence
-from mimosa.common import AbstractModel, GeneralConstraint, quant, Param
+from mimosa.common import AbstractModel, GeneralConstraint, quant, Param, ModelContext
 
 
-def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
+def get_constraints(
+    m: AbstractModel, context: ModelContext
+) -> Sequence[GeneralConstraint]:
     """
     Without financial transfers, this variable is always equal to zero:
 

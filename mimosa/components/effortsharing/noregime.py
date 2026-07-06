@@ -4,10 +4,12 @@ Effort sharing
 """
 
 from typing import Sequence
-from mimosa.common import AbstractModel, GeneralConstraint
+from mimosa.common import AbstractModel, GeneralConstraint, ModelContext
 
 
-def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
+def get_constraints(
+    m: AbstractModel, context: ModelContext
+) -> Sequence[GeneralConstraint]:
     """
     Usage:
     ```python hl_lines="2"

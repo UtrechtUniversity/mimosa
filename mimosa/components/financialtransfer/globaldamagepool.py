@@ -14,10 +14,13 @@ from mimosa.common import (
     Constraint,
     Var,
     quant,
+    ModelContext,
 )
 
 
-def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
+def get_constraints(
+    m: AbstractModel, context: ModelContext
+) -> Sequence[GeneralConstraint]:
     """
     When allowing financial transfers for a global damage cost pool, a region can
     receive financial transfers up to its level of climate damages:

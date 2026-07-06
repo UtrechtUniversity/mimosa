@@ -18,10 +18,13 @@ from mimosa.common import (
     quant,
     value,
     soft_min,
+    ModelContext,
 )
 
 
-def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
+def get_constraints(
+    m: AbstractModel, context: ModelContext
+) -> Sequence[GeneralConstraint]:
     """
     Usage:
     ```python hl_lines="2-9"

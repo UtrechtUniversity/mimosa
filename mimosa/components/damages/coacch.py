@@ -16,10 +16,13 @@ from mimosa.common import (
     Any,
     exp,
     quant,
+    ModelContext,
 )
 
 
-def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
+def get_constraints(
+    m: AbstractModel, context: ModelContext
+) -> Sequence[GeneralConstraint]:
     """
     The COACCH damage functions are split in two parts: temperature-dependent damages (non-SLR, as a function
     of global mean temperature above pre-industrial), and sea-level rise damages (SLR, as function of global mean
