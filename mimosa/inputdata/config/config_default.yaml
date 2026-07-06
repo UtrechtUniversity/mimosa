@@ -461,6 +461,7 @@ model structure:
       values:
         - combined
         - separate
+        - noadaptation
       default: combined
     
     ACCREU_monetise_mortality:

@@ -20,14 +20,12 @@ from mimosa.common import (
 from .utils import adaptation_effectiveness_fct, dmg_fct_power
 
 
-def get_constraints(m):
+def get_constraints(m, adaptation_type):
     """TODO"""
 
     constraints = []
 
     ## Gross damages:
-
-    m.slr_damage_costs_gross = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
 
     m.slr_damages_gross_constant = Param(
         m.regions, doc="regional::ACCREU.slr_noadapt_ead_constant"
@@ -39,9 +37,19 @@ def get_constraints(m):
         m.regions, doc="regional::ACCREU.slr_noadapt_ead_power"
     )
 
+    damage_cost_gross_var_name = (
+        "slr_damage_costs"
+        if adaptation_type == "noadaptation"
+        else "slr_damage_costs_gross"
+    )
+    setattr(
+        m,
+        damage_cost_gross_var_name,
+        Var(m.t, m.regions, units=quant.unit("fraction_of_GDP")),
+    )
     constraints.append(
         RegionalEquation(
-            m.slr_damage_costs_gross,
+            getattr(m, damage_cost_gross_var_name),
             lambda m, t, r: dmg_fct_power(
                 m,
                 t,
@@ -54,63 +62,67 @@ def get_constraints(m):
     )
 
     ## Adaptation:
+    if adaptation_type != "noadaptation":
 
-    m.slr_adaptation_costs_abs = Var(
-        m.t,
-        m.regions,
-        units=quant.unit("currency_unit"),
-        bounds=lambda m, t, r: (0, 0.1 * m.baseline_GDP[t, r]),
-    )
-    m.slr_adaptation_costs_abs_optimal = Var(
-        m.t, m.regions, units=quant.unit("currency_unit")
-    )
-    m.slr_adaptation_costs = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
-    m.slr_avoided_damages_adapt = Var(
-        m.t, m.regions, units=quant.unit("fraction_of_gross_damages"), bounds=(0, 1)
-    )
-    m.slr_damage_costs_residual = Var(
-        m.t, m.regions, units=quant.unit("fraction_of_GDP")
-    )
-    m.slr_damage_costs = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
+        m.slr_adaptation_costs_abs = Var(
+            m.t,
+            m.regions,
+            units=quant.unit("currency_unit"),
+            bounds=lambda m, t, r: (0, 0.1 * m.baseline_GDP[t, r]),
+        )
+        m.slr_adaptation_costs_abs_optimal = Var(
+            m.t, m.regions, units=quant.unit("currency_unit")
+        )
+        m.slr_adaptation_costs = Var(
+            m.t, m.regions, units=quant.unit("fraction_of_GDP")
+        )
+        m.slr_avoided_damages_adapt = Var(
+            m.t, m.regions, units=quant.unit("fraction_of_gross_damages"), bounds=(0, 1)
+        )
+        m.slr_damage_costs_residual = Var(
+            m.t, m.regions, units=quant.unit("fraction_of_GDP")
+        )
+        m.slr_damage_costs = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
 
-    m.slr_adaptation_max_effectiveness = Param(
-        m.regions,
-        doc="regional::ACCREU.slr_adapt_eff_max_effectiveness",
-    )
-    m.slr_adaptation_cost_param = Param(
-        m.regions,
-        doc="regional::ACCREU.slr_adapt_eff_cost_param",
-    )
+        m.slr_adaptation_max_effectiveness = Param(
+            m.regions,
+            doc="regional::ACCREU.slr_adapt_eff_max_effectiveness",
+        )
+        m.slr_adaptation_cost_param = Param(
+            m.regions,
+            doc="regional::ACCREU.slr_adapt_eff_cost_param",
+        )
 
-    constraints.extend(
-        [
-            # Adaptation effectiveness function
-            RegionalEquation(
-                m.slr_avoided_damages_adapt,
-                lambda m, t, r: adaptation_effectiveness_fct(
-                    m.slr_adaptation_costs_abs[t, r],
-                    m.slr_adaptation_max_effectiveness[r],
-                    m.slr_adaptation_cost_param[r],
+        constraints.extend(
+            [
+                # Adaptation effectiveness function
+                RegionalEquation(
+                    m.slr_avoided_damages_adapt,
+                    lambda m, t, r: adaptation_effectiveness_fct(
+                        m.slr_adaptation_costs_abs[t, r],
+                        m.slr_adaptation_max_effectiveness[r],
+                        m.slr_adaptation_cost_param[r],
+                    ),
                 ),
-            ),
-            # Adaptation costs as a fraction of GDP
-            RegionalEquation(
-                m.slr_adaptation_costs,
-                lambda m, t, r: m.slr_adaptation_costs_abs[t, r] / m.GDP_gross[t, r],
-            ),
-            # Residual damages after adaptation
-            RegionalEquation(
-                m.slr_damage_costs_residual,
-                lambda m, t, r: m.slr_damage_costs_gross[t, r]
-                * (1 - m.slr_avoided_damages_adapt[t, r]),
-            ),
-            # Total damages after adaptation
-            RegionalEquation(
-                m.slr_damage_costs,
-                lambda m, t, r: m.slr_damage_costs_residual[t, r]
-                + m.slr_adaptation_costs[t, r],
-            ),
-        ]
-    )
+                # Adaptation costs as a fraction of GDP
+                RegionalEquation(
+                    m.slr_adaptation_costs,
+                    lambda m, t, r: m.slr_adaptation_costs_abs[t, r]
+                    / m.GDP_gross[t, r],
+                ),
+                # Residual damages after adaptation
+                RegionalEquation(
+                    m.slr_damage_costs_residual,
+                    lambda m, t, r: m.slr_damage_costs_gross[t, r]
+                    * (1 - m.slr_avoided_damages_adapt[t, r]),
+                ),
+                # Total damages after adaptation
+                RegionalEquation(
+                    m.slr_damage_costs,
+                    lambda m, t, r: m.slr_damage_costs_residual[t, r]
+                    + m.slr_adaptation_costs[t, r],
+                ),
+            ]
+        )
 
     return constraints

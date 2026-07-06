@@ -20,7 +20,7 @@ from mimosa.common import (
 from .utils import adaptation_effectiveness_fct, dmg_fct_linear
 
 
-def get_constraints(m, with_combined_adaptation=True):
+def get_constraints(m, adaptation_type):
     """TODO"""
 
     constraints = []
@@ -63,7 +63,7 @@ def get_constraints(m, with_combined_adaptation=True):
 
     ## Adaptation (only for costs, doesn't apply to benefits):
 
-    if not with_combined_adaptation:
+    if adaptation_type == "separate":
 
         m.labourprod_adaptation_costs_abs = Var(
             m.t,
@@ -127,6 +127,18 @@ def get_constraints(m, with_combined_adaptation=True):
                     + m.labourprod_adaptation_costs[t, r],
                 ),
             ]
+        )
+
+    elif adaptation_type == "noadaptation":
+        m.labourprod_damage_costs = Var(
+            m.t, m.regions, units=quant.unit("fraction_of_GDP")
+        )
+        constraints.append(
+            RegionalEquation(
+                m.labourprod_damage_costs,
+                lambda m, t, r: m.labourprod_damage_costs_gross[t, r]
+                + m.labourprod_damage_costs_benefits[t, r],
+            )
         )
 
     return constraints

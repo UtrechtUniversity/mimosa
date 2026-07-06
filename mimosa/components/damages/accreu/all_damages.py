@@ -42,29 +42,25 @@ def get_constraints(
     """
 
     # In the config, the user can choose whether to use the separate adaptation module for ACCREU or not.
-    # This is done using the parameter params["model"]["damage module options"]["ACCREU adaptation"] = "separate" or "combined"
-    combined_adaptation = context.option("damage", "ACCREU adaptation") == "combined"
+    # This is done using the parameter params["model structure"]["damage module options"]["ACCREU adaptation"] = "separate" or "combined"
+    adaptation_type = context.option("damage", "ACCREU adaptation")
 
     constraints = []
 
     # Get constraints for sea-level rise damages
-    constraints.extend(sealevelrise.get_constraints(m))
+    constraints.extend(sealevelrise.get_constraints(m, adaptation_type=adaptation_type))
 
     # Get constraints for riverine flooding damages
     constraints.extend(
-        riverine_flooding.get_constraints(
-            m, with_combined_adaptation=combined_adaptation
-        )
+        riverine_flooding.get_constraints(m, adaptation_type=adaptation_type)
     )
 
     # Get constraints for labour productivity damages
     constraints.extend(
-        labour_productivity.get_constraints(
-            m, with_combined_adaptation=combined_adaptation
-        )
+        labour_productivity.get_constraints(m, adaptation_type=adaptation_type)
     )
 
-    if combined_adaptation:
+    if adaptation_type == "combined":
         # Get constraints for combined adaptation costs, which combines labour productivity and riverine flooding adaptation costs
         # Only if the user has chosen to use the combined adaptation module for ACCREU
         constraints.extend(combined_nslr_adaptation.get_constraints(m))
@@ -95,7 +91,7 @@ def get_constraints(
                         lambda m, t, r: m.combined_labprod_riv_damage_costs[t, r]
                         + m.slr_damage_costs[t, r]
                     )
-                    if combined_adaptation
+                    if adaptation_type == "combined"
                     else (
                         lambda m, t, r: m.labourprod_damage_costs[t, r]
                         + m.riverine_damage_costs[t, r]

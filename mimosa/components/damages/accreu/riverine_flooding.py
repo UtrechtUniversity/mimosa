@@ -20,7 +20,7 @@ from mimosa.common import (
 from .utils import adaptation_effectiveness_fct
 
 
-def get_constraints(m, with_combined_adaptation=True):
+def get_constraints(m, adaptation_type):
     """TODO"""
 
     constraints = []
@@ -30,9 +30,6 @@ def get_constraints(m, with_combined_adaptation=True):
     # m.riverine_damage_costs_gross_abs = Var(
     #     m.t, m.regions, units=quant.unit("currency_unit")
     # )
-    m.riverine_damage_costs_gross = Var(
-        m.t, m.regions, units=quant.unit("fraction_of_GDP")
-    )
 
     m.riverine_damages_gross_constant = Param(
         m.regions, doc="regional::ACCREU.riverine_noadapt_ead_constant"
@@ -44,13 +41,24 @@ def get_constraints(m, with_combined_adaptation=True):
         m.regions, doc="regional::ACCREU.riverine_noadapt_ead_quadr"
     )
 
+    damage_cost_gross_var_name = (
+        "riverine_damage_costs"
+        if adaptation_type == "noadaptation"
+        else "riverine_damage_costs_gross"
+    )
+    setattr(
+        m,
+        damage_cost_gross_var_name,
+        Var(m.t, m.regions, units=quant.unit("fraction_of_GDP")),
+    )
+
     constraints.append(
-        RegionalEquation(m.riverine_damage_costs_gross, gross_dmg_fct_riverine)
+        RegionalEquation(getattr(m, damage_cost_gross_var_name), gross_dmg_fct_riverine)
     )
 
     ## Adaptation:
 
-    if not with_combined_adaptation:
+    if adaptation_type in "separate":
 
         m.riverine_adaptation_costs_abs = Var(
             m.t,
