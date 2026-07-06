@@ -23,3 +23,6 @@ class ModelContext:
 
     def options(self, name: str) -> Dict[str, Any]:
         return self.components[name].options if name in self.components else {}
+
+    def option(self, component: str, option: str, default=None):
+        return self.options(component).get(option, default)
