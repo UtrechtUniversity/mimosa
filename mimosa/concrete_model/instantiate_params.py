@@ -34,7 +34,7 @@ class InstantiatedModel:
         return self.abstract_model.create_instance(self.instance_data)
 
     def get_param_values(self):
-        damage_module = self.params["model"]["damage module"]
+        damage_module = self.params["model structure"]["damage module"]
 
         instance_data = {None: {}}
 

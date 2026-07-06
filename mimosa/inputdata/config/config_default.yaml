@@ -353,17 +353,6 @@ emissions:
 ##################
 
 effort sharing:
-  regime:
-    descr: Type of effort sharing to be used
-    type: enum
-    values:
-      - noregime
-      - equal_mitigation_costs
-      - equal_total_costs
-      - per_cap_convergence
-      - ability_to_pay
-      - equal_cumulative_per_cap
-    default: noregime
   percapconv_year:
     descr: >-
       Year of convergence to per capita emission allowance 
@@ -434,7 +423,7 @@ temperature:
 
 ##################
 
-model:
+model structure:
   damage module:
     descr: Damage module to be used
     type: enum
@@ -459,6 +448,18 @@ model:
       - notransfer
       - globaldamagepool
     default: notransfer
+
+  effortsharing module:
+      descr: Type of effort sharing to be used
+      type: enum
+      values:
+        - noregime
+        - equal_mitigation_costs
+        - equal_total_costs
+        - per_cap_convergence
+        - ability_to_pay
+        - equal_cumulative_per_cap
+      default: noregime
 
   welfare module:
     descr: Welfare and utility module to be used

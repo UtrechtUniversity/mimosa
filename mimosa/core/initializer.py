@@ -1,3 +1,5 @@
+import warnings
+
 from mimosa.common import (
     AbstractModel,
     ConcreteModel,
@@ -72,7 +74,7 @@ class Preprocessor:
         self.parser_tree = parser_tree
 
     def _create_model_context(self) -> ModelContext:
-        model_params = self._params["model"]
+        model_params = self._params["model structure"]
 
         def registry_component(name):
             return ComponentConfig(
@@ -90,12 +92,9 @@ class Preprocessor:
                 "damage": registry_component("damage"),
                 "emissiontrade": registry_component("emissiontrade"),
                 "financialtransfer": registry_component("financialtransfer"),
+                "effortsharing": registry_component("effortsharing"),
                 "welfare": registry_component("welfare"),
                 "objective": registry_component("objective"),
-                "effortsharing": ComponentConfig(
-                    module=self._params["effort sharing"]["regime"],
-                    options=self._params["effort sharing"].get("regime options", {}),
-                ),
                 # Fixed/non-registry components
                 "emissions": fixed_component("emissions"),
                 "sealevelrise": fixed_component("sealevelrise"),
