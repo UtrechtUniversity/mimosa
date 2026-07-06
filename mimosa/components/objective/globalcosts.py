@@ -16,10 +16,13 @@ from mimosa.common import (
     Var,
     exp,
     minimize,
+    ModelContext,
 )
 
 
-def get_constraints(m: AbstractModel) -> Tuple[Objective, Sequence[GeneralConstraint]]:
+def get_constraints(
+    m: AbstractModel, context: ModelContext
+) -> Tuple[Objective, Sequence[GeneralConstraint]]:
     """Equations and constraints for the objective of the optimisation
     (global costs specification)
 

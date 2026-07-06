@@ -16,11 +16,12 @@ from mimosa.common import (
     Any,
     exp,
     quant,
+    ModelContext,
 )
 
 
 def get_constraints(
-    m: AbstractModel, options: dict = None
+    m: AbstractModel, context: ModelContext
 ) -> Sequence[GeneralConstraint]:
     """
     The COACCH damage functions are split in two parts: temperature-dependent damages (non-SLR, as a function

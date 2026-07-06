@@ -1,6 +1,5 @@
 from mimosa import MIMOSA, load_params
 
-
 # Loop over the three available effort sharing regimes
 for regime in [
     "equal_mitigation_costs",
@@ -10,9 +9,9 @@ for regime in [
     "equal_cumulative_per_cap",
 ]:
     params = load_params()
-    params["effort sharing"]["regime"] = regime
-    params["model"]["emissiontrade module"] = "emissiontrade"
-    params["model"]["welfare module"] = "cost_minimising"
+    params["model structure"]["effortsharing module"] = regime
+    params["model structure"]["emissiontrade module"] = "emissiontrade"
+    params["model structure"]["welfare module"] = "cost_minimising"
     params["emissions"]["carbonbudget"] = "700 GtCO2"
     params["emissions"]["baseline carbon intensity"] = False  # (1)!
     params["economics"]["MAC"]["rel_mitigation_costs_min_level"] = -0.5  # (2)!

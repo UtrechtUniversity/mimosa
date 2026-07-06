@@ -13,10 +13,13 @@ from mimosa.common import (
     GlobalEquation,
     NonNegativeReals,
     quant,
+    ModelContext,
 )
 
 
-def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
+def get_constraints(
+    m: AbstractModel, context: ModelContext
+) -> Sequence[GeneralConstraint]:
     """
     The sea-level rise (SLR) module is based on the AD-RICE 2012 model ([Kelly de Bruin, 2014](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2600006)),
     which in itself is based on RICE 2010. It consists of sea-level rise contributions from thermal expansion, glaciers and small ice caps (GSIC),

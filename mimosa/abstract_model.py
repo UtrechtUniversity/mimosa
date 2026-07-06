@@ -4,7 +4,15 @@ Abstract representation of the model
 Contains all model equations and constraints
 """
 
-from mimosa.common import Param, AbstractModel, Set, add_constraint, quant, Equation
+from mimosa.common import (
+    Param,
+    AbstractModel,
+    Set,
+    add_constraint,
+    quant,
+    Equation,
+    ModelContext,
+)
 from mimosa.common.utils import load_from_registry
 from mimosa.components import (
     effortsharing,
@@ -19,20 +27,13 @@ from mimosa.components import (
     welfare,
 )
 
-from mimosa.core.helpers import ComponentConfig
-
 ######################
 # Create model
 ######################
 
 
 def create_abstract_model(
-    damage_module: ComponentConfig,
-    emissiontrade_module: ComponentConfig,
-    financialtransfer_module: ComponentConfig,
-    welfare_module: ComponentConfig,
-    objective_module: ComponentConfig,
-    effortsharing_regime: ComponentConfig,
+    context: ModelContext,
 ) -> AbstractModel:
     """
     ## Building the abstract model
@@ -104,52 +105,52 @@ def create_abstract_model(
     ######################
 
     # Emissions and temperature equations
-    constraints.extend(emissions.get_constraints(m))
+    constraints.extend(emissions.get_constraints(m, context))
 
     # Sea level rise
-    constraints.extend(sealevelrise.get_constraints(m))
+    constraints.extend(sealevelrise.get_constraints(m, context))
 
     # Damage costs
     get_damage_constraints = load_from_registry(
-        damage_module.module, damages.DAMAGE_MODULES
+        context.module("damage"), damages.DAMAGE_MODULES
     )
-    constraints.extend(get_damage_constraints(m, damage_module.options))
+    constraints.extend(get_damage_constraints(m, context))
 
     # Abatement costs
-    constraints.extend(mitigation.get_constraints(m))
+    constraints.extend(mitigation.get_constraints(m, context))
 
     # Emission trading
     get_emissiontrade_constraints = load_from_registry(
-        emissiontrade_module.module, emissiontrade.EMISSIONTRADE_MODULES
+        context.module("emissiontrade"), emissiontrade.EMISSIONTRADE_MODULES
     )
-    constraints.extend(get_emissiontrade_constraints(m))
+    constraints.extend(get_emissiontrade_constraints(m, context))
 
     # Financial transfer
     get_financialtransfer_constraints = load_from_registry(
-        financialtransfer_module.module, financialtransfer.FINANCIALTRANSFER_MODULES
+        context.module("financialtransfer"), financialtransfer.FINANCIALTRANSFER_MODULES
     )
-    constraints.extend(get_financialtransfer_constraints(m))
+    constraints.extend(get_financialtransfer_constraints(m, context))
 
     # Effort sharing regime
     get_effortsharing_constraints = load_from_registry(
-        effortsharing_regime.module, effortsharing.EFFORTSHARING_MODULES
+        context.module("effortsharing"), effortsharing.EFFORTSHARING_MODULES
     )
-    constraints.extend(get_effortsharing_constraints(m))
+    constraints.extend(get_effortsharing_constraints(m, context))
 
     # Cobb-Douglas and economics
-    constraints.extend(cobbdouglas.get_constraints(m))
+    constraints.extend(cobbdouglas.get_constraints(m, context))
 
     # Utility and welfare
     get_welfare_constraints = load_from_registry(
-        welfare_module.module, welfare.WELFARE_MODULES
+        context.module("welfare"), welfare.WELFARE_MODULES
     )
-    constraints.extend(get_welfare_constraints(m))
+    constraints.extend(get_welfare_constraints(m, context))
 
     # Objective of optimisation
     get_objective_constraints = load_from_registry(
-        objective_module.module, objective.OBJECTIVE_MODULES
+        context.module("objective"), objective.OBJECTIVE_MODULES
     )
-    model_objective, objective_constraints = get_objective_constraints(m)
+    model_objective, objective_constraints = get_objective_constraints(m, context)
     constraints.extend(objective_constraints)
 
     ######################

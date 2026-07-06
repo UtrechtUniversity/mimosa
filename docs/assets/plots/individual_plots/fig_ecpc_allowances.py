@@ -12,7 +12,7 @@ def create_fig():
     params = mimosa.load_params()
     params["time"]["end"] = 2100
     params["effort sharing"]["regime"] = "equal_cumulative_per_cap"
-    params["model"]["emissiontrade module"] = "emissiontrade"
+    params["model structure"]["emissiontrade module"] = "emissiontrade"
     m = MIMOSA(params, prerun=False).concrete_model
     t = list(m.t)
 

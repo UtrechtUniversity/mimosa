@@ -21,10 +21,13 @@ from mimosa.common import (
     value,
     quant,
     trapezoid,
+    ModelContext,
 )
 
 
-def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
+def get_constraints(
+    m: AbstractModel, context: ModelContext
+) -> Sequence[GeneralConstraint]:
     """
 
     === ":octicons-cloud-24: Baseline and mitigated emissions"

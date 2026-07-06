@@ -15,12 +15,15 @@ from mimosa.common import (
     Constraint,
     NonNegativeReals,
     quant,
+    ModelContext,
 )
 
 from mimosa.components.mitigation import AC
 
 
-def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
+def get_constraints(
+    m: AbstractModel, context: ModelContext
+) -> Sequence[GeneralConstraint]:
     """Emission trading equations and constraints
     (global cost pool specification)
 

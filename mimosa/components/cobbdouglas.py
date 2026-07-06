@@ -15,10 +15,13 @@ from mimosa.common import (
     soft_min,
     economics,
     quant,
+    ModelContext,
 )
 
 
-def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
+def get_constraints(
+    m: AbstractModel, context: ModelContext
+) -> Sequence[GeneralConstraint]:
     """
     # Economic module and production function
 

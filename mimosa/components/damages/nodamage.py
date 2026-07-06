@@ -11,11 +11,12 @@ from mimosa.common import (
     RegionalEquation,
     Param,
     quant,
+    ModelContext,
 )
 
 
 def get_constraints(
-    m: AbstractModel, options: dict = None
+    m: AbstractModel, context: ModelContext
 ) -> Sequence[GeneralConstraint]:
     """Damage and adaptation costs equations and constraints
     (no-damage specification)

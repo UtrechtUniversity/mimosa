@@ -12,10 +12,13 @@ from mimosa.common import (
     quant,
     RegionalEquation,
     Var,
+    ModelContext,
 )
 
 
-def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
+def get_constraints(
+    m: AbstractModel, context: ModelContext
+) -> Sequence[GeneralConstraint]:
     """
     Without emission trading, the import/export of emission reductions and mitigation costs is always zero:
 

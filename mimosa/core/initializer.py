@@ -1,16 +1,18 @@
+import warnings
+
 from mimosa.common import (
     AbstractModel,
     ConcreteModel,
     data,
     regional_params,
     TransformationFactory,
+    ModelContext,
+    ComponentConfig,
 )
 from mimosa.common.config.parseconfig import check_params, parse_param_values
 from mimosa.abstract_model import create_abstract_model
 from mimosa.concrete_model.instantiate_params import InstantiatedModel
 from mimosa.concrete_model import custom_constraints
-
-from .helpers import ComponentConfig
 
 
 class Preprocessor:
@@ -71,6 +73,36 @@ class Preprocessor:
         self._params = params
         self.parser_tree = parser_tree
 
+    def _create_model_context(self) -> ModelContext:
+        model_params = self._params["model structure"]
+
+        def registry_component(name):
+            return ComponentConfig(
+                module=model_params[f"{name} module"],
+                options=model_params.get(f"{name} module options", {}),
+            )
+
+        def fixed_component(name):
+            return ComponentConfig(
+                options=model_params.get(f"{name} options", {}),
+            )
+
+        return ModelContext(
+            components={
+                "damage": registry_component("damage"),
+                "emissiontrade": registry_component("emissiontrade"),
+                "financialtransfer": registry_component("financialtransfer"),
+                "effortsharing": registry_component("effortsharing"),
+                "welfare": registry_component("welfare"),
+                "objective": registry_component("objective"),
+                # Fixed/non-registry components
+                "emissions": fixed_component("emissions"),
+                "sealevelrise": fixed_component("sealevelrise"),
+                "mitigation": fixed_component("mitigation"),
+                "cobbdouglas": fixed_component("cobbdouglas"),
+            }
+        )
+
     def _create_abstract_model(self) -> AbstractModel:
         """
         Loads all the equations and creates an abstract_model.
@@ -79,24 +111,9 @@ class Preprocessor:
         Returns:
             AbstractModel: model corresponding to the damage/objective module combination
         """
+        context = self._create_model_context()
 
-        def get_component_config(name):
-            """
-            Gets the module name in the parameter file, and any options for that module.
-            """
-            return ComponentConfig(
-                module=self._params["model"][f"{name} module"],
-                options=self._params["model"].get(f"{name} module options", {}),
-            )
-
-        return create_abstract_model(
-            get_component_config("damage"),
-            get_component_config("emissiontrade"),
-            get_component_config("financialtransfer"),
-            get_component_config("welfare"),
-            get_component_config("objective"),
-            ComponentConfig(self._params["effort sharing"]["regime"]),
-        )
+        return create_abstract_model(context)
 
     def _load_data(self):
         """

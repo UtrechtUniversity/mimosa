@@ -18,10 +18,13 @@ from mimosa.common import (
     quant,
     value,
     soft_min,
+    ModelContext,
 )
 
 
-def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
+def get_constraints(
+    m: AbstractModel, context: ModelContext
+) -> Sequence[GeneralConstraint]:
     """
     Usage:
     ```python hl_lines="2-9"
@@ -30,7 +33,7 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     params["effort sharing"]["percapconv_year"] = 2050
 
     # Per-capita convergence needs emission trading to avoid infeasibility
-    params["model"]["emissiontrade module"] = "emissiontrade"
+    params["model structure"]["emissiontrade module"] = "emissiontrade"
     # And financial transfers higher than just emission trading need to be enabled
     # (therefore allowing for negative mitigation costs)
     params["economics"]["MAC"]["rel_mitigation_costs_min_level"] = -0.5
