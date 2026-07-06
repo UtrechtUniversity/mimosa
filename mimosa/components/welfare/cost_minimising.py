@@ -12,11 +12,14 @@ from mimosa.common import (
     GeneralConstraint,
     RegionalEquation,
     GlobalEquation,
+    ModelContext,
 )
 from .utility_fct import calc_utility
 
 
-def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
+def get_constraints(
+    m: AbstractModel, context: ModelContext
+) -> Sequence[GeneralConstraint]:
     """
 
     <h3>Cost-minimising setting</h3>

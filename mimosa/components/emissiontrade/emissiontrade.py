@@ -13,10 +13,13 @@ from mimosa.common import (
     RegionalSoftEqualityConstraint,
     value,
     soft_min,
+    ModelContext,
 )
 
 
-def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
+def get_constraints(
+    m: AbstractModel, context: ModelContext
+) -> Sequence[GeneralConstraint]:
     """
     In MIMOSA, every region can reduce its own emissions. The price for this is determined
     by the area under the MAC (see [Mitigation](mitigation.md#mitigation-costs)). On top of that,

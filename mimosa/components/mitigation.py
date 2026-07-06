@@ -18,10 +18,13 @@ from mimosa.common import (
     log,
     soft_min,
     quant,
+    ModelContext,
 )
 
 
-def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
+def get_constraints(
+    m: AbstractModel, context: ModelContext
+) -> Sequence[GeneralConstraint]:
     """
 
     === ":material-chart-bell-curve-cumulative: Marginal Abatement Costs (MAC) and mitigation costs"

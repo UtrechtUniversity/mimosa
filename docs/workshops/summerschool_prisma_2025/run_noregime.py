@@ -2,7 +2,7 @@ from mimosa import MIMOSA, load_params
 
 params = load_params()
 
-params["model"]["welfare module"] = "cost_minimising"
+params["model structure"]["welfare module"] = "cost_minimising"
 params["emissions"]["carbonbudget"] = "700 GtCO2"
 params["time"]["end"] = 2100
 

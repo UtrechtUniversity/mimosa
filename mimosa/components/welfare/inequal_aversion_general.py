@@ -13,10 +13,13 @@ from mimosa.common import (
     RegionalEquation,
     GlobalEquation,
     soft_min,
+    ModelContext,
 )
 
 
-def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
+def get_constraints(
+    m: AbstractModel, context: ModelContext
+) -> Sequence[GeneralConstraint]:
     """
     <h3>General inequality aversion</h3>
 

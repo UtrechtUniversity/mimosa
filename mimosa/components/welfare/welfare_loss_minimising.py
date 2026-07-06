@@ -11,11 +11,14 @@ from mimosa.common import (
     GeneralConstraint,
     GlobalEquation,
     RegionalEquation,
+    ModelContext,
 )
 from .utility_fct import calc_utility
 
 
-def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
+def get_constraints(
+    m: AbstractModel, context: ModelContext
+) -> Sequence[GeneralConstraint]:
     """
 
     <h3>Welfare-loss-minimising setting</h3>
