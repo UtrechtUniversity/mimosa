@@ -160,6 +160,7 @@ class MIMOSA:
             model.save("run1")
         """
         self.last_saved_filename = filename
+        logger.info("Saving to %s", filename)
         save_output_pyomo(self._params, self.concrete_model, filename, **kwargs)
 
     def save_simulation(self, simulation_obj, filename, **kwargs):
@@ -176,6 +177,7 @@ class MIMOSA:
             model.save_simulation(simulation, "nopolicy_baseline")
         """
         self.last_saved_simulation_filename = filename
+        logger.info("Saving simulation to %s", filename)
         save_output(
             simulation_obj.all_vars_for_export(),
             self._params,
