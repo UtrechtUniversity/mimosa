@@ -464,6 +464,13 @@ model structure:
         - noadaptation
       default: combined
     
+    ACCREU_adaptation_impose_optimal:
+      descr: >-
+        Calculate the optimal level of adaptation analytically, instead of letting MIMOSA
+        optimise it. Useful to have optimal adaptation in simulation mode.
+      type: bool
+      default: false
+    
     ACCREU_monetise_mortality:
         descr: >-
           Flag for whether the mortality should be monetised using the SVL

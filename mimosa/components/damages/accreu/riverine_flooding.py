@@ -69,9 +69,6 @@ def get_constraints(m, context: ModelContext):
             units=quant.unit("currency_unit"),
             bounds=lambda m, t, r: (0, 0.1 * m.baseline_GDP[t, r]),
         )
-        m.riverine_adaptation_costs_abs_optimal = Var(
-            m.t, m.regions, units=quant.unit("currency_unit")
-        )
         m.riverine_adaptation_costs = Var(
             m.t, m.regions, units=quant.unit("fraction_of_GDP")
         )
@@ -104,15 +101,6 @@ def get_constraints(m, context: ModelContext):
                         m.riverine_adaptation_cost_param[r],
                     ),
                 ),
-                # Calculate analytically the optimal level of adaptation
-                RegionalEquation(
-                    m.riverine_adaptation_costs_abs_optimal,
-                    lambda m, t, r: optimal_adaptation_costs_fct(
-                        m.riverine_damage_costs_gross[t, r] * m.GDP_gross[t, r],
-                        m.riverine_adaptation_max_effectiveness[r],
-                        m.riverine_adaptation_cost_param[r],
-                    ),
-                ),
                 # Adaptation costs as a fraction of GDP
                 RegionalEquation(
                     m.riverine_adaptation_costs,
@@ -133,6 +121,22 @@ def get_constraints(m, context: ModelContext):
                 ),
             ]
         )
+
+        impose_optimal_adaptation = context.option(
+            "damage", "ACCREU_adaptation_impose_optimal"
+        )
+        if impose_optimal_adaptation:
+            constraints.append(
+                # Calculate analytically the optimal level of adaptation
+                RegionalEquation(
+                    m.riverine_adaptation_costs_abs,
+                    lambda m, t, r: optimal_adaptation_costs_fct(
+                        m.riverine_damage_costs_gross[t, r] * m.GDP_gross[t, r],
+                        m.riverine_adaptation_max_effectiveness[r],
+                        m.riverine_adaptation_cost_param[r],
+                    ),
+                )
+            )
 
     return constraints
 
