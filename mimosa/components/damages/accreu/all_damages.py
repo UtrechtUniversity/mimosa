@@ -41,11 +41,16 @@ def get_constraints(
 
     """
 
+    constraints = []
+
     # In the config, the user can choose whether to use the separate adaptation module for ACCREU or not.
     # This is done using the parameter params["model structure"]["damage module options"]["ACCREU adaptation"] = "separate" or "combined"
     adaptation_type = context.option("damage", "ACCREU adaptation")
 
-    constraints = []
+    if adaptation_type != "noadaptation":
+        m.adaptation_effectiveness_scale_factor = Param(
+            doc="::economics.damages.accreu.adaptation_effectiveness_scale_factor"
+        )
 
     # Get constraints for sea-level rise damages
     constraints.extend(sealevelrise.get_constraints(m, context))

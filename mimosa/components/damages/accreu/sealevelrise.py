@@ -105,6 +105,7 @@ def get_constraints(m, context: ModelContext):
                         m.slr_adaptation_costs_abs[t, r],
                         m.slr_adaptation_max_effectiveness[r],
                         m.slr_adaptation_cost_param[r],
+                        m.adaptation_effectiveness_scale_factor,
                     ),
                 ),
                 # Adaptation costs as a fraction of GDP
@@ -140,7 +141,7 @@ def get_constraints(m, context: ModelContext):
                         m.slr_damage_costs_gross[t, r] * m.GDP_gross[t, r],
                         m.slr_adaptation_max_effectiveness[r],
                         m.slr_adaptation_cost_param[r],
-                        scale=0.002,
+                        scale=0.00001,
                     ),
                 )
             )

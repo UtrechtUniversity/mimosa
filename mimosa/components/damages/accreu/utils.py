@@ -1,13 +1,19 @@
 from mimosa.common import exp, log, soft_min
 
 
-def adaptation_effectiveness_fct(adapt_costs, max_effectiveness, cost_param):
+def adaptation_effectiveness_fct(
+    adapt_costs, max_effectiveness, cost_param, effectiveness_scale_factor=1
+):
     """
     Adaptation effectiveness function, based on the fitted function in ACCREU:
     Avoided damages = max_effectiveness * (1 - exp(-cost_param * adapt_costs))
     """
 
-    return max_effectiveness * (1 - exp(-cost_param * adapt_costs))
+    return (
+        effectiveness_scale_factor
+        * max_effectiveness
+        * (1 - exp(-cost_param * adapt_costs))
+    )
 
 
 def dmg_fct_linear(m, t, a, b):

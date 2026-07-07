@@ -79,6 +79,7 @@ def get_constraints(m, context: ModelContext):
                     m.combined_labprod_riv_adaptation_costs_abs[t, r],
                     m.combined_labprod_riv_adaptation_max_effectiveness[r],
                     m.combined_labprod_riv_adaptation_cost_param[r],
+                    m.adaptation_effectiveness_scale_factor,
                 ),
             ),
             # Adaptation costs as a fraction of GDP

@@ -291,7 +291,15 @@ economics:
         type: float
         default: 117.59
         can_be_false: False
-
+      
+      adaptation_effectiveness_scale_factor:
+        descr: >-
+          Scales the max. effectiveness factor for the sectoral adaptation. Used to analyse
+          the effects of a less effective adaptation.
+        type: float
+        default: 1
+        min: 0
+        max: 1
 
 ##################
 
