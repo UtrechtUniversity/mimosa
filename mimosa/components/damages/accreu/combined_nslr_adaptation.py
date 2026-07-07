@@ -17,7 +17,7 @@ from mimosa.common import (
     NonNegativeReals,
 )
 
-from .utils import adaptation_effectiveness_fct
+from .utils import adaptation_effectiveness_fct, optimal_adaptation_costs_fct
 
 
 def get_constraints(m):
@@ -46,6 +46,9 @@ def get_constraints(m):
         m.regions,
         units=quant.unit("currency_unit"),
         bounds=lambda m, t, r: (0, 0.1 * m.baseline_GDP[t, r]),
+    )
+    m.combined_labprod_riv_adaptation_costs_abs_optimal = Var(
+        m.t, m.regions, units=quant.unit("currency_unit")
     )
     m.combined_labprod_riv_adaptation_costs = Var(
         m.t, m.regions, units=quant.unit("fraction_of_GDP")
@@ -76,6 +79,15 @@ def get_constraints(m):
                 m.combined_labprod_riv_avoided_damages_adapt,
                 lambda m, t, r: adaptation_effectiveness_fct(
                     m.combined_labprod_riv_adaptation_costs_abs[t, r],
+                    m.combined_labprod_riv_adaptation_max_effectiveness[r],
+                    m.combined_labprod_riv_adaptation_cost_param[r],
+                ),
+            ),
+            # Calculate analytically the optimal level of adaptation
+            RegionalEquation(
+                m.combined_labprod_riv_adaptation_costs_abs_optimal,
+                lambda m, t, r: optimal_adaptation_costs_fct(
+                    m.combined_labprod_riv_damage_costs_gross[t, r] * m.GDP_gross[t, r],
                     m.combined_labprod_riv_adaptation_max_effectiveness[r],
                     m.combined_labprod_riv_adaptation_cost_param[r],
                 ),

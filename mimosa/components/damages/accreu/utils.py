@@ -1,4 +1,4 @@
-from mimosa.common import exp
+from mimosa.common import exp, log, soft_min
 
 
 def adaptation_effectiveness_fct(adapt_costs, max_effectiveness, cost_param):
@@ -29,3 +29,9 @@ def dmg_fct_power(m, t, a, b, c, x="temperature"):
     x_t = getattr(m, x)[t]
     x_0 = getattr(m, x)[0]
     return fct(x_t) - fct(x_0)
+
+
+def optimal_adaptation_costs_fct(gross_damages_abs, a, b, scale=0.01):
+    if a * b == 0:
+        return 0
+    return soft_min(log(a * b * soft_min(gross_damages_abs, scale)) / b, scale)

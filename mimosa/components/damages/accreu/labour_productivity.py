@@ -17,7 +17,11 @@ from mimosa.common import (
     NonNegativeReals,
 )
 
-from .utils import adaptation_effectiveness_fct, dmg_fct_linear
+from .utils import (
+    adaptation_effectiveness_fct,
+    dmg_fct_linear,
+    optimal_adaptation_costs_fct,
+)
 
 
 def get_constraints(m, adaptation_type):
@@ -103,6 +107,15 @@ def get_constraints(m, adaptation_type):
                     m.labourprod_avoided_damages_adapt,
                     lambda m, t, r: adaptation_effectiveness_fct(
                         m.labourprod_adaptation_costs_abs[t, r],
+                        m.labourprod_adaptation_max_effectiveness[r],
+                        m.labourprod_adaptation_cost_param[r],
+                    ),
+                ),
+                # Calculate analytically the optimal level of adaptation
+                RegionalEquation(
+                    m.labourprod_adaptation_costs_abs_optimal,
+                    lambda m, t, r: optimal_adaptation_costs_fct(
+                        m.labourprod_damage_costs_gross[t, r] * m.GDP_gross[t, r],
                         m.labourprod_adaptation_max_effectiveness[r],
                         m.labourprod_adaptation_cost_param[r],
                     ),

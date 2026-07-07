@@ -17,7 +17,7 @@ from mimosa.common import (
     NonNegativeReals,
 )
 
-from .utils import adaptation_effectiveness_fct
+from .utils import adaptation_effectiveness_fct, optimal_adaptation_costs_fct
 
 
 def get_constraints(m, adaptation_type):
@@ -102,14 +102,14 @@ def get_constraints(m, adaptation_type):
                     ),
                 ),
                 # Calculate analytically the optimal level of adaptation
-                # RegionalConstraint(
-                #     lambda m, t, r: m.riverine_adaptation_costs_abs[t, r]
-                #     <= optimal_adaptation_costs_fct(
-                #         m.riverine_damage_costs_gross_abs[t, r],
-                #         m.riverine_adaptation_max_effectiveness[r],
-                #         m.riverine_adaptation_cost_param[r],
-                #     ),
-                # ),
+                RegionalEquation(
+                    m.riverine_adaptation_costs_abs_optimal,
+                    lambda m, t, r: optimal_adaptation_costs_fct(
+                        m.riverine_damage_costs_gross[t, r] * m.GDP_gross[t, r],
+                        m.riverine_adaptation_max_effectiveness[r],
+                        m.riverine_adaptation_cost_param[r],
+                    ),
+                ),
                 # Adaptation costs as a fraction of GDP
                 RegionalEquation(
                     m.riverine_adaptation_costs,
@@ -159,9 +159,3 @@ def gross_dmg_fct_riverine(m, t, r):
 #     return fct(m.year(t) - 2020, m.temperature[t]) - fct(
 #         m.year(0) - 2020, m.temperature[0]
 #     )
-
-
-def optimal_adaptation_costs_fct(gross_damages_abs, a, b):
-    if a * b == 0:
-        return 0
-    return soft_min(log(a * b * soft_min(gross_damages_abs, 0.01)) / b, 0.01)
