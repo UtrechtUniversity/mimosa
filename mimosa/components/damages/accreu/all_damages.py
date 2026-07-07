@@ -48,22 +48,18 @@ def get_constraints(
     constraints = []
 
     # Get constraints for sea-level rise damages
-    constraints.extend(sealevelrise.get_constraints(m, adaptation_type=adaptation_type))
+    constraints.extend(sealevelrise.get_constraints(m, context))
 
     # Get constraints for riverine flooding damages
-    constraints.extend(
-        riverine_flooding.get_constraints(m, adaptation_type=adaptation_type)
-    )
+    constraints.extend(riverine_flooding.get_constraints(m, context))
 
     # Get constraints for labour productivity damages
-    constraints.extend(
-        labour_productivity.get_constraints(m, adaptation_type=adaptation_type)
-    )
+    constraints.extend(labour_productivity.get_constraints(m, context))
 
     if adaptation_type == "combined":
         # Get constraints for combined adaptation costs, which combines labour productivity and riverine flooding adaptation costs
         # Only if the user has chosen to use the combined adaptation module for ACCREU
-        constraints.extend(combined_nslr_adaptation.get_constraints(m))
+        constraints.extend(combined_nslr_adaptation.get_constraints(m, context))
 
     # Get constraints for mortality
     monetise_mortality = context.option("damage", "ACCREU_monetise_mortality")

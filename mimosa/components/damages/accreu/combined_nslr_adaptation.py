@@ -15,12 +15,13 @@ from mimosa.common import (
     log,
     quant,
     NonNegativeReals,
+    ModelContext,
 )
 
 from .utils import adaptation_effectiveness_fct, optimal_adaptation_costs_fct
 
 
-def get_constraints(m):
+def get_constraints(m, context: ModelContext):
     """
     Adaptation for the non-SLR damages combined (labour productivity + riverine flooding).
 

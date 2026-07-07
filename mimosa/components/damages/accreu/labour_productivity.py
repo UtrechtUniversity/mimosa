@@ -15,6 +15,7 @@ from mimosa.common import (
     log,
     quant,
     NonNegativeReals,
+    ModelContext,
 )
 
 from .utils import (
@@ -24,10 +25,12 @@ from .utils import (
 )
 
 
-def get_constraints(m, adaptation_type):
+def get_constraints(m, context: ModelContext):
     """TODO"""
 
     constraints = []
+
+    adaptation_type = context.option("damage", "ACCREU adaptation")
 
     ## Gross damages:
 
