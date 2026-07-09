@@ -25,6 +25,7 @@ from mimosa.components import (
     objective,
     sealevelrise,
     welfare,
+    tippingpoints,
 )
 
 ######################
@@ -106,6 +107,9 @@ def create_abstract_model(
 
     # Emissions and temperature equations
     constraints.extend(emissions.get_constraints(m, context))
+
+    # Tipping points
+    constraints.extend(tippingpoints.get_constraints(m, context))
 
     # Sea level rise
     constraints.extend(sealevelrise.get_constraints(m, context))

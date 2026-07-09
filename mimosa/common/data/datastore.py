@@ -103,7 +103,7 @@ class DataStore:
             unit = quantity.units
 
         # 2. Extrapolate this data to beyond 2100
-        extra_years = np.arange(2110, 2260, 10)
+        extra_years = np.arange(2110, 2400, 10)
         extended_data = extrapolate(
             values, years, extra_years, [var_info["variable"], region]
         )
