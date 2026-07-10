@@ -451,6 +451,7 @@ model structure:
     values:
       - COACCH
       - ACCREU
+      - ACCREU_CGE
       - nodamage
     default: COACCH
   
@@ -581,6 +582,9 @@ regional_parameter_files:
       regionstype: COACCH
     ACCREU:
       filename: inputdata/regionalparams/ACCREU.csv
+      regionstype: IMAGE26
+    ACCREU_CGE:
+      filename: inputdata/regionalparams/ACCREU_CGE.csv
       regionstype: IMAGE26
 
 ##################
