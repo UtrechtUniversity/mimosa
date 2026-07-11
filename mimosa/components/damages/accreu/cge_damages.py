@@ -85,12 +85,19 @@ def get_constraints_temperature_dependent(
 
     # Quadratic damage function for non-SLR damages. Factor `a` represents
     # the damage quantile
+    m.temperature_1995_2014 = Param(initialize=0.85, units=quant.unit("degC_above_PI"))
     constraints.append(
         RegionalEquation(
             m.damage_costs_non_slr,
             lambda m, t, r: (
                 m.damage_scale_factor
-                * damage_fct(m.temperature[t] - 0.6, m.T0 - 0.6, m, r, is_slr=False)
+                * damage_fct(
+                    m.temperature[t] - m.temperature_1995_2014,
+                    m.T0 - m.temperature_1995_2014,
+                    m,
+                    r,
+                    is_slr=False,
+                )
             ),
         )
     )
