@@ -41,7 +41,7 @@ def get_constraints(
         [
             RegionalEquation(
                 m.damage_costs,
-                lambda m, t, r: m.damage_costs_non_slr[t, r] + m.damage_costs_slr[t, r],
+                lambda m, t, r: m.non_slr_damage_costs[t, r] + m.slr_damage_costs[t, r],
             ),
             RegionalEquation(
                 m.damage_costs_abs,
@@ -73,7 +73,7 @@ def get_constraints_temperature_dependent(
     constraints = []
 
     # Damages not related to SLR (dependent on temperature)
-    m.damage_costs_non_slr = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
+    m.non_slr_damage_costs = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
 
     m.damage_noslr_b1 = Param(m.regions, doc="regional::ACCREU_CGE.NoSLR_b1")
     m.damage_noslr_b2 = Param(m.regions, doc="regional::ACCREU_CGE.NoSLR_b2")
@@ -88,7 +88,7 @@ def get_constraints_temperature_dependent(
     m.temperature_1995_2014 = Param(initialize=0.85, units=quant.unit("degC_above_PI"))
     constraints.append(
         RegionalEquation(
-            m.damage_costs_non_slr,
+            m.non_slr_damage_costs,
             lambda m, t, r: (
                 m.damage_scale_factor
                 * damage_fct(
@@ -110,7 +110,7 @@ def get_constraints_slr(m: AbstractModel) -> Sequence[GeneralConstraint]:
     constraints = []
 
     # SLR damages
-    m.damage_costs_slr = Var(
+    m.slr_damage_costs = Var(
         m.t, m.regions, bounds=(-0.5, 0.7), units=quant.unit("fraction_of_GDP")
     )
     m.damage_slr_b1 = Param(m.regions, doc="regional::ACCREU_CGE.slr_b1")
@@ -124,7 +124,7 @@ def get_constraints_slr(m: AbstractModel) -> Sequence[GeneralConstraint]:
     # Linear damage function for SLR damages, including adaptation costs
     constraints.append(
         RegionalEquation(
-            m.damage_costs_slr,
+            m.slr_damage_costs,
             lambda m, t, r: (
                 m.damage_scale_factor
                 * damage_fct(m.total_SLR[t], m.total_SLR[0], m, r, is_slr=True)

@@ -61,7 +61,7 @@ def get_constraints(
         [
             RegionalEquation(
                 m.damage_costs,
-                lambda m, t, r: m.damage_costs_non_slr[t, r] + m.damage_costs_slr[t, r],
+                lambda m, t, r: m.non_slr_damage_costs[t, r] + m.slr_damage_costs[t, r],
             ),
             RegionalEquation(
                 m.damage_costs_abs,
@@ -125,7 +125,7 @@ def get_constraints_temperature_dependent(
     constraints = []
 
     # Damages not related to SLR (dependent on temperature)
-    m.damage_costs_non_slr = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
+    m.non_slr_damage_costs = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
 
     m.damage_noslr_form = Param(
         m.regions, within=Any, doc="regional::COACCH.NoSLR_form"
@@ -146,7 +146,7 @@ def get_constraints_temperature_dependent(
     # the damage quantile
     constraints.append(
         RegionalEquation(
-            m.damage_costs_non_slr,
+            m.non_slr_damage_costs,
             lambda m, t, r: (
                 m.damage_scale_factor
                 * damage_fct(m.temperature[t] - 0.6, m.T0 - 0.6, m, r, is_slr=False)
@@ -209,7 +209,7 @@ def get_constraints_slr(m: AbstractModel) -> Sequence[GeneralConstraint]:
     constraints = []
 
     # SLR damages
-    m.damage_costs_slr = Var(
+    m.slr_damage_costs = Var(
         m.t, m.regions, bounds=(-0.5, 0.7), units=quant.unit("fraction_of_GDP")
     )
 
@@ -249,7 +249,7 @@ def get_constraints_slr(m: AbstractModel) -> Sequence[GeneralConstraint]:
     # Linear damage function for SLR damages, including adaptation costs
     constraints.append(
         RegionalEquation(
-            m.damage_costs_slr,
+            m.slr_damage_costs,
             lambda m, t, r: (
                 m.damage_scale_factor
                 * damage_fct(m.total_SLR[t], m.total_SLR[0], m, r, is_slr=True)
