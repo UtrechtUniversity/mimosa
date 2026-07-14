@@ -25,6 +25,7 @@ def _add_equation(model, equation):
 
 
 def test_sort_equations_orders_a_linear_dependency_chain():
+    """A fully ordered dependency chain should produce its single valid order."""
     equations = {
         "emissions": _equation("emissions", ["control"]),
         "cumulative_emissions": _equation(
@@ -46,6 +47,7 @@ def test_sort_equations_orders_a_linear_dependency_chain():
 
 
 def test_sort_equations_orders_branches_before_their_merge():
+    """Independent branches may vary in order, but both must precede their consumer."""
     equations = {
         "regional_emissions": _equation("regional_emissions", ["control"]),
         "mitigation_costs": _equation("mitigation_costs", ["control"]),
@@ -61,7 +63,8 @@ def test_sort_equations_orders_branches_before_their_merge():
     assert positions["mitigation_costs"] < positions["total_costs"]
 
 
-def test_previous_timestep_dependency_does_not_create_a_hard_cycle():
+def test_previous_timestep_dependency_is_recorded_without_affecting_sort_order():
+    """Previous-period dependencies are plotting metadata, not hard ordering edges."""
     equations = {
         "stock": _equation(
             "stock",
@@ -75,10 +78,13 @@ def test_previous_timestep_dependency_does_not_create_a_hard_cycle():
 
     assert [equation.name for equation in ordered] == ["flow", "stock"]
     assert controls == ["control"]
+    # The self-edge is retained in the full graph for plotting, but it is not
+    # part of the hard-dependency graph used to order simulation equations.
     assert graph.edges["stock", "stock"]["type"] == "prev_time_dependency"
 
 
 def test_sort_equations_reports_same_timestep_cycles():
+    """Mutually dependent equations in one period cannot be simulated sequentially."""
     equations = {
         "a": _equation("a", ["c"]),
         "b": _equation("b", ["a"]),
@@ -212,6 +218,7 @@ def test_prepare_simulation_rejects_duplicate_equation_lhs(monkeypatch):
 
 
 def test_prepare_and_run_minimal_simulation_model():
+    """Equation conversion, dependency sorting, and simulation should work together."""
     model = ConcreteModel()
     model.t = Set(initialize=[0, 1, 2], ordered=True)
     model.year = lambda t: 2020 + 5 * t
