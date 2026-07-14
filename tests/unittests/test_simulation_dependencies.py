@@ -181,10 +181,6 @@ def test_calc_dependencies_distinguishes_previous_timestep_variables():
     assert set(equation.prev_time_dependencies) == {"stock"}
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="calc_dependencies currently assumes a timestep labelled 1 exists",
-)
 def test_calc_dependencies_supports_year_labels():
     model = ConcreteModel()
     model.t = Set(initialize=[2020, 2025, 2030], ordered=True)
@@ -196,6 +192,57 @@ def test_calc_dependencies_supports_year_labels():
     calc_dependencies({equation.name: equation}, model)
 
     assert set(equation.dependencies) == {"input"}
+
+
+def test_calc_dependencies_finds_dependencies_from_all_time_branches():
+    """Dependencies used only in the initial period must still affect ordering."""
+    model = ConcreteModel()
+    model.t = Set(initialize=[0, 1, 2], ordered=True)
+    model.initial_input = Var(model.t, initialize=0)
+    model.later_input = Var(model.t, initialize=0)
+    model.output = Var(model.t, initialize=0)
+    equation = GlobalEquation(
+        model.output,
+        lambda m, t: m.initial_input[t] if t == 0 else m.later_input[t],
+    )
+    _add_equation(model, equation)
+
+    calc_dependencies({equation.name: equation}, model)
+
+    assert set(equation.dependencies) == {"initial_input", "later_input"}
+
+
+def test_calc_dependencies_finds_time_index_by_set_name():
+    """Time dependencies need not use time as the variable's first index."""
+    model = ConcreteModel()
+    model.t = Set(initialize=[0, 1, 2], ordered=True)
+    model.regions = Set(initialize=["A", "B"], ordered=True)
+    model.input = Var(model.regions, model.t, initialize=0)
+    model.output = Var(model.t, model.regions, initialize=0)
+    equation = RegionalEquation(
+        model.output,
+        lambda m, t, r: m.input[r, t],
+    )
+    _add_equation(model, equation)
+
+    calc_dependencies({equation.name: equation}, model)
+
+    assert equation.dependencies == ["input"]
+
+
+def test_calc_dependencies_rejects_future_variable_references():
+    model = ConcreteModel()
+    model.t = Set(initialize=[0, 1, 2], ordered=True)
+    model.input = Var(model.t, initialize=0)
+    model.output = Var(model.t, initialize=0)
+    equation = GlobalEquation(
+        model.output,
+        lambda m, t: m.input[t + 1] if t < 2 else m.input[t],
+    )
+    _add_equation(model, equation)
+
+    with pytest.raises(ValueError, match="depends on future value"):
+        calc_dependencies({equation.name: equation}, model)
 
 
 @pytest.mark.xfail(
