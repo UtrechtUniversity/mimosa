@@ -72,9 +72,11 @@ class MIMOSA:
         """
         Checks parameters for validity, creates the model and initializes it with data.
         """
-        self.concrete_model, self._params, self.equations = (
-            self.preprocessor.build_model()
-        )
+        result = self.preprocessor.build_model()
+        self.concrete_model = result.concrete_model
+        self._params = result.params
+        self.equations = result.equations
+        self.model_context = result.context
 
     def prepare_simulation(self):
         """
