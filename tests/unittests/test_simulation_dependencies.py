@@ -3,7 +3,11 @@ import pytest
 from pyomo.environ import ConcreteModel, Param, Set, Var
 
 from mimosa.common import GlobalEquation, RegionalEquation, add_constraint
-from mimosa.core.simulation import CircularDependencyError, Simulator
+from mimosa.core.simulation import (
+    CircularDependencyError,
+    SimulationNotPreparedError,
+    Simulator,
+)
 from mimosa.core.simulation.helpers import calc_dependencies, sort_equations
 
 
@@ -22,6 +26,53 @@ def _add_equation(model, equation):
         equation.to_pyomo_constraint(model),
         equation.name,
     )
+
+
+def test_simulator_starts_unprepared():
+    simulator = Simulator()
+
+    assert simulator.is_prepared is False
+    assert simulator.concrete_model is None
+    assert simulator.equations == []
+    assert simulator.equations_sorted == []
+    assert simulator.equations_graph is None
+    assert simulator.control_variables == []
+
+
+@pytest.mark.parametrize(
+    "method_name",
+    ["run", "find_prerun_bestguess", "plot_dependency_graph"],
+)
+def test_simulator_operations_require_preparation(method_name):
+    simulator = Simulator()
+
+    with pytest.raises(SimulationNotPreparedError, match="prepare_simulation"):
+        getattr(simulator, method_name)()
+
+
+def test_failed_preparation_clears_derived_state(monkeypatch):
+    """A failed re-preparation must not leave a stale execution plan usable."""
+    simulator = Simulator()
+    simulator._is_prepared = True
+    simulator.equations_sorted = [object()]
+    simulator.equations_graph = object()
+    simulator.control_variables = ["old_control"]
+
+    def fail_dependency_calculation(_equations, _model):
+        raise ValueError("dependency failure")
+
+    monkeypatch.setattr(
+        "mimosa.core.simulation.simulator.calc_dependencies",
+        fail_dependency_calculation,
+    )
+
+    with pytest.raises(ValueError, match="dependency failure"):
+        simulator.prepare_simulation([], object())
+
+    assert simulator.is_prepared is False
+    assert simulator.equations_sorted == []
+    assert simulator.equations_graph is None
+    assert simulator.control_variables == []
 
 
 def test_sort_equations_orders_a_linear_dependency_chain():
@@ -288,7 +339,9 @@ def test_prepare_and_run_minimal_simulation_model():
         _add_equation(model, equation)
 
     simulator = Simulator()
+    assert simulator.is_prepared is False
     simulator.prepare_simulation(equations, model)
+    assert simulator.is_prepared is True
     result = simulator.run(control=np.array([1.0, 2.0, 3.0]))
 
     np.testing.assert_allclose(result.flow.values, [2.0, 4.0, 6.0])

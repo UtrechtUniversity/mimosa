@@ -52,6 +52,7 @@ class MIMOSA:
         self.status = None  # Not started yet
         self.last_saved_filename = None  # Nothing saved yes
         self.last_saved_simulation_filename = None  # Nothing saved yes
+        self._extra_constraints_added = False
 
         if prerun:
             # Check if simulation mode is possible. If yes, perform a pre-run
@@ -86,12 +87,12 @@ class MIMOSA:
         """
         self.simulator.prepare_simulation(self.equations, self.concrete_model)
 
-        # Set a flag to indicate that extra constraints have not been added yet
-        self._extra_constraints_added = False
-
     @utils.timer("Prerunning the model in simulation mode")
     def prerun_simulation(self):
         """Runs a pre-run simulation to get a good initial guess for the optimisation."""
+
+        if not self.simulator.is_prepared:
+            self.prepare_simulation()
 
         sim_m_best_guess = self.simulator.find_prerun_bestguess()
 
@@ -110,6 +111,9 @@ class MIMOSA:
                 * A float value: every region and time step will get this value
                 * A numpy array of shape (n_timesteps, n_regions): each region and time step will get the corresponding value
         """
+        if not self.simulator.is_prepared:
+            self.prepare_simulation()
+
         return self.simulator.run(**control_variables_kwargs)
 
     def run_nopolicy_baseline(self):
