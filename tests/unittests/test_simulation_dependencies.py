@@ -110,16 +110,15 @@ def test_sort_equations_detects_multiple_control_variables():
     assert set(controls) == {"control_a", "control_b"}
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="sort_equations currently omits equation nodes without graph edges",
-)
-def test_sort_equations_keeps_an_equation_without_dependencies():
+def test_sort_equations_runs_an_isolated_equation_without_plotting_it():
+    """An isolated equation belongs in the execution plan, but not the plot graph."""
     equations = {"constant": _equation("constant")}
 
-    ordered = sort_equations(equations)
+    ordered, graph, controls = sort_equations(equations, return_graph=True)
 
     assert [equation.name for equation in ordered] == ["constant"]
+    assert "constant" not in graph
+    assert controls == []
 
 
 def test_calc_dependencies_detects_variables_and_excludes_parameters():
@@ -223,8 +222,10 @@ def test_prepare_and_run_minimal_simulation_model():
     model.t = Set(initialize=[0, 1, 2], ordered=True)
     model.year = lambda t: 2020 + 5 * t
     model.control = Var(model.t, initialize=0)
+    model.factor = Param(model.t, initialize={0: 2.0, 1: 3.0, 2: 4.0})
     model.flow = Var(model.t, initialize=0)
     model.stock = Var(model.t, initialize=0)
+    model.standalone = Var(model.t, initialize=-1)
 
     equations = [
         GlobalEquation(model.flow, lambda m, t: 2 * m.control[t]),
@@ -232,6 +233,9 @@ def test_prepare_and_run_minimal_simulation_model():
             model.stock,
             lambda m, t: m.stock[t - 1] + m.flow[t] if t > 0 else 0,
         ),
+        # This output has no variable dependencies and is not consumed by
+        # another equation, but it must still be evaluated during simulation.
+        GlobalEquation(model.standalone, lambda m, t: m.factor[t] ** 2),
     ]
     for equation in equations:
         _add_equation(model, equation)
@@ -242,3 +246,4 @@ def test_prepare_and_run_minimal_simulation_model():
 
     np.testing.assert_allclose(result.flow.values, [2.0, 4.0, 6.0])
     np.testing.assert_allclose(result.stock.values, [0.0, 4.0, 10.0])
+    np.testing.assert_allclose(result.standalone.values, [4.0, 9.0, 16.0])

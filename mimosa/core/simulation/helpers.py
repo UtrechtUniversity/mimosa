@@ -80,6 +80,12 @@ def sort_equations(equations_dict, return_graph=False):
 
     equations_sorted = []
 
+    # Every equation must be present in the hard-dependency graph so that it is
+    # included in the simulation execution order, even when it has no variable
+    # dependencies and no downstream consumers. Isolated equations are not
+    # added to G_full, which is the graph used for plotting.
+    G.add_nodes_from(equations_dict)
+
     # Add edges
     for node, eq in equations_dict.items():
         for dep in eq.dependencies:
@@ -101,7 +107,8 @@ def sort_equations(equations_dict, return_graph=False):
         for node in ordered_nodes:
             try:
                 equations_sorted.append(equations_dict[node])
-                G_full.nodes[node]["has_equation"] = True
+                if node in G_full:
+                    G_full.nodes[node]["has_equation"] = True
             except KeyError:
                 # print(f"Warning: no equation found for {node}, skipping.")
                 G_full.nodes[node]["has_equation"] = False
