@@ -85,11 +85,11 @@ class Equation(ABC):
     lhs: str
     rhs: typing.Callable
     name: str
-    dependencies: typing.List[str] = []
+    dependencies: typing.List[str]
 
     # Soft dependencies are dependencies to the previous time step, which should
     # not affect order of execution, but are important to plot
-    prev_time_dependencies: typing.List[str] = []
+    prev_time_dependencies: typing.List[str]
 
     def __init__(self, lhs, rhs, indices):
         """
@@ -133,6 +133,9 @@ class Equation(ABC):
             m.regional_emissions[t, r] == (1 - m.relative_abatement[t, r]) * m.baseline_emissions[t, r]
 
         """
+
+        self.dependencies = []
+        self.prev_time_dependencies = []
 
         self.indices = [
             index if isinstance(index, str) else index.name for index in indices

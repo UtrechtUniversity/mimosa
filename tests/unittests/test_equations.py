@@ -111,3 +111,16 @@ def test_equation_skip_semantics_for_pyomo_and_simulation():
     # This records the current simulation convention. A skipped equation is
     # currently represented as zero in simulation mode.
     assert equation(model, 0) == 0
+
+
+def test_equation_dependency_state_is_not_shared_between_instances():
+    first = GlobalEquation("first", lambda _m, _t: 0)
+    second = GlobalEquation("second", lambda _m, _t: 0)
+
+    first.dependencies.append("input")
+    first.prev_time_dependencies.append("stock")
+
+    assert first.dependencies == ["input"]
+    assert first.prev_time_dependencies == ["stock"]
+    assert second.dependencies == []
+    assert second.prev_time_dependencies == []
