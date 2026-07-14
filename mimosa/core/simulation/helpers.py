@@ -1,64 +1,78 @@
 from typing import Union
-import re
+
 import networkx as nx
+from pyomo.core.expr.visitor import identify_variables
 
 from mimosa.common import (
     ConcreteModel,
     AbstractModel,
-    RegionalEquation,
-    GlobalEquation,
-    Equation,
-    Param,
+    get_indices,
 )
 
 
 def calc_dependencies(equations_dict, m: Union[ConcreteModel, AbstractModel]):
     """
-    For each equation in the equations_dict, see what variables the LHS depends on.
-    These dependencies are saved to the `dependencies` attribute of each equation.
+    Determine each equation's variable dependencies from its Pyomo expression tree.
 
-    This function evaluates the expression of the equation at timestep 1 (not zero, as
-    some equations are not defined at timestep 0) and extracts the variable strings used
-    in the expression.
+    All indexed constraint expressions are inspected so dependencies selected by an
+    initial-period or region-specific branch are included. References at the equation's
+    current timestep determine simulation order. References to an earlier timestep are
+    retained separately as metadata for the dependency plot; the simulator already
+    evaluates timesteps sequentially. Parameters and non-time-indexed variables do not
+    affect the ordering of time-dependent equations.
     """
 
-    def _extract_variables(expr_str, timestep):
-        pattern = f"([a-zA-Z_0-9]+)\\[{timestep}"
-        matches = re.findall(pattern, expr_str)
-        return matches
+    time_values = list(m.t)
+    time_positions = {time: position for position, time in enumerate(time_values)}
 
-    def _filter_out_params(variables):
-        return [v for v in variables if not isinstance(getattr(m, v, None), Param)]
+    def _as_tuple(index):
+        return index if isinstance(index, tuple) else (index,)
 
-    def _get_first_index_with_timestep(keys, timestep):
-        for key in keys:
-            if isinstance(key, tuple) and key[0] == timestep:
-                return key
-            elif key == timestep:
-                return key
-        return None
-
-    timestep = 1
     for name, eq in equations_dict.items():
+        constraint = getattr(m, "constraint_" + name)
+        equation_time_position = eq.indices.index("t")
+        dependencies = set()
+        previous_time_dependencies = set()
 
-        constraint_expr = getattr(m, "constraint_" + name)
-        index = _get_first_index_with_timestep(constraint_expr.keys(), timestep)
-        expr = str(constraint_expr[index].expr)
-        expr_rhs = expr.split("==")[1]
-        variables = set(_extract_variables(expr_rhs, timestep))
-        # Only keep variables, not params:
-        variables = _filter_out_params(variables)
+        for constraint_data in constraint.values():
+            constraint_index = _as_tuple(constraint_data.index())
+            current_time = constraint_index[equation_time_position]
+            current_position = time_positions[current_time]
 
-        prev_timestep_dependencies = _filter_out_params(
-            set(_extract_variables(expr_rhs, timestep - 1))
+            # Equation.to_pyomo_constraint always constructs ``lhs == rhs``.
+            # Inspect only the RHS so a variable occurring on both sides is not
+            # accidentally removed from the dependency set.
+            rhs_expression = constraint_data.expr.args[1]
+            for variable in identify_variables(rhs_expression, include_fixed=True):
+                component = variable.parent_component()
+                component_indices = get_indices(component)
+
+                # Static variables have no time-dependent equation to order.
+                if "t" not in component_indices:
+                    continue
+
+                variable_index = _as_tuple(variable.index())
+                variable_time_position = component_indices.index("t")
+                referenced_time = variable_index[variable_time_position]
+                referenced_position = time_positions[referenced_time]
+
+                if referenced_position == current_position:
+                    dependencies.add(component.name)
+                elif referenced_position < current_position:
+                    previous_time_dependencies.add(component.name)
+                else:
+                    raise ValueError(
+                        f"Equation '{name}' at timestep {current_time!r} depends on "
+                        f"future value {component.name}[{referenced_time!r}]."
+                    )
+
+        # A current-time dependency determines ordering; if the same variable is
+        # also referenced at an earlier time, the hard dependency takes priority
+        # in the simple directed graph used by the simulator and plot.
+        eq.dependencies = sorted(dependencies)
+        eq.prev_time_dependencies = sorted(
+            previous_time_dependencies - dependencies
         )
-        prev_timestep_dependencies = list(
-            set(prev_timestep_dependencies) - set(variables)
-        )
-
-        # Save the dependencies to the equation:
-        eq.dependencies = variables
-        eq.prev_time_dependencies = prev_timestep_dependencies
 
 
 def sort_equations(equations_dict, return_graph=False):
