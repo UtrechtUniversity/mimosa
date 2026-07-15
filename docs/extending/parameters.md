@@ -2,7 +2,7 @@ Parameteres are values used in MIMOSA that can be changed without changing the c
 
 
 ```python hl_lines="4"
-def get_constraints(m):
+def get_constraints(m, context):
     # ... existing code ...
     
     m.new_param = Param()
