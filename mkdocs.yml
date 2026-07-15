@@ -87,10 +87,10 @@ plugins:
             show_root_toc_entry: false
           paths: [src]
   - search
-  - table-reader
   - macros:
       include_dir: tests
       module_name: docs/scripts/mkdocs_macros
+  - table-reader
   - open-in-new-tab
   - plotly:
       template_default: assets/plots/template.json

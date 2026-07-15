@@ -29,15 +29,14 @@ test = ["pytest"]
 
 docs = [
   "mkdocs",
-  "mkdocs-open-in-new-tab",
   "mkdocs-material",
-  "mkdocstrings",
-  "mkdocstrings-handlers",
+  "mkdocs-open-in-new-tab",
+  "mkdocstrings[python]",
   "mkdocs-plotly-plugin",
   "mkdocs-table-reader-plugin",
-  "mkdocs-glichtbox",
   "mkdocs-macros-plugin",
   "mkdocs-glightbox",
+  "mkdocs-bibtex",
   "mike",
 ]
 
