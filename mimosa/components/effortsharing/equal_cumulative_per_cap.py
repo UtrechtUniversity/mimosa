@@ -34,7 +34,7 @@ def get_constraints(
     Usage:
     ```python hl_lines="2"
     params = load_params()
-    params["effort sharing"]["regime"] = "equal_cumulative_per_cap"
+    params["model structure"]["effortsharing module"] = "equal_cumulative_per_cap"
     model = MIMOSA(params)
     ```
 

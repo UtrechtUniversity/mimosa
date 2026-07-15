@@ -29,7 +29,7 @@ def get_constraints(
     Usage:
     ```python hl_lines="2-9"
     params = load_params()
-    params["effort sharing"]["regime"] = "per_cap_convergence"
+    params["model structure"]["effortsharing module"] = "per_cap_convergence"
     params["effort sharing"]["percapconv_year"] = 2050
 
     # Per-capita convergence needs emission trading to avoid infeasibility
@@ -127,7 +127,7 @@ def percapconv_share_rule(m, t, r):
 
     ```python hl_lines="3"
     params = load_params()
-    params["effort sharing"]["regime"] = "per_cap_convergence"
+    params["model structure"]["effortsharing module"] = "per_cap_convergence"
     params["effort sharing"]["percapconv_year"] = 2020  # Immediate per capita convergence
     ```
 
@@ -137,7 +137,7 @@ def percapconv_share_rule(m, t, r):
 
     ```python hl_lines="3"
     params = load_params()
-    params["effort sharing"]["regime"] = "per_cap_convergence"
+    params["model structure"]["effortsharing module"] = "per_cap_convergence"
     params["effort sharing"]["percapconv_year"] = False  # Grandfathering all the time
     ```
     """

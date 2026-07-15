@@ -91,11 +91,11 @@ In the next exercise, you will run MIMOSA with different effort sharing approach
 
         First, choose which effort sharing regime you want to use. You can choose between:
 
-        * [`"equal_mitigation_costs"`](../../parameters.md#effort sharing.regime)
-        * [`"equal_total_costs"`](../../parameters.md#effort sharing.regime)
-        * [`"per_cap_convergence"`](../../parameters.md#effort sharing.regime)
-        * [`"ability_to_pay"`](../../parameters.md#effort sharing.regime)
-        * [`"equal_cumulative_per_cap"`](../../parameters.md#effort sharing.regime)
+        * [`"equal_mitigation_costs"`](../../parameters.md#model structure.effortsharing module)
+        * [`"equal_total_costs"`](../../parameters.md#model structure.effortsharing module)
+        * [`"per_cap_convergence"`](../../parameters.md#model structure.effortsharing module)
+        * [`"ability_to_pay"`](../../parameters.md#model structure.effortsharing module)
+        * [`"equal_cumulative_per_cap"`](../../parameters.md#model structure.effortsharing module)
 
         More information about these regimes can be found in [van den Berg et al. (2020)](https://doi.org/10.1007/s10584-019-02368-y) (specifically, [Table 1](https://link.springer.com/article/10.1007/s10584-019-02368-y/tables/1)).
 

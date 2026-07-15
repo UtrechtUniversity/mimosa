@@ -185,14 +185,13 @@ The `file` field should point to the IAMC formatted data file. The IAMC format i
 ???+ info "Configuration values dependent on other parameter values"
 
     In the example above, the name of the scenario depends on the [`SSP`](../parameters.md#SSP). Every string in the configuration file can contain references
-    to other parameters, and are referred to using curly brackets `{}`. If you want to refer to a nested parameter (like [`effort sharing > regime`](../parameters.md#effort%20sharing.regime)), they should be joined
+    to other parameters, and are referred to using curly brackets `{}`. If you want to refer to a nested parameter (like [`model structure > effortsharing module`](../parameters.md#model structure.effortsharing module)), they should be joined
     with ` - `:
 
     ```yaml
-    scenario: "Scenario-with-{SSP}-and-{effort sharing - regime}"
+    scenario: "Scenario-with-{SSP}-and-{model structure - effortsharing module}"
     ```
 
 ## 4. Advanced: dynamic parameter settings
 
 ## 5. Advanced: complex parameter manipulations with `instantiate_params.py`
-

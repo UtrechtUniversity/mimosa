@@ -8,7 +8,7 @@ icon: material/arrow-projectile-multiple
 
 The optimisation goal of MIMOSA is to maximise discounted welfare or utility[^1]. There are three ways to calculate welfare in MIMOSA: welfare-loss-minimising, cost-minimising, and a general inequality aversion setting which is the generalised version of the first two methods.
 
-The welfare module can be chosen using the parameter `params["model"]["welfare module"]`.
+The welfare module can be chosen using the parameter [`welfare module`](../parameters.md#model structure.welfare module).
 
 
 === "Welfare-loss-minimising `default`"
@@ -16,7 +16,7 @@ The welfare module can be chosen using the parameter `params["model"]["welfare m
     Usage:
     ```python hl_lines="2"
     params = load_params()
-    params["model"]["welfare module"] = "welfare_loss_minimising"
+    params["model structure"]["welfare module"] = "welfare_loss_minimising"
     model = MIMOSA(params)
     ```
 
@@ -27,7 +27,7 @@ The welfare module can be chosen using the parameter `params["model"]["welfare m
     Usage:
     ```python hl_lines="2"
     params = load_params()
-    params["model"]["welfare module"] = "cost_minimising"
+    params["model structure"]["welfare module"] = "cost_minimising"
     model = MIMOSA(params)
     ```
 
@@ -38,7 +38,7 @@ The welfare module can be chosen using the parameter `params["model"]["welfare m
     Usage:
     ```python hl_lines="2"
     params = load_params()
-    params["model"]["welfare module"] = "inequal_aversion_general"
+    params["model structure"]["welfare module"] = "inequal_aversion_general"
     model = MIMOSA(params)
     ```
 

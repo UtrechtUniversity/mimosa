@@ -356,7 +356,7 @@ effort sharing:
   percapconv_year:
     descr: >-
       Year of convergence to per capita emission allowance 
-      (only used when effort sharing - regime is per_cap_convergence)
+      (only used when model structure - effortsharing module is per_cap_convergence)
       Can also be false, then always use grandfathering
     type: float
     min: 2020
@@ -367,7 +367,7 @@ effort sharing:
     descr: >-
       Discount rate for historical debt in the ECPC effort sharing regime
       (Equal Cumulative Per Capita regime).
-      Only used when effort sharing - regime is equal_cumulative_per_cap
+      Only used when model structure - effortsharing module is equal_cumulative_per_cap
     type: float
     min: 0
     max: 1
@@ -377,7 +377,7 @@ effort sharing:
     descr: >-
       Start year for historical debt in the ECPC effort sharing regime
       (Equal Cumulative Per Capita regime).
-      Only used when effort sharing - regime is equal_cumulative_per_cap
+      Only used when model structure - effortsharing module is equal_cumulative_per_cap
     type: float
     min: 1800
     max: 2019
