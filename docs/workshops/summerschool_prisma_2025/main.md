@@ -125,9 +125,9 @@ In the next exercise, you will run MIMOSA with different effort sharing approach
 
 #### Step 3: Effect on sovereignty
 
-!!! question "Question 5: Sovereignty and import/export of emission reductions"
+!!! question "Question 5: Sovereignty and trading of emission reductions"
 
 
-    When emission trading is enabled, each region has to pay it's own domestic reductions, plus an import/export balance. This balance is positive if the region imports emission reductions (i.e. buys emission reductions from other regions), and negative if the region exports emission reductions (i.e. sells emission reductions to other regions).
+    When emission trading is enabled, each region's total `mitigation_costs` consist of its `domestic_mitigation_costs` plus its `mitigation_cost_trading_balance`. This balance is positive if the region buys emission reductions from other regions and negative if the region sells emission reductions to other regions.
 
-    The sum of the variable `import_export_mitigation_cost_balance` is always zero. However, to get a sense of how large the financial flows each year are, you can sum all the positive values (or all the negative values) of this variable. Do this for 2050 and for 2100. How big are the financial flows? How does this compare to the global GDP in those years? 
+    The sum of `mitigation_cost_trading_balance` across regions is always zero. However, to get a sense of how large the financial flows are each year, you can sum all positive values (or all negative values) of this variable. Do this for 2050 and 2100. How large are the financial flows? How do they compare to global GDP in those years?
