@@ -70,7 +70,8 @@ def get_constraints(
 
     $$ K_{t=0,r} = \\text{init_capitalstock_factor}_r \\cdot \\text{GDP}_{t=0,r}. $$
 
-    The initial capital stock factor is a calibration factor to obtain the initial capital stock. TODO: Source (IMF)
+    The regional initial capital stock factors are calibrated from capital-stock-to-GDP ratios in
+    the [IMF Investment and Capital Stock Dataset](https://data.imf.org/en/Datasets/ICSD).
     ``` plotly
     {"file_path": "./assets/plots/economics_init_capital_factor.json"}
     ```

@@ -4,13 +4,13 @@ icon: material/earth
 
 [:octicons-arrow-left-24: Back to general structure](index.md)
 
-By default, every region pays for the emission reductions that take place within that region. Emission trading allows regions to exchange emission reductions and the associated mitigation costs. A region can then pay for reductions elsewhere, for example because those reductions are cheaper or because an [effort-sharing regime](effortsharing.md) assigns a different distribution of emission allowances.
+Without emission trading, the reductions and mitigation costs attributed to a region are the reductions and costs that physically occur within that region. Emission trading allows this attribution to differ, for example because reductions are cheaper elsewhere or because an [effort-sharing regime](effortsharing.md) assigns a different distribution of emission allowances.
 
 The emission trading module can be chosen using the parameter [`emissiontrade module`](../parameters.md#model structure.emissiontrade module).
 
 ## Physical and attributed reductions and costs
 
-Emission trading distinguishes between where an emission reduction takes place and which region receives credit for and pays for that reduction:
+Emission trading distinguishes between where an emission reduction takes place and the region to which the reduction and its cost are attributed:
 
 - `regional_emission_reduction` is the physical reduction within a region.
 - `attributed_emission_reductions` is the reduction attributed to a region after trading.

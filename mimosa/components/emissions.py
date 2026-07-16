@@ -279,10 +279,12 @@ def _get_temperature_constraints(m: AbstractModel) -> Sequence[GeneralConstraint
     \\text{temperature}_{t} = T_0 + \\text{TCRE} \\cdot \\text{cumulative emissions}_{t},
     $$
 
-    where [$T_0$](../parameters.md#temperature.initial) is the initial temperature at the start of the run (by default in 2020),
+    where [$T_0$](../parameters.md#temperature.initial) is the initial temperature at the start of the run (2025 by default),
     and the [TCRE](../parameters.md#temperature.TCRE) is the Transient Climate Response to CO<sub>2</sub> Emissions.
 
-    The initial temperature is set to 1.16°C in 2020 by default, following [Visser et al.]. The TCRE
+    The initial temperature is set to 1.27°C in 2025 by default. Temperature is expressed as warming above
+    pre-industrial levels, following the interpretation discussed by
+    [Visser et al. (2018)](https://doi.org/10.5194/cp-14-139-2018). The TCRE
     is calibrated on the IPCC AR5 or AR6 reports (the median value of the TCRE is the same in the AR5
     and AR6 calibration), but the distribution is different.
 
@@ -436,17 +438,19 @@ def _get_inertia_and_budget_constraints(
         $$
 
         By default, the [`inertia_regional`](../parameters.md#emissions.inertia.regional) parameter is active, such that regional emissions cannot be reduced by more than 5% of the initial baseline emissions per year. This is
-        based on maximum reduction speeds of the scenarios in the scenario explorer for 1.5°C pathways underpinning the IPCC Special Report on Global Warming
-        of 1.5°C (<https://data.ene.iiasa.ac.at/iamc-1.5c-explorer>) (ref https://www.frontiersin.org/articles/10.3389/fclim.2021.785577/full)
+        based on maximum reduction speeds in scenarios underpinning the IPCC Special Report on Global Warming
+        of 1.5°C, as analysed by [Hof et al. (2021)](https://doi.org/10.3389/fclim.2021.785577).
 
 
     ## Minimum emission levels (limits to net-negative emissions)
 
     Since the Marginal Abatement Cost curve is a continuous function with no upper bound, reductions can theoretically be without bound.
     To still address the difficulties associated with CDR technologies, a limit on (net) negative emissions can be imposed. These difficulties
-    can be of economic (e.g., land becoming increasingly scarce or increased dependence on very expensive storage sites) and socio-political
-    (concerns about biodiversity and food security) nature (TODO ref Hotelling-Hof-Wijst paper and Fuss et al.). By the default, the global emissions
-    are limited to -20 GtCO<sub>2</sub>/yr, and regionally to -10 GtCO<sub>2</sub>:
+    can be economic (e.g., land becoming increasingly scarce or increased dependence on expensive storage sites) or socio-political
+    (e.g., concerns about biodiversity and food security). These restrictions and side effects are discussed by
+    [Hof et al. (2021)](https://doi.org/10.3389/fclim.2021.785577) and
+    [Fuss et al. (2018)](https://doi.org/10.1088/1748-9326/aabf9f). By default, global emissions
+    are limited to -20 GtCO<sub>2</sub>/yr, and regional emissions to -10 GtCO<sub>2</sub>/yr:
 
     $$
     \\text{global emissions}_t \\geq \\text{global min level},

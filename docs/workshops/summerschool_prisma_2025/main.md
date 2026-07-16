@@ -117,7 +117,7 @@ In the next exercise, you will run MIMOSA with different effort sharing approach
 
 #### Step 2: Effect on equity
 
-!!! question "Question 4: Regional mitigation costs and equity"
+!!! question "Question 4: Attributed mitigation costs and equity"
 
     * For the two chosen regions, compare the mitigation costs in 2050 and 2100. How do these costs compare to the global mitigation costs?
     * And how do they compare to the "CBA" run?
@@ -128,6 +128,6 @@ In the next exercise, you will run MIMOSA with different effort sharing approach
 !!! question "Question 5: Sovereignty and trading of emission reductions"
 
 
-    When emission trading is enabled, each region's total `mitigation_costs` consist of its `domestic_mitigation_costs` plus its `mitigation_cost_trading_balance`. This balance is positive if the region buys emission reductions from other regions and negative if the region sells emission reductions to other regions.
+    When emission trading is enabled, each region's attributed `mitigation_costs` consist of its `domestic_mitigation_costs` plus its `mitigation_cost_trading_balance`. A positive balance means that attributed costs and reductions exceed those occurring physically within the region; a negative balance means that they are lower.
 
     The sum of `mitigation_cost_trading_balance` across regions is always zero. However, to get a sense of how large the financial flows are each year, you can sum all positive values (or all negative values) of this variable. Do this for 2050 and 2100. How large are the financial flows? How do they compare to global GDP in those years?

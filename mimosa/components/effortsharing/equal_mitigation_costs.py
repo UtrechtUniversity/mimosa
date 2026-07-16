@@ -33,7 +33,7 @@ def get_constraints(
     model = MIMOSA(params)
     ```
 
-    Equal mitigation costs implies that the regional mitigation costs in every year (in terms of
+    Equal mitigation costs implies that the attributed mitigation costs in every year (in terms of
     percentage of GDP) should be the same for every region:
 
     $$

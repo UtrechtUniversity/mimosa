@@ -197,7 +197,7 @@ $$
 $$
 
 The default tolerance is $\epsilon=0.005$, or 0.5%. For example, the equal-mitigation-costs
-effort-sharing regime requires regional mitigation costs as a share of GDP to remain close to a
+effort-sharing regime requires attributed mitigation costs as a share of GDP to remain close to a
 common global level:
 
 ```python

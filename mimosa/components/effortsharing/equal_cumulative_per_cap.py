@@ -130,17 +130,18 @@ def _calc_debt(m, r, all_emissions, all_population):
 
     The historical debt is calculated as the cumulative difference between the historical
     fair share (based on equal per capita emissions) and the actual emissions, starting from
-    a given start year (default: 1850) until the base year (default: 2020), and then
-    discounted by a given rate:
+    a given start year (default: 1850) and using all historical observations available up to
+    the first model year. The debt is discounted to that first model year, denoted by $t_0$
+    (2025 by default). If $t_{\\mathrm{hist}}$ is the final available historical observation:
 
     $$
-    \\text{debt}_{r} = \\sum_{t=\\text{start year}}^{2020} \\left(\\text{emissions}_{r,t} - \\frac{\\text{population}_{r,t}}{\\text{emissions}_{r,t}\\text{global population}_{t}} \\cdot \\text{global emissions}_{t}\\right) \\cdot e^{-\\text{discount rate} \\cdot (2020 - t)}.
+    \\text{debt}_{r} = \\sum_{t=\\text{start year}}^{t_{\\mathrm{hist}}} \\left(\\text{emissions}_{r,t} - \\frac{\\text{population}_{r,t}}{\\text{global population}_{t}} \\cdot \\text{global emissions}_{t}\\right) \\cdot e^{-\\text{discount rate} \\cdot (t_0 - t)}.
     $$
 
     where you can set the following parameters:
 
     * $\\text{start year}$ using [`params["effort sharing"]["ecpc_start_year"]`](../parameters.md#effort sharing.ecpc_start_year) (default: 1850),
-    * $\\text{discount rate}$ using [`params["effort sharing"]["ecpc_start_year"]`](../parameters.md#effort sharing.ecpc_discount_rate) (default: 3%/yr).
+    * $\\text{discount rate}$ using [`params["effort sharing"]["ecpc_discount_rate"]`](../parameters.md#effort sharing.ecpc_discount_rate) (default: 3%/yr).
 
     The historical debt is therefore positive for regions that emitted more than their fair share of cumulative emissions per capita, and negative for regions that emitted less than their fair share:
 

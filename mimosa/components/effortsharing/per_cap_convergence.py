@@ -44,7 +44,8 @@ def get_constraints(
     from a given year (called the convergence year). The convergence year can be set with the parameter
     [`percapconv_year`](../parameters.md#effort sharing.percapconv_year) and is
     set to 2050 by default. Before this convergence year, the allowances are interpolated
-    between grandfathering (current emission distribution) in 2020 and equal per capita emission rights in the convergence year.
+    between grandfathering (the emission distribution in the first model year) and equal per capita
+    emission rights in the convergence year.
 
 
     Therefore, two functions are needed. First, the allowances for equal per capita emissions (EPC):
@@ -61,10 +62,10 @@ def get_constraints(
 
     :::mimosa.components.effortsharing.per_cap_convergence.percapconv_share_rule
 
-    Finally, the allowances per region are added as constraint on the regional emissions. Since this regime needs
-    [emission trading](emissiontrading.md) to avoid infeasibility, the regional emissions can be expressed as the baseline emissions
-    minus the reductions that this region needs to pay for: the attributed emission reductions (this is not necessarily equal to the regional emissions
-    in physical terms, as the region can buy or sell allowances from other regions):
+    Finally, the calculated allowances are imposed on each region's `regional_emission_allowances`.
+    Since this regime needs [emission trading](emissiontrading.md) to avoid infeasibility, allowances
+    are calculated from the reductions attributed to a region. These can differ from the physical
+    reductions within that region because reductions can be traded:
 
     $$
     \\text{allowances}_{t,r} = \\text{baseline emissions}_{t,r} - \\text{attributed emission reductions}_{t,r}
@@ -128,7 +129,7 @@ def percapconv_share_rule(m, t, r):
     ```python hl_lines="3"
     params = load_params()
     params["model structure"]["effortsharing module"] = "per_cap_convergence"
-    params["effort sharing"]["percapconv_year"] = 2020  # Immediate per capita convergence
+    params["effort sharing"]["percapconv_year"] = params["time"]["start"]
     ```
 
     #### Grandfathering

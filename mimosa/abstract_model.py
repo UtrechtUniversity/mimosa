@@ -116,7 +116,7 @@ def create_abstract_model(
     )
     constraints.extend(get_damage_constraints(m, context))
 
-    # Abatement costs
+    # Mitigation costs
     constraints.extend(mitigation.get_constraints(m, context))
 
     # Emission trading

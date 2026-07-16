@@ -21,15 +21,14 @@ def get_constraints(
     m: AbstractModel, context: ModelContext
 ) -> Sequence[GeneralConstraint]:
     """
-    In MIMOSA, every region can reduce its own emissions. The price for this is determined
-    by the area under the MAC (see [Mitigation](mitigation.md#mitigation-costs)). On top of that,
-    regions can trade emission reductions with each other. Regions can pay other regions to reduce
-    their emissions, or receive payments for reducing their own emissions.
+    In MIMOSA, every region can physically reduce its own emissions. The domestic cost is determined
+    by the area under the MAC (see [Mitigation](mitigation.md#mitigation-costs)). Emission trading
+    allows the reductions and mitigation costs attributed to a region to differ from the reductions
+    and costs occurring within that region.
 
-    The financial transfers for
-    this are captured in the variable $\\text{mitigation cost trading balance}_{t,r}$. If it is positive,
-    the region has to pay for emission reductions in other regions. If it is negative,
-    the region receives payments for reducing its own emissions. For every timestep,
+    The associated financial flow is captured by
+    $\\text{mitigation cost trading balance}_{t,r}$. A positive balance increases the mitigation costs
+    attributed to a region; a negative balance reduces them. For every timestep,
     the sum of these transfers should be zero:
 
     $$
@@ -105,7 +104,7 @@ def get_constraints(
                 == 0.0,
                 "sum_mitigation_equals_sum_area_under_mac",
             ),
-            # Constraint: from import/export mitigation costs to import/export of emissions using the global carbon price
+            # Convert the mitigation-cost trading balance into the emission-reduction trading balance
             RegionalEquation(
                 m.emission_reduction_trading_balance,
                 lambda m, t, r: (
