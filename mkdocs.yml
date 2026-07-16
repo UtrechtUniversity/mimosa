@@ -24,6 +24,7 @@ nav:
       - Doing multiple runs: run/multipleruns.md
       - Doing an effort-sharing run: run/effortsharing.md
       - "Advanced: logging": run/logging.md
+      - Python reference: run/python_reference.md
   - MIMOSA Dashboard: "https://dashboard-mimosa.onrender.com/"
   - Extending MIMOSA:
       - Getting started: extending/getting_started.md

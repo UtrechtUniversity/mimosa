@@ -3,6 +3,7 @@ Parses the config.yaml file and checks for consistency with the default config t
 """
 
 import re
+from typing import Optional
 
 from mimosa.common.utils import load_yaml
 from mimosa.common import quant
@@ -137,7 +138,23 @@ def parse_param_values(params):
     return params
 
 
-def load_params(user_yaml_filename=None):
+def load_params(user_yaml_filename: Optional[str] = None) -> dict:
+    """
+    Load, validate and parse a MIMOSA configuration.
+
+    Values not supplied by the user are taken from `config_default.yaml`.
+
+    Args:
+        user_yaml_filename: Path to a YAML file containing configuration values
+            that override the defaults. If omitted, only the defaults are loaded.
+
+    Returns:
+        dict: Complete parsed configuration for constructing `mimosa.MIMOSA`.
+
+    Raises:
+        RuntimeWarning: If the user file contains an obsolete, unknown or
+            misspelled configuration entry.
+    """
     if user_yaml_filename is None:
         user_yaml = {}
     else:

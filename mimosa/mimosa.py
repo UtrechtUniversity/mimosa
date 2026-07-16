@@ -7,6 +7,8 @@ it creates an `instance` of the AbstractModel. This is then sent to the solver.
 Finally, the export functions are called here.
 """
 
+from typing import Any, Optional
+
 from mimosa.common import (
     utils,
     logger,
@@ -19,21 +21,30 @@ from mimosa.core import simulation
 
 from mimosa.core.initializer import Preprocessor
 from mimosa.core.solver import Solver
-from mimosa.core.simulation import Simulator
+from mimosa.core.simulation import Simulator, SimulationObjectModel
 
 
 class MIMOSA:
     """
-    The MIMOSA object creates an AbstractModel, makes a Concrete instance
-    out of it, solves it and saves the results.
+    Build and run a MIMOSA model.
+
+    Creating this object checks and parses the configuration, builds the selected
+    model components, loads their data and creates a Pyomo concrete model.
 
     Args:
-        params (dict): contains all Param values, and is based on `input/config.yaml`
-        prerun (bool): if True, runs a pre-run simulation to get a good initial guess for the optimisation.
+        params: Configuration dictionary, normally created with
+            `mimosa.load_params()`. Change its values before creating the model.
+        prerun: If `True`, prepare the simulator, calculate an initial guess for
+            optimisation and store a no-policy damage baseline. Disable this when
+            only the constructed model is needed or when model construction time is
+            more important than the initial guess.
 
     Attributes:
-        concrete_model (ConcreteModel): initialised Pyomo model
-        equations (list): list of equations (not constraints) used for simulation mode
+        concrete_model: Instantiated Pyomo model used for optimisation.
+        equations: Equations available to simulation mode.
+        model_context: Selected model components and their model options.
+        simulator: Simulator associated with this model.
+        status: Solver status after `solve()`; `None` before a solve starts.
 
     """
 
@@ -41,7 +52,7 @@ class MIMOSA:
     equations: list
     _params: dict
 
-    def __init__(self, params: dict, prerun=True):
+    def __init__(self, params: dict, prerun: bool = True) -> None:
         # Check if input parameter dictionary is valid
         self.preprocessor = Preprocessor(params)
         self.solver = Solver()
@@ -101,25 +112,45 @@ class MIMOSA:
         # Set the best guess as initial values for the concrete model
         self.simulator.initialize_pyomo_model(self.concrete_model, sim_m_best_guess)
 
-    def run_simulation(self, **control_variables_kwargs):
+    def run_simulation(
+        self, **control_variables_kwargs: Any
+    ) -> SimulationObjectModel:
         """
-        Runs MIMOSA as simulation.
+        Evaluate the model equations for supplied control variables.
 
-        It first sets the "free" variables (relative_abatement), then runs the simulation.
+        Every control variable that is omitted or set to `None` is set to zero.
+        Available control names can be inspected with
+        `model.simulator.control_variables`.
 
         Args:
-            control_variables_kwargs: A set of keyword arguments to optionally set free variables to a value. Can be:
-                * None (equivalent to 0)
-                * A float value: every region and time step will get this value
-                * A numpy array of shape (n_timesteps, n_regions): each region and time step will get the corresponding value
+            **control_variables_kwargs: Values for control variables, keyed by
+                variable name. Each value can be a number applied to all indices,
+                a NumPy array matching the variable's dimensions, a dictionary
+                keyed like the Pyomo variable, or `None` for zero.
+
+        Returns:
+            SimulationObjectModel: Calculated simulation results.
+
+        Raises:
+            ValueError: If a supplied name is not a control variable.
+            AssertionError: If an array has the wrong dimensions.
         """
         if not self.simulator.is_prepared:
             self.prepare_simulation()
 
         return self.simulator.run(**control_variables_kwargs)
 
-    def run_nopolicy_baseline(self):
-        """Runs the no-policy baseline simulation with relative abatement set to 0."""
+    def run_nopolicy_baseline(self) -> SimulationObjectModel:
+        """
+        Run and store the no-policy reference used for avoided damages.
+
+        All control variables are set to zero. The resulting damage costs are
+        stored in the Pyomo model as `nopolicy_damage_costs` for subsequent policy
+        runs.
+
+        Returns:
+            SimulationObjectModel: No-policy simulation results.
+        """
 
         # Run simulator with default relative abatement set to 0
         nopolicy_baseline = self.run_simulation()
@@ -138,10 +169,21 @@ class MIMOSA:
         return nopolicy_baseline
 
     @utils.timer("Model solve", True)
-    def solve(self, verbose=True, use_neos=False, **kwargs) -> None:
-        """Sends the model to a solver.
+    def solve(
+        self, verbose: bool = True, use_neos: bool = False, **kwargs: Any
+    ) -> None:
+        """
+        Optimise the Pyomo model locally with IPOPT or remotely through NEOS.
+
+        Args:
+            verbose: Print IPOPT output during a local solve.
+            use_neos: Submit the model to NEOS instead of using local IPOPT.
+            **kwargs: Solver-specific options. Local IPOPT accepts
+                `halt_on_ampl_error`, `ipopt_maxiter` and `ipopt_output_file`.
+                NEOS requires `neos_email` and optionally accepts `solver_name`.
+
         Raises:
-            SolverException: raised if solver did not exit with status OK
+            SolverException: If the solver does not finish with status `OK`.
         """
         self.status = None  # Not started yet
 
@@ -153,34 +195,52 @@ class MIMOSA:
             )
         self.status = results.solver.status
 
-    def save(self, filename=None, **kwargs):
+    def save(self, filename: Optional[str] = None, **kwargs: Any) -> None:
         """
-        Saves the MIMOSA optimisation results to a file.
+        Save optimisation results and their configuration.
+
+        This creates `<filename>.csv` and `<filename>.csv.params.json`.
 
         Args:
-            filename (str): The filename to save the results to.
+            filename: Base filename without an extension.
+            **kwargs: Output options. `folder` selects the output directory and
+                `hash_suffix=True` adds a configuration hash to the filename.
 
-        Example usage:
+        Example:
+            ```python
             model = MIMOSA(params)
             model.solve()
             model.save("run1")
+            ```
         """
         self.last_saved_filename = filename
         logger.info("Saving to %s", filename)
         save_output_pyomo(self._params, self.concrete_model, filename, **kwargs)
 
-    def save_simulation(self, simulation_obj, filename, **kwargs):
+    def save_simulation(
+        self,
+        simulation_obj: SimulationObjectModel,
+        filename: str,
+        **kwargs: Any,
+    ) -> None:
         """
-        Saves the simulation results to a file.
+        Save simulation results and their configuration.
+
+        This creates `<filename>.csv` and `<filename>.csv.params.json`.
 
         Args:
-            simulation_obj (SimulationObjectModel): The simulation results to save.
-            filename (str): The filename to save the results to.
+            simulation_obj: Results returned by `run_simulation()` or
+                `run_nopolicy_baseline()`.
+            filename: Base filename without an extension.
+            **kwargs: Output options. `folder` selects the output directory and
+                `hash_suffix=True` adds a configuration hash to the filename.
 
-        Example usage:
+        Example:
+            ```python
             model = MIMOSA(params)
             simulation = model.run_nopolicy_baseline()
             model.save_simulation(simulation, "nopolicy_baseline")
+            ```
         """
         self.last_saved_simulation_filename = filename
         logger.info("Saving simulation to %s", filename)
@@ -194,10 +254,10 @@ class MIMOSA:
         )
 
     @property
-    def params(self):
+    def params(self) -> dict:
         """
-        Returns the parsed parameters used to create the model.
+        dict: Parsed configuration used to construct the model.
 
-        Note that the params cannot be changed after the model has been created.
+        Changing this dictionary does not rebuild or update the existing model.
         """
         return self._params
