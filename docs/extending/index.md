@@ -65,3 +65,6 @@ Typically, when extending MIMOSA, the following steps can be followed:
 1. [Create a new component](components.md) (`optional`, only necessary if the extension is a new module)
 2. [Add new variables and constraints to the model](variables_constraints.md)
 3. [Add new parameters and data to the model](parameters.md)
+
+For components with user-selectable versions or options that change which equations are created, see
+[Selectable modules and model options](advanced_components.md).
