@@ -12,12 +12,12 @@ The following pages explain how to add variables, equations, constraints, parame
 model components. They focus on the conventions used in MIMOSA rather than providing a general
 introduction to Pyomo.
 
-MIMOSA starts with a Pyomo `AbstractModel` in `mimosa/abstract_model.py`. Variables, parameters,
-equations and constraints from all model components are added to this shared object, which is always
-called `m`:
+MIMOSA's shared Pyomo `AbstractModel`, time and region sets, and baseline inputs are created in
+`mimosa/base_model.py`. The components listed in `mimosa/abstract_model.py` then add their variables,
+parameters, equations and constraints to this shared object, which is always called `m`:
 
 ```python
-m = AbstractModel()
+m = create_base_model()
 ```
 
 !!! info "A note about file structure"
@@ -27,25 +27,27 @@ m = AbstractModel()
     ```python title="MIMOSA file structure"
     mimosa/
     ├── abstract_model.py # (1)!
+    ├── base_model.py # (2)!
     ├── mimosa.py
-    ├── components/ # (2)!
+    ├── components/ # (3)!
     │   ├── emissions.py
     │   ├── mitigation.py
     │   └── ...
     └── inputdata/
         ├── config/
-        │   └── config_default.yaml # (3)!
+        │   └── config_default.yaml # (4)!
         ├── regionalparams/
         └── data/
 
-    run.py # (4)!
+    run.py # (5)!
 
     ```
 
-    1.  The model components are combined in this file.
-    2.  The components discussed in the [Model documentation](../components/index.md) are defined in this folder.
-    3.  Configuration parameter types and default values are defined in this file.
-    4.  Example of a basic model run. Place your run files here, such that the mimosa package from this folder is used,
+    1.  The model components are listed and combined in this file.
+    2.  Shared time, region and baseline input parameters are defined in this file.
+    3.  The components discussed in the [Model documentation](../components/index.md) are defined in this folder.
+    4.  Configuration parameter types and default values are defined in this file.
+    5.  Example of a basic model run. Place your run files here, such that the mimosa package from this folder is used,
         and not a version previously installed through `pip install mimosa`.
 
 For most extensions, use the following steps:

@@ -52,9 +52,10 @@ for the available forms and more complete examples.
 
 Add a Python file to `mimosa/components`:
 
-```text
+```text hl_lines="7"
 mimosa/
 ├── abstract_model.py
+├── base_model.py
 └── components/
     ├── emissions.py
     ├── mitigation.py
@@ -70,9 +71,9 @@ the Pyomo `Param` to a configuration value or input file.
 
 ## 2. Add the component to MIMOSA
 
-Import and call the component in `mimosa/abstract_model.py`:
+Import and register the component in the component catalogue in `mimosa/abstract_model.py`:
 
-```python title="mimosa/abstract_model.py" hl_lines="3 13"
+```python title="mimosa/abstract_model.py" hl_lines="3 10"
 from mimosa.components import (
     emissions,
     new_component,
@@ -80,23 +81,21 @@ from mimosa.components import (
 )
 
 
-def create_abstract_model(context: ModelContext):
-    m = AbstractModel()
-    constraints = []
-
-    constraints.extend(emissions.get_constraints(m, context))
-    constraints.extend(new_component.get_constraints(m, context))
-
+MODEL_COMPONENTS = (
+    fixed_component("emissions", emissions.get_constraints),
+    fixed_component("new_component", new_component.get_constraints),
     # ... remaining components ...
+)
 ```
 
-Place the call near related model components so the file remains easy to understand. References inside
-equation functions are evaluated after the model components have been added, so their dependencies do
-not determine the order of these calls.
+Place the entry near related model components so the construction sequence remains easy to understand.
+References inside equation functions are evaluated after the model components have been added, so their
+dependencies do not normally determine the order of these entries.
 
 That is all that is required for a component that should always be included. There is no need to add
-the component to `ModelContext` or `config_default.yaml` unless users need to choose between different
-versions or the component needs options while the model is being put together.
+the component anywhere else. There is also no need to change `config_default.yaml` unless users need
+to choose between different versions or the component needs options while the model is being put
+together.
 
 ## 3. Document the component
 
@@ -134,8 +133,8 @@ needs a full optimisation run.
 
 Continue with:
 
-* [Selectable modules](selectable_modules.md) when users should be able to choose between alternative
+- [Selectable modules](selectable_modules.md) when users should be able to choose between alternative
   versions of a component, or when adding a new submodule to an existing group such as damages,
   welfare or effort sharing;
-* [Model options](model_options.md) when a setting changes which variables or equations a component
+- [Model options](model_options.md) when a setting changes which variables or equations a component
   creates.

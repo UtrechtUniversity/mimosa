@@ -11,21 +11,18 @@ There are two naming conventions:
 | Selectable component              | `<name> module options`                     | `damage module options` |
 | Component that is always included | `<name> options`                            | `emissions options`     |
 
-These names are read by `Preprocessor._create_model_context`:
+The component catalogue determines which naming convention is used:
 
-```python title="mimosa/core/initializer.py"
-def registry_component(name):
-    return ComponentConfig(
-        module=model_params[f"{name} module"],
-        options=model_params.get(f"{name} module options", {}),
-    )
-
-
-def fixed_component(name):
-    return ComponentConfig(
-        options=model_params.get(f"{name} options", {}),
-    )
+```python title="mimosa/abstract_model.py"
+MODEL_COMPONENTS = (
+    fixed_component("emissions", emissions.get_constraints),
+    selectable_component("damage", damages.DAMAGE_MODULES),
+    # ... remaining components ...
+)
 ```
+
+`fixed_component` reads `<name> options`. `selectable_component` reads both `<name> module` and
+`<name> module options`.
 
 ## Options for a selectable component
 
@@ -119,23 +116,14 @@ available through `ModelContext`.
 
 ## Options for a new fixed component
 
-A newly added plain component only needs to be added to `ModelContext` when it starts using options.
-Add it to the fixed components in `Preprocessor._create_model_context`:
+A plain component is already registered with `fixed_component` in the component catalogue. That entry
+also makes its options available through `ModelContext`, so no extra Python registration is needed:
 
-```python title="mimosa/core/initializer.py" hl_lines="9"
-components={
-    # ... selectable components ...
-
-    # Fixed/non-registry components
-    "emissions": fixed_component("emissions"),
-    "sealevelrise": fixed_component("sealevelrise"),
-    "mitigation": fixed_component("mitigation"),
-    "cobbdouglas": fixed_component("cobbdouglas"),
-    "new_component": fixed_component("new_component"),
-}
+```python title="mimosa/abstract_model.py"
+fixed_component("new_component", new_component.get_constraints),
 ```
 
-Then define `new_component options` under `model structure` and read individual values with
+Define `new_component options` under `model structure` and read individual values with
 `context.option("new_component", "option name", default=...)`.
 
 ## Other ways to read options

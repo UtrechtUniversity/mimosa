@@ -106,7 +106,7 @@ want MIMOSA to support several biodiversity representations: no biodiversity imp
 temperature-dependent representation, and a more detailed representation based on ecosystems.
 
 This requires a new component package, a new selection dictionary, a configuration choice, and one
-place where MIMOSA loads the selected submodule.
+entry in MIMOSA's component catalogue.
 
 ### 1. Create the package and submodules
 
@@ -157,44 +157,24 @@ model structure:
     default: none
 ```
 
-### 4. Add the selection to `ModelContext`
+### 4. Add the selection to the component catalogue
 
-In `Preprocessor._create_model_context`, add the new name using `registry_component`:
-
-```python title="mimosa/core/initializer.py" hl_lines="8"
-components={
-    "damage": registry_component("damage"),
-    "emissiontrade": registry_component("emissiontrade"),
-    "financialtransfer": registry_component("financialtransfer"),
-    "effortsharing": registry_component("effortsharing"),
-    "welfare": registry_component("welfare"),
-    "objective": registry_component("objective"),
-    "biodiversity": registry_component("biodiversity"),
-
-    # ... fixed components ...
-}
-```
-
-The name `biodiversity` connects three places: `biodiversity module` in the configuration,
-`registry_component("biodiversity")` in the model context, and `context.module("biodiversity")` when
-the model is assembled.
-
-### 5. Load the selected submodule
-
-Import the package and load its selected function in `mimosa/abstract_model.py`:
+Import the package and add it to `MODEL_COMPONENTS` in
+`mimosa/abstract_model.py`:
 
 ```python title="mimosa/abstract_model.py"
-from mimosa.common.utils import load_from_registry
 from mimosa.components import biodiversity
 
-    # ...
 
-    get_biodiversity_constraints = load_from_registry(
-        context.module("biodiversity"),
-        biodiversity.BIODIVERSITY_MODULES,
-    )
-    constraints.extend(get_biodiversity_constraints(m, context))
+MODEL_COMPONENTS = (
+    # ... existing components ...
+    selectable_component("biodiversity", biodiversity.BIODIVERSITY_MODULES),
+)
 ```
+
+The name `biodiversity` must match the first part of `biodiversity module` in the configuration.
+MIMOSA then reads the selection into `ModelContext` and calls the chosen function automatically.
+Place the entry near the model components that use or produce related quantities.
 
 Users can now select a representation in the same way as existing modules:
 

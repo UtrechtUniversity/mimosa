@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Iterator
+from typing import Iterator, List, Tuple
 
 from mimosa.common import (
     AbstractModel,
@@ -8,10 +8,9 @@ from mimosa.common import (
     regional_params,
     TransformationFactory,
     ModelContext,
-    ComponentConfig,
 )
 from mimosa.common.config.parseconfig import check_params, parse_param_values
-from mimosa.abstract_model import create_abstract_model
+from mimosa.abstract_model import ALL_COMPONENTS, create_abstract_model
 from mimosa.concrete_model.instantiate_params import InstantiatedModel
 from mimosa.concrete_model import custom_constraints
 
@@ -105,34 +104,14 @@ class Preprocessor:
     def _create_model_context(self) -> ModelContext:
         model_params = self._params["model structure"]
 
-        def registry_component(name):
-            return ComponentConfig(
-                module=model_params[f"{name} module"],
-                options=model_params.get(f"{name} module options", {}),
-            )
-
-        def fixed_component(name):
-            return ComponentConfig(
-                options=model_params.get(f"{name} options", {}),
-            )
-
         return ModelContext(
             components={
-                "damage": registry_component("damage"),
-                "emissiontrade": registry_component("emissiontrade"),
-                "financialtransfer": registry_component("financialtransfer"),
-                "effortsharing": registry_component("effortsharing"),
-                "welfare": registry_component("welfare"),
-                "objective": registry_component("objective"),
-                # Fixed/non-registry components
-                "emissions": fixed_component("emissions"),
-                "sealevelrise": fixed_component("sealevelrise"),
-                "mitigation": fixed_component("mitigation"),
-                "cobbdouglas": fixed_component("cobbdouglas"),
+                component.name: component.read_config(model_params)
+                for component in ALL_COMPONENTS
             }
         )
 
-    def _create_abstract_model(self) -> AbstractModel:
+    def _create_abstract_model(self) -> Tuple[AbstractModel, List]:
         """
         Loads all the equations and creates an abstract_model.
         `abstract` here means that the model is not yet instantiated with data.
