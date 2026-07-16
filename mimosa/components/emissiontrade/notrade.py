@@ -20,13 +20,25 @@ def get_constraints(
     m: AbstractModel, context: ModelContext
 ) -> Sequence[GeneralConstraint]:
     """
-    Without emission trading, the import/export of emission reductions and mitigation costs is always zero:
+    Without emission trading, both trading balances are always zero:
 
     $$
-    \\text{mitigation_cost_trading_balance}_{t,r} = 0
+    \\begin{align}
+    \\text{emission reduction trading balance}_{t,r} &= 0,\\\\
+    \\text{mitigation cost trading balance}_{t,r} &= 0.
+    \\end{align}
     $$
 
-    This means that the mitigation costs and the area under the MAC are exactly the same for each region (see [Mitigation costs](mitigation.md#mitigation-costs)).
+    Therefore, the reductions attributed to a region are the physical reductions within that region, and
+    `mitigation_costs` is equal to `domestic_mitigation_costs` (see
+    [Mitigation costs](mitigation.md#mitigation-costs)). The model does not create a separate
+    `attributed_emission_reductions` result for this option.
+
+    Without trade, regional emission allowances are simply equal to regional emissions:
+
+    $$
+    \\text{regional emission allowances}_{t,r} = \\text{regional emissions}_{t,r}.
+    $$
     """
     constraints = []  # No constraints here
 

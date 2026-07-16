@@ -9,7 +9,7 @@ to compensate for damage costs. In MIMOSA, two types can be chosen: either no fi
 
 The financial transfer module can be chosen using the parameter [`financialtransfer module`](../parameters.md#model structure.financialtransfer module).
 
-Note that the difference with emission trading is that (paid for) emission reductions are not affected by any financial transfer from this module.
+Unlike emission trading, financial transfers do not change the emission reductions attributed to a region or its regional emission allowances.
 
 === "No transfers `default`"
 

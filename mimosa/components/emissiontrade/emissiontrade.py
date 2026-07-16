@@ -36,8 +36,9 @@ def get_constraints(
     \\sum_r \\text{mitigation cost trading balance}_{t,r} = 0
     $$
 
-    All emissions are traded at the global carbon price. Therefore, the financial flows (mitigation cost balance) is
-    translated into emission flows (emission reduction trading balance) using the global carbon price:
+    A single global carbon price is used to convert the financial flow
+    (`mitigation_cost_trading_balance`) into a flow of attributed emission reductions
+    (`emission_reduction_trading_balance`):
 
     $$
     \\text{emission reduction trading balance}_{t,r} = \\frac{\\text{mitigation cost trading balance}_{t,r}}{\\text{global carbon price}_{t}},
@@ -49,14 +50,18 @@ def get_constraints(
     \\text{global carbon price}_{t} = \\frac{\\sum_r \\text{carbon price}_{t,r} \\cdot \\text{population}_{t,r}}{\\sum_r \\text{population}_{t,r}}.
     $$
 
-    Finally, the emission reductions paid for by a region are calculated as the physical reductions in the region plus the
+    The emission reductions attributed to a region are calculated as the physical reductions in that region plus its
     emission reduction trading balance:
 
     $$
-    \\text{paid for emission reductions}_{t,r} = \\text{regional emission reduction}_{t,r} + \\text{emission reduction trading balance}_{t,r}.
+    \\text{attributed emission reductions}_{t,r} = \\text{regional emission reduction}_{t,r} + \\text{emission reduction trading balance}_{t,r}.
     $$
 
+    Regional emission allowances are the baseline emissions minus the reductions attributed to the region:
 
+    $$
+    \\text{regional emission allowances}_{t,r} = \\text{baseline emissions}_{t,r} - \\text{attributed emission reductions}_{t,r}.
+    $$
 
     """
     constraints = []
@@ -110,7 +115,7 @@ def get_constraints(
                     else 0
                 ),
             ),
-            # Constraint: paid for emission reductions
+            # Constraint: emission reductions attributed to the region after trading
             RegionalEquation(
                 m.attributed_emission_reductions,
                 lambda m, t, r: (
@@ -120,7 +125,7 @@ def get_constraints(
                     else Constraint.Skip
                 ),
             ),
-            # Constraint: regional emission allowances, equal to baseline minus paid for emission reductions
+            # Constraint: regional emission allowances, equal to baseline minus attributed emission reductions
             RegionalEquation(
                 m.regional_emission_allowances,
                 lambda m, t, r: (

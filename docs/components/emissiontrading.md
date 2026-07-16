@@ -4,11 +4,77 @@ icon: material/earth
 
 [:octicons-arrow-left-24: Back to general structure](index.md)
 
-By default, every region has to pay for their own emission reductions. However, emission trading is a mechanism to allow regions to trade emission allowances with each other. This way, regions can pay for reductions in other regions if it is cheaper than reducing their own emissions or when following an effort-sharing regime.
+By default, every region pays for the emission reductions that take place within that region. Emission trading allows regions to exchange emission reductions and the associated mitigation costs. A region can then pay for reductions elsewhere, for example because those reductions are cheaper or because an [effort-sharing regime](effortsharing.md) assigns a different distribution of emission allowances.
 
 The emission trading module can be chosen using the parameter [`emissiontrade module`](../parameters.md#model structure.emissiontrade module).
 
-Note that emission trading is most often used in combination with an [effort-sharing module](effortsharing.md).
+## Physical and attributed reductions and costs
+
+Emission trading distinguishes between where an emission reduction takes place and which region receives credit for and pays for that reduction:
+
+- `regional_emission_reduction` is the physical reduction within a region.
+- `attributed_emission_reductions` is the reduction attributed to a region after trading.
+- `domestic_mitigation_costs` is the cost of the physical reductions within a region.
+- `mitigation_costs` is the cost attributed to a region after trading.
+
+With emission trading, the two pairs are connected through the trading balances:
+
+$$
+\begin{align}
+\text{attributed emission reductions}_{t,r}
+    &= \text{regional emission reduction}_{t,r}
+       + \text{emission reduction trading balance}_{t,r},\\
+\text{mitigation costs}_{t,r}
+    &= \text{domestic mitigation costs}_{t,r}
+       + \text{mitigation cost trading balance}_{t,r}.
+\end{align}
+$$
+
+A positive trading balance means that a region buys reductions and pays other regions. A negative balance means that a region sells reductions and receives payment. Without emission trading, both balances are zero, so physical and attributed reductions and costs are the same.
+
+## Variables in the model results
+
+| Variable | Meaning | Unit | Availability |
+| --- | --- | --- | --- |
+| `regional_emission_reduction` | Physical emission reduction within the region | Emissions per year | Both options |
+| `attributed_emission_reductions` | Emission reductions attributed to the region after trading | Emissions per year | Emission trading only |
+| `emission_reduction_trading_balance` | Reductions bought (positive) or sold (negative) by the region | Emissions per year | Both options; always zero without trade |
+| `regional_emission_allowances` | Emissions assigned to the region after accounting for its attributed reductions | Emissions per year | Both options |
+| `domestic_mitigation_costs` | Cost of reductions taking place within the region | Currency per year | Both options |
+| `mitigation_costs` | Mitigation costs attributed to the region after trading | Currency per year | Both options |
+| `mitigation_cost_trading_balance` | Payments made (positive) or received (negative) by the region | Currency per year | Both options; always zero without trade |
+| `carbonprice` | Marginal carbon price in a region | Currency per unit of emissions | Both options |
+| `global_carbonprice` | Population-weighted average carbon price used to convert payments into traded reductions | Currency per unit of emissions | Emission trading only |
+
+The exact units are determined by the configured [model units](../extending/units.md). With the default units, emissions flows are expressed per year and costs are expressed in trillion 2010 US dollars per year.
+
+## Checking emission-trading results
+
+For every timestep with emission trading, the payments sum to zero across regions:
+
+$$
+\sum_r \text{mitigation cost trading balance}_{t,r} = 0.
+$$
+
+Because all payments are converted at the same global carbon price, the emission reduction trading balances also sum to zero. Therefore, trading changes the regional attribution of reductions and costs, but not their global totals. Small non-zero sums can occur in numerical results because of solver tolerances.
+
+The regional emission allowances are calculated from the reductions attributed to a region:
+
+$$
+\text{regional emission allowances}_{t,r}
+    = \text{baseline emissions}_{t,r}
+      - \text{attributed emission reductions}_{t,r}.
+$$
+
+Without emission trading, `regional_emission_allowances` is simply equal to `regional_emissions`.
+
+## Interaction with other modules
+
+Emission trading is often used with an [effort-sharing module](effortsharing.md). Effort sharing determines how allowances or costs should be distributed among regions, while emission trading connects that distribution to the physical reductions and costs in each region.
+
+The [financial transfer module](financialtransfers.md) is separate. Its transfers redistribute damage costs and do not change `attributed_emission_reductions`, `regional_emission_allowances`, or either emission-trading balance.
+
+## Available options
 
 === "No emission trade `default`"
 

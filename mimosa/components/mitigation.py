@@ -153,11 +153,11 @@ def _get_mac_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     \\end{align}
     $$
 
-    Finally, the mitigation costs used in MIMOSA are equal to the domestic mitigation costs, plus potentially import/export of mitigation
-    costs if [emission trading](emissiontrading.md) is enabled:
+    Finally, the mitigation costs used in MIMOSA are equal to the domestic mitigation costs plus the mitigation cost trading
+    balance if [emission trading](emissiontrading.md) is enabled:
 
     $$
-    \\text{mitigation costs}_{t,r} = \\text{domestic mitigation costs}_{t,r} + \\text{import/export mitigation cost balance}_{t,r}.
+    \\text{mitigation costs}_{t,r} = \\text{domestic mitigation costs}_{t,r} + \\text{mitigation cost trading balance}_{t,r}.
     $$
 
 
