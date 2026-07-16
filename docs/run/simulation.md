@@ -63,12 +63,7 @@ The separate [baseline guide](baseline.md) shows both a no-policy scenario with 
 A single number applies to every timestep and region:
 
 ```python
-from mimosa import MIMOSA, load_params
-
-model = MIMOSA(load_params())
-
-simulation = model.run_simulation(relative_abatement=0.25)
-model.save_simulation(simulation, "constant_25_percent_abatement")
+--8<-- "tests/runs/run_simulation.py"
 ```
 
 For a pathway that varies over time or regions, a control can instead be supplied as:

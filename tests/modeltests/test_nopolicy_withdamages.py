@@ -1,7 +1,7 @@
 import pytest
 from tests.modeltests.utils import exec_run, SimulationObjectModel, read_output
 
-pytestmark = pytest.mark.simulation
+pytestmark = [pytest.mark.documentation, pytest.mark.simulation]
 
 
 @pytest.fixture(scope="module")

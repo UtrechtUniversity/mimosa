@@ -2,7 +2,7 @@ import pytest
 import numpy as np
 from tests.modeltests.utils import exec_run, SolverStatus, read_output
 
-pytestmark = pytest.mark.ipopt
+pytestmark = [pytest.mark.documentation, pytest.mark.ipopt]
 
 
 @pytest.fixture(scope="module")
