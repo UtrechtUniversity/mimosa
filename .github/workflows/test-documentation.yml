@@ -1,0 +1,38 @@
+name: Check documentation
+
+on:
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test_documentation:
+    name: Build documentation on Python 3.11
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Upgrade pip and build tools
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
+
+      - name: Install MIMOSA and documentation dependencies
+        run: |
+          python -m pip install -e ".[docs]"
+
+      - name: Check installed dependencies
+        run: |
+          python -m pip check
+
+      - name: Build documentation strictly
+        run: |
+          python -m mkdocs build --strict
