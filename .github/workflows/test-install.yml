@@ -42,4 +42,4 @@ jobs:
 
       - name: Run tests (excluding ipopt)
         run: |
-          pytest -m "not ipopt"
+          python -m pytest tests -m "not ipopt"

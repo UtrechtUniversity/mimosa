@@ -46,4 +46,4 @@ jobs:
       - name: Run full tests (with ipopt)
         shell: bash -l {0}
         run: |
-          pytest
+          python -m pytest tests
