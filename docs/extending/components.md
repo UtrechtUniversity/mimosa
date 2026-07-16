@@ -41,8 +41,8 @@ The function does three things:
 
 Every component function receives both `m` and `context`. A basic component does not need to use
 `context`; it only needs to include it in the function definition because MIMOSA supplies it when the
-component is added. More advanced uses are described under
-[Selectable modules and model options](advanced_components.md).
+component is added. More advanced uses are described under [Selectable modules](selectable_modules.md)
+and [Model options](model_options.md).
 
 `GlobalEquation` and `RegionalEquation` are used in both the Pyomo model and simulation mode. Other
 constraints only affect the Pyomo model. See [Variables, equations and constraints](variables_constraints.md)
@@ -132,9 +132,10 @@ needs a full optimisation run.
 
 ## More advanced components
 
-Continue with [Selectable modules and model options](advanced_components.md) when:
+Continue with:
 
-- users should be able to choose between alternative versions of a component;
-- a choice changes which variables or equations are created;
-- the component needs settings before Pyomo parameters are instantiated; or
-- you are adding a new implementation to an existing group such as damages, welfare or effort sharing.
+* [Selectable modules](selectable_modules.md) when users should be able to choose between alternative
+  versions of a component, or when adding a new submodule to an existing group such as damages,
+  welfare or effort sharing;
+* [Model options](model_options.md) when a setting changes which variables or equations a component
+  creates.

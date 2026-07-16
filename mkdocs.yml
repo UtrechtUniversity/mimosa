@@ -28,9 +28,10 @@ nav:
   - Extending MIMOSA:
       - extending/index.md
       - New components: extending/components.md
-      - "Advanced: selectable components": extending/advanced_components.md
       - Variables, equations, constraints: extending/variables_constraints.md
       - Parameters: extending/parameters.md
+      - "Advanced: selectable modules": extending/selectable_modules.md
+      - "Advanced: model options": extending/model_options.md
       - Units: extending/units.md
   - Model code: "https://github.com/UtrechtUniversity/mimosa"
   - Workshops:

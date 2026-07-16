@@ -66,5 +66,5 @@ Typically, when extending MIMOSA, the following steps can be followed:
 2. [Add new variables and constraints to the model](variables_constraints.md)
 3. [Add new parameters and data to the model](parameters.md)
 
-For components with user-selectable versions or options that change which equations are created, see
-[Selectable modules and model options](advanced_components.md).
+For more advanced extensions, see [Selectable modules](selectable_modules.md) and
+[Model options](model_options.md).
