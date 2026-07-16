@@ -11,7 +11,8 @@ from mimosa.common import Constraint
 import mimosa.components
 
 params = load_params()
-model = MIMOSA(params)
+# Constraint documentation only needs the constructed model, not a baseline simulation.
+model = MIMOSA(params, prerun=False)
 
 all_constraints = list(model.concrete_model.component_objects(Constraint))
 
