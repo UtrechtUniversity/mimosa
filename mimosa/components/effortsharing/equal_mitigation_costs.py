@@ -43,12 +43,13 @@ def get_constraints(
     where the variable $\\text{common level}_t$ can have arbitrary values and is purely used as a common
     value accross all the regions[^1].
 
-    [^1]: Note that for numerical stability, the constraint is not implemented as an equality constraint,
-        but as an "almost-equality" constraint (called soft-equality constraint). This means that it is enough
-        if the left-hand side (LHS) and right-hand side (RHS) are very close to each other (less than 0.5%):
+    [^1]: Implementing every regional condition as an exact equality can give IPOPT too many or
+        redundant equality equations relative to the available variables. The condition is therefore
+        implemented as an "almost-equality" (a soft-equality constraint), allowing a difference of at
+        most 0.5%. See [Soft-equality constraints](../extending/variables_constraints.md#soft-equality-constraints).
 
         $$
-        0.995 \\cdot \\text{LHS} \\leq \\text{RHS} \\leq 1.005 \\cdot \\text{LHS}.
+        0.995 \\cdot \\text{RHS} \\leq \\text{LHS} \\leq 1.005 \\cdot \\text{RHS}.
         $$
 
     """

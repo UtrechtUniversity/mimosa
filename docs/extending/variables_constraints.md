@@ -115,9 +115,10 @@ There are situations where the relationship between variables cannot be expresse
 * The left-hand-side and right-hand-side contain the same variable, but not in a way that can be expressed as an equation.
 * The left-hand-side contains more than one variable (e.g. `sqrt(x + y) = sin(z)`).
 
-In these cases, you can use a general constraint. They do not have a left-hand-side and right-hand-sie explicitly, but
-are defined as a lambda function that returns a boolean value. The general constraint is then satisfied if the
-lambda function returns `True`. If it returns `False`, the constraint is violated.
+In these cases, you can use a general constraint. It does not define one variable as the
+left-hand side of an equation. Instead, its function returns a symbolic Pyomo equality or
+inequality expression. The optimiser searches for variable values for which that relation is
+satisfied.
 
 For example, to create a constraint to enforce a maximum carbon budget, you can use the following code:
 
@@ -148,14 +149,20 @@ There are four types of constraints, depending on whether they depend on regions
 
 
 
-**Note:** as shown in this example, constraints do not need to be equality constraints. They can also be inequality constraints. Also, 
-constraints do need to be in the form of `m.variable == expression`: the left-hand-side and the right-hand-side can be non-linear combinations of variables and parameters.
+As shown in this example, constraints can be equalities or inequalities. They do **not** need to
+have the form `m.variable == expression`: both sides can contain combinations of variables and
+parameters.
+
+Unlike `GlobalEquation` and `RegionalEquation`, general constraints are only passed to the Pyomo
+optimisation model. They are not executed in [simulation mode](../run/simulation.md).
 
 <br>
 
 ##### Conditionally skip constraints
 
-If a constraint should only be enforced under certain conditions, you can use an the `Constraint.Skip` statement. This can be for certain time periods, regions, or any condition based on parameters. It is not possible to skip constraints based on variable values.
+If a constraint should only be enforced under certain conditions, use `Constraint.Skip`. This can
+depend on the timestep, region or parameter values. It cannot depend on the value of an optimisation
+variable, because that value is not known while the constraint is being constructed.
 
 ```python hl_lines="4 5"
 GlobalConstraint(
@@ -171,10 +178,81 @@ GlobalConstraint(
 **Note:** the variable `t` is a time index (starting at `t=0`), and `m.year(t)` returns the year of the time index `t`.
 
 
-## 4. Advanced: soft-equality constraints
+## 4. Advanced: soft-equality constraints {id="soft-equality-constraints"}
+
+Some modelling conditions should be almost equal but should not be added as another set of exact
+equalities. MIMOSA provides `GlobalSoftEqualityConstraint` and
+`RegionalSoftEqualityConstraint` for this purpose. A relative soft equality
+
+$$
+\text{LHS} \approx \text{RHS}
+$$
+
+is converted into two inequalities:
+
+$$
+(1-\epsilon)\,\text{RHS}
+\leq \text{LHS}
+\leq (1+\epsilon)\,\text{RHS}.
+$$
+
+The default tolerance is $\epsilon=0.005$, or 0.5%. For example, the equal-mitigation-costs
+effort-sharing regime requires regional mitigation costs as a share of GDP to remain close to a
+common global level:
+
+```python
+RegionalSoftEqualityConstraint(
+    lambda m, t, r: m.rel_mitigation_costs[t, r],
+    lambda m, t, r: m.effort_sharing_common_level[t],
+    name="effort_sharing_regime_mitigation_costs",
+    epsilon=0.005,
+)
+```
+
+A relative tolerance assumes that the right-hand side is non-negative. If the target can be zero or
+negative, use an absolute tolerance instead.
+
+Effort-sharing conditions are applied for every region, while regional allowances, costs and trading
+balances are already linked by the main model equations and global accounting constraints. Adding
+every effort-sharing condition as an exact equality can therefore create too many or redundant
+equalities relative to the available variables. IPOPT requires sufficient degrees of freedom and a
+well-behaved equality-constraint Jacobian; an overdetermined or linearly dependent equality system
+can stop before the optimisation starts.
+
+The soft formulation expresses the intended allocation as a narrow feasible interval instead. Its
+bounds are inequalities rather than exact equalities, and the small interval also avoids requiring
+numerically exact agreement between regions.
+
+Use `absolute_epsilon` instead when a fixed tolerance in the unit of the quantity is clearer:
+
+```python
+RegionalSoftEqualityConstraint(
+    lambda m, t, r: calculated_allowances(m, t, r),
+    lambda m, t, r: m.regional_emission_allowances[t, r],
+    name="regional_allowances",
+    absolute_epsilon=0.001,
+)
+```
+
+This enforces $\text{RHS}-0.001 \leq \text{LHS} \leq \text{RHS}+0.001$. Choose and
+document a tolerance that is small for the model quantity but not smaller than the numerical
+precision the optimisation can reliably achieve.
 
 ## 5. Advanced: numerical stability
 
-* Avoid division by zero: add a small number to the denominator
-* Avoid large numbers: scale the variables by choosing appropriate units
-* Avoid negative numbers in exponents and square roots by using the `soft_min` and `soft_max` functions
+Non-linear optimisation is sensitive to scale and to functions that are undefined or non-smooth in
+part of their domain. When adding equations and constraints:
+
+- Choose [units](units.md) that keep typical variable and constraint values at manageable scales.
+- Give variables meaningful bounds when their valid range is known.
+- Avoid division by values that can reach zero and powers, logarithms or square roots outside their
+  valid domain.
+- Use MIMOSA's smooth `soft_min` and `soft_max` approximations where a documented approximation is
+  scientifically acceptable. Do not use Python's `min`, `max` or a conditional based on a Pyomo
+  variable.
+- Provide sensible initial values for variables in difficult non-linear equations.
+- Do not add an arbitrary small number to a denominator without checking how it changes the equation
+  and its units.
+
+Numerical workarounds are part of the model formulation. Explain them beside the equation and test
+their behaviour over the expected input range.

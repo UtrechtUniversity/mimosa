@@ -153,6 +153,10 @@ Simulation mode can be used when the selected model components define a sequence
 
 Ordinary constraints, such as bounds linking several decision variables or equity constraints, are not executed by the simulator. Use optimisation when those constraints need to determine the result, or check separately that prescribed controls satisfy them.
 
+This is particularly important for [effort-sharing regimes](../components/effortsharing.md). Their
+regional allowance conditions constrain calculated variables rather than defining new simulation
+equations, so simulation mode cannot determine an effort-sharing allocation by itself.
+
 ## Inspecting equation dependencies
 
 The dependency graph shows how equation outputs depend on other model variables. It can help identify control variables and understand the simulation order:
