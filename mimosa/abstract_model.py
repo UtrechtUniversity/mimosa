@@ -24,14 +24,15 @@ from mimosa.components import (
 from mimosa.core.component_definition import (
     fixed_component,
     selectable_component,
+    validate_unique_component_names,
 )
-
 
 #######################
 # Component catalogue
 #######################
 
 # The tuple order is the order in which model components are constructed.
+# The name of each component corresponds to the name in the parameters file.
 MODEL_COMPONENTS = (
     # Emissions and temperature
     fixed_component("emissions", emissions.get_constraints),
@@ -58,6 +59,7 @@ MODEL_COMPONENTS = (
 OBJECTIVE_COMPONENT = selectable_component("objective", objective.OBJECTIVE_MODULES)
 
 ALL_COMPONENTS = MODEL_COMPONENTS + (OBJECTIVE_COMPONENT,)
+validate_unique_component_names(ALL_COMPONENTS)
 
 
 ########################

@@ -1,4 +1,6 @@
 import itertools
+from collections import Counter
+
 import numpy as np
 import pandas as pd
 import networkx as nx
@@ -63,10 +65,20 @@ class Simulator:
         self.equations = list(equations)
         self.concrete_model = concrete_model
 
+        equation_name_counts = Counter(eq.name for eq in self.equations)
+        duplicate_equation_names = sorted(
+            name for name, count in equation_name_counts.items() if count > 1
+        )
+        if duplicate_equation_names:
+            raise ValueError(
+                "Duplicate equation definitions for: "
+                + ", ".join(duplicate_equation_names)
+            )
+
         # Check the dependencies between variables and equations to test
         # if there are circular dependencies. If there are, it is not possible
         # to run in simulation mode.
-        equations_dict = {eq.name: eq for eq in equations}
+        equations_dict = {eq.name: eq for eq in self.equations}
         calc_dependencies(equations_dict, concrete_model)
         # Perform topological sort of equations based on dependencies
         self.equations_sorted, self.equations_graph, self.control_variables = (

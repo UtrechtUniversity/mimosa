@@ -7,6 +7,7 @@ from mimosa.abstract_model import (
 )
 from mimosa.core.component_definition import (
     ComponentDefinition,
+    validate_unique_component_names,
 )
 from mimosa.core.helpers import ComponentConfig, ModelContext
 
@@ -91,3 +92,11 @@ def test_component_definition_requires_one_construction_method():
             get_constraints=lambda *_args: [],
             modules={"choice": lambda *_args: []},
         )
+
+
+def test_component_catalogue_rejects_duplicate_names():
+    first = ComponentDefinition(name="duplicate", get_constraints=lambda *_args: [])
+    second = ComponentDefinition(name="duplicate", get_constraints=lambda *_args: [])
+
+    with pytest.raises(ValueError, match="Duplicate component names.*duplicate"):
+        validate_unique_component_names([first, second])

@@ -1,7 +1,8 @@
 """Construction and configuration mechanics for model components."""
 
+from collections import Counter
 from dataclasses import dataclass
-from typing import Callable, Dict, Optional
+from typing import Callable, Dict, Iterable, Optional
 
 from mimosa.common.utils import load_from_registry
 
@@ -53,3 +54,17 @@ def selectable_component(
 ) -> ComponentDefinition:
     """Define a component selected through ``<name> module`` in the config."""
     return ComponentDefinition(name=name, modules=modules)
+
+
+def validate_unique_component_names(
+    components: Iterable[ComponentDefinition],
+) -> None:
+    """Reject component catalogues containing the same name more than once."""
+    name_counts = Counter(component.name for component in components)
+    duplicate_names = sorted(
+        name for name, count in name_counts.items() if count > 1
+    )
+    if duplicate_names:
+        raise ValueError(
+            "Duplicate component names in the catalogue: " + ", ".join(duplicate_names)
+        )

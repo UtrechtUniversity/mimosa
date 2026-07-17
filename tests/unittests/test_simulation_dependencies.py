@@ -296,10 +296,6 @@ def test_calc_dependencies_rejects_future_variable_references():
         calc_dependencies({equation.name: equation}, model)
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="prepare_simulation currently overwrites duplicate equation names",
-)
 def test_prepare_simulation_rejects_duplicate_equation_lhs(monkeypatch):
     first = _equation("output", ["first_control"])
     second = _equation("output", ["second_control"])
