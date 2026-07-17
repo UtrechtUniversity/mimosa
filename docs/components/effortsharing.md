@@ -7,8 +7,8 @@ icon: fontawesome/solid/people-carry-box
 Effort-sharing regimes can be used to enforce the redistribution of mitigation effort and damage costs among
 regions following pre-defined equity principles. By default, in MIMOSA, no effort-sharing regime is imposed.
 
-Besides no regime at all, there are three types of effort-sharing regimes implemented in MIMOSA. This can be
-set using the [`effort_sharing_regime`](../parameters.md#effort sharing.regime) parameter.
+Besides no regime at all, there are five effort-sharing regimes implemented in MIMOSA. The regime can be
+selected using the [`effortsharing module`](../parameters.md#model structure.effortsharing module) parameter.
 
 === "No regime `default`"
 
@@ -34,3 +34,10 @@ set using the [`effort_sharing_regime`](../parameters.md#effort sharing.regime) 
 
     :::mimosa.components.effortsharing.equal_cumulative_per_cap.get_constraints
 
+??? note "Effort sharing in simulation mode"
+
+    The example effort-sharing runs use optimisation. In simulation mode, the effort-sharing rules
+    are not applied directly because they are constraints on calculated variables such as regional
+    emission allowances and mitigation costs. A simulation can replay an optimised effort-sharing
+    result when all underlying control values, including the relevant trading balances, are supplied,
+    but it does not determine a new effort-sharing allocation itself.

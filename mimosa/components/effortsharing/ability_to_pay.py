@@ -29,7 +29,7 @@ def get_constraints(
     Usage:
     ```python hl_lines="2"
     params = load_params()
-    params["effort sharing"]["regime"] = "ability_to_pay"
+    params["model structure"]["effortsharing module"] = "ability_to_pay"
     model = MIMOSA(params)
     ```
 

@@ -1,4 +1,5 @@
 *.xlsx
+!docs/assets/data/COACCH_damage_function_coefficients_IMAGE_regions.xlsx
 
 # Visual Studio Code
 .vscode/

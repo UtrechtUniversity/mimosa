@@ -24,13 +24,20 @@ nav:
       - Doing multiple runs: run/multipleruns.md
       - Doing an effort-sharing run: run/effortsharing.md
       - "Advanced: logging": run/logging.md
+      - Python reference: run/python_reference.md
   - MIMOSA Dashboard: "https://dashboard-mimosa.onrender.com/"
   - Extending MIMOSA:
-      - extending/index.md
+      - Getting started: extending/getting_started.md
+      - Overview: extending/index.md
       - New components: extending/components.md
       - Variables, equations, constraints: extending/variables_constraints.md
       - Parameters: extending/parameters.md
+      - "Advanced: selectable modules": extending/selectable_modules.md
+      - "Advanced: model options": extending/model_options.md
       - Units: extending/units.md
+  - Release notes:
+      - Overview: release_notes/index.md
+      - Version 1.3.0: release_notes/1.3.0.md
   - Model code: "https://github.com/UtrechtUniversity/mimosa"
   - Workshops:
       - Summer school PRISMA 2025: workshops/summerschool_prisma_2025/main.md
@@ -87,10 +94,10 @@ plugins:
             show_root_toc_entry: false
           paths: [src]
   - search
-  - table-reader
   - macros:
       include_dir: tests
       module_name: docs/scripts/mkdocs_macros
+  - table-reader
   - open-in-new-tab
   - plotly:
       template_default: assets/plots/template.json

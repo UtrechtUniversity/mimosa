@@ -91,11 +91,11 @@ In the next exercise, you will run MIMOSA with different effort sharing approach
 
         First, choose which effort sharing regime you want to use. You can choose between:
 
-        * [`"equal_mitigation_costs"`](../../parameters.md#effort sharing.regime)
-        * [`"equal_total_costs"`](../../parameters.md#effort sharing.regime)
-        * [`"per_cap_convergence"`](../../parameters.md#effort sharing.regime)
-        * [`"ability_to_pay"`](../../parameters.md#effort sharing.regime)
-        * [`"equal_cumulative_per_cap"`](../../parameters.md#effort sharing.regime)
+        * [`"equal_mitigation_costs"`](../../parameters.md#model structure.effortsharing module)
+        * [`"equal_total_costs"`](../../parameters.md#model structure.effortsharing module)
+        * [`"per_cap_convergence"`](../../parameters.md#model structure.effortsharing module)
+        * [`"ability_to_pay"`](../../parameters.md#model structure.effortsharing module)
+        * [`"equal_cumulative_per_cap"`](../../parameters.md#model structure.effortsharing module)
 
         More information about these regimes can be found in [van den Berg et al. (2020)](https://doi.org/10.1007/s10584-019-02368-y) (specifically, [Table 1](https://link.springer.com/article/10.1007/s10584-019-02368-y/tables/1)).
 
@@ -117,7 +117,7 @@ In the next exercise, you will run MIMOSA with different effort sharing approach
 
 #### Step 2: Effect on equity
 
-!!! question "Question 4: Regional mitigation costs and equity"
+!!! question "Question 4: Attributed mitigation costs and equity"
 
     * For the two chosen regions, compare the mitigation costs in 2050 and 2100. How do these costs compare to the global mitigation costs?
     * And how do they compare to the "CBA" run?
@@ -125,9 +125,9 @@ In the next exercise, you will run MIMOSA with different effort sharing approach
 
 #### Step 3: Effect on sovereignty
 
-!!! question "Question 5: Sovereignty and import/export of emission reductions"
+!!! question "Question 5: Sovereignty and trading of emission reductions"
 
 
-    When emission trading is enabled, each region has to pay it's own domestic reductions, plus an import/export balance. This balance is positive if the region imports emission reductions (i.e. buys emission reductions from other regions), and negative if the region exports emission reductions (i.e. sells emission reductions to other regions).
+    When emission trading is enabled, each region's attributed `mitigation_costs` consist of its `domestic_mitigation_costs` plus its `mitigation_cost_trading_balance`. A positive balance means that attributed costs and reductions exceed those occurring physically within the region; a negative balance means that they are lower.
 
-    The sum of the variable `import_export_mitigation_cost_balance` is always zero. However, to get a sense of how large the financial flows each year are, you can sum all the positive values (or all the negative values) of this variable. Do this for 2050 and for 2100. How big are the financial flows? How does this compare to the global GDP in those years? 
+    The sum of `mitigation_cost_trading_balance` across regions is always zero. However, to get a sense of how large the financial flows are each year, you can sum all positive values (or all negative values) of this variable. Do this for 2050 and 2100. How large are the financial flows? How do they compare to global GDP in those years?

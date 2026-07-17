@@ -1,4 +1,6 @@
 import itertools
+from collections import Counter
+
 import numpy as np
 import pandas as pd
 import networkx as nx
@@ -7,6 +9,10 @@ from scipy.optimize import minimize
 from mimosa.common import RegionalEquation, GlobalEquation, Var, ConcreteModel
 from .objects import SimulationObjectModel, SimVar
 from .helpers import calc_dependencies, sort_equations, plot_dependency_graph
+
+
+class SimulationNotPreparedError(RuntimeError):
+    """Raised when simulation is requested before dependencies are prepared."""
 
 
 class Simulator:
@@ -30,7 +36,20 @@ class Simulator:
     control_variables: list
 
     def __init__(self):
-        pass
+        self.reset()
+
+    def reset(self):
+        self.concrete_model = None
+        self.equations = []
+        self.equations_sorted = []
+        self.equations_graph = None
+        self.control_variables = []
+        self._is_prepared = False
+
+    @property
+    def is_prepared(self):
+        """Whether the simulator has a complete, valid execution plan."""
+        return self._is_prepared
 
     def prepare_simulation(self, equations, concrete_model):
         """
@@ -39,18 +58,33 @@ class Simulator:
         dependencies.
         """
 
-        self.equations = equations
+        # Clear derived state first so failed re-preparation cannot leave an old
+        # execution plan that appears usable with a new model or equation set.
+        self.reset()
+
+        self.equations = list(equations)
         self.concrete_model = concrete_model
+
+        equation_name_counts = Counter(eq.name for eq in self.equations)
+        duplicate_equation_names = sorted(
+            name for name, count in equation_name_counts.items() if count > 1
+        )
+        if duplicate_equation_names:
+            raise ValueError(
+                "Duplicate equation definitions for: "
+                + ", ".join(duplicate_equation_names)
+            )
 
         # Check the dependencies between variables and equations to test
         # if there are circular dependencies. If there are, it is not possible
         # to run in simulation mode.
-        equations_dict = {eq.name: eq for eq in equations}
+        equations_dict = {eq.name: eq for eq in self.equations}
         calc_dependencies(equations_dict, concrete_model)
         # Perform topological sort of equations based on dependencies
         self.equations_sorted, self.equations_graph, self.control_variables = (
             sort_equations(equations_dict, return_graph=True)
         )
+        self._is_prepared = True
 
     def run(self, simulation_model=None, **control_variables_kwargs):
         """
@@ -67,6 +101,8 @@ class Simulator:
             * A numpy array of shape (n_timesteps, n_regions): each region and time step will get the corresponding value
               (or shape (n_timesteps,) for global variables)
         """
+
+        self._require_prepared()
 
         if simulation_model is None:
             # Create a SimulationObjectModel object that will be used to run the simulation
@@ -113,6 +149,7 @@ class Simulator:
         return simulation_model
 
     def find_prerun_bestguess(self):
+        self._require_prepared()
 
         # Create the simulation model that will be used in the initial guessing
         sim_m = SimulationObjectModel(self.concrete_model)
@@ -150,6 +187,7 @@ class Simulator:
         """
         Plots the dependency graph of the equations.
         """
+        self._require_prepared()
         return plot_dependency_graph(self.equations_graph)
 
     ####################
@@ -181,6 +219,12 @@ class Simulator:
     ## Private functions
     ##
     ####################
+
+    def _require_prepared(self):
+        if not self._is_prepared:
+            raise SimulationNotPreparedError(
+                "Simulator is not prepared. Call prepare_simulation() first."
+            )
 
     def _simulate(self, sim_m: SimulationObjectModel):
         """

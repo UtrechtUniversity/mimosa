@@ -21,11 +21,14 @@ def create_fig():
     )
 
     ecpc_debts = {}
+    base_year = 2025
 
     for year in [1850, 1990]:
         for discount_rate in 0.01, 0.03, 0.05:
-            mock_m = MockEcpcModel(year, 2020, discount_rate)
-            ecpc_debts[f"    r=<b>{discount_rate}</b><br><b>{year}</b>-2020"] = (
+            mock_m = MockEcpcModel(year, base_year, discount_rate)
+            ecpc_debts[
+                f"    r=<b>{discount_rate}</b><br><b>{year}</b>-{base_year}"
+            ] = (
                 pd.Series(
                     {
                         r: mimosa.components.effortsharing.equal_cumulative_per_cap._calc_debt(

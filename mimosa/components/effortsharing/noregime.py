@@ -14,7 +14,7 @@ def get_constraints(
     Usage:
     ```python hl_lines="2"
     params = load_params()
-    params["effort sharing"]["regime"] = "noregime"
+    params["model structure"]["effortsharing module"] = "noregime"
     model = MIMOSA(params)
     ```
 
