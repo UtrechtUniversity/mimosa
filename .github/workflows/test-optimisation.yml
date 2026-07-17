@@ -2,11 +2,44 @@ name: Optimisation test with IPOPT
 
 on:
   workflow_dispatch:
+  pull_request:
+    branches: [master]
   push:
     tags: ["v*.*.*"]
     branches: [master]
 
 jobs:
+  test_optimisation_pr:
+    if: github.event_name == 'pull_request'
+    name: PR test with IPOPT on Python 3.11, Ubuntu
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Miniconda
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          python-version: "3.11"
+          channels: conda-forge
+          activate-environment: test-env
+          environment-file: tests/environment.yml
+
+      - name: Install mimosa
+        shell: bash -l {0}
+        run: |
+          pip install .
+
+      - name: Dependency check
+        shell: bash -l {0}
+        run: |
+          pip check
+
+      - name: Run full tests (with ipopt)
+        shell: bash -l {0}
+        run: |
+          python -m pytest tests
+
   test_optimisation:
     if: |
       github.event_name == 'workflow_dispatch' ||
