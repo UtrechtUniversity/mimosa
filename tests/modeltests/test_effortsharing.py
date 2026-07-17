@@ -2,7 +2,7 @@ import pytest
 import numpy as np
 from tests.modeltests.utils import exec_run, SolverStatus, read_output
 
-pytestmark = pytest.mark.ipopt
+pytestmark = [pytest.mark.documentation, pytest.mark.ipopt]
 
 
 @pytest.fixture(scope="module")
@@ -75,7 +75,7 @@ def test_per_cap_convergence(script_output):
     # After 2050, emissions per capita are equal (smaller than 0.05 GtCO2 per capita deviation):
     assert per_capita_emissions_deviation["2050":].max() < 0.05
 
-    # Check that regional emission allowances are equal to baseline emissions minus paid for emission reductions
+    # Regional allowances equal baseline emissions minus attributed reductions
     # (emissions after trade)
     allowances_diff = output_df_ind.loc["regional_emission_allowances"] - (
         output_df_ind.loc["baseline_emissions"]

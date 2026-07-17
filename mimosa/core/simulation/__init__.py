@@ -5,4 +5,4 @@ from .helpers import (
     plot_dependency_graph,
     CircularDependencyError,
 )
-from .simulator import Simulator
+from .simulator import Simulator, SimulationNotPreparedError

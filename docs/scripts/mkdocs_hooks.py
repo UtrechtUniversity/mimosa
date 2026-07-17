@@ -17,8 +17,8 @@ from mimosa.common.config.utils.parsers import PARSER_FACTORY
 # Get the default parameters and the parser tree
 params, parser_tree = check_params({}, return_parser_tree=True)
 
-# Create an instance of the MIMOSA model to get the names of each parameter to be parsed
-model = MIMOSA(params).concrete_model
+# Create the model only to inspect its parameters; no baseline simulation is needed.
+model = MIMOSA(params, prerun=False).concrete_model
 
 
 def markdown_parse_param_reference(markdown):

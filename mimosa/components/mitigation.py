@@ -153,11 +153,11 @@ def _get_mac_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     \\end{align}
     $$
 
-    Finally, the mitigation costs used in MIMOSA are equal to the domestic mitigation costs, plus potentially import/export of mitigation
-    costs if [emission trading](emissiontrading.md) is enabled:
+    Finally, the mitigation costs used in MIMOSA are equal to the domestic mitigation costs plus the mitigation cost trading
+    balance if [emission trading](emissiontrading.md) is enabled:
 
     $$
-    \\text{mitigation costs}_{t,r} = \\text{domestic mitigation costs}_{t,r} + \\text{import/export mitigation cost balance}_{t,r}.
+    \\text{mitigation costs}_{t,r} = \\text{domestic mitigation costs}_{t,r} + \\text{mitigation cost trading balance}_{t,r}.
     $$
 
 
@@ -217,8 +217,7 @@ def _get_mac_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
 
     # Mitigation costs
 
-    # Note that the mitigation costs are equal to the area under the MAC plus
-    # potential import/export of mitigation costs (if emission trading is enabled)
+    # Mitigation costs equal domestic costs plus the mitigation-cost trading balance
     m.mitigation_costs = Var(
         m.t,
         m.regions,
@@ -244,7 +243,7 @@ def _get_mac_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
                 lambda m, t, r: AC(m.relative_abatement[t, r], m, t, r)
                 * m.baseline_emissions[t, r],
             ),
-            # Total mitigation costs: domestic mitigation costs plus import/export of mitigation costs (if emission trading is enabled)
+            # Attributed mitigation costs: domestic costs plus the trading balance
             RegionalEquation(
                 m.mitigation_costs,
                 lambda m, t, r: (

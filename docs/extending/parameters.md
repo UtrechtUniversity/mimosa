@@ -1,8 +1,10 @@
-Parameteres are values used in MIMOSA that can be changed without changing the code. A new parameter called `new_param` can be added in the `get_constraints` function of any component:
+# Adding parameters and data
+
+Parameters are values used in MIMOSA that can be changed without changing the code. A new parameter called `new_param` can be added in the `get_constraints` function of any component:
 
 
 ```python hl_lines="4"
-def get_constraints(m):
+def get_constraints(m, context):
     # ... existing code ...
     
     m.new_param = Param()
@@ -80,13 +82,13 @@ Initializing their value is done in three steps:
 
     In the folder [`mimosa/inputdata/regionalparams/`]({{config.repo_url}}/tree/master/mimosa/inputdata/regionalparams/), create a new CSV file:
 
-    ```python hl_lines="10"
+    ```text
     mimosa
     │   ...
     │
     └─── inputdata
         └─── config
-            │   config_default.csv
+            │   config_default.yaml
         └─── regionalparams
             │   economics.csv
             |   mac.csv 
@@ -112,7 +114,7 @@ Initializing their value is done in three steps:
 
 2. **Register this regional parameter file** in the configuration file under the key [`regional_parameter_files`](../parameters.md#regional_parameter_files):
 
-    ```yaml title="mimosa/inputdata/config/config_default.yaml" hl_lines="8 9 10"
+    ```yaml title="mimosa/inputdata/config/config_default.yaml"
     ...
     regional_parameter_files:
       ...
@@ -128,7 +130,30 @@ Initializing their value is done in three steps:
 
     ??? info "What if my parameter values have a different regional resolution?"
 
-        Todo
+        Give every regional parameter file a `regionstype` describing the regions in its `region`
+        column. If this differs from the model's selected [`regionstype`](../parameters.md#regionstype),
+        MIMOSA looks for a conversion table registered under
+        [`regionsmappings`](../parameters.md#regionsmappings):
+
+        ```yaml title="mimosa/inputdata/config/config_default.yaml"
+        regionsmappings:
+          default:
+            - regionstype1: IMAGE26
+              regionstype2: NEW_REGIONS
+              conversiontable: inputdata/regions/IMAGE26_NEW_REGIONS.csv
+        ```
+
+        The conversion CSV must contain columns named `IMAGE26` and `NEW_REGIONS`, with each row
+        connecting regions in the two definitions. The mapping is applied by
+        [`region_mappers.py`]({{config.repo_url}}/blob/master/mimosa/common/regional_params/region_mappers.py).
+        When several source regions map to one target region, numeric parameter values are averaged
+        and non-numeric values use the first value. The same table can also be used in the reverse
+        direction.
+
+        This mechanism only converts regional parameter files. It does not aggregate or disaggregate
+        model variables, outputs or time-dependent input data. A new model region definition must
+        also be added to the allowed `regionstype` values, its region codes must be listed under
+        `regions`, and time-dependent input data must be available at that resolution.
 
     -------
     
@@ -153,11 +178,11 @@ m.population = Param(
 )
 ```
 
-1.  The `units` field is optional, but it is good practice to include it. This is especially important for numerical values with units (values that are not dimensionless). The `quant` module is imported as `quant` from the `mimosa` package.
+1.  The `units` field is optional, but it is good practice to include it. This is especially important for numerical values with units (values that are not dimensionless). Import `quant` from `mimosa.common`. See [Units](units.md) for the standard model units and conversion behaviour.
 
 Just like regional parameters, the parameter values are linked to the underlying data using the `doc` field, starting with `timeandregional::`. The input data source should be in IAMC format. For each parameter, the filename, variable, scenario and model should be specified in the configuration file:
 
-```yaml title="mimosa/inputdata/config/config_default.yaml" hl_lines="8 9 10 11 12"
+```yaml title="mimosa/inputdata/config/config_default.yaml"
 ...
 input:
   variables:
@@ -167,9 +192,9 @@ input:
       default:
         variable: Population
         unit: population_unit
-        scenario: "{SSP}-Ref-SPA0-V17"
-        model: IMAGE
-        file: inputdata/data/data_IMAGE_SSP.csv
+        scenario: "{SSP}-Baseline"
+        model: IMAGE 3.4
+        file: inputdata/data/data_IMAGE_SSP_updated.csv
     ...
 ```
 
@@ -177,22 +202,17 @@ input:
 
 The `file` field should point to the IAMC formatted data file. The IAMC format is a CSV file with the following columns:
 
-:fontawesome-solid-file-csv: [`mimosa/inputdata/data/data_IMAGE_SSP.csv`]({{config.repo_url}}/tree/master/mimosa/inputdata/data/data_IMAGE_SSP.csv)
+:fontawesome-solid-file-csv: [`mimosa/inputdata/data/data_IMAGE_SSP_updated.csv`]({{config.repo_url}}/tree/master/mimosa/inputdata/data/data_IMAGE_SSP_updated.csv)
 
-{{ read_csv("mimosa/inputdata/data/data_IMAGE_SSP.csv", nrows=3) }}
+{{ read_csv("mimosa/inputdata/data/data_IMAGE_SSP_updated.csv", nrows=3) }}
 |... | ... |... |... |
 
 ???+ info "Configuration values dependent on other parameter values"
 
     In the example above, the name of the scenario depends on the [`SSP`](../parameters.md#SSP). Every string in the configuration file can contain references
-    to other parameters, and are referred to using curly brackets `{}`. If you want to refer to a nested parameter (like [`effort sharing > regime`](../parameters.md#effort%20sharing.regime)), they should be joined
+    to other parameters, and are referred to using curly brackets `{}`. If you want to refer to a nested parameter (like [`model structure > effortsharing module`](../parameters.md#model structure.effortsharing module)), they should be joined
     with ` - `:
 
     ```yaml
-    scenario: "Scenario-with-{SSP}-and-{effort sharing - regime}"
+    scenario: "Scenario-with-{SSP}-and-{model structure - effortsharing module}"
     ```
-
-## 4. Advanced: dynamic parameter settings
-
-## 5. Advanced: complex parameter manipulations with `instantiate_params.py`
-

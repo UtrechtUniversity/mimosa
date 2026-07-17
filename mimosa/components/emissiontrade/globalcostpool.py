@@ -28,7 +28,7 @@ def get_constraints(
     (global cost pool specification)
 
     Necessary variables:
-        m.mitigation_costs (abatement costs as paid for by this region)
+        m.mitigation_costs (mitigation costs attributed to this region)
 
     Returns:
         list of constraints (any of:
@@ -87,7 +87,7 @@ def get_constraints(
                 ),
                 "paid_for_emission_reductions",
             ),
-            # Import export of emission reduction balance: if positive: , if negative:
+            # Difference between attributed and physical emission reductions
             RegionalConstraint(
                 lambda m, t, r: (
                     m.emission_reduction_trading_balance[t, r]

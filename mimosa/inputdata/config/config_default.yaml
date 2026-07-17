@@ -54,7 +54,7 @@ economics:
     descr: >-
       Parameter of inequality aversion.
       Should be between 0 and `elasmu`.
-      Only used when welfare_module='inequal_aversion_general'
+      Only used when model structure - welfare module is inequal_aversion_general
     type: float
     min: 0.0
     max: 3
@@ -108,7 +108,7 @@ economics:
       descr: >-
         Scaling factor for learning by doing to transform the units of cumulative mitigation
         in relative terms (compared to baseline emissions in t=0). Only used for calibration,
-        and should not be used to change the amount of LBD (for this, use the economics > MAC > rho parameter)
+        and should not be used to change the amount of LBD (for this, use economics > MAC > LBD_rate)
       type: quantity
       unit: emissions_unit
       default: 40 GtCO2
@@ -206,7 +206,7 @@ economics:
     rel_mitigation_costs_min_level:
       descr: >-
         Minimum level of mitigation costs (rel to GDP). By default, this is 0:
-        no negative abatement costs are allowed. For certain burden sharing regimes,
+        no negative attributed mitigation costs are allowed. For certain effort-sharing regimes,
         this value can become negative to allow certain (small) financial transfers.
       type: float
       min: -2
@@ -377,7 +377,7 @@ effort sharing:
   percapconv_year:
     descr: >-
       Year of convergence to per capita emission allowance 
-      (only used when effort sharing - regime is per_cap_convergence)
+      (only used when model structure - effortsharing module is per_cap_convergence)
       Can also be false, then always use grandfathering
     type: float
     min: 2020
@@ -388,7 +388,7 @@ effort sharing:
     descr: >-
       Discount rate for historical debt in the ECPC effort sharing regime
       (Equal Cumulative Per Capita regime).
-      Only used when effort sharing - regime is equal_cumulative_per_cap
+      Only used when model structure - effortsharing module is equal_cumulative_per_cap
     type: float
     min: 0
     max: 1
@@ -398,7 +398,7 @@ effort sharing:
     descr: >-
       Start year for historical debt in the ECPC effort sharing regime
       (Equal Cumulative Per Capita regime).
-      Only used when effort sharing - regime is equal_cumulative_per_cap
+      Only used when model structure - effortsharing module is equal_cumulative_per_cap
     type: float
     min: 1800
     max: 2019

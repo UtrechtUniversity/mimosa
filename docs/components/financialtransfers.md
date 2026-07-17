@@ -7,16 +7,16 @@ icon: fontawesome/solid/money-bill-transfer
 Besides [emission trading](emissiontrading.md), another mechanism to redistribute costs among regions is by allowing financial transfers
 to compensate for damage costs. In MIMOSA, two types can be chosen: either no financial transfers (default), or a global damage cost pool.
 
-The financial transfer module can be chosen using the parameter [`financialtransfer module`](../parameters.md#model.financialtransfer%20module).
+The financial transfer module can be chosen using the parameter [`financialtransfer module`](../parameters.md#model structure.financialtransfer module).
 
-Note that the difference with emission trading is that (paid for) emission reductions are not affected by any financial transfer from this module.
+Unlike emission trading, financial transfers do not change the emission reductions attributed to a region or its regional emission allowances.
 
 === "No transfers `default`"
 
     Usage:
     ```python hl_lines="2"
     params = load_params()
-    params["model"]["financialtransfer module"] = "notransfer"
+    params["model structure"]["financialtransfer module"] = "notransfer"
     model = MIMOSA(params)
     ```
 
@@ -27,9 +27,8 @@ Note that the difference with emission trading is that (paid for) emission reduc
     Usage:
     ```python hl_lines="2"
     params = load_params()
-    params["model"]["financialtransfer module"] = "globaldamagepool"
+    params["model structure"]["financialtransfer module"] = "globaldamagepool"
     model = MIMOSA(params)
     ```
 
     :::mimosa.components.financialtransfer.globaldamagepool.get_constraints
-

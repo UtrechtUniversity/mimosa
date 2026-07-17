@@ -1,6 +1,6 @@
 from mimosa import MIMOSA, load_params
 
-# Loop over the three available effort sharing regimes
+# Loop over the five available effort-sharing regimes
 for regime in [
     "equal_mitigation_costs",
     "equal_total_costs",
