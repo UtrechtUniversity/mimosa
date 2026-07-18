@@ -46,7 +46,8 @@ and [Model options](model_options.md).
 
 `GlobalEquation` and `RegionalEquation` are used in both the Pyomo model and simulation mode. Other
 constraints only affect the Pyomo model. See [Variables, equations and constraints](variables_constraints.md)
-for the available forms and more complete examples.
+for the available forms, an explanation of the `lambda` syntax, and complete examples of global and
+regional variables.
 
 ## 1. Create the component file
 
