@@ -12,17 +12,17 @@ The emission trading module can be chosen using the parameter [`emissiontrade mo
 
 Emission trading distinguishes between where an emission reduction takes place and the region to which the reduction and its cost are attributed:
 
-- `regional_emission_reduction` is the physical reduction within a region.
+- `regional_emission_reductions` is the physical reduction within a region.
 - `attributed_emission_reductions` is the reduction attributed to a region after trading.
-- `domestic_mitigation_costs` is the cost of the physical reductions within a region.
-- `mitigation_costs` is the cost attributed to a region after trading.
+- `domestic_mitigation_costs_abs` is the cost of the physical reductions within a region.
+- `mitigation_costs_abs` is the cost attributed to a region after trading.
 
 With emission trading, the two pairs are connected through the trading balances:
 
 $$
 \begin{align}
 \text{attributed emission reductions}_{t,r}
-    &= \text{regional emission reduction}_{t,r}
+    &= \text{regional emission reductions}_{t,r}
        + \text{emission reduction trading balance}_{t,r},\\
 \text{mitigation costs}_{t,r}
     &= \text{domestic mitigation costs}_{t,r}
@@ -34,17 +34,17 @@ A positive trading balance means that a region buys reductions and pays other re
 
 ## Variables in the model results
 
-| Variable | Meaning | Unit | Availability |
-| --- | --- | --- | --- |
-| `regional_emission_reduction` | Physical emission reduction within the region | Emissions per year | Both options |
-| `attributed_emission_reductions` | Emission reductions attributed to the region after trading | Emissions per year | Emission trading only |
-| `emission_reduction_trading_balance` | Reductions bought (positive) or sold (negative) by the region | Emissions per year | Both options; always zero without trade |
-| `regional_emission_allowances` | Emissions assigned to the region after accounting for its attributed reductions | Emissions per year | Both options |
-| `domestic_mitigation_costs` | Cost of reductions taking place within the region | Currency per year | Both options |
-| `mitigation_costs` | Mitigation costs attributed to the region after trading | Currency per year | Both options |
-| `mitigation_cost_trading_balance` | Payments made (positive) or received (negative) by the region | Currency per year | Both options; always zero without trade |
-| `carbonprice` | Marginal carbon price in a region | Currency per unit of emissions | Both options |
-| `global_carbonprice` | Population-weighted average carbon price used to convert payments into traded reductions | Currency per unit of emissions | Emission trading only |
+| Variable                             | Meaning                                                                                  | Unit                           | Availability                            |
+| ------------------------------------ | ---------------------------------------------------------------------------------------- | ------------------------------ | --------------------------------------- |
+| `regional_emission_reductions`       | Physical emission reduction within the region                                            | Emissions per year             | Both options                            |
+| `attributed_emission_reductions`     | Emission reductions attributed to the region after trading                               | Emissions per year             | Emission trading only                   |
+| `emission_reduction_trading_balance` | Reductions bought (positive) or sold (negative) by the region                            | Emissions per year             | Both options; always zero without trade |
+| `regional_emission_allowances`       | Emissions assigned to the region after accounting for its attributed reductions          | Emissions per year             | Both options                            |
+| `domestic_mitigation_costs_abs`      | Cost of reductions taking place within the region                                        | Currency per year              | Both options                            |
+| `mitigation_costs_abs`               | Mitigation costs attributed to the region after trading                                  | Currency per year              | Both options                            |
+| `mitigation_cost_trading_balance`    | Payments made (positive) or received (negative) by the region                            | Currency per year              | Both options; always zero without trade |
+| `carbonprice`                        | Marginal carbon price in a region                                                        | Currency per unit of emissions | Both options                            |
+| `global_carbonprice`                 | Population-weighted average carbon price used to convert payments into traded reductions | Currency per unit of emissions | Emission trading only                   |
 
 The exact units are determined by the configured [model units](../extending/units.md). With the default units, emissions flows are expressed per year and costs are expressed in trillion 2010 US dollars per year.
 

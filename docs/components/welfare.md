@@ -10,7 +10,6 @@ MIMOSA separates the calculation of yearly welfare[^1] from the final optimisati
 
 The welfare module can be chosen using the parameter [`welfare module`](../parameters.md#model structure.welfare module).
 
-
 === "Welfare-loss-minimising `default`"
 
     Usage:
@@ -44,13 +43,11 @@ The welfare module can be chosen using the parameter [`welfare module`](../param
 
     :::mimosa.components.welfare.inequal_aversion_general.get_constraints
 
-
-
 ## Optimisation goal and discounting
 
-The welfare module determines how regional consumption is aggregated into `yearly_welfare`. The separate [`objective module`](../parameters.md#model structure.objective module) determines what MIMOSA optimises:
+The welfare module determines how regional consumption is aggregated into `global_welfare`. The separate [`objective module`](../parameters.md#model structure.objective module) determines what MIMOSA optimises:
 
-- `utility` (default) maximises discounted `yearly_welfare`.
+- `utility` (default) maximises discounted `global_welfare`.
 - `globalcosts` minimises discounted mitigation and damage costs.
 
 The objective can be selected in the model configuration:
@@ -78,7 +75,7 @@ $$
 e^{-\text{PRTP}(t-t_0)} \cdot \text{yearly welfare}(t)\, dt.
 $$
 
-MIMOSA maximises the final value of `NPV`. With the global-cost objective, `yearly_welfare` is replaced by:
+MIMOSA maximises the final value of `NPV`. With the global-cost objective, `global_welfare` is replaced by:
 
 $$
 \text{global costs}_t =
@@ -94,10 +91,10 @@ and the final `NPV` is minimised. The welfare variables are still calculated in 
 
 The main result variables are:
 
-| Variable | Meaning |
-| --- | --- |
-| `utility` | Regional utility or consumption measure, depending on the selected welfare module |
-| `yearly_welfare` | Welfare aggregated across regions for one timestep |
-| `NPV` | Discounted welfare under the utility objective, or discounted costs under the global-cost objective |
+| Variable         | Meaning                                                                                             |
+| ---------------- | --------------------------------------------------------------------------------------------------- |
+| `utility`        | Regional utility or consumption measure, depending on the selected welfare module                   |
+| `global_welfare` | Welfare aggregated across regions for one timestep                                                  |
+| `NPV`            | Discounted welfare under the utility objective, or discounted costs under the global-cost objective |
 
-[^1]: While the terms welfare and utility can be used interchangeably, we typically refer to *utility* as the regional utility, and *welfare* as the global population-weighted utility.
+[^1]: While the terms welfare and utility can be used interchangeably, we typically refer to _utility_ as the regional utility, and _welfare_ as the global population-weighted utility.

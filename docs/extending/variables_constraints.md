@@ -15,10 +15,10 @@ Inside the function `get_constraints()`, create the new variable `m.carbon_inten
 ```python title="mimosa/components/cobbdouglas.py" hl_lines="5"
 def get_constraints(m, context):
     # ... existing code ...
-    
+
     # New variable
     m.carbon_intensity = Var(m.t, m.regions)
-    
+
     # ... existing code ...
 ```
 
@@ -51,7 +51,6 @@ The order of the sets determines the order used when accessing a value. For exam
     expression.” The local index could technically have another name, but MIMOSA consistently uses
     `t` and `r` for readability.
 
-
 ## 2. Equations
 
 Most of the relationships between variables are in the form of `variable(t, r) = fct(other_var1, other_var2, ...)`.
@@ -71,7 +70,7 @@ RegionalEquation(
 )
 ```
 
-**Important note:** the left-hand side should be specified *without* the indices (`t`, `r`): it should be just the variable (e.g. `m.carbon_intensity`, not <span style="text-decoration: line-through; text-decoration-color: rgba(0,0,0,.25);" markdown>`m.carbon_intensity[t, r]`</span>)
+**Important note:** the left-hand side should be specified _without_ the indices (`t`, `r`): it should be just the variable (e.g. `m.carbon_intensity`, not <span style="text-decoration: line-through; text-decoration-color: rgba(0,0,0,.25);" markdown>`m.carbon_intensity[t, r]`</span>)
 
 ### What the `lambda` function does
 
@@ -102,10 +101,10 @@ For example, these two definitions mean the same thing:
 
 The arguments must match the equation type:
 
-| Equation type | Function arguments | Called for |
-| --- | --- | --- |
-| `RegionalEquation` | `m, t, r` | every time step and region |
-| `GlobalEquation` | `m, t` | every time step |
+| Equation type      | Function arguments | Called for                 |
+| ------------------ | ------------------ | -------------------------- |
+| `RegionalEquation` | `m, t, r`          | every time step and region |
+| `GlobalEquation`   | `m, t`             | every time step            |
 
 Here `m` is the shared MIMOSA model, while `t` and `r` are the current values drawn from `m.t` and
 `m.regions`. Use a named function instead of `lambda` when the calculation needs several statements,
@@ -159,7 +158,7 @@ returns MIMOSA equations. Add the new equation to the returned list:
 def get_constraints(m, context):
     equations = []
     # ... existing code ...
-    
+
     equations.extend([
         RegionalEquation(
             m.carbon_intensity,  # Name of the left-hand-side variable
@@ -175,9 +174,9 @@ def get_constraints(m, context):
 
 There are situations where the relationship between variables cannot be expressed as an equation:
 
-* The relationship is not a simple equality, but an inequality (e.g. `x >= y`).
-* The left-hand-side and right-hand-side contain the same variable, but not in a way that can be expressed as an equation.
-* The left-hand-side contains more than one variable (e.g. `sqrt(x + y) = sin(z)`).
+- The relationship is not a simple equality, but an inequality (e.g. `x >= y`).
+- The left-hand-side and right-hand-side contain the same variable, but not in a way that can be expressed as an equation.
+- The left-hand-side contains more than one variable (e.g. `sqrt(x + y) = sin(z)`).
 
 In these cases, you can use a general constraint. It does not define one variable as the
 left-hand side of an equation. Instead, its function returns a symbolic Pyomo equality or
@@ -197,25 +196,23 @@ There are four types of constraints, depending on whether they depend on regions
 
 - Region and time dependent:
 
-    `RegionalConstraint(lambda m, t, r: ..., name="...")`
+  `RegionalConstraint(lambda m, t, r: ..., name="...")`
 
 - Only region dependent:
 
-    `RegionalInitConstraint(lambda m, r: ..., name="...")`
+  `RegionalInitConstraint(lambda m, r: ..., name="...")`
 
 - Only time dependent, not on region:
-    
-    `GlobalConstraint(lambda m, t: ..., name="...")`
+
+  `GlobalConstraint(lambda m, t: ..., name="...")`
 
 - Not dependent on time nor on region:
 
-    `GlobalInitConstraint(lambda m: ..., name="...")`
+  `GlobalInitConstraint(lambda m: ..., name="...")`
 
 As with equations, the arguments of each `lambda` identify the model and the indices for which
 MIMOSA calls it: `m` is the shared model, `t` is a member of `m.t`, and `r` is a member of
 `m.regions`.
-
-
 
 As shown in this example, constraints can be equalities or inequalities. They do **not** need to
 have the form `m.variable == expression`: both sides can contain combinations of variables and
@@ -245,7 +242,6 @@ GlobalConstraint(
 
 **Note:** the variable `t` is a time index (starting at `t=0`), and `m.year(t)` returns the year of the time index `t`.
 
-
 ## 4. Advanced: soft-equality constraints {id="soft-equality-constraints"}
 
 Some modelling conditions should be almost equal but should not be added as another set of exact
@@ -270,7 +266,7 @@ common global level:
 
 ```python
 RegionalSoftEqualityConstraint(
-    lambda m, t, r: m.rel_mitigation_costs[t, r],
+    lambda m, t, r: m.mitigation_costs[t, r],
     lambda m, t, r: m.effort_sharing_common_level[t],
     name="effort_sharing_regime_mitigation_costs",
     epsilon=0.005,
@@ -316,11 +312,11 @@ Sharp piecewise functions can also make a non-linear optimisation problem harder
 exports three smooth approximations from `mimosa.common`. The function sometimes informally called
 “softswitch” is named `soft_switch` in Python:
 
-| Helper | Smooth approximation | Typical use |
-| --- | --- | --- |
-| `soft_switch(x, scale)` | 0 when $x<0$, 1 when $x>0$ | Smoothly turn a term on around $x=0$ |
-| `soft_min(x, scale)` | $\max(0,x)$ | Keep a quantity approximately non-negative |
-| `soft_max(x, maxval, scale)` | $\min(x,\text{maxval})$ | Cap a quantity at an approximate upper limit |
+| Helper                       | Smooth approximation       | Typical use                                  |
+| ---------------------------- | -------------------------- | -------------------------------------------- |
+| `soft_switch(x, scale)`      | 0 when $x<0$, 1 when $x>0$ | Smoothly turn a term on around $x=0$         |
+| `soft_min(x, scale)`         | $\max(0,x)$                | Keep a quantity approximately non-negative   |
+| `soft_max(x, maxval, scale)` | $\min(x,\text{maxval})$    | Cap a quantity at an approximate upper limit |
 
 The names `soft_min` and `soft_max` describe the bound being applied: `soft_min` applies a lower
 bound of zero, while `soft_max` applies the supplied upper bound. They are approximations, so their
