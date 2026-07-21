@@ -218,20 +218,20 @@ def _get_mac_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     # Mitigation costs
 
     # Mitigation costs equal domestic costs plus the mitigation-cost trading balance
-    m.mitigation_costs = Var(
+    m.mitigation_costs_abs = Var(
         m.t,
         m.regions,
         initialize=0,
         units=quant.unit("currency_unit"),
     )
-    m.domestic_mitigation_costs = Var(
+    m.domestic_mitigation_costs_abs = Var(
         m.t,
         m.regions,
         initialize=0,
         units=quant.unit("currency_unit"),
     )
-    m.rel_mitigation_costs = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
-    m.rel_mitigation_costs_min_level = Param(
+    m.mitigation_costs = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
+    m.mitigation_costs_min_level = Param(
         doc="::economics.MAC.rel_mitigation_costs_min_level"
     )
     constraints.extend(
@@ -239,38 +239,38 @@ def _get_mac_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
             # Domestic mitigation costs: area under the MAC times baseline emissions,
             # so the costs of mitigation in a region without taking into account emission trading
             RegionalEquation(
-                m.domestic_mitigation_costs,
+                m.domestic_mitigation_costs_abs,
                 lambda m, t, r: AC(m.relative_abatement[t, r], m, t, r)
                 * m.baseline_emissions[t, r],
             ),
             # Attributed mitigation costs: domestic costs plus the trading balance
             RegionalEquation(
-                m.mitigation_costs,
+                m.mitigation_costs_abs,
                 lambda m, t, r: (
-                    m.domestic_mitigation_costs[t, r]
+                    m.domestic_mitigation_costs_abs[t, r]
                     + m.mitigation_cost_trading_balance[t, r]
                 ),
             ),
             RegionalEquation(
-                m.rel_mitigation_costs,
-                lambda m, t, r: m.mitigation_costs[t, r] / m.GDP_gross[t, r],
+                m.mitigation_costs,
+                lambda m, t, r: m.mitigation_costs_abs[t, r] / m.GDP_gross[t, r],
             ),
             RegionalConstraint(
-                lambda m, t, r: m.rel_mitigation_costs[t, r]
-                >= (m.rel_mitigation_costs_min_level if t > 0 else 0.0),
+                lambda m, t, r: m.mitigation_costs[t, r]
+                >= (m.mitigation_costs_min_level if t > 0 else 0.0),
                 "rel_mitigation_costs_non_negative",
             ),
         ]
     )
 
     # Keep track of relative global costs
-    m.global_rel_mitigation_costs = Var(m.t, units=quant.unit("fraction_of_GDP"))
+    m.global_mitigation_costs = Var(m.t, units=quant.unit("fraction_of_GDP"))
     constraints.extend(
         [
             GlobalEquation(
-                m.global_rel_mitigation_costs,
+                m.global_mitigation_costs,
                 lambda m, t: (
-                    sum(m.mitigation_costs[t, r] for r in m.regions)
+                    sum(m.mitigation_costs_abs[t, r] for r in m.regions)
                     / m.global_GDP_gross[t]
                 ),
             ),
@@ -291,7 +291,7 @@ def _get_mac_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
             GlobalEquation(
                 m.global_cost_per_emission_reduction_unit,
                 lambda m, t: (
-                    sum(m.mitigation_costs[t, r] for r in m.regions)
+                    sum(m.mitigation_costs_abs[t, r] for r in m.regions)
                     / soft_min(
                         sum(m.regional_emission_reduction[t, r] for r in m.regions)
                     )
@@ -303,7 +303,7 @@ def _get_mac_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
                 m.global_emission_reduction_per_cost_unit,
                 lambda m, t: (
                     sum(m.regional_emission_reduction[t, r] for r in m.regions)
-                    / soft_min(sum(m.mitigation_costs[t, r] for r in m.regions))
+                    / soft_min(sum(m.mitigation_costs_abs[t, r] for r in m.regions))
                     if t > 0
                     else 0
                 ),

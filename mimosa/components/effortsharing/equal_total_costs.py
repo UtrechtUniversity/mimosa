@@ -66,7 +66,7 @@ def get_constraints(
     return [
         # Total costs: mitigation + damage costs should be equal among regions as % GDP
         RegionalSoftEqualityConstraint(
-            lambda m, t, r: m.rel_mitigation_costs[t, r]
+            lambda m, t, r: m.mitigation_costs[t, r]
             + m.damage_costs[t, r]
             + m.rel_financial_transfer[t, r],
             lambda m, t, r: m.effort_sharing_common_level[t],

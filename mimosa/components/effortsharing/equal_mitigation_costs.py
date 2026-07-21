@@ -58,7 +58,7 @@ def get_constraints(
 
     return [
         RegionalSoftEqualityConstraint(
-            lambda m, t, r: m.rel_mitigation_costs[t, r],
+            lambda m, t, r: m.mitigation_costs[t, r],
             lambda m, t, r: m.effort_sharing_common_level[t],
             "effort_sharing_regime_mitigation_costs",
         ),
