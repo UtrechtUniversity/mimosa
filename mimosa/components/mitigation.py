@@ -293,7 +293,7 @@ def _get_mac_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
                 lambda m, t: (
                     sum(m.mitigation_costs_abs[t, r] for r in m.regions)
                     / soft_min(
-                        sum(m.regional_emission_reduction[t, r] for r in m.regions)
+                        sum(m.regional_emission_reductions[t, r] for r in m.regions)
                     )
                     if t > 0
                     else 0
@@ -302,7 +302,7 @@ def _get_mac_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
             GlobalEquation(
                 m.global_emission_reduction_per_cost_unit,
                 lambda m, t: (
-                    sum(m.regional_emission_reduction[t, r] for r in m.regions)
+                    sum(m.regional_emission_reductions[t, r] for r in m.regions)
                     / soft_min(sum(m.mitigation_costs_abs[t, r] for r in m.regions))
                     if t > 0
                     else 0

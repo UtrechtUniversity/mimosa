@@ -92,7 +92,7 @@ def get_constraints(
                 lambda m, t, r: (
                     m.emission_reduction_trading_balance[t, r]
                     == m.attributed_emission_reductions[t, r]
-                    - m.regional_emission_reduction[t, r]
+                    - m.regional_emission_reductions[t, r]
                     if t > 0
                     else Constraint.Skip
                 ),
