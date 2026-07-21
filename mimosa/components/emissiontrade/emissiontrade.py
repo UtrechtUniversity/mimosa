@@ -65,16 +65,16 @@ def get_constraints(
     """
     constraints = []
 
-    m.global_carbonprice = Var(m.t)
+    m.global_carbon_price = Var(m.t)
 
     # Emissions are traded at the global carbon price
     constraints.extend(
         [
             # Constraint that sets the global carbon price to the average of the regional carbon prices:
             GlobalEquation(
-                m.global_carbonprice,
+                m.global_carbon_price,
                 lambda m, t: sum(
-                    m.carbonprice[t, r] * m.population[t, r] for r in m.regions
+                    m.carbon_price[t, r] * m.population[t, r] for r in m.regions
                 )
                 / m.global_population[t],
             ),
@@ -109,7 +109,7 @@ def get_constraints(
                 m.emission_reduction_trading_balance,
                 lambda m, t, r: (
                     m.mitigation_cost_trading_balance[t, r]
-                    / soft_min(m.global_carbonprice[t])
+                    / soft_min(m.global_carbon_price[t])
                     if t > 0
                     else 0
                 ),

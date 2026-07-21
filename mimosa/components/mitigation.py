@@ -198,7 +198,7 @@ def _get_mac_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
         m.regions,
         doc=lambda params: f'regional::MAC.{params["economics"]["MAC"]["regional calibration factor"]}',
     )  # Regional scaling of the MAC
-    m.carbonprice = Var(
+    m.carbon_price = Var(
         m.t,
         m.regions,
         bounds=lambda m: (0, 2 * m.MAC_gamma),
@@ -207,7 +207,7 @@ def _get_mac_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     constraints.extend(
         [
             RegionalEquation(
-                m.carbonprice,
+                m.carbon_price,
                 lambda m, t, r: (
                     MAC(m.relative_abatement[t, r], m, t, r) if t > 0 else 0
                 ),
