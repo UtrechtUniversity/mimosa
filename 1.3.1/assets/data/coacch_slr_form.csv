@@ -1,0 +1,27 @@
+Region,SLR (with opt. adapt.),SLR (no adaptation)
+CAN,Linear,Quadratic
+USA,Linear,Quadratic
+MEX,Linear,Quadratic
+RCAM,Linear,Quadratic
+BRA,Linear,Quadratic
+RSAM,Linear,Quadratic
+NAF,Linear,Linear
+WAF,Linear,Linear
+EAF,Linear,Linear
+SAF,Linear,Quadratic
+WEU,Logistic,Linear
+CEU,Logistic,Quadratic
+TUR,Linear,Quadratic
+UKR,Linear,Quadratic
+STAN,Linear,Quadratic
+RUS,Linear,Quadratic
+ME,Linear,Quadratic
+INDIA,Linear,Linear
+KOR,Linear,Quadratic
+CHN,Linear,Quadratic
+SEAS,Linear,Linear
+INDO,Linear,Linear
+JAP,Linear,Linear
+OCE,Linear,Quadratic
+RSAS,Logistic,Quadratic
+RSAF,Linear,Linear
