@@ -47,7 +47,7 @@ def get_constraints(
                     m.NPV[t - 1]
                     + m.dt
                     * exp(-m.PRTP * (m.year(t) - m.beginyear))
-                    * m.yearly_welfare[t]
+                    * m.global_welfare[t]
                     if t > 0
                     else 0
                 ),
