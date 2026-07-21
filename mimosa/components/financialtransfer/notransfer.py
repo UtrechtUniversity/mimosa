@@ -15,7 +15,7 @@ def get_constraints(
     Without financial transfers, this variable is always equal to zero:
 
     $$
-    \\text{financial transf.}_{t,r} = \\text{rel. financial transf.} = 0.0
+    \\text{financial transfer abs}_{t,r} = \\text{financial transfer}_{t,r} = 0.0
     $$
     """
     constraints = []

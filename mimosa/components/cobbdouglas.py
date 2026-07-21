@@ -34,13 +34,13 @@ def get_constraints(
     :::mimosa.common.economics.calc_GDP
 
     The net GDP is then calculated by subtracting the damages and
-    mitigation costs from the gross GDP. *(Note that in MIMOSA, the damages are expressed as a fraction of the gross GDP,
-    whereas the mitigation costs are expressed in absolute terms.)*
+    mitigation costs from the gross GDP. The `_abs` variables are used here because the amounts
+    subtracted from GDP must be in currency units.
 
     $$
     \\begin{align}
     \\text{GDP}_{\\text{net},t,r} =\\ & \\text{GDP}_{\\text{gross},t,r} \\cdot (1 - \\text{damage costs}_{t,r}) \\\\
-    &\\ \\ \\ - \\text{mitigation costs}_{t,r} - \\text{financial transf.}_{t,r}
+    &\\ \\ \\ - \\text{mitigation costs abs}_{t,r} - \\text{financial transfer abs}_{t,r}
     \\end{align}
     $$
 

@@ -24,8 +24,8 @@ $$
 \text{attributed emission reductions}_{t,r}
     &= \text{regional emission reductions}_{t,r}
        + \text{emission reduction trading balance}_{t,r},\\
-\text{mitigation costs}_{t,r}
-    &= \text{domestic mitigation costs}_{t,r}
+\text{mitigation costs abs}_{t,r}
+    &= \text{domestic mitigation costs abs}_{t,r}
        + \text{mitigation cost trading balance}_{t,r}.
 \end{align}
 $$
@@ -43,8 +43,8 @@ A positive trading balance means that a region buys reductions and pays other re
 | `domestic_mitigation_costs_abs`      | Cost of reductions taking place within the region                                        | Currency per year              | Both options                            |
 | `mitigation_costs_abs`               | Mitigation costs attributed to the region after trading                                  | Currency per year              | Both options                            |
 | `mitigation_cost_trading_balance`    | Payments made (positive) or received (negative) by the region                            | Currency per year              | Both options; always zero without trade |
-| `carbonprice`                        | Marginal carbon price in a region                                                        | Currency per unit of emissions | Both options                            |
-| `global_carbonprice`                 | Population-weighted average carbon price used to convert payments into traded reductions | Currency per unit of emissions | Emission trading only                   |
+| `carbon_price`                       | Marginal carbon price in a region                                                        | Currency per unit of emissions | Both options                            |
+| `global_carbon_price`                | Population-weighted average carbon price used to convert payments into traded reductions | Currency per unit of emissions | Emission trading only                   |
 
 The exact units are determined by the configured [model units](../extending/units.md). With the default units, emissions flows are expressed per year and costs are expressed in trillion 2010 US dollars per year.
 

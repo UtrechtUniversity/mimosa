@@ -37,7 +37,7 @@ def get_constraints(
     percentage of GDP) should be the same for every region:
 
     $$
-    \\frac{\\text{mitig. costs}_{t,r}}{\\text{GDP}_{\\text{gross},t,r}} = \\text{common level}_t,
+    \\text{mitigation costs}_{t,r} = \\text{common level}_t,
     $$
 
     where the variable $\\text{common level}_t$ can have arbitrary values and is purely used as a common

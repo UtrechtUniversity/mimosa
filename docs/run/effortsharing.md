@@ -24,7 +24,7 @@ The example combines each regime with the following settings:
 Five output pairs are created, named `run_<regime>.csv` and
 `run_<regime>.csv.params.json`. Useful variables for comparing the results include
 `regional_emission_allowances`, `attributed_emission_reductions`,
-`mitigation_cost_trading_balance` and `rel_mitigation_costs`.
+`mitigation_cost_trading_balance` and `mitigation_costs`.
 
 ## Points to keep in mind
 

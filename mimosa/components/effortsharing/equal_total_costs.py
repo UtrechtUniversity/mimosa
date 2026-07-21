@@ -36,7 +36,7 @@ def get_constraints(
     In this effort-sharing regime, the damages are also taken into account when equalising the costs among regions:
 
     $$
-    \\frac{\\text{mitig. costs}_{t,r}}{\\text{GDP}_{\\text{gross},t,r}} + \\text{damages}_{t,r}\\ (+ \\text{rel. financial transf.}_{t,r}) = \\text{common level}_t,
+    \\text{mitigation costs}_{t,r} + \\text{damage costs}_{t,r}\\ (+ \\text{financial transfer}_{t,r}) = \\text{common level}_t,
     $$
 
     where the variable $\\text{common level}_t$ can have arbitrary values and is purely used as a common

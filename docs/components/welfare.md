@@ -80,7 +80,7 @@ MIMOSA maximises the final value of `NPV`. With the global-cost objective, `glob
 $$
 \text{global costs}_t =
 \sum_r \left(
-\text{mitigation costs}_{t,r}
+\text{mitigation costs abs}_{t,r}
 + \text{damage costs}_{t,r} \cdot \text{GDP gross}_{t,r}
 \right),
 $$

@@ -53,7 +53,7 @@ def get_constraints(
     emission reduction trading balance:
 
     $$
-    \\text{attributed emission reductions}_{t,r} = \\text{regional emission reduction}_{t,r} + \\text{emission reduction trading balance}_{t,r}.
+    \\text{attributed emission reductions}_{t,r} = \\text{regional emission reductions}_{t,r} + \\text{emission reduction trading balance}_{t,r}.
     $$
 
     Regional emission allowances are the baseline emissions minus the reductions attributed to the region:

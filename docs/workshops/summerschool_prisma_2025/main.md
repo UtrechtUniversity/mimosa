@@ -47,8 +47,8 @@ In the dashboard, a lot of information is already shown in the various tabs. You
     Investigate the following policy-relevant questions:
 
     * What is the cost-optimal temperature target? And how high does temperature rise without any policy?
-    * How big are the *global* economic damages in 2050 and 2100 in the baseline run, and in the CBA run? *Hint: look at the variable* `damage_relative_global`. And how big are the global avoided damages in the CBA run?
-    * How big are the *global* mitigation costs in 2050 and 2100 in the CBA run? And how does this compare to the avoided damages? Calculate the benefit-cost ratio (BCR) for 2050 and 2100.
+    * How big are the *global* economic damages in 2050 and 2100 in the baseline run, and in the CBA run? *Hint: look at `global_damage_costs` and `global_avoided_damage_costs`.*
+    * How big are the *global* mitigation costs (`global_mitigation_costs`) in 2050 and 2100 in the CBA run? And how does this compare to the avoided damages? Calculate the benefit-cost ratio (BCR) for 2050 and 2100.
 
 !!! question "Question 2: regional differences"
 

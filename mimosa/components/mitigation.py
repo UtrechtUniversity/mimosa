@@ -144,36 +144,38 @@ def _get_mac_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     ```
 
     Since the MAC is expressed in terms of relative abatement, we still need to multiply by the baseline emissions to obtain
-    mitigation costs in currency unit (dollars). The area under the MAC, also called the domestic mitigation costs, is therefore calculated as:
+    absolute mitigation costs in currency units (dollars). The area under the MAC, also called the
+    absolute domestic mitigation costs, is therefore calculated as:
     
     $$
     \\begin{align}
-    \\text{domestic mitigation costs}_{t,r} &= \\left(\\int_0^{a_{t,r}} \\text{MAC}_{\\text{regional},t,r}(a)\\ da \\right) \\cdot \\text{baseline emissions}_{t,r}\\\\
+    \\text{domestic mitigation costs abs}_{t,r} &= \\left(\\int_0^{a_{t,r}} \\text{MAC}_{\\text{regional},t,r}(a)\\ da \\right) \\cdot \\text{baseline emissions}_{t,r}\\\\
     &= \\text{factor}_{t,r} \\cdot \\frac{\\gamma \\cdot a_{t,r}^{\\beta+1}}{\\beta+1} \\cdot \\text{baseline emissions}_{t,r}
     \\end{align}
     $$
 
-    Finally, the mitigation costs used in MIMOSA are equal to the domestic mitigation costs plus the mitigation cost trading
-    balance if [emission trading](emissiontrading.md) is enabled:
+    Finally, the absolute mitigation costs attributed to a region are equal to its absolute domestic
+    mitigation costs plus the mitigation cost trading balance if
+    [emission trading](emissiontrading.md) is enabled:
 
     $$
-    \\text{mitigation costs}_{t,r} = \\text{domestic mitigation costs}_{t,r} + \\text{mitigation cost trading balance}_{t,r}.
+    \\text{mitigation costs abs}_{t,r} = \\text{domestic mitigation costs abs}_{t,r} + \\text{mitigation cost trading balance}_{t,r}.
     $$
 
 
-    ### Relative mitigation costs and minimum level of mitigation costs
-    Contrary to damages, the mitigation costs are expressed in absolute dollars, not in percentage of GDP. The relative mitigation
-    costs are also available as a variable:
+    ### Mitigation costs as a fraction of GDP and their minimum level
+    In model output, `mitigation_costs_abs` contains the absolute costs in currency units and
+    `mitigation_costs` contains the same costs as a fraction of gross GDP:
 
     $$
-    \\text{rel mitigation costs}_{t,r} = \\frac{\\text{mitigation costs}_{t,r}}{\\text{GDP}_{\\text{gross}, t,r}}.
+    \\text{mitigation costs}_{t,r} = \\frac{\\text{mitigation costs abs}_{t,r}}{\\text{GDP}_{\\text{gross}, t,r}}.
     $$
 
     When emission trading is allowed, some regions may even have negative mitigation costs. How negative this can become can
     be configured with the parameter [`rel_mitigation_costs_min_level`](../parameters.md#economics.MAC.rel_mitigation_costs_min_level).
 
     $$
-    \\text{rel mitigation costs}_{t,r} \\geq \\text{rel mitigation costs min level}.
+    \\text{mitigation costs}_{t,r} \\geq \\text{mitigation costs min level}.
     $$
 
     By default, this parameter is 0, meaning that the mitigation costs can not become negative.
@@ -185,7 +187,7 @@ def _get_mac_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     - param::MAC_gamma
     - param::MAC_beta
     - param::MAC_scaling_factor
-    - param::rel_mitigation_costs_min_level
+    - param::mitigation_costs_min_level
 
     """
 
