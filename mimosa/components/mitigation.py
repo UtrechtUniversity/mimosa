@@ -144,36 +144,38 @@ def _get_mac_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     ```
 
     Since the MAC is expressed in terms of relative abatement, we still need to multiply by the baseline emissions to obtain
-    mitigation costs in currency unit (dollars). The area under the MAC, also called the domestic mitigation costs, is therefore calculated as:
+    absolute mitigation costs in currency units (dollars). The area under the MAC, also called the
+    absolute domestic mitigation costs, is therefore calculated as:
     
     $$
     \\begin{align}
-    \\text{domestic mitigation costs}_{t,r} &= \\left(\\int_0^{a_{t,r}} \\text{MAC}_{\\text{regional},t,r}(a)\\ da \\right) \\cdot \\text{baseline emissions}_{t,r}\\\\
+    \\text{domestic mitigation costs abs}_{t,r} &= \\left(\\int_0^{a_{t,r}} \\text{MAC}_{\\text{regional},t,r}(a)\\ da \\right) \\cdot \\text{baseline emissions}_{t,r}\\\\
     &= \\text{factor}_{t,r} \\cdot \\frac{\\gamma \\cdot a_{t,r}^{\\beta+1}}{\\beta+1} \\cdot \\text{baseline emissions}_{t,r}
     \\end{align}
     $$
 
-    Finally, the mitigation costs used in MIMOSA are equal to the domestic mitigation costs plus the mitigation cost trading
-    balance if [emission trading](emissiontrading.md) is enabled:
+    Finally, the absolute mitigation costs attributed to a region are equal to its absolute domestic
+    mitigation costs plus the mitigation cost trading balance if
+    [emission trading](emissiontrading.md) is enabled:
 
     $$
-    \\text{mitigation costs}_{t,r} = \\text{domestic mitigation costs}_{t,r} + \\text{mitigation cost trading balance}_{t,r}.
+    \\text{mitigation costs abs}_{t,r} = \\text{domestic mitigation costs abs}_{t,r} + \\text{mitigation cost trading balance}_{t,r}.
     $$
 
 
-    ### Relative mitigation costs and minimum level of mitigation costs
-    Contrary to damages, the mitigation costs are expressed in absolute dollars, not in percentage of GDP. The relative mitigation
-    costs are also available as a variable:
+    ### Mitigation costs as a fraction of GDP and their minimum level
+    In model output, `mitigation_costs_abs` contains the absolute costs in currency units and
+    `mitigation_costs` contains the same costs as a fraction of gross GDP:
 
     $$
-    \\text{rel mitigation costs}_{t,r} = \\frac{\\text{mitigation costs}_{t,r}}{\\text{GDP}_{\\text{gross}, t,r}}.
+    \\text{mitigation costs}_{t,r} = \\frac{\\text{mitigation costs abs}_{t,r}}{\\text{GDP}_{\\text{gross}, t,r}}.
     $$
 
     When emission trading is allowed, some regions may even have negative mitigation costs. How negative this can become can
     be configured with the parameter [`rel_mitigation_costs_min_level`](../parameters.md#economics.MAC.rel_mitigation_costs_min_level).
 
     $$
-    \\text{rel mitigation costs}_{t,r} \\geq \\text{rel mitigation costs min level}.
+    \\text{mitigation costs}_{t,r} \\geq \\text{mitigation costs min level}.
     $$
 
     By default, this parameter is 0, meaning that the mitigation costs can not become negative.
@@ -185,7 +187,7 @@ def _get_mac_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     - param::MAC_gamma
     - param::MAC_beta
     - param::MAC_scaling_factor
-    - param::rel_mitigation_costs_min_level
+    - param::mitigation_costs_min_level
 
     """
 
@@ -198,7 +200,7 @@ def _get_mac_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
         m.regions,
         doc=lambda params: f'regional::MAC.{params["economics"]["MAC"]["regional calibration factor"]}',
     )  # Regional scaling of the MAC
-    m.carbonprice = Var(
+    m.carbon_price = Var(
         m.t,
         m.regions,
         bounds=lambda m: (0, 2 * m.MAC_gamma),
@@ -207,7 +209,7 @@ def _get_mac_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     constraints.extend(
         [
             RegionalEquation(
-                m.carbonprice,
+                m.carbon_price,
                 lambda m, t, r: (
                     MAC(m.relative_abatement[t, r], m, t, r) if t > 0 else 0
                 ),
@@ -218,20 +220,20 @@ def _get_mac_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     # Mitigation costs
 
     # Mitigation costs equal domestic costs plus the mitigation-cost trading balance
-    m.mitigation_costs = Var(
+    m.mitigation_costs_abs = Var(
         m.t,
         m.regions,
         initialize=0,
         units=quant.unit("currency_unit"),
     )
-    m.domestic_mitigation_costs = Var(
+    m.domestic_mitigation_costs_abs = Var(
         m.t,
         m.regions,
         initialize=0,
         units=quant.unit("currency_unit"),
     )
-    m.rel_mitigation_costs = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
-    m.rel_mitigation_costs_min_level = Param(
+    m.mitigation_costs = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
+    m.mitigation_costs_min_level = Param(
         doc="::economics.MAC.rel_mitigation_costs_min_level"
     )
     constraints.extend(
@@ -239,38 +241,38 @@ def _get_mac_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
             # Domestic mitigation costs: area under the MAC times baseline emissions,
             # so the costs of mitigation in a region without taking into account emission trading
             RegionalEquation(
-                m.domestic_mitigation_costs,
+                m.domestic_mitigation_costs_abs,
                 lambda m, t, r: AC(m.relative_abatement[t, r], m, t, r)
                 * m.baseline_emissions[t, r],
             ),
             # Attributed mitigation costs: domestic costs plus the trading balance
             RegionalEquation(
-                m.mitigation_costs,
+                m.mitigation_costs_abs,
                 lambda m, t, r: (
-                    m.domestic_mitigation_costs[t, r]
+                    m.domestic_mitigation_costs_abs[t, r]
                     + m.mitigation_cost_trading_balance[t, r]
                 ),
             ),
             RegionalEquation(
-                m.rel_mitigation_costs,
-                lambda m, t, r: m.mitigation_costs[t, r] / m.GDP_gross[t, r],
+                m.mitigation_costs,
+                lambda m, t, r: m.mitigation_costs_abs[t, r] / m.GDP_gross[t, r],
             ),
             RegionalConstraint(
-                lambda m, t, r: m.rel_mitigation_costs[t, r]
-                >= (m.rel_mitigation_costs_min_level if t > 0 else 0.0),
+                lambda m, t, r: m.mitigation_costs[t, r]
+                >= (m.mitigation_costs_min_level if t > 0 else 0.0),
                 "rel_mitigation_costs_non_negative",
             ),
         ]
     )
 
     # Keep track of relative global costs
-    m.global_rel_mitigation_costs = Var(m.t, units=quant.unit("fraction_of_GDP"))
+    m.global_mitigation_costs = Var(m.t, units=quant.unit("fraction_of_GDP"))
     constraints.extend(
         [
             GlobalEquation(
-                m.global_rel_mitigation_costs,
+                m.global_mitigation_costs,
                 lambda m, t: (
-                    sum(m.mitigation_costs[t, r] for r in m.regions)
+                    sum(m.mitigation_costs_abs[t, r] for r in m.regions)
                     / m.global_GDP_gross[t]
                 ),
             ),
@@ -291,9 +293,9 @@ def _get_mac_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
             GlobalEquation(
                 m.global_cost_per_emission_reduction_unit,
                 lambda m, t: (
-                    sum(m.mitigation_costs[t, r] for r in m.regions)
+                    sum(m.mitigation_costs_abs[t, r] for r in m.regions)
                     / soft_min(
-                        sum(m.regional_emission_reduction[t, r] for r in m.regions)
+                        sum(m.regional_emission_reductions[t, r] for r in m.regions)
                     )
                     if t > 0
                     else 0
@@ -302,8 +304,8 @@ def _get_mac_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
             GlobalEquation(
                 m.global_emission_reduction_per_cost_unit,
                 lambda m, t: (
-                    sum(m.regional_emission_reduction[t, r] for r in m.regions)
-                    / soft_min(sum(m.mitigation_costs[t, r] for r in m.regions))
+                    sum(m.regional_emission_reductions[t, r] for r in m.regions)
+                    / soft_min(sum(m.mitigation_costs_abs[t, r] for r in m.regions))
                     if t > 0
                     else 0
                 ),
@@ -378,8 +380,10 @@ def _get_learning_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
             lambda m, t: (
                 soft_min(
                     (
-                        m.cumulative_global_baseline_emissions[t - 1]
-                        - m.cumulative_emissions[t - 1]  # Now changed to t-1, check
+                        m.global_cumulative_baseline_emissions[t - 1]
+                        - m.global_cumulative_emissions[
+                            t - 1
+                        ]  # Now changed to t-1, check
                     )
                     / m.LBD_scaling
                     + 1.0

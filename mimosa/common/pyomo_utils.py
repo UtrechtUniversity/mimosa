@@ -116,11 +116,11 @@ class Equation(ABC):
         Example:
             GlobalEquation(
                 lhs="temperature",
-                rhs=lambda m, t: m.T0 + m.TCRE * m.cumulative_emissions[t]
+                rhs=lambda m, t: m.T0 + m.TCRE * m.global_cumulative_emissions[t]
             )
 
             which will be evaluated as:
-            m.temperature[t] == m.T0 + m.TCRE * m.cumulative_emissions[t]
+            m.temperature[t] == m.T0 + m.TCRE * m.global_cumulative_emissions[t]
 
             or:
 
@@ -154,7 +154,7 @@ class Equation(ABC):
         Evaluates the right-hand side of the equation with the given indices.
 
         Example:
-            eq = GlobalEquation(lhs="temperature", rhs=lambda m, t: m.T0 + m.TCRE * m.cumulative_emissions[t])
+            eq = GlobalEquation(lhs="temperature", rhs=lambda m, t: m.T0 + m.TCRE * m.global_cumulative_emissions[t])
             eq(m, t)
         """
         value = self.rhs(m, *indices)

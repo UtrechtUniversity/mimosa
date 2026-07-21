@@ -62,7 +62,7 @@ def get_constraints(
     m.elasmu = Param(doc="::economics.elasmu")
 
     m.utility = Var(m.t, m.regions, initialize=10)
-    m.yearly_welfare = Var(m.t)
+    m.global_welfare = Var(m.t)
 
     constraints.extend(
         [
@@ -70,7 +70,7 @@ def get_constraints(
                 m.utility, lambda m, t, r: m.consumption[t, r] / m.population[t, r]
             ),
             GlobalEquation(
-                m.yearly_welfare,
+                m.global_welfare,
                 lambda m, t: m.global_population[t]
                 * calc_utility(
                     sum(m.consumption[t, r] for r in m.regions),

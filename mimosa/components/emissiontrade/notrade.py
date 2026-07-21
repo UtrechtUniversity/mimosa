@@ -30,7 +30,7 @@ def get_constraints(
     $$
 
     Therefore, the reductions attributed to a region are the physical reductions within that region, and
-    `mitigation_costs` is equal to `domestic_mitigation_costs` (see
+    `mitigation_costs_abs` is equal to `domestic_mitigation_costs_abs` (see
     [Mitigation costs](mitigation.md#mitigation-costs)). The model does not create a separate
     `attributed_emission_reductions` result for this option.
 

@@ -27,6 +27,6 @@ def test_cumulative_emissions_carbon_budget(script_output):
         model.preprocessor.parser_tree["emissions"]["carbonbudget"].unit,
     )
 
-    cum_emissions = output_df_ind.loc[("cumulative_emissions", "Global")]
+    cum_emissions = output_df_ind.loc[("global_cumulative_emissions", "Global")]
     assert cum_emissions["2100"] <= param_carbonbudget
     assert cum_emissions.iloc[-1] <= param_carbonbudget
