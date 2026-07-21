@@ -79,9 +79,7 @@ def test_sort_equations_orders_a_linear_dependency_chain():
     """A fully ordered dependency chain should produce its single valid order."""
     equations = {
         "emissions": _equation("emissions", ["control"]),
-        "cumulative_emissions": _equation(
-            "cumulative_emissions", ["emissions"]
-        ),
+        "cumulative_emissions": _equation("cumulative_emissions", ["emissions"]),
         "temperature": _equation("temperature", ["cumulative_emissions"]),
     }
 
@@ -101,9 +99,9 @@ def test_sort_equations_orders_branches_before_their_merge():
     """Independent branches may vary in order, but both must precede their consumer."""
     equations = {
         "regional_emissions": _equation("regional_emissions", ["control"]),
-        "mitigation_costs": _equation("mitigation_costs", ["control"]),
+        "mitigation_costs_abs": _equation("mitigation_costs_abs", ["control"]),
         "total_costs": _equation(
-            "total_costs", ["regional_emissions", "mitigation_costs"]
+            "total_costs", ["regional_emissions", "mitigation_costs_abs"]
         ),
     }
 
@@ -111,7 +109,7 @@ def test_sort_equations_orders_branches_before_their_merge():
     positions = {equation.name: i for i, equation in enumerate(ordered)}
 
     assert positions["regional_emissions"] < positions["total_costs"]
-    assert positions["mitigation_costs"] < positions["total_costs"]
+    assert positions["mitigation_costs_abs"] < positions["total_costs"]
 
 
 def test_previous_timestep_dependency_is_recorded_without_affecting_sort_order():
@@ -203,8 +201,7 @@ def test_calc_dependencies_detects_global_and_regional_variables():
     equation = RegionalEquation(
         model.output,
         lambda m, t, r: (
-            m.regional_input[t, r]
-            + m.global_input[t] * m.regional_factor[t, r]
+            m.regional_input[t, r] + m.global_input[t] * m.regional_factor[t, r]
         ),
     )
     _add_equation(model, equation)

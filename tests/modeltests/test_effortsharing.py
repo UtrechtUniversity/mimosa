@@ -24,7 +24,7 @@ def test_equal_mitigation_costs(script_output):
     """
     output_df_ind = read_output(filename="run_equal_mitigation_costs")
 
-    mitigation_costs = output_df_ind.loc["rel_mitigation_costs", "2030":]
+    mitigation_costs = output_df_ind.loc["mitigation_costs", "2030":]
 
     relative_standard_deviation = mitigation_costs.std() / mitigation_costs.mean()
 
@@ -42,7 +42,7 @@ def test_equal_total_costs(script_output):
     output_df_ind = read_output(filename="run_equal_total_costs")
 
     total_costs = (
-        output_df_ind.loc["rel_mitigation_costs", "2030":]
+        output_df_ind.loc["mitigation_costs", "2030":]
         + output_df_ind.loc["damage_costs", "2030":]
         + output_df_ind.loc["rel_financial_transfer", "2030":]
     )

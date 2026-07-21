@@ -21,7 +21,7 @@ def test_zero_mitigation_costs(script_output):
     output_df_ind = read_output(model, simulation=True)
 
     assert output_df_ind.loc[
-        "mitigation_costs", "2025":"2100"
+        "mitigation_costs_abs", "2025":"2100"
     ].max().max() == pytest.approx(0.0, abs=0.001)
 
 
