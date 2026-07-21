@@ -58,7 +58,7 @@ def get_constraints(
     m.inequal_aversion = Param(doc="::economics.inequal_aversion")
 
     m.utility = Var(m.t, m.regions, initialize=10)
-    m.yearly_welfare = Var(m.t)
+    m.global_welfare = Var(m.t)
 
     constraints.extend(
         [
@@ -69,7 +69,7 @@ def get_constraints(
                 ),
             ),
             GlobalEquation(
-                m.yearly_welfare,
+                m.global_welfare,
                 lambda m, t: sum(m.population[t, r] for r in m.regions)
                 * calc_global_utility(
                     sum(m.utility[t, r] for r in m.regions),

@@ -36,7 +36,7 @@ def get_constraints(
     In this effort-sharing regime, the damages are also taken into account when equalising the costs among regions:
 
     $$
-    \\frac{\\text{mitig. costs}_{t,r}}{\\text{GDP}_{\\text{gross},t,r}} + \\text{damages}_{t,r}\\ (+ \\text{rel. financial transf.}_{t,r}) = \\text{common level}_t,
+    \\text{mitigation costs}_{t,r} + \\text{damage costs}_{t,r}\\ (+ \\text{financial transfer}_{t,r}) = \\text{common level}_t,
     $$
 
     where the variable $\\text{common level}_t$ can have arbitrary values and is purely used as a common
@@ -66,9 +66,9 @@ def get_constraints(
     return [
         # Total costs: mitigation + damage costs should be equal among regions as % GDP
         RegionalSoftEqualityConstraint(
-            lambda m, t, r: m.rel_mitigation_costs[t, r]
+            lambda m, t, r: m.mitigation_costs[t, r]
             + m.damage_costs[t, r]
-            + m.rel_financial_transfer[t, r],
+            + m.financial_transfer[t, r],
             lambda m, t, r: m.effort_sharing_common_level[t],
             "effort_sharing_regime_total_costs",
             ignore_if=lambda m, t, r: m.year(t) > 2100,

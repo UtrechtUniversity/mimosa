@@ -51,7 +51,7 @@ def get_constraints(
                     + m.dt
                     * exp(-m.PRTP * (m.year(t) - m.beginyear))
                     * (
-                        sum(m.mitigation_costs[t, r] for r in m.regions)
+                        sum(m.mitigation_costs_abs[t, r] for r in m.regions)
                         + sum(
                             m.damage_costs[t, r] * m.GDP_gross[t, r] for r in m.regions
                         )
