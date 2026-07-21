@@ -191,10 +191,12 @@ def _get_emissions_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     m.regional_emission_reduction = Var(
         m.t, m.regions, units=quant.unit("emissionsrate_unit")
     )
-    m.cumulative_emissions = Var(m.t, units=quant.unit("emissions_unit"))
+    m.global_cumulative_emissions = Var(m.t, units=quant.unit("emissions_unit"))
     m.global_emissions = Var(m.t, units=quant.unit("emissionsrate_unit"))
 
-    m.cumulative_emissions_trapz = Param(doc="::emissions.cumulative_emissions_trapz")
+    m.global_cumulative_emissions_trapz = Param(
+        doc="::emissions.cumulative_emissions_trapz"
+    )
 
     constraints.extend(
         [
@@ -235,12 +237,12 @@ def _get_emissions_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
             ),
             # Cumulative emissions
             GlobalEquation(
-                m.cumulative_emissions,
+                m.global_cumulative_emissions,
                 lambda m, t: (
-                    m.cumulative_emissions[t - 1]
+                    m.global_cumulative_emissions[t - 1]
                     + (
                         (m.dt * (m.global_emissions[t] + m.global_emissions[t - 1]) / 2)
-                        if value(m.cumulative_emissions_trapz)
+                        if value(m.global_cumulative_emissions_trapz)
                         else (m.dt * m.global_emissions[t])
                     )
                     if t > 0
@@ -250,13 +252,13 @@ def _get_emissions_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
         ]
     )
 
-    m.emission_relative_cumulative = Var(m.t, initialize=1)
+    m.global_relative_cumulative_emissions = Var(m.t, initialize=1)
     constraints.extend(
         [
             GlobalEquation(
-                m.emission_relative_cumulative,
+                m.global_relative_cumulative_emissions,
                 lambda m, t: (
-                    m.cumulative_emissions[t]
+                    m.global_cumulative_emissions[t]
                     / m.global_cumulative_baseline_emissions[t]
                     if t > 0
                     else 1
@@ -349,7 +351,7 @@ def _get_temperature_constraints(m: AbstractModel) -> Sequence[GeneralConstraint
             GlobalEquation(
                 m.temperature,
                 lambda m, t: (
-                    m.T0 + m.TCRE * m.cumulative_emissions[t] if t > 0 else m.T0
+                    m.T0 + m.TCRE * m.global_cumulative_emissions[t] if t > 0 else m.T0
                 ),
             ),
             GlobalConstraint(
@@ -512,7 +514,7 @@ def _get_inertia_and_budget_constraints(
             # Carbon budget constraints:
             GlobalConstraint(
                 lambda m, t: (
-                    m.cumulative_emissions[t]
+                    m.global_cumulative_emissions[t]
                     - (
                         m.budget
                         + (
@@ -527,7 +529,7 @@ def _get_inertia_and_budget_constraints(
                 ),
                 name="carbon_budget",
             ),
-            GlobalConstraint(lambda m, t: m.cumulative_emissions[t] >= 0),
+            GlobalConstraint(lambda m, t: m.global_cumulative_emissions[t] >= 0),
             # Global and regional inertia constraints:
             GlobalConstraint(
                 lambda m, t: (

@@ -59,7 +59,7 @@ def get_constraints(
 
     # m.obj = Objective(rule=lambda m: m.NPV[m.tf] * (
     #     soft_switch(m.budget-(
-    #         m.cumulative_emissions[m.year2100]
+    #         m.global_cumulative_emissions[m.year2100]
     #         + sum(soft_min(m.global_emissions[t]) for t in m.t if m.year(t) >= 2100)
     #     ), scale=1)
     # ), sense=maximize)
