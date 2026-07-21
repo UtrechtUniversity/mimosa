@@ -73,7 +73,7 @@ def _set_baseline_emissions(m: AbstractModel) -> None:
     )
 
     # And create a param for the global cumulative baseline emissions
-    m.cumulative_global_baseline_emissions = Param(
+    m.global_cumulative_baseline_emissions = Param(
         m.t,
         initialize=lambda m, t: sum(
             value(m.cumulative_baseline_emissions[t, r]) for r in m.regions
@@ -257,7 +257,7 @@ def _get_emissions_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
                 m.emission_relative_cumulative,
                 lambda m, t: (
                     m.cumulative_emissions[t]
-                    / m.cumulative_global_baseline_emissions[t]
+                    / m.global_cumulative_baseline_emissions[t]
                     if t > 0
                     else 1
                 ),

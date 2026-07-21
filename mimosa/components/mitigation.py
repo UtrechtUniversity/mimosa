@@ -378,7 +378,7 @@ def _get_learning_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
             lambda m, t: (
                 soft_min(
                     (
-                        m.cumulative_global_baseline_emissions[t - 1]
+                        m.global_cumulative_baseline_emissions[t - 1]
                         - m.cumulative_emissions[t - 1]  # Now changed to t-1, check
                     )
                     / m.LBD_scaling
