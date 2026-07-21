@@ -52,10 +52,10 @@ def get_constraints(
     constraints = []
 
     # Note: positive financial transfer means paying money, negative means receiving
-    m.financial_transfer = Var(
+    m.financial_transfer_abs = Var(
         m.t, m.regions, initialize=0, units=quant.unit("currency_unit")
     )
-    m.rel_financial_transfer = Var(
+    m.financial_transfer = Var(
         m.t, m.regions, initialize=0, units=quant.unit("fraction_of_GDP")
     )
 
@@ -63,24 +63,24 @@ def get_constraints(
         [
             GlobalConstraint(
                 lambda m, t: (
-                    sum(m.financial_transfer[t, r] for r in m.regions) == 0.0
+                    sum(m.financial_transfer_abs[t, r] for r in m.regions) == 0.0
                     if t > 0
                     else Constraint.Skip
                 ),
                 "zero_sum_of_yearly_financial_transfer",
             ),
             RegionalInitConstraint(
-                lambda m, r: m.financial_transfer[0, r] == 0.0,
+                lambda m, r: m.financial_transfer_abs[0, r] == 0.0,
                 "no_transfer_in_first_year",
             ),
             RegionalConstraint(
-                lambda m, t, r: m.financial_transfer[t, r]
+                lambda m, t, r: m.financial_transfer_abs[t, r]
                 >= -m.damage_costs[t, r] * m.GDP_gross[t, r],
                 "received_financial_transfer_max_own_damages",
             ),
             RegionalConstraint(
-                lambda m, t, r: m.rel_financial_transfer[t, r] * m.GDP_gross[t, r]
-                == m.financial_transfer[t, r],
+                lambda m, t, r: m.financial_transfer[t, r] * m.GDP_gross[t, r]
+                == m.financial_transfer_abs[t, r],
                 "financial_transfer_rel_to_gdp",
             ),
         ]

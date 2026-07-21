@@ -44,7 +44,7 @@ def test_equal_total_costs(script_output):
     total_costs = (
         output_df_ind.loc["mitigation_costs", "2030":]
         + output_df_ind.loc["damage_costs", "2030":]
-        + output_df_ind.loc["rel_financial_transfer", "2030":]
+        + output_df_ind.loc["financial_transfer", "2030":]
     )
 
     relative_standard_deviation = total_costs.std() / total_costs.mean()

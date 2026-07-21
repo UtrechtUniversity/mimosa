@@ -21,10 +21,10 @@ def get_constraints(
     constraints = []
 
     # Since it is always zero, it is better to make it a Param instead of Var for numerical stability
-    m.financial_transfer = Param(
+    m.financial_transfer_abs = Param(
         m.t, m.regions, initialize=0, units=quant.unit("currency_unit")
     )
-    m.rel_financial_transfer = Param(
+    m.financial_transfer = Param(
         m.t, m.regions, initialize=0, units=quant.unit("fraction_of_GDP")
     )
 
