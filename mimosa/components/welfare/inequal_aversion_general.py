@@ -23,7 +23,28 @@ def get_constraints(
     """
     <h3>General inequality aversion</h3>
 
-    TODO
+    This setting makes the weight given to inequality between regions explicit. Let $C_{t,r}$
+    be regional consumption, $L_{t,r}$ population, $\\eta$ the inequality-aversion parameter
+    (`inequal_aversion`), and $\\mu$ the elasticity of marginal utility (`elasmu`). MIMOSA first
+    calculates:
+
+    $$
+    U_{t,r} = L_{t,r}
+    \\left(\\frac{C_{t,r}}{L_{t,r}}\\right)^{1-\\eta}.
+    $$
+
+    The regional values are then aggregated into yearly welfare:
+
+    $$
+    W_t = \\frac{L_t}{1-\\mu}
+    \\left(\\frac{\\sum_r U_{t,r}}{L_t}\\right)^{
+    \\frac{1-\\mu}{1-\\eta}}.
+    $$
+
+    A higher $\\eta$ gives relatively more weight to consumption changes in poorer regions.
+    Setting $\\eta=0$ gives the same policy weighting as the cost-minimising setting, while
+    setting $\\eta=\\mu$ gives the same policy weighting as the welfare-loss-minimising
+    setting. The welfare levels can differ by terms that do not depend on the policy controls.
 
     <h3>Parameters defined in this module</h3>
     - param::elasmu
@@ -37,7 +58,7 @@ def get_constraints(
     m.inequal_aversion = Param(doc="::economics.inequal_aversion")
 
     m.utility = Var(m.t, m.regions, initialize=10)
-    m.yearly_welfare = Var(m.t)
+    m.global_welfare = Var(m.t)
 
     constraints.extend(
         [
@@ -48,7 +69,7 @@ def get_constraints(
                 ),
             ),
             GlobalEquation(
-                m.yearly_welfare,
+                m.global_welfare,
                 lambda m, t: sum(m.population[t, r] for r in m.regions)
                 * calc_global_utility(
                     sum(m.utility[t, r] for r in m.regions),

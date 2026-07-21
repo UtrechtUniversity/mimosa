@@ -26,25 +26,25 @@ def get_constraints(
     receive financial transfers up to its level of climate damages:
 
     $$
-    \\text{financial transf.}_{t,r} \\geq - \\text{damages}_{t,r} \\cdot \\text{GDP}_{\\text{gross},t,r}
+    \\text{financial transfer abs}_{t,r} \\geq - \\text{damage costs}_{t,r} \\cdot \\text{GDP}_{\\text{gross},t,r}
     $$
 
     The sum of financial transfers per time period should be zero, since it is a redistribution
     of costs:
 
     $$
-    \\sum_r \\text{financial transf.}_{t,r} = 0
+    \\sum_r \\text{financial transfer abs}_{t,r} = 0
     $$
 
     Also, in the first year, no financial transfers are allowed:
 
-    $$ \\text{financial_transf.}_{0,r} = 0. $$
+    $$ \\text{financial transfer abs}_{0,r} = 0. $$
 
-    Finally, the financial transfers are expressed in currency units (dollars). They can also
-    be expressed as percentage of GDP:
+    `financial_transfer_abs` is expressed in currency units (dollars), while
+    `financial_transfer` is expressed as a fraction of gross GDP:
 
     $$
-    \\text{rel. financial transf.}_{t,r} = \\frac{\\text{financial transf.}_{t,r}}{\\text{GDP}_{\\text{gross},t,r}}
+    \\text{financial transfer}_{t,r} = \\frac{\\text{financial transfer abs}_{t,r}}{\\text{GDP}_{\\text{gross},t,r}}
     $$
 
 
@@ -52,10 +52,10 @@ def get_constraints(
     constraints = []
 
     # Note: positive financial transfer means paying money, negative means receiving
-    m.financial_transfer = Var(
+    m.financial_transfer_abs = Var(
         m.t, m.regions, initialize=0, units=quant.unit("currency_unit")
     )
-    m.rel_financial_transfer = Var(
+    m.financial_transfer = Var(
         m.t, m.regions, initialize=0, units=quant.unit("fraction_of_GDP")
     )
 
@@ -63,24 +63,24 @@ def get_constraints(
         [
             GlobalConstraint(
                 lambda m, t: (
-                    sum(m.financial_transfer[t, r] for r in m.regions) == 0.0
+                    sum(m.financial_transfer_abs[t, r] for r in m.regions) == 0.0
                     if t > 0
                     else Constraint.Skip
                 ),
                 "zero_sum_of_yearly_financial_transfer",
             ),
             RegionalInitConstraint(
-                lambda m, r: m.financial_transfer[0, r] == 0.0,
+                lambda m, r: m.financial_transfer_abs[0, r] == 0.0,
                 "no_transfer_in_first_year",
             ),
             RegionalConstraint(
-                lambda m, t, r: m.financial_transfer[t, r]
+                lambda m, t, r: m.financial_transfer_abs[t, r]
                 >= -m.damage_costs[t, r] * m.GDP_gross[t, r],
                 "received_financial_transfer_max_own_damages",
             ),
             RegionalConstraint(
-                lambda m, t, r: m.rel_financial_transfer[t, r] * m.GDP_gross[t, r]
-                == m.financial_transfer[t, r],
+                lambda m, t, r: m.financial_transfer[t, r] * m.GDP_gross[t, r]
+                == m.financial_transfer_abs[t, r],
                 "financial_transfer_rel_to_gdp",
             ),
         ]

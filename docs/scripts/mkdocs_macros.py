@@ -11,7 +11,8 @@ from mimosa.common import Constraint
 import mimosa.components
 
 params = load_params()
-model = MIMOSA(params)
+# Constraint documentation only needs the constructed model, not a baseline simulation.
+model = MIMOSA(params, prerun=False)
 
 all_constraints = list(model.concrete_model.component_objects(Constraint))
 
@@ -46,8 +47,8 @@ def define_env(env):
     update_env = python_handler.update_env
 
     # override the `update_env` method of the Python handler
-    def patched_update_env(md, config):
-        update_env(md, config)
+    def patched_update_env(*args, **kwargs):
+        update_env(*args, **kwargs)
 
         # get the `convert_markdown` filter of the env
         convert_markdown = python_handler.env.filters["convert_markdown"]

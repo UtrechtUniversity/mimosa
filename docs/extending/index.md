@@ -1,67 +1,60 @@
 # Extending MIMOSA
 
-## Forking MIMOSA from GitHub
-
 ## General form of the model
 
-MIMOSA is built as a [Pyomo](https://www.pyomo.org/) model: an open-source Python package optimisation modelling language. 
-Pyomo models consist of a combination of variables, constraints and parameters. The constraints link together the variables
-in the form of (non-linear) equations. One variable is defined as the optimisation objective: in MIMOSA's case, 
-the net present value of the global welfare. Pyomo translates the combination of variables, constraints and parameters to
-a form suitable for an external solver. The solver maximises the objective variable, while trying to fulfill all the 
-constraints.
+MIMOSA is built with [Pyomo](https://www.pyomo.org/), an open-source optimisation modelling
+package. The model combines variables and parameters with equations that calculate model outcomes
+and constraints that restrict the feasible solution. The selected [objective
+module](../components/welfare.md#optimisation-goal-and-discounting) either maximises discounted
+welfare or minimises discounted global costs.
 
-On this page, we give examples of how to extend MIMOSA by adding new variables and constraints, by adding new parameters,
-and by creating completely new model components (modules). The basis of MIMOSA is a Pyomo `AbstractModel`: a model object
-where all variables and other components will be added to and which will be sent to the solver. In `mimosa/abstract_model.py`,
-this object is created:
+The following pages explain how to add variables, equations, constraints, parameters and complete
+model components. They focus on the conventions used in MIMOSA rather than providing a general
+introduction to Pyomo.
+
+MIMOSA's shared Pyomo `AbstractModel`, time and region sets, and baseline inputs are created in
+`mimosa/base_model.py`. The components listed in `mimosa/abstract_model.py` then add their variables,
+parameters, equations and constraints to this shared object, which is always called `m`:
 
 ```python
-m = AbstractModel()
+m = create_base_model()
 ```
-
-This model will always be referred to as `m`.
 
 !!! info "A note about file structure"
 
     After forking and cloning MIMOSA to your computer, you will find a file structure that looks like this:
 
     ```python title="MIMOSA file structure"
-    mimosa
-    │   abstract_model.py # (1)!
-    │   mimosa.py
-    │
-    └─── components # (2)!
-        │   emissions.py
-        │   mitigation.py
-        │   ...
-    │
-    └─── inputdata
-        │
-        └─── config / config_default.yaml # (3)!
-        │
-        └─── regionalparams / ...
-        │
-        └─── data / ...
+    mimosa/
+    ├── abstract_model.py # (1)!
+    ├── base_model.py # (2)!
+    ├── mimosa.py
+    ├── components/ # (3)!
+    │   ├── emissions.py
+    │   ├── mitigation.py
+    │   └── ...
+    └── inputdata/
+        ├── config/
+        │   └── config_default.yaml # (4)!
+        ├── regionalparams/
+        └── data/
 
-    run.py # (4)!
-    
+    run.py # (5)!
+
     ```
-    
-    1.  All the model components are tied together in this file
-    2.  The different components discussed in the [Model documentation](../components/index.md) pages are defined in the
-        Python files in this folder
-    3.  All parameters types and default values are defined in this file
-    4.  Example of a basic model run. Place your run files here, such that the mimosa package from this folder is used,
+
+    1.  The model components are listed and combined in this file.
+    2.  Shared time, region and baseline input parameters are defined in this file.
+    3.  The components discussed in the [Model documentation](../components/index.md) are defined in this folder.
+    4.  Configuration parameter types and default values are defined in this file.
+    5.  Example of a basic model run. Place your run files here, such that the mimosa package from this folder is used,
         and not a version previously installed through `pip install mimosa`.
 
-    The different components discussed in the
-    [Model documentation](../components/index.md) pages are defined in the Python files in the folder
-    [`mimosa/components`]({{config.repo_url}}/tree/master/mimosa/components). All these modules are tied
-    together in the file [`mimosa/abstract_model.py`]({{config.repo_url}}/blob/master/mimosa/abstract_model.py).
-
-Typically, when extending MIMOSA, the following steps can be followed:
+For most extensions, use the following steps:
 
 1. [Create a new component](components.md) (`optional`, only necessary if the extension is a new module)
 2. [Add new variables and constraints to the model](variables_constraints.md)
 3. [Add new parameters and data to the model](parameters.md)
+
+For more advanced extensions, see [Selectable modules](selectable_modules.md) and
+[Model options](model_options.md).

@@ -34,13 +34,13 @@ def get_constraints(
     :::mimosa.common.economics.calc_GDP
 
     The net GDP is then calculated by subtracting the damages and
-    mitigation costs from the gross GDP. *(Note that in MIMOSA, the damages are expressed as a fraction of the gross GDP,
-    whereas the mitigation costs are expressed in absolute terms.)*
+    mitigation costs from the gross GDP. The `_abs` variables are used here because the amounts
+    subtracted from GDP must be in currency units.
 
     $$
     \\begin{align}
     \\text{GDP}_{\\text{net},t,r} =\\ & \\text{GDP}_{\\text{gross},t,r} \\cdot (1 - \\text{damage costs}_{t,r}) \\\\
-    &\\ \\ \\ - \\text{mitigation costs}_{t,r} - \\text{financial transf.}_{t,r}
+    &\\ \\ \\ - \\text{mitigation costs abs}_{t,r} - \\text{financial transfer abs}_{t,r}
     \\end{align}
     $$
 
@@ -70,7 +70,8 @@ def get_constraints(
 
     $$ K_{t=0,r} = \\text{init_capitalstock_factor}_r \\cdot \\text{GDP}_{t=0,r}. $$
 
-    The initial capital stock factor is a calibration factor to obtain the initial capital stock. TODO: Source (IMF)
+    The regional initial capital stock factors are calibrated from capital-stock-to-GDP ratios in
+    the [IMF Investment and Capital Stock Dataset](https://data.imf.org/en/Datasets/ICSD).
     ``` plotly
     {"file_path": "./assets/plots/economics_init_capital_factor.json"}
     ```
@@ -170,8 +171,8 @@ def get_constraints(
                 lambda m, t, r: (
                     m.GDP_gross[t, r]
                     * (1 - (m.damage_costs[t, r] if not value(m.ignore_damages) else 0))
-                    - m.mitigation_costs[t, r]
-                    - m.financial_transfer[t, r]
+                    - m.mitigation_costs_abs[t, r]
+                    - m.financial_transfer_abs[t, r]
                 ),
             ),
             GlobalEquation(

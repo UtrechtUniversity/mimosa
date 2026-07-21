@@ -30,7 +30,7 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
         units=quant.unit("fraction_of_GDP"),
     )
     m.avoided_damage_costs = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
-    m.avoided_damage_costs_global = Var(m.t, units=quant.unit("fraction_of_GDP"))
+    m.global_avoided_damage_costs = Var(m.t, units=quant.unit("fraction_of_GDP"))
 
     constraints.extend(
         [
@@ -39,7 +39,7 @@ def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
                 lambda m, t, r: m.nopolicy_damage_costs[t, r] - m.damage_costs[t, r],
             ),
             GlobalEquation(
-                m.avoided_damage_costs_global,
+                m.global_avoided_damage_costs,
                 lambda m, t: (
                     sum(
                         m.avoided_damage_costs[t, r] * m.GDP_gross[t, r]

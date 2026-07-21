@@ -28,7 +28,7 @@ def get_constraints(
     (global cost pool specification)
 
     Necessary variables:
-        m.mitigation_costs (abatement costs as paid for by this region)
+        m.mitigation_costs_abs (mitigation costs attributed to this region)
 
     Returns:
         list of constraints (any of:
@@ -40,7 +40,7 @@ def get_constraints(
     """
     constraints = []
 
-    m.domestic_mitigation_costs = Var(
+    m.domestic_mitigation_costs_abs = Var(
         m.t,
         m.regions,
         within=NonNegativeReals,
@@ -52,13 +52,13 @@ def get_constraints(
     constraints.extend(
         [
             RegionalConstraint(
-                lambda m, t, r: m.domestic_mitigation_costs[t, r]
+                lambda m, t, r: m.domestic_mitigation_costs_abs[t, r]
                 == AC(m.relative_abatement[t, r], m, t, r) * m.baseline_emissions[t, r],
                 "mitigation_costs",
             ),
             GlobalConstraint(
-                lambda m, t: sum(m.mitigation_costs[t, r] for r in m.regions)
-                == sum(m.domestic_mitigation_costs[t, r] for r in m.regions),
+                lambda m, t: sum(m.mitigation_costs_abs[t, r] for r in m.regions)
+                == sum(m.domestic_mitigation_costs_abs[t, r] for r in m.regions),
                 "sum_mitigation_costs_equals_sum_domestic_mitigation_costs",
             ),
         ]
@@ -80,19 +80,19 @@ def get_constraints(
             RegionalConstraint(
                 lambda m, t, r: (
                     m.attributed_emission_reductions[t, r]
-                    == m.mitigation_costs[t, r]
+                    == m.mitigation_costs_abs[t, r]
                     * m.global_emission_reduction_per_cost_unit[t]
                     if t > 0
                     else Constraint.Skip
                 ),
                 "paid_for_emission_reductions",
             ),
-            # Import export of emission reduction balance: if positive: , if negative:
+            # Difference between attributed and physical emission reductions
             RegionalConstraint(
                 lambda m, t, r: (
                     m.emission_reduction_trading_balance[t, r]
                     == m.attributed_emission_reductions[t, r]
-                    - m.regional_emission_reduction[t, r]
+                    - m.regional_emission_reductions[t, r]
                     if t > 0
                     else Constraint.Skip
                 ),
@@ -100,7 +100,7 @@ def get_constraints(
             ),
             RegionalConstraint(
                 lambda m, t, r: m.mitigation_cost_trading_balance[t, r]
-                == m.mitigation_costs[t, r] - m.domestic_mitigation_costs[t, r],
+                == m.mitigation_costs_abs[t, r] - m.domestic_mitigation_costs_abs[t, r],
                 "import_export_mitigation_cost_balance",
             ),
         ]

@@ -3,7 +3,7 @@ from mimosa import MIMOSA, load_params
 regime = "PUT_YOUR_EFFORT_SHARING_REGIME_HERE"  # (1)!
 
 params = load_params()
-params["effort sharing"]["regime"] = regime
+params["model structure"]["effortsharing module"] = regime
 
 params["model structure"]["emissiontrade module"] = "emissiontrade"
 params["model structure"]["welfare module"] = "cost_minimising"

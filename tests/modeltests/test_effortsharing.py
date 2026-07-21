@@ -2,7 +2,7 @@ import pytest
 import numpy as np
 from tests.modeltests.utils import exec_run, SolverStatus, read_output
 
-pytestmark = pytest.mark.ipopt
+pytestmark = [pytest.mark.documentation, pytest.mark.ipopt]
 
 
 @pytest.fixture(scope="module")
@@ -24,7 +24,7 @@ def test_equal_mitigation_costs(script_output):
     """
     output_df_ind = read_output(filename="run_equal_mitigation_costs")
 
-    mitigation_costs = output_df_ind.loc["rel_mitigation_costs", "2030":]
+    mitigation_costs = output_df_ind.loc["mitigation_costs", "2030":]
 
     relative_standard_deviation = mitigation_costs.std() / mitigation_costs.mean()
 
@@ -42,9 +42,9 @@ def test_equal_total_costs(script_output):
     output_df_ind = read_output(filename="run_equal_total_costs")
 
     total_costs = (
-        output_df_ind.loc["rel_mitigation_costs", "2030":]
+        output_df_ind.loc["mitigation_costs", "2030":]
         + output_df_ind.loc["damage_costs", "2030":]
-        + output_df_ind.loc["rel_financial_transfer", "2030":]
+        + output_df_ind.loc["financial_transfer", "2030":]
     )
 
     relative_standard_deviation = total_costs.std() / total_costs.mean()
@@ -75,7 +75,7 @@ def test_per_cap_convergence(script_output):
     # After 2050, emissions per capita are equal (smaller than 0.05 GtCO2 per capita deviation):
     assert per_capita_emissions_deviation["2050":].max() < 0.05
 
-    # Check that regional emission allowances are equal to baseline emissions minus paid for emission reductions
+    # Regional allowances equal baseline emissions minus attributed reductions
     # (emissions after trade)
     allowances_diff = output_df_ind.loc["regional_emission_allowances"] - (
         output_df_ind.loc["baseline_emissions"]

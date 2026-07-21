@@ -49,7 +49,7 @@ def get_constraints(
     m.damage_costs = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
     m.damage_costs_abs = Var(m.t, m.regions, units=quant.unit("currency_unit"))
     m.damage_scale_factor = Param(doc="::economics.damages.scale factor")
-    m.damage_relative_global = Var(
+    m.global_damage_costs = Var(
         m.t,
         units=quant.unit("fraction_of_GDP"),
     )
@@ -65,7 +65,7 @@ def get_constraints(
                 lambda m, t, r: m.damage_costs[t, r] * m.GDP_gross[t, r],
             ),
             GlobalEquation(
-                m.damage_relative_global,
+                m.global_damage_costs,
                 lambda m, t: (
                     sum(m.damage_costs_abs[t, r] for r in m.regions)
                     / m.global_GDP_gross[t]
@@ -110,7 +110,7 @@ def _get_constraints_temperature_dependent(
     \\text{damages}_{\\text{non-SLR},t,r} = a_{q,r} \\cdot \\big( D(\\text{temperature}_t - 0.6; b_{1,r}, b_{2,r}) -  D(T_0 - 0.6; b_{1,r}, b_{2,r}) \\big).
     $$
 
-    All the damage coefficients are region-dependent (see [Damage functions and coefficients](./#damage-functions-and-coefficients)).
+    All the damage coefficients are region-dependent (see [Damage functions and coefficients](damages.md#damage-functions-and-coefficients)).
 
     ### Temperature-dependent damages aggregated to the world, and comparison with the literature:
 
@@ -163,7 +163,7 @@ def _get_constraints_slr(m: AbstractModel) -> Sequence[GeneralConstraint]:
     on a different time scale: sea-level rise is a slow process with high inertia. Therefore, these damages are
     calculated as a function of global mean sea-level rise (SLR) in meters (calculated in the [Sea-level rise](sealevelrise.md) component).
 
-    The SLR damages are calculated with the DIVA impact model (see [Impact sectors used in the damage functions](./#impact-sectors-used-in-the-damage-functions)).
+    The SLR damages are calculated with the DIVA impact model (see [Impact sectors used in the damage functions](damages.md#impact-sectors-used-in-the-damage-functions)).
     These damages are available either with optimal adaptation (and include adaptation costs), or without adaptation. This can be
     chosen with the parameter [coacch_slr_withadapt](../parameters.md#economics.damages.coacch_slr_withadapt). By default, the optimal
     adaptation case is used.
@@ -181,7 +181,7 @@ def _get_constraints_slr(m: AbstractModel) -> Sequence[GeneralConstraint]:
 
     The values of $b_1$, $b_2$, and $b_3$ are region-dependent and depend on whether adaptation is included or not. These are different
     values than the coefficients in the temperature-dependent damages. The functional form
-    depends on the regression of the underlying impact data (see [Damage functions and coefficients](./#damage-functions-and-coefficients)),
+    depends on the regression of the underlying impact data (see [Damage functions and coefficients](damages.md#damage-functions-and-coefficients)),
     and are equal to:
 
     <div class="tiny_table table_first_col_header table_scrollable" markdown>

@@ -1,7 +1,7 @@
 import pytest
 from tests.modeltests.utils import exec_run, SimulationObjectModel, read_output
 
-pytestmark = pytest.mark.simulation
+pytestmark = [pytest.mark.documentation, pytest.mark.simulation]
 
 
 @pytest.fixture(scope="module")
@@ -21,18 +21,18 @@ def test_zero_mitigation_costs(script_output):
     output_df_ind = read_output(model, simulation=True)
 
     assert output_df_ind.loc[
-        "mitigation_costs", "2025":"2100"
+        "mitigation_costs_abs", "2025":"2100"
     ].max().max() == pytest.approx(0.0, abs=0.001)
 
 
-def test_carbonprice_zero(script_output):
+def test_carbon_price_zero(script_output):
     """Carbon price should be zero"""
     model = script_output["model"]
     output_df_ind = read_output(model, simulation=True)
 
-    assert output_df_ind.loc["carbonprice", "2025":"2100"].max().max() == pytest.approx(
-        0.0, abs=0.001
-    )
+    assert output_df_ind.loc[
+        "carbon_price", "2025":"2100"
+    ].max().max() == pytest.approx(0.0, abs=0.001)
 
 
 def test_emissions_equal_to_baseline_emissions(script_output):

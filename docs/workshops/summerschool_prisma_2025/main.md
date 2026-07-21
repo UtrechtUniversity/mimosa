@@ -26,7 +26,7 @@ For this exercise, you will do two runs of MIMOSA: a no-policy baseline run, and
 
         ```python
         --8<-- "docs/workshops/summerschool_prisma_2025/run_baseline.py"
-        ``` 
+        ```
 
     === "Run 2: Cost-benefit run"
 
@@ -36,9 +36,8 @@ For this exercise, you will do two runs of MIMOSA: a no-policy baseline run, and
         --8<-- "docs/workshops/summerschool_prisma_2025/run_cba.py"
         ```
 
-
-
 #### Step 2: Analyse the results
+
 The code will produce a CSV file with the results of the run. The file is saved in the `output` folder. You can either open the CSV file (e.g. `output/run_baseline_nopolicy.csv`) in Excel/Python, or you can use the MIMOSA Dashboard. Open the [MIMOSA Dashboard](https://dashboard-mimosa.onrender.com/) and drag and drop the CSV file into the dashboard. This will allow you to visualise the results of the simulation. You can also drag and drop multiple files to compare the results of different runs: try dropping both `run_baseline_nopolicy.csv` and `run_cba.csv` to compare the results of the no-policy baseline run and the CBA run.
 
 In the dashboard, a lot of information is already shown in the various tabs. You can also go to the tab "All variables" to show any variable present in the output file.
@@ -48,10 +47,8 @@ In the dashboard, a lot of information is already shown in the various tabs. You
     Investigate the following policy-relevant questions:
 
     * What is the cost-optimal temperature target? And how high does temperature rise without any policy?
-    * How big are the *global* economic damages in 2050 and 2100 in the baseline run, and in the CBA run? *Hint: look at the variable* `damage_relative_global`. And how big are the global avoided damages in the CBA run?
-    * How big are the *global* mitigation costs in 2050 and 2100 in the CBA run? And how does this compare to the avoided damages? Calculate the benefit-cost ratio (BCR) for 2050 and 2100.
-
-
+    * How big are the *global* economic damages in 2050 and 2100 in the baseline run, and in the CBA run? *Hint: look at `global_damage_costs` and `global_avoided_damage_costs`.*
+    * How big are the *global* mitigation costs (`global_mitigation_costs`) in 2050 and 2100 in the CBA run? And how does this compare to the avoided damages? Calculate the benefit-cost ratio (BCR) for 2050 and 2100.
 
 !!! question "Question 2: regional differences"
 
@@ -63,10 +60,9 @@ In the dashboard, a lot of information is already shown in the various tabs. You
 
 Rerun MIMOSA with different parameters. Have a look at the [parameter reference](../../parameters.md) to see which parameters you can change. Interesting parameters could be:
 
- * [`params["economics"]["PRTP"]`](../../parameters.md#economics.PRTP): The discount rate (pure rate of time preference). Choose values between 0.01 (low end) and 0.03 (high end). The default is 0.015 (corresponding to 1.5%/year).
- * [`params["economics"]["damages"]["quantile"]`](../../parameters.md#economics.damages.quantile): The quantile of the damages distribution. Choose values between 0.05 (low end) and 0.95 (high end). The default is 0.5 (corresponding to the median).
- * [`params["temperature"]["TCRE"]`](../../parameters.md#temperature.TCRE): The transient climate response to cumulative emissions. Choose values between 0.42 (low end) and 0.82 (high end). The default is 0.62&nbsp;&deg;C/TtCO<sub>2</sub> (corresponding to the median).
-
+- [`params["economics"]["PRTP"]`](../../parameters.md#economics.PRTP): The discount rate (pure rate of time preference). Choose values between 0.01 (low end) and 0.03 (high end). The default is 0.015 (corresponding to 1.5%/year).
+- [`params["economics"]["damages"]["quantile"]`](../../parameters.md#economics.damages.quantile): The quantile of the damages distribution. Choose values between 0.05 (low end) and 0.95 (high end). The default is 0.5 (corresponding to the median).
+- [`params["temperature"]["TCRE"]`](../../parameters.md#temperature.TCRE): The transient climate response to cumulative emissions. Choose values between 0.42 (low end) and 0.82 (high end). The default is 0.62&nbsp;&deg;C/TtCO<sub>2</sub> (corresponding to the median).
 
 !!! question "Question 3: sensitivity analysis"
 
@@ -91,22 +87,22 @@ In the next exercise, you will run MIMOSA with different effort sharing approach
 
         First, choose which effort sharing regime you want to use. You can choose between:
 
-        * [`"equal_mitigation_costs"`](../../parameters.md#effort sharing.regime)
-        * [`"equal_total_costs"`](../../parameters.md#effort sharing.regime)
-        * [`"per_cap_convergence"`](../../parameters.md#effort sharing.regime)
-        * [`"ability_to_pay"`](../../parameters.md#effort sharing.regime)
-        * [`"equal_cumulative_per_cap"`](../../parameters.md#effort sharing.regime)
+        * [`"equal_mitigation_costs"`](../../parameters.md#model structure.effortsharing module)
+        * [`"equal_total_costs"`](../../parameters.md#model structure.effortsharing module)
+        * [`"per_cap_convergence"`](../../parameters.md#model structure.effortsharing module)
+        * [`"ability_to_pay"`](../../parameters.md#model structure.effortsharing module)
+        * [`"equal_cumulative_per_cap"`](../../parameters.md#model structure.effortsharing module)
 
         More information about these regimes can be found in [van den Berg et al. (2020)](https://doi.org/10.1007/s10584-019-02368-y) (specifically, [Table 1](https://link.springer.com/article/10.1007/s10584-019-02368-y/tables/1)).
 
-        Then, run the following code where you change the variable `regime`. 
+        Then, run the following code where you change the variable `regime`.
 
         ```python hl_lines="3 6"
         --8<-- "docs/workshops/summerschool_prisma_2025/run_effortsharing.py"
         ```
 
         1. Change this variable with the chosen option.
-    
+
     === "Run 2: Cost-minimising regime"
 
         Next, run MIMOSA with the cost-minimising regime. There is no need for emission trading, so simply use the following code:
@@ -117,17 +113,15 @@ In the next exercise, you will run MIMOSA with different effort sharing approach
 
 #### Step 2: Effect on equity
 
-!!! question "Question 4: Regional mitigation costs and equity"
+!!! question "Question 4: Attributed mitigation costs and equity"
 
     * For the two chosen regions, compare the mitigation costs in 2050 and 2100. How do these costs compare to the global mitigation costs?
     * And how do they compare to the "CBA" run?
 
-
 #### Step 3: Effect on sovereignty
 
-!!! question "Question 5: Sovereignty and import/export of emission reductions"
+!!! question "Question 5: Sovereignty and trading of emission reductions"
 
+    When emission trading is enabled, each region's attributed `mitigation_costs_abs` consist of its `domestic_mitigation_costs_abs` plus its `mitigation_cost_trading_balance`. A positive balance means that attributed costs and reductions exceed those occurring physically within the region; a negative balance means that they are lower.
 
-    When emission trading is enabled, each region has to pay it's own domestic reductions, plus an import/export balance. This balance is positive if the region imports emission reductions (i.e. buys emission reductions from other regions), and negative if the region exports emission reductions (i.e. sells emission reductions to other regions).
-
-    The sum of the variable `import_export_mitigation_cost_balance` is always zero. However, to get a sense of how large the financial flows each year are, you can sum all the positive values (or all the negative values) of this variable. Do this for 2050 and for 2100. How big are the financial flows? How does this compare to the global GDP in those years? 
+    The sum of `mitigation_cost_trading_balance` across regions is always zero. However, to get a sense of how large the financial flows are each year, you can sum all positive values (or all negative values) of this variable. Do this for 2050 and 2100. How large are the financial flows? How do they compare to global GDP in those years?

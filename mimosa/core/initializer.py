@@ -1,4 +1,5 @@
-import warnings
+from dataclasses import dataclass
+from typing import Iterator, List, Tuple
 
 from mimosa.common import (
     AbstractModel,
@@ -7,12 +8,27 @@ from mimosa.common import (
     regional_params,
     TransformationFactory,
     ModelContext,
-    ComponentConfig,
 )
 from mimosa.common.config.parseconfig import check_params, parse_param_values
-from mimosa.abstract_model import create_abstract_model
+from mimosa.abstract_model import ALL_COMPONENTS, create_abstract_model
 from mimosa.concrete_model.instantiate_params import InstantiatedModel
 from mimosa.concrete_model import custom_constraints
+
+
+@dataclass(frozen=True)
+class ModelBuildResult:
+    """Named outputs of the model-construction pipeline."""
+
+    concrete_model: ConcreteModel
+    params: dict
+    equations: list
+    context: ModelContext
+
+    def __iter__(self) -> Iterator:
+        """Preserve the former three-value tuple-unpacking interface."""
+        yield self.concrete_model
+        yield self.params
+        yield self.equations
 
 
 class Preprocessor:
@@ -27,9 +43,11 @@ class Preprocessor:
     concrete_model: ConcreteModel
     equations: list
     parser_tree: dict
+    model_context: ModelContext
     _abstract_model: AbstractModel
     _data_store: data.DataStore
     _regional_param_store: regional_params.RegionalParamStore
+    instantiated_model: InstantiatedModel
 
     def __init__(self, params):
         self._params = params
@@ -42,16 +60,26 @@ class Preprocessor:
         2. Creates an abstract model based on the specified modules.
         3. Loads the necessary data and regional parameters.
         4. Instantiates the abstract model with the loaded data and parameters.
-        5. Preprocesses the Pyomo model by aggregating identical variables and more
+        5. Applies custom constraints and Pyomo transformations.
+
         Returns:
-            ConcreteModel: The instantiated model ready for simulation.
+            ModelBuildResult: Named references to the concrete model, parsed
+                parameters, simulation equations, and model context.
         """
         self._check_and_parse_params()
+        self.model_context = self._create_model_context()
         self._abstract_model, self.equations = self._create_abstract_model()
         self._data_store, self._regional_param_store = self._load_data()
         self.concrete_model = self._instantiate_model()
-        self._preprocess_pyomo_model()
-        return self.concrete_model, self.parsed_params, self.equations
+        self._apply_custom_constraints()
+        self._apply_pyomo_transformations()
+
+        return ModelBuildResult(
+            concrete_model=self.concrete_model,
+            params=self.parsed_params,
+            equations=self.equations,
+            context=self.model_context,
+        )
 
     @property
     def parsed_params(self):
@@ -76,34 +104,14 @@ class Preprocessor:
     def _create_model_context(self) -> ModelContext:
         model_params = self._params["model structure"]
 
-        def registry_component(name):
-            return ComponentConfig(
-                module=model_params[f"{name} module"],
-                options=model_params.get(f"{name} module options", {}),
-            )
-
-        def fixed_component(name):
-            return ComponentConfig(
-                options=model_params.get(f"{name} options", {}),
-            )
-
         return ModelContext(
             components={
-                "damage": registry_component("damage"),
-                "emissiontrade": registry_component("emissiontrade"),
-                "financialtransfer": registry_component("financialtransfer"),
-                "effortsharing": registry_component("effortsharing"),
-                "welfare": registry_component("welfare"),
-                "objective": registry_component("objective"),
-                # Fixed/non-registry components
-                "emissions": fixed_component("emissions"),
-                "sealevelrise": fixed_component("sealevelrise"),
-                "mitigation": fixed_component("mitigation"),
-                "cobbdouglas": fixed_component("cobbdouglas"),
+                component.name: component.read_config(model_params)
+                for component in ALL_COMPONENTS
             }
         )
 
-    def _create_abstract_model(self) -> AbstractModel:
+    def _create_abstract_model(self) -> Tuple[AbstractModel, List]:
         """
         Loads all the equations and creates an abstract_model.
         `abstract` here means that the model is not yet instantiated with data.
@@ -111,9 +119,7 @@ class Preprocessor:
         Returns:
             AbstractModel: model corresponding to the damage/objective module combination
         """
-        context = self._create_model_context()
-
-        return create_abstract_model(context)
+        return create_abstract_model(self.model_context)
 
     def _load_data(self):
         """
@@ -134,25 +140,25 @@ class Preprocessor:
         Returns:
             ConcreteModel: instantiated model ready for simulation
         """
-        instantiated_model = InstantiatedModel(
+        self.instantiated_model = InstantiatedModel(
             self._abstract_model, self._regional_param_store, self._data_store
         )
-        m = instantiated_model.concrete_model
+        return self.instantiated_model.concrete_model
 
-        # Optionally, custom extra constraints to variables can be added, and disable other constraints
+    def _apply_custom_constraints(self) -> None:
+        """Apply configured constraints to the instantiated concrete model."""
         if self._params.get("custom_constraints") is not None:
-            custom_constraints.set_custom_constraints(m, self._params)
+            custom_constraints.set_custom_constraints(
+                self.concrete_model, self._params
+            )
 
-        return m
-
-    def _preprocess_pyomo_model(self) -> None:
+    def _apply_pyomo_transformations(self) -> None:
         """
-        Pyomo can apply certain pre-processing steps before sending the model
-        to the solver. These include:
-          - Aggregate variables that are linked by equality constraints
-          - Initialise non-fixed variables to midpoint of their boundaries
-          - Fix variables that are de-facto fixed
-          - Propagate variable fixing for equalities of type x = y
+        Apply Pyomo transformations after model instantiation and customization.
+
+        These transformations initialize non-fixed variables to the midpoint of
+        their bounds, detect de-facto fixed variables, and, for multi-region
+        models, propagate variable fixing through equalities.
         """
         more_than_one_region = len(self._params["regions"]) > 1
 
