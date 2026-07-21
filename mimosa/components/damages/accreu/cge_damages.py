@@ -32,7 +32,7 @@ def get_constraints(
     m.non_market_damage_costs_abs = Param(
         m.t, m.regions, initialize=0.0, units=quant.unit("currency_unit")
     )
-    m.damage_relative_global = Var(
+    m.global_damage_costs = Var(
         m.t,
         units=quant.unit("fraction_of_GDP"),
     )
@@ -48,7 +48,7 @@ def get_constraints(
                 lambda m, t, r: m.damage_costs[t, r] * m.GDP_gross[t, r],
             ),
             GlobalEquation(
-                m.damage_relative_global,
+                m.global_damage_costs,
                 lambda m, t: (
                     sum(m.damage_costs_abs[t, r] for r in m.regions)
                     / m.global_GDP_gross[t]
