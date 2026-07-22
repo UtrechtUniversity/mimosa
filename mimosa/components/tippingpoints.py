@@ -22,7 +22,8 @@ def get_constraints(
 ) -> Sequence[GeneralConstraint]:
     """Comments"""
 
-    # total temperature anomaly due to crossing tipping points
+    # total temperature anomaly due solely to crossing tipping points
+    # temperature anomaly above PIA from increasing GHGs is NOT included in this value
     m.total_tipping_anomaly = Var(m.t)
     # temperature anomalies accrued by crossing LABC threshold
     m.tipping_temps_LABC = Var(m.t)
@@ -41,11 +42,11 @@ def get_constraints(
 
 #####################################################
     constraints = [
-        # PFAT temperature anomaly
+        # PFAT global temperature anomaly
         GlobalEquation(
             m.tipping_temps_PFAT,
             lambda m, t: (
-                calc_temp_PFAT(
+                calc_global_temp_PFAT(
                     m.PFAT_threshold,
                     m.temperature[t],
                     m,
@@ -55,11 +56,20 @@ def get_constraints(
             ),
         ),
 
+        # LABC global temperature anomaly
+        GlobalEquation(
+            m.tipping_temps_LABC,
+            lambda m, t: (calc_global_temp_LABC(m.LABC_threshold, m.temperature[t], m,))
+            if t > 0
+            else 0
+        ),
 
-        # total temperature anomaly from tipping is summation of all individual contributions
+
+        # total temperature anomaly from tipping is combination of all individual contributions
+        # warming temperature anomalies are added, cooling temperature anomalies are subtracted
         GlobalEquation(
             m.total_tipping_anomaly,
-            lambda m, t: (m.tipping_temps_LABC[t] + m.tipping_temps_PFAT[t]),
+            lambda m, t: (m.tipping_temps_PFAT[t] - m.tipping_temps_LABC[t]),
         ),
 
 
@@ -71,23 +81,23 @@ def get_constraints(
 # calculates the temperature anomaly from exceeding the PFAT tipping threshold
 # uses estimate of 13 - 25 GtC released per degree Celsius over threshold (Anderson McKay 2022)
 # this function uses an average of 19 GtC released per degree C over tipping threshold
-def calc_temp_PFAT(
+def calc_global_temp_PFAT(
     PFAT_threshold,
     temp_current,
     m: AbstractModel,
 ):
     # temperature increase above PFAT threshold multiplied by 19 GtC per degree C increase
     # multiplied by TCRE to get units of degrees C
-    temp_total = temp_current + ( soft_switch(temp_current - PFAT_threshold) * 19 * m.TCRE)
+    temp_total = ( soft_switch(temp_current - PFAT_threshold) * 19 * m.TCRE)
     return temp_total
  
 
 # calculates the temperature anomaly from exceeding the LABC tipping threshold
-# uses estimate of 0.5 degrees C of global cooling (Anderson McKay 2022)
+# uses estimate of 0.46 degrees C of global cooling (Anderson McKay 2022)
 # TODO: The change in GMST is currently represented as being proportional to the amount by which
 #       the tipping temperature LABC_threshold has been exceeded. This is NOT accurate.
-def calc_temp_LABC(LABC_threshold, temp_current, m: AbstractModel):
+def calc_global_temp_LABC(LABC_threshold, temp_current, m: AbstractModel):
 
-    temp_total = temp_current - ( soft_switch(temp_current - LABC_threshold) * 0.5)
+    temp_total = ( soft_switch(temp_current - LABC_threshold) * 0.46)
     return temp_total
         
