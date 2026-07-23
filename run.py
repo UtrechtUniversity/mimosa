@@ -9,4 +9,4 @@ params["emissions"]["non increasing emissions after 2100"] = False
 
 model1 = MIMOSA(params)
 model1.solve()
-model1.save("test_with_double_count_fixed")
+model1.save("test_with_units_added")

@@ -24,15 +24,17 @@ def get_constraints(
 
     # total temperature anomaly due solely to crossing tipping points
     # temperature anomaly above PIA from increasing GHGs is NOT included in this value
-    m.total_tipping_anomaly = Var(m.t)
+    m.total_tipping_anomaly = Var(m.t, units=quant.unit("degC_above_PI"))
     # temperature anomalies accrued by crossing LABC threshold
-    m.tipping_temps_LABC = Var(m.t)
+    m.tipping_temps_LABC = Var(m.t, units=quant.unit("degC_above_PI"))
     # temperature anomalies accrued for each year by crossing PFAT threshold
-    m.tipping_temps_PFAT = Var(m.t)
+    m.tipping_temps_PFAT = Var(m.t, units=quant.unit("degC_above_PI"))
+
 
     # temperature tipping threshold for abrupt boreal permafrost thaw
     # taken from Anderson McKay (2022)
     m.PFAT_threshold = Param(initialize=1.5)
+
  
     # temperature tipping threshold for Labrador Sea convection collapse
     # taken from Anderson McKay (2022)
