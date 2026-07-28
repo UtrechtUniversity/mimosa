@@ -352,6 +352,95 @@ emissions:
 
 ##################
 
+tippingpoints:
+
+  PFAT:
+    include:
+      descr: If true, include effects of abrupt permafrost thaw (PFAT) tipping element
+      type: bool
+      default: False
+      can_be_false: True
+
+    threshold_quantile:
+      descr: Quantile for PFAT tipping temperature threshold
+      type: enum
+      values:
+        - 0.05
+        - 0.5
+        - 0.95
+      default: 0.5
+
+    severity_quantile:
+      descr: Quantile for the intensity of effects from crossing PFAT tipping threshold
+      type: enum
+      values:
+        - 0.05
+        - 0.5
+        - 0.95
+      default: 0.5
+
+  LABC:
+    include:
+      descr: If true, include effects of Labrador convection collapse (LABC) tipping element
+      type: bool
+      default: False
+      can_be_false: True
+
+    threshold_quantile:
+      descr: Quantile for LABC tipping temperature threshold
+      type: enum
+      values:
+        - 0.05
+        - 0.5
+        - 0.95
+      default: 0.5
+
+
+  AMOC:
+    include:
+      descr: If true, include effects of AMOC tipping element
+      type: bool
+      default: False
+      can_be_false: True
+
+    threshold_quantile:
+      descr: Quantile for AMOC tipping temperature threshold
+      type: enum
+      values:
+        - 0.05
+        - 0.5
+        - 0.95
+      default: 0.5
+
+
+  AMAZ:
+    include:
+      descr: If true, include effects of Amazon Rainforest dieback (AMAZ) tipping element
+      type: bool
+      default: False
+      can_be_false: True
+
+    threshold_quantile:
+      descr: Quantile for AMAZ tipping temperature threshold
+      type: enum
+      values:
+        - 0.05
+        - 0.5
+        - 0.95
+      default: 0.5
+
+    severity_quantile:
+      descr: Quantile for the intensity of effects from crossing AMAZ tipping threshold
+      type: enum
+      values:
+        - 0.05
+        - 0.5
+        - 0.95
+      default: 0.5
+      
+
+##################
+
 effort sharing:
   percapconv_year:
     descr: >-
