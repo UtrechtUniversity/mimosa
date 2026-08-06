@@ -32,11 +32,11 @@ def get_constraints(
     m.total_tipping_anomaly = Var(m.t, units=quant.unit("degC_above_PI"))
 
     # read in model structure specified by user to see which tipping elements should be included
-    include_ALL = context.option("tipping points options", "include ALL")
-    include_PFAT = context.option("tipping points options", "include PFAT")
-    include_LABC = context.option("tipping points options", "include LABC")
-    include_AMOC = context.option("tipping points options", "include AMOC")
-    include_AMAZ = context.option("tipping points options", "include AMAZ")
+    include_ALL = context.option("tipping points", "include ALL")
+    include_PFAT = context.option("tipping points", "include PFAT")
+    include_LABC = context.option("tipping points", "include LABC")
+    include_AMOC = context.option("tipping points", "include AMOC")
+    include_AMAZ = context.option("tipping points", "include AMAZ")
 
     # if user specifies inclusion of PFAT tipping element in model structure
     # OR if user specifies including of ALL tipping elements in model structure
