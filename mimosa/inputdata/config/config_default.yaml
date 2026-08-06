@@ -355,12 +355,6 @@ emissions:
 tippingpoints:
 
   PFAT:
-    include:
-      descr: If true, include effects of abrupt permafrost thaw (PFAT) tipping element
-      type: bool
-      default: False
-      can_be_false: True
-
     threshold_quantile:
       descr: Quantile for PFAT tipping temperature threshold
       type: enum
@@ -380,12 +374,6 @@ tippingpoints:
       default: 0.5
 
   LABC:
-    include:
-      descr: If true, include effects of Labrador convection collapse (LABC) tipping element
-      type: bool
-      default: False
-      can_be_false: True
-
     threshold_quantile:
       descr: Quantile for LABC tipping temperature threshold
       type: enum
@@ -397,12 +385,6 @@ tippingpoints:
 
 
   AMOC:
-    include:
-      descr: If true, include effects of AMOC tipping element
-      type: bool
-      default: False
-      can_be_false: True
-
     threshold_quantile:
       descr: Quantile for AMOC tipping temperature threshold
       type: enum
@@ -414,12 +396,6 @@ tippingpoints:
 
 
   AMAZ:
-    include:
-      descr: If true, include effects of Amazon Rainforest dieback (AMAZ) tipping element
-      type: bool
-      default: False
-      can_be_false: True
-
     threshold_quantile:
       descr: Quantile for AMAZ tipping temperature threshold
       type: enum
@@ -566,6 +542,33 @@ model structure:
       - utility
       - globalcosts
     default: utility
+
+  tipping points options:
+    include ALL:
+      descr: Include all available tipping elements
+      type: bool
+      default: False
+
+    include PFAT:
+      descr: Include PFAT tipping element
+      type: bool
+      default: False
+
+    include LABC:
+      descr: Include LABC tipping element
+      type: bool
+      default: False
+
+    include AMOC:
+      descr: Include AMOC tipping element
+      type: bool
+      default: False
+
+    include AMAZ:
+      descr: Include AMAZ tipping element
+      type: bool
+      default: False
+    
 
 regionstype:
   descr: Name of the region definition. Used in the mapping of the regional parameters.
