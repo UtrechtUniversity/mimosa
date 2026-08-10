@@ -1,3 +1,7 @@
+from pathlib import Path
+import runpy
+
+import pandas as pd
 import pytest
 
 from mimosa import MIMOSA, load_params
@@ -49,3 +53,18 @@ def test_slr_projection_sets_share_initial_state_and_diverge():
         simulation.slr_cumlws[15] == pytest.approx(0.03)
         for simulation in simulations.values()
     )
+
+
+def test_documented_ar6_benchmark_is_current():
+    repository_root = Path(__file__).resolve().parents[2]
+    script = runpy.run_path(
+        repository_root / "docs" / "scripts" / "generate_slr_benchmark.py"
+    )
+    calculated_tables = script["calculate_benchmark_tables"]()
+    documented_tables = (
+        pd.read_csv(script["TOTALS_OUTPUT"], dtype=str),
+        pd.read_csv(script["COMPONENTS_OUTPUT"], dtype=str),
+    )
+
+    for calculated, documented in zip(calculated_tables, documented_tables):
+        pd.testing.assert_frame_equal(calculated, documented)

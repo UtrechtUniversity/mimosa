@@ -232,11 +232,20 @@ def get_constraints(
     following benchmark prescribes a linear warming path from 1.27 degrees C in
     2025 to the stated 2100 warming level. Values are metres relative to 1900:
 
-    | 2100 warming | AR6 median [likely range] | low | central | high |
-    | ------------ | ------------------------- | --- | ------- | ---- |
-    | 2 degrees C  | 0.668 [0.558--0.848]      | 0.550 | 0.624 | 0.831 |
-    | 3 degrees C  | 0.778 [0.658--0.968]      | 0.652 | 0.751 | 1.176 |
-    | 4 degrees C  | 0.858 [0.738--1.068]      | 0.749 | 0.873 | 1.549 |
+    <div class="tiny_table table_first_col_header" markdown>
+    {{ read_csv_macro("docs/assets/data/slr_ar6_benchmark.csv") }}
+    </div>
+
+    The MIMOSA columns in this table and the component table below are generated
+    directly from the current component equations. After changing the SLR
+    formulation or parameters, regenerate both tables from the repository root:
+
+    ```shell
+    python docs/scripts/generate_slr_benchmark.py
+    ```
+
+    A model test compares the committed CSV files with a fresh calculation so
+    that outdated documentation is detected automatically.
 
     AR6 Chapter 12 reports the warming-level values relative to 1995--2014.
     The table adds the assessed 0.158 m rise from 1900 to 1995--2014, following
@@ -249,13 +258,9 @@ def get_constraints(
     4 degrees C by design, representing rapid Antarctic loss. For transparency,
     the central 2100 component values at 2, 3, and 4 degrees C respectively are:
 
-    | Component | 2 degrees C | 3 degrees C | 4 degrees C |
-    | --------- | -----------: | -----------: | -----------: |
-    | Thermal expansion | 0.219 | 0.283 | 0.347 |
-    | Glaciers | 0.152 | 0.169 | 0.178 |
-    | Greenland | 0.103 | 0.147 | 0.193 |
-    | Antarctica | 0.120 | 0.122 | 0.125 |
-    | Land-water storage | 0.030 | 0.030 | 0.030 |
+    <div class="tiny_table table_first_col_header" markdown>
+    {{ read_csv_macro("docs/assets/data/slr_ar6_components.csv") }}
+    </div>
 
     References:
 
