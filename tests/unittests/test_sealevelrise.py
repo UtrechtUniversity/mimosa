@@ -103,3 +103,17 @@ def test_antarctic_update_is_limited_by_remaining_ice(m):
 
     assert contribution_large < contribution_small
     assert contribution_large > 0
+
+
+def test_projection_sets_order_ordinary_responses():
+    parameter_sets = sealevelrise.SLR_PROJECTION_PARAMETER_SETS
+
+    assert parameter_sets["low"]["thermal_fast_sensitivity"] < parameter_sets[
+        "central"
+    ]["thermal_fast_sensitivity"]
+    assert parameter_sets["low"]["gsic_timescale"] > parameter_sets["central"][
+        "gsic_timescale"
+    ]
+    assert parameter_sets["low"]["ais_background_rate"] < parameter_sets[
+        "central"
+    ]["ais_background_rate"]

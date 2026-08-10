@@ -44,3 +44,8 @@ def test_slr_projection_sets_share_initial_state_and_diverge():
         for projection in ("low", "central", "high")
     ]
     assert slr_2100[0] < slr_2100[1] < slr_2100[2]
+
+    assert all(
+        simulation.slr_cumlws[15] == pytest.approx(0.03)
+        for simulation in simulations.values()
+    )

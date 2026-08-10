@@ -428,8 +428,9 @@ model structure:
     projection:
       descr: >-
         Deterministic sea-level-rise parameter set. The central set represents
-        median projections; low and high represent alternative physical-response
-        assumptions while sharing the same historical initial conditions.
+        an AR6-calibrated central response; low represents the lower part of
+        the AR6 likely range, and high is a low-likelihood, high-impact
+        sensitivity case. All sets share the same historical initial conditions.
       type: enum
       values:
         - low
