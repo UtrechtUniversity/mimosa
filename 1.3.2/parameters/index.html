@@ -898,6 +898,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="model structure">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#model-structure-sealevelrise-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        sealevelrise options
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -2002,6 +2019,23 @@
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="model structure">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#model-structure-sealevelrise-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        sealevelrise options
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -3315,6 +3349,40 @@ model = MIMOSA(params)
 <div class="param_group" id="model structure">
 <h2 id="model-structure">model structure</h2>
 <div class="param_content">
+<div class="param_group" id="sealevelrise options">
+<h3 id="model-structure-sealevelrise-options"><span class="param_group_breadcrumbs">model structure &gt; </span>sealevelrise options</h3>
+<div class="param_content">
+<details class="parameter">
+<summary>projection</summary>
+<p><span class="param_anchor" id="model structure.sealevelrise options.projection"> </span></p>
+<p>Deterministic sea-level-rise parameter set. The central set represents an AR6-calibrated central response; low represents the lower part of the AR6 likely range, and high is a low-likelihood, high-impact sensitivity case. All sets share the same historical initial conditions.</p>
+<ul>
+<li>
+<p>Type: enum</p>
+</li>
+<li>
+<p>Default: central</p>
+</li>
+<li>
+<p>Can be false: False</p>
+</li>
+<li>
+<p>Allowed values:</p>
+<ul>
+<li>low</li>
+<li>central</li>
+<li>high</li>
+</ul>
+</li>
+</ul>
+<p>Example usage: </p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-46-1"><a href="#__codelineno-46-1" id="__codelineno-46-1" name="__codelineno-46-1"></a><span class="n">params</span> <span class="o">=</span> <span class="n">load_params</span><span class="p">()</span>
+</span><span id="__span-46-2"><a href="#__codelineno-46-2" id="__codelineno-46-2" name="__codelineno-46-2"></a><span class="hll"><span class="n">params</span><span class="p">[</span><span class="s2">"model structure"</span><span class="p">][</span><span class="s2">"sealevelrise options"</span><span class="p">][</span><span class="s2">"projection"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"central"</span>
+</span></span><span id="__span-46-3"><a href="#__codelineno-46-3" id="__codelineno-46-3" name="__codelineno-46-3"></a><span class="n">model</span> <span class="o">=</span> <span class="n">MIMOSA</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+</span></code></pre></div>
+</details>
+</div>
+</div>
 <details class="parameter">
 <summary>damage module</summary>
 <p><span class="param_anchor" id="model structure.damage module"> </span></p>
@@ -3338,9 +3406,9 @@ model = MIMOSA(params)
 </li>
 </ul>
 <p>Example usage: </p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-46-1"><a href="#__codelineno-46-1" id="__codelineno-46-1" name="__codelineno-46-1"></a><span class="n">params</span> <span class="o">=</span> <span class="n">load_params</span><span class="p">()</span>
-</span><span id="__span-46-2"><a href="#__codelineno-46-2" id="__codelineno-46-2" name="__codelineno-46-2"></a><span class="hll"><span class="n">params</span><span class="p">[</span><span class="s2">"model structure"</span><span class="p">][</span><span class="s2">"damage module"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"COACCH"</span>
-</span></span><span id="__span-46-3"><a href="#__codelineno-46-3" id="__codelineno-46-3" name="__codelineno-46-3"></a><span class="n">model</span> <span class="o">=</span> <span class="n">MIMOSA</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-47-1"><a href="#__codelineno-47-1" id="__codelineno-47-1" name="__codelineno-47-1"></a><span class="n">params</span> <span class="o">=</span> <span class="n">load_params</span><span class="p">()</span>
+</span><span id="__span-47-2"><a href="#__codelineno-47-2" id="__codelineno-47-2" name="__codelineno-47-2"></a><span class="hll"><span class="n">params</span><span class="p">[</span><span class="s2">"model structure"</span><span class="p">][</span><span class="s2">"damage module"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"COACCH"</span>
+</span></span><span id="__span-47-3"><a href="#__codelineno-47-3" id="__codelineno-47-3" name="__codelineno-47-3"></a><span class="n">model</span> <span class="o">=</span> <span class="n">MIMOSA</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
 </span></code></pre></div>
 </details>
 <details class="parameter">
@@ -3367,9 +3435,9 @@ model = MIMOSA(params)
 </li>
 </ul>
 <p>Example usage: </p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-47-1"><a href="#__codelineno-47-1" id="__codelineno-47-1" name="__codelineno-47-1"></a><span class="n">params</span> <span class="o">=</span> <span class="n">load_params</span><span class="p">()</span>
-</span><span id="__span-47-2"><a href="#__codelineno-47-2" id="__codelineno-47-2" name="__codelineno-47-2"></a><span class="hll"><span class="n">params</span><span class="p">[</span><span class="s2">"model structure"</span><span class="p">][</span><span class="s2">"emissiontrade module"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"notrade"</span>
-</span></span><span id="__span-47-3"><a href="#__codelineno-47-3" id="__codelineno-47-3" name="__codelineno-47-3"></a><span class="n">model</span> <span class="o">=</span> <span class="n">MIMOSA</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-48-1"><a href="#__codelineno-48-1" id="__codelineno-48-1" name="__codelineno-48-1"></a><span class="n">params</span> <span class="o">=</span> <span class="n">load_params</span><span class="p">()</span>
+</span><span id="__span-48-2"><a href="#__codelineno-48-2" id="__codelineno-48-2" name="__codelineno-48-2"></a><span class="hll"><span class="n">params</span><span class="p">[</span><span class="s2">"model structure"</span><span class="p">][</span><span class="s2">"emissiontrade module"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"notrade"</span>
+</span></span><span id="__span-48-3"><a href="#__codelineno-48-3" id="__codelineno-48-3" name="__codelineno-48-3"></a><span class="n">model</span> <span class="o">=</span> <span class="n">MIMOSA</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
 </span></code></pre></div>
 </details>
 <details class="parameter">
@@ -3395,9 +3463,9 @@ model = MIMOSA(params)
 </li>
 </ul>
 <p>Example usage: </p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-48-1"><a href="#__codelineno-48-1" id="__codelineno-48-1" name="__codelineno-48-1"></a><span class="n">params</span> <span class="o">=</span> <span class="n">load_params</span><span class="p">()</span>
-</span><span id="__span-48-2"><a href="#__codelineno-48-2" id="__codelineno-48-2" name="__codelineno-48-2"></a><span class="hll"><span class="n">params</span><span class="p">[</span><span class="s2">"model structure"</span><span class="p">][</span><span class="s2">"financialtransfer module"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"notransfer"</span>
-</span></span><span id="__span-48-3"><a href="#__codelineno-48-3" id="__codelineno-48-3" name="__codelineno-48-3"></a><span class="n">model</span> <span class="o">=</span> <span class="n">MIMOSA</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-49-1"><a href="#__codelineno-49-1" id="__codelineno-49-1" name="__codelineno-49-1"></a><span class="n">params</span> <span class="o">=</span> <span class="n">load_params</span><span class="p">()</span>
+</span><span id="__span-49-2"><a href="#__codelineno-49-2" id="__codelineno-49-2" name="__codelineno-49-2"></a><span class="hll"><span class="n">params</span><span class="p">[</span><span class="s2">"model structure"</span><span class="p">][</span><span class="s2">"financialtransfer module"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"notransfer"</span>
+</span></span><span id="__span-49-3"><a href="#__codelineno-49-3" id="__codelineno-49-3" name="__codelineno-49-3"></a><span class="n">model</span> <span class="o">=</span> <span class="n">MIMOSA</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
 </span></code></pre></div>
 </details>
 <details class="parameter">
@@ -3427,9 +3495,9 @@ model = MIMOSA(params)
 </li>
 </ul>
 <p>Example usage: </p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-49-1"><a href="#__codelineno-49-1" id="__codelineno-49-1" name="__codelineno-49-1"></a><span class="n">params</span> <span class="o">=</span> <span class="n">load_params</span><span class="p">()</span>
-</span><span id="__span-49-2"><a href="#__codelineno-49-2" id="__codelineno-49-2" name="__codelineno-49-2"></a><span class="hll"><span class="n">params</span><span class="p">[</span><span class="s2">"model structure"</span><span class="p">][</span><span class="s2">"effortsharing module"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"noregime"</span>
-</span></span><span id="__span-49-3"><a href="#__codelineno-49-3" id="__codelineno-49-3" name="__codelineno-49-3"></a><span class="n">model</span> <span class="o">=</span> <span class="n">MIMOSA</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-50-1"><a href="#__codelineno-50-1" id="__codelineno-50-1" name="__codelineno-50-1"></a><span class="n">params</span> <span class="o">=</span> <span class="n">load_params</span><span class="p">()</span>
+</span><span id="__span-50-2"><a href="#__codelineno-50-2" id="__codelineno-50-2" name="__codelineno-50-2"></a><span class="hll"><span class="n">params</span><span class="p">[</span><span class="s2">"model structure"</span><span class="p">][</span><span class="s2">"effortsharing module"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"noregime"</span>
+</span></span><span id="__span-50-3"><a href="#__codelineno-50-3" id="__codelineno-50-3" name="__codelineno-50-3"></a><span class="n">model</span> <span class="o">=</span> <span class="n">MIMOSA</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
 </span></code></pre></div>
 </details>
 <details class="parameter">
@@ -3456,9 +3524,9 @@ model = MIMOSA(params)
 </li>
 </ul>
 <p>Example usage: </p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-50-1"><a href="#__codelineno-50-1" id="__codelineno-50-1" name="__codelineno-50-1"></a><span class="n">params</span> <span class="o">=</span> <span class="n">load_params</span><span class="p">()</span>
-</span><span id="__span-50-2"><a href="#__codelineno-50-2" id="__codelineno-50-2" name="__codelineno-50-2"></a><span class="hll"><span class="n">params</span><span class="p">[</span><span class="s2">"model structure"</span><span class="p">][</span><span class="s2">"welfare module"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"welfare_loss_minimising"</span>
-</span></span><span id="__span-50-3"><a href="#__codelineno-50-3" id="__codelineno-50-3" name="__codelineno-50-3"></a><span class="n">model</span> <span class="o">=</span> <span class="n">MIMOSA</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-51-1"><a href="#__codelineno-51-1" id="__codelineno-51-1" name="__codelineno-51-1"></a><span class="n">params</span> <span class="o">=</span> <span class="n">load_params</span><span class="p">()</span>
+</span><span id="__span-51-2"><a href="#__codelineno-51-2" id="__codelineno-51-2" name="__codelineno-51-2"></a><span class="hll"><span class="n">params</span><span class="p">[</span><span class="s2">"model structure"</span><span class="p">][</span><span class="s2">"welfare module"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"welfare_loss_minimising"</span>
+</span></span><span id="__span-51-3"><a href="#__codelineno-51-3" id="__codelineno-51-3" name="__codelineno-51-3"></a><span class="n">model</span> <span class="o">=</span> <span class="n">MIMOSA</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
 </span></code></pre></div>
 </details>
 <details class="parameter">
@@ -3484,9 +3552,9 @@ model = MIMOSA(params)
 </li>
 </ul>
 <p>Example usage: </p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-51-1"><a href="#__codelineno-51-1" id="__codelineno-51-1" name="__codelineno-51-1"></a><span class="n">params</span> <span class="o">=</span> <span class="n">load_params</span><span class="p">()</span>
-</span><span id="__span-51-2"><a href="#__codelineno-51-2" id="__codelineno-51-2" name="__codelineno-51-2"></a><span class="hll"><span class="n">params</span><span class="p">[</span><span class="s2">"model structure"</span><span class="p">][</span><span class="s2">"objective module"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"utility"</span>
-</span></span><span id="__span-51-3"><a href="#__codelineno-51-3" id="__codelineno-51-3" name="__codelineno-51-3"></a><span class="n">model</span> <span class="o">=</span> <span class="n">MIMOSA</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-52-1"><a href="#__codelineno-52-1" id="__codelineno-52-1" name="__codelineno-52-1"></a><span class="n">params</span> <span class="o">=</span> <span class="n">load_params</span><span class="p">()</span>
+</span><span id="__span-52-2"><a href="#__codelineno-52-2" id="__codelineno-52-2" name="__codelineno-52-2"></a><span class="hll"><span class="n">params</span><span class="p">[</span><span class="s2">"model structure"</span><span class="p">][</span><span class="s2">"objective module"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"utility"</span>
+</span></span><span id="__span-52-3"><a href="#__codelineno-52-3" id="__codelineno-52-3" name="__codelineno-52-3"></a><span class="n">model</span> <span class="o">=</span> <span class="n">MIMOSA</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
 </span></code></pre></div>
 </details>
 </div>
@@ -3515,9 +3583,9 @@ model = MIMOSA(params)
 </li>
 </ul>
 <p>Example usage: </p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-52-1"><a href="#__codelineno-52-1" id="__codelineno-52-1" name="__codelineno-52-1"></a><span class="n">params</span> <span class="o">=</span> <span class="n">load_params</span><span class="p">()</span>
-</span><span id="__span-52-2"><a href="#__codelineno-52-2" id="__codelineno-52-2" name="__codelineno-52-2"></a><span class="hll"><span class="n">params</span><span class="p">[</span><span class="s2">"regionstype"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"IMAGE26"</span>
-</span></span><span id="__span-52-3"><a href="#__codelineno-52-3" id="__codelineno-52-3" name="__codelineno-52-3"></a><span class="n">model</span> <span class="o">=</span> <span class="n">MIMOSA</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-53-1"><a href="#__codelineno-53-1" id="__codelineno-53-1" name="__codelineno-53-1"></a><span class="n">params</span> <span class="o">=</span> <span class="n">load_params</span><span class="p">()</span>
+</span><span id="__span-53-2"><a href="#__codelineno-53-2" id="__codelineno-53-2" name="__codelineno-53-2"></a><span class="hll"><span class="n">params</span><span class="p">[</span><span class="s2">"regionstype"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"IMAGE26"</span>
+</span></span><span id="__span-53-3"><a href="#__codelineno-53-3" id="__codelineno-53-3" name="__codelineno-53-3"></a><span class="n">model</span> <span class="o">=</span> <span class="n">MIMOSA</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
 </span></code></pre></div>
 </details>
 <details class="parameter">
@@ -3536,9 +3604,9 @@ model = MIMOSA(params)
 </li>
 </ul>
 <p>Example usage: </p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-53-1"><a href="#__codelineno-53-1" id="__codelineno-53-1" name="__codelineno-53-1"></a><span class="n">params</span> <span class="o">=</span> <span class="n">load_params</span><span class="p">()</span>
-</span><span id="__span-53-2"><a href="#__codelineno-53-2" id="__codelineno-53-2" name="__codelineno-53-2"></a><span class="hll"><span class="n">params</span><span class="p">[</span><span class="s2">"regionsmappings"</span><span class="p">]</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">'regionstype1'</span><span class="p">:</span> <span class="s1">'IMAGE26'</span><span class="p">,</span> <span class="s1">'regionstype2'</span><span class="p">:</span> <span class="s1">'COACCH'</span><span class="p">,</span> <span class="s1">'conversiontable'</span><span class="p">:</span> <span class="s1">'inputdata/regions/IMAGE26_COACCH.csv'</span><span class="p">},</span> <span class="p">{</span><span class="s1">'regionstype1'</span><span class="p">:</span> <span class="s1">'IMAGE26'</span><span class="p">,</span> <span class="s1">'regionstype2'</span><span class="p">:</span> <span class="s1">'ADRICE2010'</span><span class="p">,</span> <span class="s1">'conversiontable'</span><span class="p">:</span> <span class="s1">'inputdata/regions/IMAGE26_ADRICE2010.csv'</span><span class="p">},</span> <span class="p">{</span><span class="s1">'regionstype1'</span><span class="p">:</span> <span class="s1">'IMAGE26'</span><span class="p">,</span> <span class="s1">'regionstype2'</span><span class="p">:</span> <span class="s1">'ADRICE2012'</span><span class="p">,</span> <span class="s1">'conversiontable'</span><span class="p">:</span> <span class="s1">'inputdata/regions/IMAGE26_ADRICE2012.csv'</span><span class="p">}]</span>
-</span></span><span id="__span-53-3"><a href="#__codelineno-53-3" id="__codelineno-53-3" name="__codelineno-53-3"></a><span class="n">model</span> <span class="o">=</span> <span class="n">MIMOSA</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-54-1"><a href="#__codelineno-54-1" id="__codelineno-54-1" name="__codelineno-54-1"></a><span class="n">params</span> <span class="o">=</span> <span class="n">load_params</span><span class="p">()</span>
+</span><span id="__span-54-2"><a href="#__codelineno-54-2" id="__codelineno-54-2" name="__codelineno-54-2"></a><span class="hll"><span class="n">params</span><span class="p">[</span><span class="s2">"regionsmappings"</span><span class="p">]</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">'regionstype1'</span><span class="p">:</span> <span class="s1">'IMAGE26'</span><span class="p">,</span> <span class="s1">'regionstype2'</span><span class="p">:</span> <span class="s1">'COACCH'</span><span class="p">,</span> <span class="s1">'conversiontable'</span><span class="p">:</span> <span class="s1">'inputdata/regions/IMAGE26_COACCH.csv'</span><span class="p">},</span> <span class="p">{</span><span class="s1">'regionstype1'</span><span class="p">:</span> <span class="s1">'IMAGE26'</span><span class="p">,</span> <span class="s1">'regionstype2'</span><span class="p">:</span> <span class="s1">'ADRICE2010'</span><span class="p">,</span> <span class="s1">'conversiontable'</span><span class="p">:</span> <span class="s1">'inputdata/regions/IMAGE26_ADRICE2010.csv'</span><span class="p">},</span> <span class="p">{</span><span class="s1">'regionstype1'</span><span class="p">:</span> <span class="s1">'IMAGE26'</span><span class="p">,</span> <span class="s1">'regionstype2'</span><span class="p">:</span> <span class="s1">'ADRICE2012'</span><span class="p">,</span> <span class="s1">'conversiontable'</span><span class="p">:</span> <span class="s1">'inputdata/regions/IMAGE26_ADRICE2012.csv'</span><span class="p">}]</span>
+</span></span><span id="__span-54-3"><a href="#__codelineno-54-3" id="__codelineno-54-3" name="__codelineno-54-3"></a><span class="n">model</span> <span class="o">=</span> <span class="n">MIMOSA</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
 </span></code></pre></div>
 </details>
 <details class="parameter">
@@ -3557,9 +3625,9 @@ model = MIMOSA(params)
 </li>
 </ul>
 <p>Example usage: </p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-54-1"><a href="#__codelineno-54-1" id="__codelineno-54-1" name="__codelineno-54-1"></a><span class="n">params</span> <span class="o">=</span> <span class="n">load_params</span><span class="p">()</span>
-</span><span id="__span-54-2"><a href="#__codelineno-54-2" id="__codelineno-54-2" name="__codelineno-54-2"></a><span class="hll"><span class="n">params</span><span class="p">[</span><span class="s2">"regional_parameter_files"</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'economics'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'filename'</span><span class="p">:</span> <span class="s1">'inputdata/regionalparams/economics.csv'</span><span class="p">,</span> <span class="s1">'regionstype'</span><span class="p">:</span> <span class="s1">'IMAGE26'</span><span class="p">},</span> <span class="s1">'MAC'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'filename'</span><span class="p">:</span> <span class="s1">'inputdata/regionalparams/mac.csv'</span><span class="p">,</span> <span class="s1">'regionstype'</span><span class="p">:</span> <span class="s1">'IMAGE26'</span><span class="p">},</span> <span class="s1">'COACCH'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'filename'</span><span class="p">:</span> <span class="s1">'inputdata/regionalparams/COACCH.csv'</span><span class="p">,</span> <span class="s1">'regionstype'</span><span class="p">:</span> <span class="s1">'COACCH'</span><span class="p">}}</span>
-</span></span><span id="__span-54-3"><a href="#__codelineno-54-3" id="__codelineno-54-3" name="__codelineno-54-3"></a><span class="n">model</span> <span class="o">=</span> <span class="n">MIMOSA</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-55-1"><a href="#__codelineno-55-1" id="__codelineno-55-1" name="__codelineno-55-1"></a><span class="n">params</span> <span class="o">=</span> <span class="n">load_params</span><span class="p">()</span>
+</span><span id="__span-55-2"><a href="#__codelineno-55-2" id="__codelineno-55-2" name="__codelineno-55-2"></a><span class="hll"><span class="n">params</span><span class="p">[</span><span class="s2">"regional_parameter_files"</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'economics'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'filename'</span><span class="p">:</span> <span class="s1">'inputdata/regionalparams/economics.csv'</span><span class="p">,</span> <span class="s1">'regionstype'</span><span class="p">:</span> <span class="s1">'IMAGE26'</span><span class="p">},</span> <span class="s1">'MAC'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'filename'</span><span class="p">:</span> <span class="s1">'inputdata/regionalparams/mac.csv'</span><span class="p">,</span> <span class="s1">'regionstype'</span><span class="p">:</span> <span class="s1">'IMAGE26'</span><span class="p">},</span> <span class="s1">'COACCH'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'filename'</span><span class="p">:</span> <span class="s1">'inputdata/regionalparams/COACCH.csv'</span><span class="p">,</span> <span class="s1">'regionstype'</span><span class="p">:</span> <span class="s1">'COACCH'</span><span class="p">}}</span>
+</span></span><span id="__span-55-3"><a href="#__codelineno-55-3" id="__codelineno-55-3" name="__codelineno-55-3"></a><span class="n">model</span> <span class="o">=</span> <span class="n">MIMOSA</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
 </span></code></pre></div>
 </details>
 <details class="parameter">
@@ -3578,9 +3646,9 @@ model = MIMOSA(params)
 </li>
 </ul>
 <p>Example usage: </p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-55-1"><a href="#__codelineno-55-1" id="__codelineno-55-1" name="__codelineno-55-1"></a><span class="n">params</span> <span class="o">=</span> <span class="n">load_params</span><span class="p">()</span>
-</span><span id="__span-55-2"><a href="#__codelineno-55-2" id="__codelineno-55-2" name="__codelineno-55-2"></a><span class="hll"><span class="n">params</span><span class="p">[</span><span class="s2">"regions"</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'CAN'</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">'USA'</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">'MEX'</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">'RCAM'</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">'BRA'</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">'RSAM'</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">'NAF'</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">'WAF'</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">'EAF'</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">'SAF'</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">'WEU'</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">'CEU'</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">'TUR'</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">'UKR'</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">'STAN'</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">'RUS'</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">'ME'</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">'INDIA'</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">'KOR'</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">'CHN'</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">'SEAS'</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">'INDO'</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">'JAP'</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">'OCE'</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">'RSAS'</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">'RSAF'</span><span class="p">:</span> <span class="kc">None</span><span class="p">}</span>
-</span></span><span id="__span-55-3"><a href="#__codelineno-55-3" id="__codelineno-55-3" name="__codelineno-55-3"></a><span class="n">model</span> <span class="o">=</span> <span class="n">MIMOSA</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-56-1"><a href="#__codelineno-56-1" id="__codelineno-56-1" name="__codelineno-56-1"></a><span class="n">params</span> <span class="o">=</span> <span class="n">load_params</span><span class="p">()</span>
+</span><span id="__span-56-2"><a href="#__codelineno-56-2" id="__codelineno-56-2" name="__codelineno-56-2"></a><span class="hll"><span class="n">params</span><span class="p">[</span><span class="s2">"regions"</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'CAN'</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">'USA'</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">'MEX'</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">'RCAM'</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">'BRA'</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">'RSAM'</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">'NAF'</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">'WAF'</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">'EAF'</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">'SAF'</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">'WEU'</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">'CEU'</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">'TUR'</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">'UKR'</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">'STAN'</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">'RUS'</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">'ME'</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">'INDIA'</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">'KOR'</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">'CHN'</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">'SEAS'</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">'INDO'</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">'JAP'</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">'OCE'</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">'RSAS'</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">'RSAF'</span><span class="p">:</span> <span class="kc">None</span><span class="p">}</span>
+</span></span><span id="__span-56-3"><a href="#__codelineno-56-3" id="__codelineno-56-3" name="__codelineno-56-3"></a><span class="n">model</span> <span class="o">=</span> <span class="n">MIMOSA</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
 </span></code></pre></div>
 </details>
 <div class="param_group" id="input">
@@ -3605,9 +3673,9 @@ model = MIMOSA(params)
 </li>
 </ul>
 <p>Example usage: </p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-56-1"><a href="#__codelineno-56-1" id="__codelineno-56-1" name="__codelineno-56-1"></a><span class="n">params</span> <span class="o">=</span> <span class="n">load_params</span><span class="p">()</span>
-</span><span id="__span-56-2"><a href="#__codelineno-56-2" id="__codelineno-56-2" name="__codelineno-56-2"></a><span class="hll"><span class="n">params</span><span class="p">[</span><span class="s2">"input"</span><span class="p">][</span><span class="s2">"variables"</span><span class="p">][</span><span class="s2">"GDP"</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'variable'</span><span class="p">:</span> <span class="s1">'GDP|PPP'</span><span class="p">,</span> <span class="s1">'unit'</span><span class="p">:</span> <span class="s1">'currency_unit'</span><span class="p">,</span> <span class="s1">'scenario'</span><span class="p">:</span> <span class="s1">'</span><span class="si">{SSP}</span><span class="s1">-Baseline'</span><span class="p">,</span> <span class="s1">'model'</span><span class="p">:</span> <span class="s1">'IMAGE 3.4'</span><span class="p">,</span> <span class="s1">'file'</span><span class="p">:</span> <span class="s1">'inputdata/data/data_IMAGE_SSP_updated.csv'</span><span class="p">}</span>
-</span></span><span id="__span-56-3"><a href="#__codelineno-56-3" id="__codelineno-56-3" name="__codelineno-56-3"></a><span class="n">model</span> <span class="o">=</span> <span class="n">MIMOSA</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-57-1"><a href="#__codelineno-57-1" id="__codelineno-57-1" name="__codelineno-57-1"></a><span class="n">params</span> <span class="o">=</span> <span class="n">load_params</span><span class="p">()</span>
+</span><span id="__span-57-2"><a href="#__codelineno-57-2" id="__codelineno-57-2" name="__codelineno-57-2"></a><span class="hll"><span class="n">params</span><span class="p">[</span><span class="s2">"input"</span><span class="p">][</span><span class="s2">"variables"</span><span class="p">][</span><span class="s2">"GDP"</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'variable'</span><span class="p">:</span> <span class="s1">'GDP|PPP'</span><span class="p">,</span> <span class="s1">'unit'</span><span class="p">:</span> <span class="s1">'currency_unit'</span><span class="p">,</span> <span class="s1">'scenario'</span><span class="p">:</span> <span class="s1">'</span><span class="si">{SSP}</span><span class="s1">-Baseline'</span><span class="p">,</span> <span class="s1">'model'</span><span class="p">:</span> <span class="s1">'IMAGE 3.4'</span><span class="p">,</span> <span class="s1">'file'</span><span class="p">:</span> <span class="s1">'inputdata/data/data_IMAGE_SSP_updated.csv'</span><span class="p">}</span>
+</span></span><span id="__span-57-3"><a href="#__codelineno-57-3" id="__codelineno-57-3" name="__codelineno-57-3"></a><span class="n">model</span> <span class="o">=</span> <span class="n">MIMOSA</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
 </span></code></pre></div>
 </details>
 <details class="parameter">
@@ -3626,9 +3694,9 @@ model = MIMOSA(params)
 </li>
 </ul>
 <p>Example usage: </p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-57-1"><a href="#__codelineno-57-1" id="__codelineno-57-1" name="__codelineno-57-1"></a><span class="n">params</span> <span class="o">=</span> <span class="n">load_params</span><span class="p">()</span>
-</span><span id="__span-57-2"><a href="#__codelineno-57-2" id="__codelineno-57-2" name="__codelineno-57-2"></a><span class="hll"><span class="n">params</span><span class="p">[</span><span class="s2">"input"</span><span class="p">][</span><span class="s2">"variables"</span><span class="p">][</span><span class="s2">"emissions"</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'variable'</span><span class="p">:</span> <span class="s1">'Emissions|CO2'</span><span class="p">,</span> <span class="s1">'unit'</span><span class="p">:</span> <span class="s1">'emissionsrate_unit'</span><span class="p">,</span> <span class="s1">'scenario'</span><span class="p">:</span> <span class="s1">'</span><span class="si">{SSP}</span><span class="s1">-Baseline'</span><span class="p">,</span> <span class="s1">'model'</span><span class="p">:</span> <span class="s1">'IMAGE 3.4'</span><span class="p">,</span> <span class="s1">'file'</span><span class="p">:</span> <span class="s1">'inputdata/data/data_IMAGE_SSP_updated.csv'</span><span class="p">}</span>
-</span></span><span id="__span-57-3"><a href="#__codelineno-57-3" id="__codelineno-57-3" name="__codelineno-57-3"></a><span class="n">model</span> <span class="o">=</span> <span class="n">MIMOSA</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-58-1"><a href="#__codelineno-58-1" id="__codelineno-58-1" name="__codelineno-58-1"></a><span class="n">params</span> <span class="o">=</span> <span class="n">load_params</span><span class="p">()</span>
+</span><span id="__span-58-2"><a href="#__codelineno-58-2" id="__codelineno-58-2" name="__codelineno-58-2"></a><span class="hll"><span class="n">params</span><span class="p">[</span><span class="s2">"input"</span><span class="p">][</span><span class="s2">"variables"</span><span class="p">][</span><span class="s2">"emissions"</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'variable'</span><span class="p">:</span> <span class="s1">'Emissions|CO2'</span><span class="p">,</span> <span class="s1">'unit'</span><span class="p">:</span> <span class="s1">'emissionsrate_unit'</span><span class="p">,</span> <span class="s1">'scenario'</span><span class="p">:</span> <span class="s1">'</span><span class="si">{SSP}</span><span class="s1">-Baseline'</span><span class="p">,</span> <span class="s1">'model'</span><span class="p">:</span> <span class="s1">'IMAGE 3.4'</span><span class="p">,</span> <span class="s1">'file'</span><span class="p">:</span> <span class="s1">'inputdata/data/data_IMAGE_SSP_updated.csv'</span><span class="p">}</span>
+</span></span><span id="__span-58-3"><a href="#__codelineno-58-3" id="__codelineno-58-3" name="__codelineno-58-3"></a><span class="n">model</span> <span class="o">=</span> <span class="n">MIMOSA</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
 </span></code></pre></div>
 </details>
 <details class="parameter">
@@ -3647,9 +3715,9 @@ model = MIMOSA(params)
 </li>
 </ul>
 <p>Example usage: </p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-58-1"><a href="#__codelineno-58-1" id="__codelineno-58-1" name="__codelineno-58-1"></a><span class="n">params</span> <span class="o">=</span> <span class="n">load_params</span><span class="p">()</span>
-</span><span id="__span-58-2"><a href="#__codelineno-58-2" id="__codelineno-58-2" name="__codelineno-58-2"></a><span class="hll"><span class="n">params</span><span class="p">[</span><span class="s2">"input"</span><span class="p">][</span><span class="s2">"variables"</span><span class="p">][</span><span class="s2">"population"</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'variable'</span><span class="p">:</span> <span class="s1">'Population'</span><span class="p">,</span> <span class="s1">'unit'</span><span class="p">:</span> <span class="s1">'population_unit'</span><span class="p">,</span> <span class="s1">'scenario'</span><span class="p">:</span> <span class="s1">'</span><span class="si">{SSP}</span><span class="s1">-Baseline'</span><span class="p">,</span> <span class="s1">'model'</span><span class="p">:</span> <span class="s1">'IMAGE 3.4'</span><span class="p">,</span> <span class="s1">'file'</span><span class="p">:</span> <span class="s1">'inputdata/data/data_IMAGE_SSP_updated.csv'</span><span class="p">}</span>
-</span></span><span id="__span-58-3"><a href="#__codelineno-58-3" id="__codelineno-58-3" name="__codelineno-58-3"></a><span class="n">model</span> <span class="o">=</span> <span class="n">MIMOSA</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-59-1"><a href="#__codelineno-59-1" id="__codelineno-59-1" name="__codelineno-59-1"></a><span class="n">params</span> <span class="o">=</span> <span class="n">load_params</span><span class="p">()</span>
+</span><span id="__span-59-2"><a href="#__codelineno-59-2" id="__codelineno-59-2" name="__codelineno-59-2"></a><span class="hll"><span class="n">params</span><span class="p">[</span><span class="s2">"input"</span><span class="p">][</span><span class="s2">"variables"</span><span class="p">][</span><span class="s2">"population"</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'variable'</span><span class="p">:</span> <span class="s1">'Population'</span><span class="p">,</span> <span class="s1">'unit'</span><span class="p">:</span> <span class="s1">'population_unit'</span><span class="p">,</span> <span class="s1">'scenario'</span><span class="p">:</span> <span class="s1">'</span><span class="si">{SSP}</span><span class="s1">-Baseline'</span><span class="p">,</span> <span class="s1">'model'</span><span class="p">:</span> <span class="s1">'IMAGE 3.4'</span><span class="p">,</span> <span class="s1">'file'</span><span class="p">:</span> <span class="s1">'inputdata/data/data_IMAGE_SSP_updated.csv'</span><span class="p">}</span>
+</span></span><span id="__span-59-3"><a href="#__codelineno-59-3" id="__codelineno-59-3" name="__codelineno-59-3"></a><span class="n">model</span> <span class="o">=</span> <span class="n">MIMOSA</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
 </span></code></pre></div>
 </details>
 </div>
@@ -3675,9 +3743,9 @@ model = MIMOSA(params)
 </li>
 </ul>
 <p>Example usage: </p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-59-1"><a href="#__codelineno-59-1" id="__codelineno-59-1" name="__codelineno-59-1"></a><span class="n">params</span> <span class="o">=</span> <span class="n">load_params</span><span class="p">()</span>
-</span><span id="__span-59-2"><a href="#__codelineno-59-2" id="__codelineno-59-2" name="__codelineno-59-2"></a><span class="hll"><span class="n">params</span><span class="p">[</span><span class="s2">"custom_constraints"</span><span class="p">][</span><span class="s2">"constraint_variables"</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-</span></span><span id="__span-59-3"><a href="#__codelineno-59-3" id="__codelineno-59-3" name="__codelineno-59-3"></a><span class="n">model</span> <span class="o">=</span> <span class="n">MIMOSA</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-60-1"><a href="#__codelineno-60-1" id="__codelineno-60-1" name="__codelineno-60-1"></a><span class="n">params</span> <span class="o">=</span> <span class="n">load_params</span><span class="p">()</span>
+</span><span id="__span-60-2"><a href="#__codelineno-60-2" id="__codelineno-60-2" name="__codelineno-60-2"></a><span class="hll"><span class="n">params</span><span class="p">[</span><span class="s2">"custom_constraints"</span><span class="p">][</span><span class="s2">"constraint_variables"</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+</span></span><span id="__span-60-3"><a href="#__codelineno-60-3" id="__codelineno-60-3" name="__codelineno-60-3"></a><span class="n">model</span> <span class="o">=</span> <span class="n">MIMOSA</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
 </span></code></pre></div>
 </details>
 <details class="parameter">
@@ -3696,9 +3764,9 @@ model = MIMOSA(params)
 </li>
 </ul>
 <p>Example usage: </p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-60-1"><a href="#__codelineno-60-1" id="__codelineno-60-1" name="__codelineno-60-1"></a><span class="n">params</span> <span class="o">=</span> <span class="n">load_params</span><span class="p">()</span>
-</span><span id="__span-60-2"><a href="#__codelineno-60-2" id="__codelineno-60-2" name="__codelineno-60-2"></a><span class="hll"><span class="n">params</span><span class="p">[</span><span class="s2">"custom_constraints"</span><span class="p">][</span><span class="s2">"disabled_constraints"</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-</span></span><span id="__span-60-3"><a href="#__codelineno-60-3" id="__codelineno-60-3" name="__codelineno-60-3"></a><span class="n">model</span> <span class="o">=</span> <span class="n">MIMOSA</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-61-1"><a href="#__codelineno-61-1" id="__codelineno-61-1" name="__codelineno-61-1"></a><span class="n">params</span> <span class="o">=</span> <span class="n">load_params</span><span class="p">()</span>
+</span><span id="__span-61-2"><a href="#__codelineno-61-2" id="__codelineno-61-2" name="__codelineno-61-2"></a><span class="hll"><span class="n">params</span><span class="p">[</span><span class="s2">"custom_constraints"</span><span class="p">][</span><span class="s2">"disabled_constraints"</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+</span></span><span id="__span-61-3"><a href="#__codelineno-61-3" id="__codelineno-61-3" name="__codelineno-61-3"></a><span class="n">model</span> <span class="o">=</span> <span class="n">MIMOSA</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
 </span></code></pre></div>
 </details>
 <details class="parameter">
@@ -3717,9 +3785,9 @@ model = MIMOSA(params)
 </li>
 </ul>
 <p>Example usage: </p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-61-1"><a href="#__codelineno-61-1" id="__codelineno-61-1" name="__codelineno-61-1"></a><span class="n">params</span> <span class="o">=</span> <span class="n">load_params</span><span class="p">()</span>
-</span><span id="__span-61-2"><a href="#__codelineno-61-2" id="__codelineno-61-2" name="__codelineno-61-2"></a><span class="hll"><span class="n">params</span><span class="p">[</span><span class="s2">"custom_constraints"</span><span class="p">][</span><span class="s2">"custom_mapping"</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-</span></span><span id="__span-61-3"><a href="#__codelineno-61-3" id="__codelineno-61-3" name="__codelineno-61-3"></a><span class="n">model</span> <span class="o">=</span> <span class="n">MIMOSA</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-62-1"><a href="#__codelineno-62-1" id="__codelineno-62-1" name="__codelineno-62-1"></a><span class="n">params</span> <span class="o">=</span> <span class="n">load_params</span><span class="p">()</span>
+</span><span id="__span-62-2"><a href="#__codelineno-62-2" id="__codelineno-62-2" name="__codelineno-62-2"></a><span class="hll"><span class="n">params</span><span class="p">[</span><span class="s2">"custom_constraints"</span><span class="p">][</span><span class="s2">"custom_mapping"</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+</span></span><span id="__span-62-3"><a href="#__codelineno-62-3" id="__codelineno-62-3" name="__codelineno-62-3"></a><span class="n">model</span> <span class="o">=</span> <span class="n">MIMOSA</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
 </span></code></pre></div>
 </details>
 </div>
