@@ -424,6 +424,19 @@ temperature:
 ##################
 
 model structure:
+  sealevelrise options:
+    projection:
+      descr: >-
+        Deterministic sea-level-rise parameter set. The central set represents
+        median projections; low and high represent alternative physical-response
+        assumptions while sharing the same historical initial conditions.
+      type: enum
+      values:
+        - low
+        - central
+        - high
+      default: central
+
   damage module:
     descr: Damage module to be used
     type: enum

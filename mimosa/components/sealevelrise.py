@@ -23,6 +23,70 @@ from mimosa.common import (
 )
 
 
+# Coherent deterministic response sets. Historical initial conditions and ice
+# potentials are deliberately shared: these sets describe uncertainty in future
+# physical response, rather than uncertainty in observed present-day sea level.
+SLR_PROJECTION_PARAMETER_SETS = {
+    "low": {
+        "thermal_fast_sensitivity": 0.060,
+        "thermal_slow_sensitivity": 0.200,
+        "thermal_fast_timescale": 50.0,
+        "thermal_slow_timescale": 500.0,
+        "gsic_temp_sensitivity": 2.4,
+        "gsic_timescale": 260.0,
+        "gis_threshold": 2.2,
+        "gis_transition_width": 0.7,
+        "gis_base_timescale": 8000.0,
+        "gis_timescale_sensitivity": 0.2,
+        "ais_ocean_temp_scaling": 0.45,
+        "ais_ocean_temp_timescale": 50.0,
+        "ais_background_rate": 0.0004,
+        "ais_temp_sensitivity": 0.0001,
+        "ais_fast_rate": 0.0,
+        "ais_fast_threshold": 3.0,
+        "ais_fast_transition_width": 0.2,
+    },
+    "central": {
+        "thermal_fast_sensitivity": 0.080,
+        "thermal_slow_sensitivity": 0.270,
+        "thermal_fast_timescale": 40.0,
+        "thermal_slow_timescale": 400.0,
+        "gsic_temp_sensitivity": 2.0,
+        "gsic_timescale": 200.0,
+        "gis_threshold": 1.8,
+        "gis_transition_width": 0.6,
+        "gis_base_timescale": 6000.0,
+        "gis_timescale_sensitivity": 0.3,
+        "ais_ocean_temp_scaling": 0.60,
+        "ais_ocean_temp_timescale": 30.0,
+        "ais_background_rate": 0.0008,
+        "ais_temp_sensitivity": 0.0002,
+        "ais_fast_rate": 0.005,
+        "ais_fast_threshold": 2.5,
+        "ais_fast_transition_width": 0.15,
+    },
+    "high": {
+        "thermal_fast_sensitivity": 0.100,
+        "thermal_slow_sensitivity": 0.340,
+        "thermal_fast_timescale": 30.0,
+        "thermal_slow_timescale": 300.0,
+        "gsic_temp_sensitivity": 1.6,
+        "gsic_timescale": 140.0,
+        "gis_threshold": 1.4,
+        "gis_transition_width": 0.5,
+        "gis_base_timescale": 4000.0,
+        "gis_timescale_sensitivity": 0.4,
+        "ais_ocean_temp_scaling": 0.80,
+        "ais_ocean_temp_timescale": 20.0,
+        "ais_background_rate": 0.0012,
+        "ais_temp_sensitivity": 0.00035,
+        "ais_fast_rate": 0.012,
+        "ais_fast_threshold": 1.8,
+        "ais_fast_transition_width": 0.12,
+    },
+}
+
+
 def get_constraints(
     m: AbstractModel, context: ModelContext
 ) -> Sequence[GeneralConstraint]:
@@ -37,6 +101,17 @@ def get_constraints(
     between zero in 1900 and the central 2025 estimates below. This makes the
     reference year explicit and prevents a run starting before 2025 from using
     2025 sea-level values.
+
+    The component option `projection` selects a coherent `low`, `central`, or
+    `high` deterministic response set. The sets use identical historical
+    initial conditions, but different sensitivities, response times, and AIS
+    fast-response assumptions. The default is `central`.
+
+    The projection can be selected before model construction with:
+
+    ```python
+    params["model structure"]["sealevelrise options"]["projection"] = "high"
+    ```
 
     # Thermal expansion
 
@@ -118,6 +193,16 @@ def get_constraints(
     - [Martínez Montero et al. (2022), SURFER v2.0](https://doi.org/10.5194/gmd-15-8059-2022).
     """
 
+    projection = context.option("sealevelrise", "projection", default="central")
+    try:
+        slr_params = SLR_PROJECTION_PARAMETER_SETS[projection]
+    except KeyError as exc:
+        valid = ", ".join(SLR_PROJECTION_PARAMETER_SETS)
+        raise ValueError(
+            f"Unknown SLR projection parameter set '{projection}'. "
+            f"Expected one of: {valid}."
+        ) from exc
+
     # A common reference year and rounded central component values at the
     # default model start. Their 0.23 m sum is consistent with the assessed
     # historical rise and recent component trends. Values are metres of global
@@ -131,27 +216,43 @@ def get_constraints(
     m.slr_thermal = Var(m.t, within=NonNegativeReals, units=quant.unit("m"))
     m.slr_thermal_fast_init = Param(initialize=0.045)
     m.slr_thermal_slow_init = Param(initialize=0.025)
-    m.slr_thermal_fast_sensitivity = Param(initialize=0.080)
-    m.slr_thermal_slow_sensitivity = Param(initialize=0.270)
-    m.slr_thermal_fast_timescale = Param(initialize=40.0)
-    m.slr_thermal_slow_timescale = Param(initialize=400.0)
+    m.slr_thermal_fast_sensitivity = Param(
+        initialize=slr_params["thermal_fast_sensitivity"]
+    )
+    m.slr_thermal_slow_sensitivity = Param(
+        initialize=slr_params["thermal_slow_sensitivity"]
+    )
+    m.slr_thermal_fast_timescale = Param(
+        initialize=slr_params["thermal_fast_timescale"]
+    )
+    m.slr_thermal_slow_timescale = Param(
+        initialize=slr_params["thermal_slow_timescale"]
+    )
 
     # Glaciers. The 0.32 m potential follows the AR6 parametric extrapolation.
     m.slr_cumgsic = Var(m.t, within=NonNegativeReals, units=quant.unit("m"))
     m.slr_gsic_init = Param(initialize=0.090)
     m.slr_gsic_total_ice = Param(initialize=0.32)
-    m.slr_gsic_temp_sensitivity = Param(initialize=2.0)
-    m.slr_gsic_timescale = Param(initialize=200.0)
+    m.slr_gsic_temp_sensitivity = Param(
+        initialize=slr_params["gsic_temp_sensitivity"]
+    )
+    m.slr_gsic_timescale = Param(initialize=slr_params["gsic_timescale"])
 
     # Greenland. The potential is the sea-level equivalent of the full ice
     # sheet; the remaining parameters govern equilibrium and response speed.
     m.slr_cumgis = Var(m.t, within=NonNegativeReals, units=quant.unit("m"))
     m.slr_gis_init = Param(initialize=0.045)
     m.slr_gis_total_ice = Param(initialize=7.3)
-    m.slr_gis_threshold = Param(initialize=1.8)
-    m.slr_gis_transition_width = Param(initialize=0.6)
-    m.slr_gis_base_timescale = Param(initialize=6000.0)
-    m.slr_gis_timescale_sensitivity = Param(initialize=0.3)
+    m.slr_gis_threshold = Param(initialize=slr_params["gis_threshold"])
+    m.slr_gis_transition_width = Param(
+        initialize=slr_params["gis_transition_width"]
+    )
+    m.slr_gis_base_timescale = Param(
+        initialize=slr_params["gis_base_timescale"]
+    )
+    m.slr_gis_timescale_sensitivity = Param(
+        initialize=slr_params["gis_timescale_sensitivity"]
+    )
 
     # Antarctica. The proxy temperature is in degrees C above pre-industrial;
     # rates are metres of sea-level equivalent per year.
@@ -159,17 +260,29 @@ def get_constraints(
         m.t, units=quant.unit("degC_above_PI")
     )
     m.slr_ais_ocean_temp_init = Param(initialize=0.30)
-    m.slr_ais_ocean_temp_scaling = Param(initialize=0.60)
-    m.slr_ais_ocean_temp_timescale = Param(initialize=30.0)
+    m.slr_ais_ocean_temp_scaling = Param(
+        initialize=slr_params["ais_ocean_temp_scaling"]
+    )
+    m.slr_ais_ocean_temp_timescale = Param(
+        initialize=slr_params["ais_ocean_temp_timescale"]
+    )
     m.slr_cumais = Var(m.t, within=NonNegativeReals, units=quant.unit("m"))
     m.slr_ais_init = Param(initialize=0.025)
     # Effective vulnerable Antarctic stock, rather than the full AIS potential.
     m.slr_ais_total_ice = Param(initialize=5.0)
-    m.slr_ais_background_rate = Param(initialize=0.0008)
-    m.slr_ais_temp_sensitivity = Param(initialize=0.0002)
-    m.slr_ais_fast_rate = Param(initialize=0.005)
-    m.slr_ais_fast_threshold = Param(initialize=2.5)
-    m.slr_ais_fast_transition_width = Param(initialize=0.15)
+    m.slr_ais_background_rate = Param(
+        initialize=slr_params["ais_background_rate"]
+    )
+    m.slr_ais_temp_sensitivity = Param(
+        initialize=slr_params["ais_temp_sensitivity"]
+    )
+    m.slr_ais_fast_rate = Param(initialize=slr_params["ais_fast_rate"])
+    m.slr_ais_fast_threshold = Param(
+        initialize=slr_params["ais_fast_threshold"]
+    )
+    m.slr_ais_fast_transition_width = Param(
+        initialize=slr_params["ais_fast_transition_width"]
+    )
 
     m.total_SLR = Var(m.t, within=NonNegativeReals, units=quant.unit("m"))
 

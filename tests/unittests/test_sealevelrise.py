@@ -41,6 +41,14 @@ def test_initial_values_share_1900_reference(m):
     assert sealevelrise.slr_initial_value(0.08, m) == pytest.approx(0.0)
 
 
+def test_projection_parameter_sets_have_identical_structure():
+    parameter_sets = sealevelrise.SLR_PROJECTION_PARAMETER_SETS
+    central_keys = set(parameter_sets["central"])
+
+    assert set(parameter_sets) == {"low", "central", "high"}
+    assert all(set(values) == central_keys for values in parameter_sets.values())
+
+
 def test_relaxation_is_time_step_invariant_for_constant_forcing(m):
     initial = 0.05
     equilibrium = 0.5
