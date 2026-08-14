@@ -34,8 +34,16 @@ def get_constraints(m, context: ModelContext):
 
     ## Gross damages:
 
-    m.labourprod_damage_costs_gross = Var(
-        m.t, m.regions, units=quant.unit("fraction_of_GDP")
+    damage_cost_gross_var_name = (
+        "labourprod_damage_costs"
+        if adaptation_type == "noadaptation"
+        else "labourprod_damage_costs_gross"
+    )
+
+    setattr(
+        m,
+        damage_cost_gross_var_name,
+        Var(m.t, m.regions, units=quant.unit("fraction_of_GDP")),
     )
 
     m.labourprod_damages_gross_constant = Param(
@@ -46,7 +54,9 @@ def get_constraints(m, context: ModelContext):
     )
 
     constraints.append(
-        RegionalEquation(m.labourprod_damage_costs_gross, gross_dmg_fct_labourprod)
+        RegionalEquation(
+            getattr(m, damage_cost_gross_var_name), gross_dmg_fct_labourprod
+        )
     )
 
     ## Benefits from less cooling demand due to higher temperatures (negative damages):
@@ -84,9 +94,6 @@ def get_constraints(m, context: ModelContext):
         m.labourprod_avoided_damages_adapt = Var(
             m.t, m.regions, units=quant.unit("fraction_of_gross_damages"), bounds=(0, 1)
         )
-        m.labourprod_damage_costs_residual = Var(
-            m.t, m.regions, units=quant.unit("fraction_of_GDP")
-        )
         m.labourprod_damage_costs = Var(
             m.t, m.regions, units=quant.unit("fraction_of_GDP")
         )
@@ -120,16 +127,9 @@ def get_constraints(m, context: ModelContext):
                 ),
                 # Residual damages after adaptation
                 RegionalEquation(
-                    m.labourprod_damage_costs_residual,
+                    m.labourprod_damage_costs,
                     lambda m, t, r: m.labourprod_damage_costs_gross[t, r]
                     * (1 - m.labourprod_avoided_damages_adapt[t, r]),
-                ),
-                # Total damages after adaptation
-                RegionalEquation(
-                    m.labourprod_damage_costs,
-                    lambda m, t, r: m.labourprod_damage_costs_residual[t, r]
-                    + m.labourprod_damage_costs_benefits[t, r]
-                    + m.labourprod_adaptation_costs[t, r],
                 ),
             ]
         )
@@ -150,18 +150,20 @@ def get_constraints(m, context: ModelContext):
                 )
             )
 
-    elif adaptation_type == "noadaptation":
-        m.labourprod_damage_costs = Var(
+    if adaptation_type != "combined":
+        ## Net damages (costs + negative benefits):
+
+        m.labourprod_damage_costs_net = Var(
             m.t, m.regions, units=quant.unit("fraction_of_GDP")
         )
+
         constraints.append(
             RegionalEquation(
-                m.labourprod_damage_costs,
-                lambda m, t, r: m.labourprod_damage_costs_gross[t, r]
+                m.labourprod_damage_costs_net,
+                lambda m, t, r: m.labourprod_damage_costs[t, r]
                 + m.labourprod_damage_costs_benefits[t, r],
             )
         )
-
     return constraints
 
 

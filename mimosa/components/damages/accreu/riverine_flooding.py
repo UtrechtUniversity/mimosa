@@ -61,7 +61,7 @@ def get_constraints(m, context: ModelContext):
 
     ## Adaptation:
 
-    if adaptation_type in "separate":
+    if adaptation_type == "separate":
 
         m.riverine_adaptation_costs_abs = Var(
             m.t,
@@ -74,9 +74,6 @@ def get_constraints(m, context: ModelContext):
         )
         m.riverine_avoided_damages_adapt = Var(
             m.t, m.regions, units=quant.unit("fraction_of_gross_damages"), bounds=(0, 1)
-        )
-        m.riverine_damage_costs_residual = Var(
-            m.t, m.regions, units=quant.unit("fraction_of_GDP")
         )
         m.riverine_damage_costs = Var(
             m.t, m.regions, units=quant.unit("fraction_of_GDP")
@@ -110,15 +107,9 @@ def get_constraints(m, context: ModelContext):
                 ),
                 # Residual damages after adaptation
                 RegionalEquation(
-                    m.riverine_damage_costs_residual,
+                    m.riverine_damage_costs,
                     lambda m, t, r: m.riverine_damage_costs_gross[t, r]
                     * (1 - m.riverine_avoided_damages_adapt[t, r]),
-                ),
-                # Total damages after adaptation
-                RegionalEquation(
-                    m.riverine_damage_costs,
-                    lambda m, t, r: m.riverine_damage_costs_residual[t, r]
-                    + m.riverine_adaptation_costs[t, r],
                 ),
             ]
         )

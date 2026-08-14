@@ -99,8 +99,7 @@ def get_constraints(m, context: ModelContext):
                 m.combined_labprod_riv_damage_costs,
                 lambda m, t, r: m.combined_labprod_riv_damage_costs_residual[t, r]
                 # Add labour productivity benefits to the combined non-SLR damages
-                + m.labourprod_damage_costs_benefits[t, r]
-                + m.combined_labprod_riv_adaptation_costs[t, r],
+                + m.labourprod_damage_costs_benefits[t, r],
             ),
         ]
     )

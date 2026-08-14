@@ -53,7 +53,9 @@ def get_constraints(
                     * (
                         sum(m.mitigation_costs_abs[t, r] for r in m.regions)
                         + sum(
-                            m.damage_costs[t, r] * m.GDP_gross[t, r] for r in m.regions
+                            (m.damage_costs[t, r] + m.adaptation_costs[t, r])
+                            * m.GDP_gross[t, r]
+                            for r in m.regions
                         )
                     )
                     if t > 0

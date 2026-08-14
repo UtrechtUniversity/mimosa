@@ -76,7 +76,9 @@ def get_constraints(
 
     m.damage_costs = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
     m.damage_costs_abs = Var(m.t, m.regions, units=quant.unit("currency_unit"))
-    m.damage_scale_factor = Param(doc="::economics.damages.scale factor")
+    m.damage_scale_factor = Param(
+        doc="::economics.damages.scale factor"
+    )  # Not implemented yet
     m.global_damage_costs = Var(
         m.t,
         units=quant.unit("fraction_of_GDP"),
@@ -94,7 +96,7 @@ def get_constraints(
                     )
                     if adaptation_type == "combined"
                     else (
-                        lambda m, t, r: m.labourprod_damage_costs[t, r]
+                        lambda m, t, r: m.labourprod_damage_costs_net[t, r]
                         + m.riverine_damage_costs[t, r]
                         + m.slr_damage_costs[t, r]
                     )
@@ -113,6 +115,53 @@ def get_constraints(
             ),
         ]
     )
+
+    if adaptation_type != "noadaptation":
+
+        m.adaptation_costs = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
+        m.adaptation_costs_abs = Var(m.t, m.regions, units=quant.unit("currency_unit"))
+        m.global_adaptation_costs = Var(
+            m.t,
+            units=quant.unit("fraction_of_GDP"),
+        )
+
+        constraints.extend(
+            [
+                # Adaptation costs:
+                RegionalEquation(
+                    m.adaptation_costs,
+                    (
+                        (
+                            lambda m, t, r: m.combined_labprod_riv_adaptation_costs[
+                                t, r
+                            ]
+                            + m.slr_adaptation_costs[t, r]
+                        )
+                        if adaptation_type == "combined"
+                        else (
+                            lambda m, t, r: m.labourprod_adaptation_costs[t, r]
+                            + m.riverine_adaptation_costs[t, r]
+                            + m.slr_adaptation_costs[t, r]
+                        )
+                    ),
+                ),
+                RegionalEquation(
+                    m.adaptation_costs_abs,
+                    lambda m, t, r: m.adaptation_costs[t, r] * m.GDP_gross[t, r],
+                ),
+                GlobalEquation(
+                    m.global_adaptation_costs,
+                    lambda m, t: (
+                        sum(m.adaptation_costs_abs[t, r] for r in m.regions)
+                        / m.global_GDP_gross[t]
+                    ),
+                ),
+            ]
+        )
+    else:
+        m.adaptation_costs = Param(
+            m.t, m.regions, units=quant.unit("fraction_of_GDP"), initialize=0.0
+        )
 
     ## Non-market damages:
     if monetise_mortality:

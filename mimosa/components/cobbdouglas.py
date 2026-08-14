@@ -170,7 +170,14 @@ def get_constraints(
                 m.GDP_net,
                 lambda m, t, r: (
                     m.GDP_gross[t, r]
-                    * (1 - (m.damage_costs[t, r] if not value(m.ignore_damages) else 0))
+                    * (
+                        1
+                        - (
+                            (m.damage_costs[t, r] + m.adaptation_costs[t, r])
+                            if not value(m.ignore_damages)
+                            else 0
+                        )
+                    )
                     - m.mitigation_costs_abs[t, r]
                     - m.financial_transfer_abs[t, r]
                 ),

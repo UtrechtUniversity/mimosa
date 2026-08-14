@@ -11,6 +11,8 @@ root = logging.getLogger()
 root.setLevel("INFO")
 root.addHandler(handler)
 
+PREFIX = "accreu"
+
 
 def init_params(adaptation_type, monetise_mortality):
     params = load_params()
@@ -30,14 +32,14 @@ for monetise_mortality in [True, False]:
     params_mit = init_params("noadaptation", monetise_mortality)
     model_mit = MIMOSA(params_mit)
     model_mit.solve()
-    model_mit.save(f"accreu_tier1_mit_mortality_{monetise_mortality}")
+    model_mit.save(f"{PREFIX}_tier1_mit_mortality_{monetise_mortality}")
 
     #### Run "baseline" (Tier 1): no-policy baseline with no adaptation
     params_baseline = init_params("noadaptation", monetise_mortality)
     model_baseline = MIMOSA(params_baseline)
     sim_run_baseline = model_baseline.run_nopolicy_baseline()
     model_baseline.save_simulation(
-        sim_run_baseline, f"accreu_tier1_baseline_mortality_{monetise_mortality}"
+        sim_run_baseline, f"{PREFIX}_tier1_baseline_mortality_{monetise_mortality}"
     )
 
     for adaptation_type in ["combined", "separate"]:
@@ -47,7 +49,7 @@ for monetise_mortality in [True, False]:
         model_mit_ada = MIMOSA(params_mit_ada)
         model_mit_ada.solve(ipopt_maxiter=10000)
         model_mit_ada.save(
-            f"accreu_tier1_mit_ada_adapt_{adaptation_type}_mortality_{monetise_mortality}"
+            f"{PREFIX}_tier1_mit_ada_adapt_{adaptation_type}_mortality_{monetise_mortality}"
         )
 
         #### Run "ada" (Tier 1): no-policy baseline with optimal adaptation
@@ -59,7 +61,7 @@ for monetise_mortality in [True, False]:
         sim_ada = model_ada.run_nopolicy_baseline()
         model_ada.save_simulation(
             sim_ada,
-            f"accreu_tier1_ada_adapt_{adaptation_type}_mortality_{monetise_mortality}",
+            f"{PREFIX}_tier1_ada_adapt_{adaptation_type}_mortality_{monetise_mortality}",
         )
 
         #### Run "mit_then_ada" (Tier 4): Given mitigation from run mit, optimise adaptation
@@ -76,7 +78,7 @@ for monetise_mortality in [True, False]:
         )
         model_mit_then_ada.save_simulation(
             sim_mit_then_ada,
-            f"accreu_tier4_mit_then_ada_adapt_{adaptation_type}_mortality_{monetise_mortality}",
+            f"{PREFIX}_tier4_mit_then_ada_adapt_{adaptation_type}_mortality_{monetise_mortality}",
         )
 
         #### Run "mit_ada_unplanned" (Tier 2): Take a MIMOSA optimisation run and just change the adaptation level
@@ -96,5 +98,5 @@ for monetise_mortality in [True, False]:
         )
         model_mit_ada_unplanned.save_simulation(
             sim_mit_ada_unplanned,
-            f"accreu_tier2_mit_ada_unplanned_adapt_{adaptation_type}_mortality_{monetise_mortality}",
+            f"{PREFIX}_tier2_mit_ada_unplanned_adapt_{adaptation_type}_mortality_{monetise_mortality}",
         )

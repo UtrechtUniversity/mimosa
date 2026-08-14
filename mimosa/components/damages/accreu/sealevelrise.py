@@ -82,9 +82,6 @@ def get_constraints(m, context: ModelContext):
         m.slr_avoided_damages_adapt = Var(
             m.t, m.regions, units=quant.unit("fraction_of_gross_damages"), bounds=(0, 1)
         )
-        m.slr_damage_costs_residual = Var(
-            m.t, m.regions, units=quant.unit("fraction_of_GDP")
-        )
         m.slr_damage_costs = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
 
         m.slr_adaptation_max_effectiveness = Param(
@@ -116,15 +113,9 @@ def get_constraints(m, context: ModelContext):
                 ),
                 # Residual damages after adaptation
                 RegionalEquation(
-                    m.slr_damage_costs_residual,
+                    m.slr_damage_costs,
                     lambda m, t, r: m.slr_damage_costs_gross[t, r]
                     * (1 - m.slr_avoided_damages_adapt[t, r]),
-                ),
-                # Total damages after adaptation
-                RegionalEquation(
-                    m.slr_damage_costs,
-                    lambda m, t, r: m.slr_damage_costs_residual[t, r]
-                    + m.slr_adaptation_costs[t, r],
                 ),
             ]
         )

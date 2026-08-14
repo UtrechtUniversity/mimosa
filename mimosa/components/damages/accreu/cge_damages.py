@@ -63,6 +63,11 @@ def get_constraints(
     # Get constraints for sea-level rise damages
     constraints.extend(get_constraints_slr(m))
 
+    # Adaptation is not modelled yet:
+    m.adaptation_costs = Param(
+        m.t, m.regions, units=quant.unit("fraction_of_GDP"), initialize=0.0
+    )
+
     return constraints
 
 
