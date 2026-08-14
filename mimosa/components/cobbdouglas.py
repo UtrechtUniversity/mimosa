@@ -200,12 +200,19 @@ def get_constraints(
 
     # GDP loss: takes into account indirect effects of reduced GDP growth due to damages and mitigation costs
     m.GDP_loss = Var(
-        m.t,
-        m.regions,
-        units=quant.unit("fraction_of_baseline_GDP"),
-        initialize=0,
+        m.t, m.regions, units=quant.unit("fraction_of_baseline_GDP"), initialize=0
     )
     m.global_GDP_loss = Var(
+        m.t, units=quant.unit("fraction_of_baseline_GDP"), initialize=0
+    )
+
+    m.total_direct_costs_abs = Var(
+        m.t, m.regions, units=quant.unit("currency_unit"), initialize=0
+    )
+    m.indirect_costs = Var(
+        m.t, m.regions, units=quant.unit("fraction_of_baseline_GDP"), initialize=0
+    )
+    m.global_indirect_costs = Var(
         m.t, units=quant.unit("fraction_of_baseline_GDP"), initialize=0
     )
 
@@ -222,6 +229,31 @@ def get_constraints(
                 lambda m, t: (
                     (m.global_baseline_GDP[t] - m.global_GDP_net[t])
                     / m.global_baseline_GDP[t]
+                ),
+            ),
+            RegionalEquation(
+                m.total_direct_costs_abs,
+                lambda m, t, r: (
+                    m.mitigation_costs_abs[t, r]
+                    + m.damage_costs_abs[t, r]
+                    + m.adaptation_costs_abs[t, r]
+                ),
+            ),
+            RegionalEquation(
+                m.indirect_costs,
+                lambda m, t, r: (
+                    m.GDP_loss[t, r]
+                    - (m.total_direct_costs_abs[t, r] / m.baseline_GDP[t, r])
+                ),
+            ),
+            GlobalEquation(
+                m.global_indirect_costs,
+                lambda m, t: (
+                    m.global_GDP_loss[t]
+                    - (
+                        sum(m.total_direct_costs_abs[t, r] for r in m.regions)
+                        / m.global_baseline_GDP[t]
+                    )
                 ),
             ),
         ]

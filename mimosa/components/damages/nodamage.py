@@ -35,8 +35,14 @@ def get_constraints(
     constraints = []
 
     m.damage_costs = Var(m.t, m.regions, initialize=0.0)  # Shouldn't this be a param?
+    m.damage_costs_abs = Param(
+        m.t, m.regions, units=quant.unit("currency_unit"), initialize=0.0
+    )
     m.adaptation_costs = Param(
         m.t, m.regions, units=quant.unit("fraction_of_GDP"), initialize=0.0
+    )
+    m.adaptation_costs_abs = Param(
+        m.t, m.regions, units=quant.unit("currency_unit"), initialize=0.0
     )
     m.non_market_damage_costs_abs = Param(
         m.t, m.regions, initialize=0.0, units=quant.unit("currency_unit")

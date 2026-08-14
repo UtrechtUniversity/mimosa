@@ -67,6 +67,9 @@ def get_constraints(
     m.adaptation_costs = Param(
         m.t, m.regions, units=quant.unit("fraction_of_GDP"), initialize=0.0
     )
+    m.adaptation_costs_abs = Param(
+        m.t, m.regions, units=quant.unit("currency_unit"), initialize=0.0
+    )
 
     return constraints
 
