@@ -93,6 +93,9 @@ def get_constraints(m, monetise_mortality=False):
                 0.5 * m.baseline_GDP[t, r],
             ),
         )
+        m.mortality_damage_costs = Var(
+            m.t, m.regions, units=quant.unit("fraction_of_GDP")
+        )
         constraints.extend(
             [
                 RegionalEquation(
@@ -105,6 +108,11 @@ def get_constraints(m, monetise_mortality=False):
                     m.mortality_damage_costs_abs,
                     lambda m, t, r: m.mortality_svl[t, r]
                     * (m.mortality_heat_related[t, r] + m.mortality_cold_related[t, r]),
+                ),
+                RegionalEquation(
+                    m.mortality_damage_costs,
+                    lambda m, t, r: m.mortality_damage_costs_abs[t, r]
+                    / m.GDP_gross[t, r],
                 ),
             ]
         )
