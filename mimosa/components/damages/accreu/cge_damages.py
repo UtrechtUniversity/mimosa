@@ -10,6 +10,7 @@ from mimosa.common import (
     Var,
     GeneralConstraint,
     RegionalEquation,
+    GlobalEquation,
     value,
     soft_max,
     Any,
@@ -17,8 +18,6 @@ from mimosa.common import (
     quant,
     ModelContext,
 )
-
-from .utils import add_global_costs_from_absolute
 
 
 def get_constraints(
@@ -33,6 +32,10 @@ def get_constraints(
     m.non_market_damage_costs_abs = Param(
         m.t, m.regions, initialize=0.0, units=quant.unit("currency_unit")
     )
+    m.global_damage_costs = Var(
+        m.t,
+        units=quant.unit("fraction_of_GDP"),
+    )
     # Total damages are sum of non-SLR and SLR damages
     constraints.extend(
         [
@@ -44,9 +47,15 @@ def get_constraints(
                 m.damage_costs_abs,
                 lambda m, t, r: m.damage_costs[t, r] * m.GDP_gross[t, r],
             ),
+            GlobalEquation(
+                m.global_damage_costs,
+                lambda m, t: (
+                    sum(m.damage_costs_abs[t, r] for r in m.regions)
+                    / m.global_GDP_gross[t]
+                ),
+            ),
         ]
     )
-    add_global_costs_from_absolute(m, constraints, m.damage_costs_abs)
 
     # Get constraints for temperature dependent damages
     constraints.extend(get_constraints_temperature_dependent(m))

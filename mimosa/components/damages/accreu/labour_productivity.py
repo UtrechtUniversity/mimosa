@@ -18,8 +18,6 @@ from mimosa.common import (
 )
 
 from .utils import (
-    add_global_costs_from_absolute,
-    add_global_costs_from_relative,
     adaptation_effectiveness_fct,
     dmg_fct_linear,
     optimal_adaptation_costs_fct,
@@ -151,14 +149,6 @@ def get_constraints(m, context: ModelContext):
                 )
             )
 
-        add_global_costs_from_absolute(
-            m, constraints, m.labourprod_adaptation_costs_abs
-        )
-
-    add_global_costs_from_relative(
-        m, constraints, m.labourprod_damage_costs_benefits
-    )
-
     if adaptation_type != "combined":
         ## Net damages (costs + negative benefits):
 
@@ -173,9 +163,6 @@ def get_constraints(m, context: ModelContext):
                 + m.labourprod_damage_costs_benefits[t, r],
             )
         )
-
-        add_global_costs_from_relative(m, constraints, m.labourprod_damage_costs)
-        add_global_costs_from_relative(m, constraints, m.labourprod_damage_costs_net)
 
     return constraints
 

@@ -18,8 +18,6 @@ from mimosa.common import (
 )
 
 from .utils import (
-    add_global_costs_from_absolute,
-    add_global_costs_from_relative,
     adaptation_effectiveness_fct,
     optimal_adaptation_costs_fct,
 )
@@ -133,13 +131,6 @@ def get_constraints(m, context: ModelContext):
                     ),
                 )
             )
-
-        add_global_costs_from_absolute(
-            m, constraints, m.riverine_adaptation_costs_abs
-        )
-
-    if adaptation_type != "combined":
-        add_global_costs_from_relative(m, constraints, m.riverine_damage_costs)
 
     return constraints
 
