@@ -18,7 +18,7 @@ from mimosa.common import (
     ModelContext,
 )
 
-from .utils import add_global_costs
+from .utils import add_global_costs_from_absolute
 
 
 def get_constraints(
@@ -46,7 +46,7 @@ def get_constraints(
             ),
         ]
     )
-    add_global_costs(m, constraints, m.damage_costs)
+    add_global_costs_from_absolute(m, constraints, m.damage_costs_abs)
 
     # Get constraints for temperature dependent damages
     constraints.extend(get_constraints_temperature_dependent(m))

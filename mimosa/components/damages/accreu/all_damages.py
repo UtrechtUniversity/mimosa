@@ -27,7 +27,7 @@ from . import (
     mortality,
     combined_nslr_adaptation,
 )
-from .utils import add_global_costs
+from .utils import add_global_costs_from_absolute
 
 
 def get_constraints(
@@ -103,7 +103,7 @@ def get_constraints(
             ),
         ]
     )
-    add_global_costs(m, constraints, m.damage_costs)
+    add_global_costs_from_absolute(m, constraints, m.damage_costs_abs)
 
     if adaptation_type != "noadaptation":
 
@@ -135,7 +135,7 @@ def get_constraints(
                 ),
             ]
         )
-        add_global_costs(m, constraints, m.adaptation_costs)
+        add_global_costs_from_absolute(m, constraints, m.adaptation_costs_abs)
     else:
         m.adaptation_costs = Param(
             m.t, m.regions, units=quant.unit("fraction_of_GDP"), initialize=0.0

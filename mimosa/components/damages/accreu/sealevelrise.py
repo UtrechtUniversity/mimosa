@@ -18,7 +18,8 @@ from mimosa.common import (
 )
 
 from .utils import (
-    add_global_costs,
+    add_global_costs_from_absolute,
+    add_global_costs_from_relative,
     adaptation_effectiveness_fct,
     dmg_fct_power,
     optimal_adaptation_costs_fct,
@@ -137,8 +138,8 @@ def get_constraints(m, context: ModelContext):
                 )
             )
 
-        add_global_costs(m, constraints, m.slr_adaptation_costs)
+        add_global_costs_from_absolute(m, constraints, m.slr_adaptation_costs_abs)
 
-    add_global_costs(m, constraints, m.slr_damage_costs)
+    add_global_costs_from_relative(m, constraints, m.slr_damage_costs)
 
     return constraints
