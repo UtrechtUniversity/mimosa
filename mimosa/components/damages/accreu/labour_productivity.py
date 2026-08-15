@@ -6,7 +6,6 @@ from mimosa.common import (
     GeneralConstraint,
     RegionalConstraint,
     RegionalEquation,
-    GlobalEquation,
     value,
     soft_max,
     soft_min,
@@ -19,6 +18,7 @@ from mimosa.common import (
 )
 
 from .utils import (
+    add_global_costs,
     adaptation_effectiveness_fct,
     dmg_fct_linear,
     optimal_adaptation_costs_fct,
@@ -150,37 +150,9 @@ def get_constraints(m, context: ModelContext):
                 )
             )
 
-        m.global_labourprod_adaptation_costs = Var(
-            m.t, units=quant.unit("fraction_of_GDP")
-        )
-        constraints.append(
-            GlobalEquation(
-                m.global_labourprod_adaptation_costs,
-                lambda m, t: (
-                    sum(
-                        m.labourprod_adaptation_costs[t, r] * m.GDP_gross[t, r]
-                        for r in m.regions
-                    )
-                    / m.global_GDP_gross[t]
-                ),
-            )
-        )
+        add_global_costs(m, constraints, m.labourprod_adaptation_costs)
 
-    m.global_labourprod_damage_costs_benefits = Var(
-        m.t, units=quant.unit("fraction_of_GDP")
-    )
-    constraints.append(
-        GlobalEquation(
-            m.global_labourprod_damage_costs_benefits,
-            lambda m, t: (
-                sum(
-                    m.labourprod_damage_costs_benefits[t, r] * m.GDP_gross[t, r]
-                    for r in m.regions
-                )
-                / m.global_GDP_gross[t]
-            ),
-        )
-    )
+    add_global_costs(m, constraints, m.labourprod_damage_costs_benefits)
 
     if adaptation_type != "combined":
         ## Net damages (costs + negative benefits):
@@ -197,38 +169,8 @@ def get_constraints(m, context: ModelContext):
             )
         )
 
-        m.global_labourprod_damage_costs = Var(
-            m.t, units=quant.unit("fraction_of_GDP")
-        )
-        m.global_labourprod_damage_costs_net = Var(
-            m.t, units=quant.unit("fraction_of_GDP")
-        )
-
-        constraints.extend(
-            [
-                GlobalEquation(
-                    m.global_labourprod_damage_costs,
-                    lambda m, t: (
-                        sum(
-                            m.labourprod_damage_costs[t, r] * m.GDP_gross[t, r]
-                            for r in m.regions
-                        )
-                        / m.global_GDP_gross[t]
-                    ),
-                ),
-                GlobalEquation(
-                    m.global_labourprod_damage_costs_net,
-                    lambda m, t: (
-                        sum(
-                            m.labourprod_damage_costs_net[t, r]
-                            * m.GDP_gross[t, r]
-                            for r in m.regions
-                        )
-                        / m.global_GDP_gross[t]
-                    ),
-                ),
-            ]
-        )
+        add_global_costs(m, constraints, m.labourprod_damage_costs)
+        add_global_costs(m, constraints, m.labourprod_damage_costs_net)
 
     return constraints
 

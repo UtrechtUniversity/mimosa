@@ -1,4 +1,28 @@
-from mimosa.common import exp, log, soft_min
+from mimosa.common import GlobalEquation, Var, exp, log, quant, soft_min
+
+
+def add_global_costs(m, constraints, regional_costs):
+    """Add the global GDP-weighted equivalent of regional relative costs."""
+    regional_name = regional_costs.name
+    global_name = f"global_{regional_name}"
+
+    setattr(
+        m,
+        global_name,
+        Var(m.t, units=quant.unit("fraction_of_GDP")),
+    )
+    constraints.append(
+        GlobalEquation(
+            getattr(m, global_name),
+            lambda m, t: (
+                sum(
+                    getattr(m, regional_name)[t, r] * m.GDP_gross[t, r]
+                    for r in m.regions
+                )
+                / m.global_GDP_gross[t]
+            ),
+        )
+    )
 
 
 def adaptation_effectiveness_fct(

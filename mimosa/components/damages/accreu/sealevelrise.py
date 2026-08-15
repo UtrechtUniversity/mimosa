@@ -6,7 +6,6 @@ from mimosa.common import (
     GeneralConstraint,
     RegionalConstraint,
     RegionalEquation,
-    GlobalEquation,
     value,
     soft_max,
     soft_min,
@@ -19,6 +18,7 @@ from mimosa.common import (
 )
 
 from .utils import (
+    add_global_costs,
     adaptation_effectiveness_fct,
     dmg_fct_power,
     optimal_adaptation_costs_fct,
@@ -137,36 +137,8 @@ def get_constraints(m, context: ModelContext):
                 )
             )
 
-        m.global_slr_adaptation_costs = Var(
-            m.t, units=quant.unit("fraction_of_GDP")
-        )
-        constraints.append(
-            GlobalEquation(
-                m.global_slr_adaptation_costs,
-                lambda m, t: (
-                    sum(
-                        m.slr_adaptation_costs[t, r] * m.GDP_gross[t, r]
-                        for r in m.regions
-                    )
-                    / m.global_GDP_gross[t]
-                ),
-            )
-        )
+        add_global_costs(m, constraints, m.slr_adaptation_costs)
 
-    m.global_slr_damage_costs = Var(
-        m.t, units=quant.unit("fraction_of_GDP")
-    )
-    constraints.append(
-        GlobalEquation(
-            m.global_slr_damage_costs,
-            lambda m, t: (
-                sum(
-                    m.slr_damage_costs[t, r] * m.GDP_gross[t, r]
-                    for r in m.regions
-                )
-                / m.global_GDP_gross[t]
-            ),
-        )
-    )
+    add_global_costs(m, constraints, m.slr_damage_costs)
 
     return constraints
