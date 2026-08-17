@@ -49,8 +49,6 @@ def run_temperature_benchmark(model, final_temperature):
     """Evaluate the SLR equations along a prescribed linear warming path."""
 
     initial_year = int(value(model.slr_initial_year))
-    time_step = int(value(model.dt))
-
     thermal_fast = value(model.slr_thermal_fast_init)
     thermal_slow = value(model.slr_thermal_slow_init)
     glaciers = value(model.slr_gsic_init)
@@ -59,8 +57,15 @@ def run_temperature_benchmark(model, final_temperature):
     antarctica = value(model.slr_ais_init)
     land_water = 0.0
 
-    for year in range(initial_year + time_step, FINAL_YEAR + 1, time_step):
-        forcing_year = year - time_step
+    for t in model.t:
+        year = model.year(t)
+        if t == 0:
+            continue
+        if year > FINAL_YEAR:
+            break
+
+        period_length = value(model.period_length[t])
+        forcing_year = model.year(t - 1)
         warming_fraction = (forcing_year - initial_year) / (
             FINAL_YEAR - initial_year
         )
@@ -75,6 +80,7 @@ def run_temperature_benchmark(model, final_temperature):
                 model.slr_thermal_fast_sensitivity,
                 model.slr_thermal_fast_timescale,
                 model,
+                period_length,
             )
         )
         thermal_slow = value(
@@ -84,15 +90,25 @@ def run_temperature_benchmark(model, final_temperature):
                 model.slr_thermal_slow_sensitivity,
                 model.slr_thermal_slow_timescale,
                 model,
+                period_length,
             )
         )
-        glaciers = value(sealevelrise.slr_gsic(glaciers, temperature, model))
-        greenland = value(sealevelrise.slr_gis(greenland, temperature, model))
+        glaciers = value(
+            sealevelrise.slr_gsic(
+                glaciers, temperature, model, period_length
+            )
+        )
+        greenland = value(
+            sealevelrise.slr_gis(
+                greenland, temperature, model, period_length
+            )
+        )
         antarctic_ocean_temperature = value(
             sealevelrise.slr_antarctic_ocean_temperature(
                 antarctic_ocean_temperature,
                 temperature,
                 model,
+                period_length,
             )
         )
         antarctica = value(
@@ -100,9 +116,10 @@ def run_temperature_benchmark(model, final_temperature):
                 antarctica,
                 antarctic_ocean_temperature,
                 model,
+                period_length,
             )
         )
-        land_water += time_step * value(model.slr_lws_rate)
+        land_water += period_length * value(model.slr_lws_rate)
 
     components = {
         "Thermal expansion": thermal_fast + thermal_slow,
