@@ -11,7 +11,7 @@ root = logging.getLogger()
 root.setLevel("INFO")
 root.addHandler(handler)
 
-PREFIX = "accreu_periods2"
+PREFIX = "accreu"
 
 
 def init_params(adaptation_type, monetise_mortality):
