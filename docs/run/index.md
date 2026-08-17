@@ -16,17 +16,23 @@ With this code, the default parameter values are used (see [Parameter reference]
 
 ### Configuring the time grid
 
-The `time.periods` parameter maps each inclusive period end year to the timestep
-length used after the preceding endpoint. The default grid uses five-year
-timesteps through 2050 and ten-year timesteps thereafter:
+The `time.dt` parameter sets the initial timestep length, while `time.periods`
+optionally maps change years to the new timestep length used after that year.
+The default grid uses five-year timesteps through 2050 and ten-year timesteps
+thereafter:
 
 ```python
 params = load_params()
 params["time"]["start"] = 2025
-params["time"]["periods"] = {2050: 5, 2150: 10}
+params["time"]["end"] = 2150
+params["time"]["dt"] = 5
+params["time"]["periods"] = {2050: 10}
 ```
 
-Every period must contain an integer number of timesteps. Within model equations,
+Additional changes can be added to the mapping. For example, with `end = 2290`,
+`{2050: 10, 2150: 20}` uses five-year timesteps through 2050, ten-year
+timesteps through 2150, and twenty-year timesteps thereafter. Every change year
+and the final year must lie on the resulting grid. Within model equations,
 `m.period_length[t]` gives the number of years between timestep `t - 1` and `t`;
 it is zero for the initial timestep.
 
