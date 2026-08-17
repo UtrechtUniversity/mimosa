@@ -11,7 +11,6 @@ params["emissions"]["carbonbudget"] = "700 GtCO2"
 params["emissions"]["baseline carbon intensity"] = False
 params["economics"]["MAC"]["rel_mitigation_costs_min_level"] = -0.5
 params["time"]["end"] = 2100
-params["time"]["periods"] = {}
 
 model3 = MIMOSA(params)
 model3.solve()
