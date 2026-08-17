@@ -11,7 +11,6 @@ from mimosa.common import (
     GeneralConstraint,
     GlobalConstraint,
     RegionalConstraint,
-    RegionalInitConstraint,
     RegionalEquation,
     GlobalEquation,
     Constraint,
@@ -211,7 +210,9 @@ def _get_mac_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
             RegionalEquation(
                 m.carbon_price,
                 lambda m, t, r: (
-                    MAC(m.relative_abatement[t, r], m, t, r) if t > 0 else 0
+                    Constraint.Skip
+                    if t == 0
+                    else MAC(m.relative_abatement[t, r], m, t, r)
                 ),
             ),
         ]
@@ -293,21 +294,21 @@ def _get_mac_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
             GlobalEquation(
                 m.global_cost_per_emission_reduction_unit,
                 lambda m, t: (
-                    sum(m.mitigation_costs_abs[t, r] for r in m.regions)
+                    Constraint.Skip
+                    if t == 0
+                    else sum(m.mitigation_costs_abs[t, r] for r in m.regions)
                     / soft_min(
                         sum(m.regional_emission_reductions[t, r] for r in m.regions)
                     )
-                    if t > 0
-                    else 0
                 ),
             ),
             GlobalEquation(
                 m.global_emission_reduction_per_cost_unit,
                 lambda m, t: (
-                    sum(m.regional_emission_reductions[t, r] for r in m.regions)
+                    Constraint.Skip
+                    if t == 0
+                    else sum(m.regional_emission_reductions[t, r] for r in m.regions)
                     / soft_min(sum(m.mitigation_costs_abs[t, r] for r in m.regions))
-                    if t > 0
-                    else 0
                 ),
             ),
         ]
@@ -378,7 +379,9 @@ def _get_learning_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
         GlobalEquation(
             m.LBD_factor,
             lambda m, t: (
-                soft_min(
+                Constraint.Skip
+                if t == 0
+                else soft_min(
                     (
                         m.global_cumulative_baseline_emissions[t - 1]
                         - m.global_cumulative_emissions[
@@ -389,8 +392,6 @@ def _get_learning_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
                     + 1.0
                 )
                 ** m.log_LBD_rate
-                if t > 0
-                else 1.0
             ),
         )
     )

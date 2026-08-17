@@ -73,7 +73,7 @@ class Preprocessor:
         self._abstract_model, self.equations = self._create_abstract_model()
         self._data_store, self._regional_param_store = self._load_data()
         self.concrete_model = self._instantiate_model()
-        self._fix_pilot_initial_conditions()
+        self._fix_initial_conditions()
         self._apply_custom_constraints()
         self._apply_pyomo_transformations()
 
@@ -155,8 +155,8 @@ class Preprocessor:
                 self.concrete_model, self._params
             )
 
-    def _fix_pilot_initial_conditions(self) -> None:
-        """Fix a small pilot set of state variables at the initial timestep.
+    def _fix_initial_conditions(self) -> None:
+        """Fix variables whose defining equation is skipped initially.
 
         This deliberately lives in the preprocessor for now.  The indexed variables,
         regions, and parameter values do not exist while the AbstractModel is being
@@ -165,12 +165,62 @@ class Preprocessor:
         """
         m = self.concrete_model
 
-        m.global_cumulative_emissions[0].fix(0)
+        global_initial_conditions = {
+            "global_cumulative_emissions": 0,
+            "global_relative_cumulative_emissions": 1,
+            "temperature": m.T0,
+            "global_cost_per_emission_reduction_unit": 0,
+            "global_emission_reduction_per_cost_unit": 0,
+            "LBD_factor": 1,
+            "NPV": 0,
+        }
+        if self.model_context.module("effortsharing") == "ability_to_pay":
+            global_initial_conditions["effortsharing_AP_inv_correction_factor"] = 1
+
+        for variable_name, initial_value in global_initial_conditions.items():
+            if hasattr(m, variable_name):
+                getattr(m, variable_name)[0].fix(value(initial_value))
 
         for r in m.regions:
+            m.regional_emissions[0, r].fix(value(m.ssp_baseline_emissions[0, r]))
             m.capital_stock[0, r].fix(
                 value(m.init_capitalstock_factor[r] * m.baseline_GDP[0, r])
             )
+            m.GDP_gross[0, r].fix(value(m.baseline_GDP[0, r]))
+            m.carbon_price[0, r].fix(0)
+
+            emissiontrade_module = self.model_context.module("emissiontrade")
+            if emissiontrade_module in {"emissiontrade", "globalcostpool"}:
+                m.attributed_emission_reductions[0, r].fix(0)
+                m.emission_reduction_trading_balance[0, r].fix(0)
+
+            if emissiontrade_module == "emissiontrade":
+                m.regional_emission_allowances[0, r].fix(
+                    value(m.baseline_emissions[0, r])
+                )
+
+            if self.model_context.module("financialtransfer") == "globaldamagepool":
+                m.financial_transfer_abs[0, r].fix(0)
+
+            damage_module = self.model_context.module("damage")
+            if damage_module == "ACCREU":
+                adaptation_type = self.model_context.option(
+                    "damage", "ACCREU adaptation"
+                )
+                damage_suffix = "" if adaptation_type == "noadaptation" else "_gross"
+                accreu_initial_damage_variables = {
+                    f"slr_damage_costs{damage_suffix}",
+                    f"riverine_damage_costs{damage_suffix}",
+                    f"labourprod_damage_costs{damage_suffix}",
+                    "labourprod_damage_costs_benefits",
+                    "mortality_heat_related",
+                    "mortality_cold_related",
+                }
+                for variable_name in accreu_initial_damage_variables:
+                    getattr(m, variable_name)[0, r].fix(0)
+            elif damage_module == "ACCREU_CGE":
+                m.non_slr_damage_costs[0, r].fix(0)
+                m.slr_damage_costs[0, r].fix(0)
 
         slr_initial_conditions = {
             "slr_thermal_fast": slr_initial_value(m.slr_thermal_fast_init, m),

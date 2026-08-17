@@ -10,7 +10,6 @@ from mimosa.common import (
     Constraint,
     GeneralConstraint,
     GlobalConstraint,
-    GlobalInitConstraint,
     Objective,
     Param,
     Var,
@@ -63,7 +62,6 @@ def get_constraints(
                 ),
                 name="NPV",
             ),
-            GlobalInitConstraint(lambda m: m.NPV[0] == 0),
         ]
     )
 

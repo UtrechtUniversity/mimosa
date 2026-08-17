@@ -11,6 +11,7 @@ from mimosa.common import (
     GeneralConstraint,
     RegionalEquation,
     GlobalEquation,
+    Constraint,
     value,
     soft_max,
     Any,
@@ -98,7 +99,9 @@ def get_constraints_temperature_dependent(
         RegionalEquation(
             m.non_slr_damage_costs,
             lambda m, t, r: (
-                m.damage_scale_factor
+                Constraint.Skip
+                if t == 0
+                else m.damage_scale_factor
                 * damage_fct(
                     m.temperature[t] - m.temperature_1995_2014,
                     m.T0 - m.temperature_1995_2014,
@@ -134,7 +137,9 @@ def get_constraints_slr(m: AbstractModel) -> Sequence[GeneralConstraint]:
         RegionalEquation(
             m.slr_damage_costs,
             lambda m, t, r: (
-                m.damage_scale_factor
+                Constraint.Skip
+                if t == 0
+                else m.damage_scale_factor
                 * damage_fct(m.total_SLR[t], m.total_SLR[0], m, r, is_slr=True)
             ),
         )

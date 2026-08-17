@@ -6,6 +6,7 @@ from mimosa.common import (
     GeneralConstraint,
     RegionalConstraint,
     RegionalEquation,
+    Constraint,
     value,
     soft_max,
     soft_min,
@@ -54,7 +55,10 @@ def get_constraints(m, context: ModelContext):
 
     constraints.append(
         RegionalEquation(
-            getattr(m, damage_cost_gross_var_name), gross_dmg_fct_labourprod
+            getattr(m, damage_cost_gross_var_name),
+            lambda m, t, r: (
+                Constraint.Skip if t == 0 else gross_dmg_fct_labourprod(m, t, r)
+            ),
         )
     )
 
@@ -73,7 +77,10 @@ def get_constraints(m, context: ModelContext):
 
     constraints.append(
         RegionalEquation(
-            m.labourprod_damage_costs_benefits, benefits_dmg_fct_labourprod
+            m.labourprod_damage_costs_benefits,
+            lambda m, t, r: (
+                Constraint.Skip if t == 0 else benefits_dmg_fct_labourprod(m, t, r)
+            ),
         )
     )
 

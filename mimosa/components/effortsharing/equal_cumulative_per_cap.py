@@ -15,7 +15,6 @@ from mimosa.common import (
     GeneralConstraint,
     Constraint,
     RegionalConstraint,
-    RegionalInitConstraint,
     RegionalEquation,
     GlobalEquation,
     RegionalSoftEqualityConstraint,

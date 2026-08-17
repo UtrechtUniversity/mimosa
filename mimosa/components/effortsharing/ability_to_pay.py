@@ -71,7 +71,9 @@ def get_constraints(
         GlobalEquation(
             m.effortsharing_AP_inv_correction_factor,
             lambda m, t: (
-                (
+                Constraint.Skip
+                if t == 0
+                else (
                     sum(m.baseline_emissions[t, r] for r in m.regions)
                     - m.global_emissions[t]
                 )
@@ -81,8 +83,6 @@ def get_constraints(
                         for r in m.regions
                     )
                 )
-                if t > 0
-                else 1
             ),
         ),
         RegionalEquation(

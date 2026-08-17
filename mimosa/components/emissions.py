@@ -12,9 +12,7 @@ from mimosa.common import (
     Var,
     GeneralConstraint,
     GlobalConstraint,
-    GlobalInitConstraint,
     RegionalConstraint,
-    RegionalInitConstraint,
     RegionalEquation,
     GlobalEquation,
     Constraint,
@@ -216,14 +214,14 @@ def _get_emissions_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
             RegionalEquation(
                 m.regional_emissions,
                 lambda m, t, r: (
-                    (1 - m.relative_abatement[t, r])
+                    Constraint.Skip
+                    if t == 0
+                    else (1 - m.relative_abatement[t, r])
                     * (
                         m.baseline_emissions[t, r]
                         if value(m.use_carbon_intensity_for_baseline)
                         else m.ssp_baseline_emissions[t, r]
                     )
-                    if t > 0
-                    else m.ssp_baseline_emissions[0, r]
                 ),
             ),
             RegionalEquation(
@@ -260,10 +258,10 @@ def _get_emissions_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
             GlobalEquation(
                 m.global_relative_cumulative_emissions,
                 lambda m, t: (
-                    m.global_cumulative_emissions[t]
+                    Constraint.Skip
+                    if t == 0
+                    else m.global_cumulative_emissions[t]
                     / m.global_cumulative_baseline_emissions[t]
-                    if t > 0
-                    else 1
                 ),
             ),
         ]
@@ -353,7 +351,9 @@ def _get_temperature_constraints(m: AbstractModel) -> Sequence[GeneralConstraint
             GlobalEquation(
                 m.temperature,
                 lambda m, t: (
-                    m.T0 + m.TCRE * m.global_cumulative_emissions[t] if t > 0 else m.T0
+                    Constraint.Skip
+                    if t == 0
+                    else m.T0 + m.TCRE * m.global_cumulative_emissions[t]
                 ),
             ),
             GlobalConstraint(

@@ -108,10 +108,10 @@ def get_constraints(
             RegionalEquation(
                 m.emission_reduction_trading_balance,
                 lambda m, t, r: (
-                    m.mitigation_cost_trading_balance[t, r]
+                    Constraint.Skip
+                    if t == 0
+                    else m.mitigation_cost_trading_balance[t, r]
                     / soft_min(m.global_carbon_price[t])
-                    if t > 0
-                    else 0
                 ),
             ),
             # Constraint: emission reductions attributed to the region after trading
@@ -128,9 +128,10 @@ def get_constraints(
             RegionalEquation(
                 m.regional_emission_allowances,
                 lambda m, t, r: (
-                    m.baseline_emissions[t, r] - m.attributed_emission_reductions[t, r]
-                    if t > 0
+                    Constraint.Skip
+                    if t == 0
                     else m.baseline_emissions[t, r]
+                    - m.attributed_emission_reductions[t, r]
                 ),
             ),
         ]

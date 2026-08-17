@@ -156,14 +156,14 @@ def get_constraints(
             RegionalEquation(
                 m.GDP_gross,
                 lambda m, t, r: (
-                    economics.calc_GDP(
+                    Constraint.Skip
+                    if t == 0
+                    else economics.calc_GDP(
                         m.TFP[t, r],
                         m.population[t, r],
                         soft_min(m.capital_stock[t, r], scale=10),
                         m.alpha,
                     )
-                    if t > 0
-                    else m.baseline_GDP[0, r]
                 ),
             ),
             GlobalEquation(

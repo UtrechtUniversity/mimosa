@@ -7,6 +7,7 @@ from mimosa.common import (
     RegionalConstraint,
     RegionalEquation,
     GlobalEquation,
+    Constraint,
     value,
     soft_max,
     soft_min,
@@ -38,12 +39,16 @@ def get_constraints(m, monetise_mortality=False):
     constraints.append(
         RegionalEquation(
             m.mortality_heat_related,
-            lambda m, t, r: m.population[t, r]
-            * dmg_fct_linear(
-                m,
-                t,
-                m.mortality_heat_related_constant[r],
-                m.mortality_heat_related_linear[r],
+            lambda m, t, r: (
+                Constraint.Skip
+                if t == 0
+                else m.population[t, r]
+                * dmg_fct_linear(
+                    m,
+                    t,
+                    m.mortality_heat_related_constant[r],
+                    m.mortality_heat_related_linear[r],
+                )
             ),
         )
     )
@@ -64,13 +69,17 @@ def get_constraints(m, monetise_mortality=False):
     constraints.append(
         RegionalEquation(
             m.mortality_cold_related,
-            lambda m, t, r: m.population[t, r]
-            * dmg_fct_power(
-                m,
-                t,
-                m.mortality_cold_related_constant[r],
-                m.mortality_cold_related_prod[r],
-                m.mortality_cold_related_power[r],
+            lambda m, t, r: (
+                Constraint.Skip
+                if t == 0
+                else m.population[t, r]
+                * dmg_fct_power(
+                    m,
+                    t,
+                    m.mortality_cold_related_constant[r],
+                    m.mortality_cold_related_prod[r],
+                    m.mortality_cold_related_power[r],
+                )
             ),
         )
     )

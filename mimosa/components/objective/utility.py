@@ -10,6 +10,7 @@ from mimosa.common import (
     Var,
     GeneralConstraint,
     GlobalEquation,
+    Constraint,
     Objective,
     exp,
     maximize,
@@ -44,12 +45,12 @@ def get_constraints(
             GlobalEquation(
                 m.NPV,
                 lambda m, t: (
-                    m.NPV[t - 1]
+                    Constraint.Skip
+                    if t == 0
+                    else m.NPV[t - 1]
                     + m.period_length[t]
                     * exp(-m.PRTP * (m.year(t) - m.beginyear))
                     * m.global_welfare[t]
-                    if t > 0
-                    else 0
                 ),
             ),
         ]

@@ -10,7 +10,6 @@ from mimosa.common import (
     GeneralConstraint,
     RegionalConstraint,
     GlobalConstraint,
-    RegionalInitConstraint,
     Constraint,
     Var,
     quant,
@@ -68,10 +67,6 @@ def get_constraints(
                     else Constraint.Skip
                 ),
                 "zero_sum_of_yearly_financial_transfer",
-            ),
-            RegionalInitConstraint(
-                lambda m, r: m.financial_transfer_abs[0, r] == 0.0,
-                "no_transfer_in_first_year",
             ),
             RegionalConstraint(
                 lambda m, t, r: m.financial_transfer_abs[t, r]
