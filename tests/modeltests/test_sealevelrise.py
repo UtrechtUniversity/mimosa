@@ -43,14 +43,19 @@ def test_slr_projection_sets_share_initial_state_and_diverge():
     initial_values = [simulation.total_SLR[0] for simulation in simulations.values()]
     assert initial_values == pytest.approx([0.23, 0.23, 0.23])
 
+    index_2100 = next(
+        t
+        for t in simulations["central"].t
+        if simulations["central"].year(t) == 2100
+    )
     slr_2100 = [
-        simulations[projection].total_SLR[15]
+        simulations[projection].total_SLR[index_2100]
         for projection in ("low", "central", "high")
     ]
     assert slr_2100[0] < slr_2100[1] < slr_2100[2]
 
     assert all(
-        simulation.slr_cumlws[15] == pytest.approx(0.03)
+        simulation.slr_cumlws[index_2100] == pytest.approx(0.03)
         for simulation in simulations.values()
     )
 
