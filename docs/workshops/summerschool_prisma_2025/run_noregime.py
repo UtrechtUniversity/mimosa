@@ -4,7 +4,8 @@ params = load_params()
 
 params["model structure"]["welfare module"] = "cost_minimising"
 params["emissions"]["carbonbudget"] = "700 GtCO2"
-params["time"]["periods"] = {2100: 5}
+params["time"]["end"] = 2100
+params["time"]["periods"] = {}
 
 model4 = MIMOSA(params)
 model4.solve()

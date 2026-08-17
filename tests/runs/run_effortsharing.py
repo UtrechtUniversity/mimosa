@@ -15,7 +15,8 @@ for regime in [
     params["emissions"]["carbonbudget"] = "700 GtCO2"
     params["emissions"]["baseline carbon intensity"] = False  # (1)!
     params["economics"]["MAC"]["rel_mitigation_costs_min_level"] = -0.5  # (2)!
-    params["time"]["periods"] = {2100: 5}
+    params["time"]["end"] = 2100
+    params["time"]["periods"] = {}
 
     model1 = MIMOSA(params)
     model1.solve()

@@ -6,10 +6,24 @@ time:
     max: 2100
     default: 2025
 
+  end:
+    descr: Last year of the model run
+    type: int
+    min: 1901
+    max: 2300
+    default: 2150
+
+  dt:
+    descr: Initial timestep length in years
+    type: float
+    min: 0.5
+    max: 20
+    default: 5
+
   periods:
     descr: >-
-      Model periods, mapping each inclusive end year to the timestep length in
-      years used after the preceding endpoint
+      Optional timestep changes, mapping each change year to the timestep length
+      in years used after that year
     type: dict
     keys:
       type: int
@@ -20,8 +34,7 @@ time:
       min: 0.5
       max: 20
     default:
-      2050: 5
-      2150: 10
+      2050: 10
 
 ##################
 
