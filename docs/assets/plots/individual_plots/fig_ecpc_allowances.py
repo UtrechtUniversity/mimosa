@@ -11,7 +11,6 @@ from .common import mimosa, COLORS, MIMOSA, value, plotly_express_to_subplot
 def create_fig():
     params = mimosa.load_params()
     params["time"]["end"] = 2100
-    params["time"]["periods"] = {}
     params["model structure"]["effortsharing module"] = "equal_cumulative_per_cap"
     params["model structure"]["emissiontrade module"] = "emissiontrade"
     m = MIMOSA(params, prerun=False).concrete_model
