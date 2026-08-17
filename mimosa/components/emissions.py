@@ -239,18 +239,16 @@ def _get_emissions_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
             GlobalEquation(
                 m.global_cumulative_emissions,
                 lambda m, t: (
-                    m.global_cumulative_emissions[t - 1]
+                    Constraint.Skip
+                    if t == 0
+                    else m.global_cumulative_emissions[t - 1]
                     + (
-                        (
-                            m.period_length[t]
-                            * (m.global_emissions[t] + m.global_emissions[t - 1])
-                            / 2
-                        )
+                        m.period_length[t]
+                        * (m.global_emissions[t] + m.global_emissions[t - 1])
+                        / 2
                         if value(m.global_cumulative_emissions_trapz)
                         else (m.period_length[t] * m.global_emissions[t])
                     )
-                    if t > 0
-                    else 0
                 ),
             ),
         ]

@@ -11,8 +11,10 @@ from mimosa.common import (
 )
 from mimosa.common.config.parseconfig import check_params, parse_param_values
 from mimosa.abstract_model import ALL_COMPONENTS, create_abstract_model
+from mimosa.components.sealevelrise import slr_initial_value
 from mimosa.concrete_model.instantiate_params import InstantiatedModel
 from mimosa.concrete_model import custom_constraints
+from pyomo.environ import value
 
 
 @dataclass(frozen=True)
@@ -71,6 +73,7 @@ class Preprocessor:
         self._abstract_model, self.equations = self._create_abstract_model()
         self._data_store, self._regional_param_store = self._load_data()
         self.concrete_model = self._instantiate_model()
+        self._fix_pilot_initial_conditions()
         self._apply_custom_constraints()
         self._apply_pyomo_transformations()
 
@@ -151,6 +154,37 @@ class Preprocessor:
             custom_constraints.set_custom_constraints(
                 self.concrete_model, self._params
             )
+
+    def _fix_pilot_initial_conditions(self) -> None:
+        """Fix a small pilot set of state variables at the initial timestep.
+
+        This deliberately lives in the preprocessor for now.  The indexed variables,
+        regions, and parameter values do not exist while the AbstractModel is being
+        assembled, so parameter-dependent initial values can only be fixed after
+        ``create_instance`` has returned the concrete model.
+        """
+        m = self.concrete_model
+
+        m.global_cumulative_emissions[0].fix(0)
+
+        for r in m.regions:
+            m.capital_stock[0, r].fix(
+                value(m.init_capitalstock_factor[r] * m.baseline_GDP[0, r])
+            )
+
+        slr_initial_conditions = {
+            "slr_thermal_fast": slr_initial_value(m.slr_thermal_fast_init, m),
+            "slr_thermal_slow": slr_initial_value(m.slr_thermal_slow_init, m),
+            "slr_cumgsic": slr_initial_value(m.slr_gsic_init, m),
+            "slr_cumgis": slr_initial_value(m.slr_gis_init, m),
+            "slr_antarctic_ocean_temp": slr_initial_value(
+                m.slr_ais_ocean_temp_init, m
+            ),
+            "slr_cumais": slr_initial_value(m.slr_ais_init, m),
+            "slr_cumlws": 0,
+        }
+        for variable_name, initial_value in slr_initial_conditions.items():
+            getattr(m, variable_name)[0].fix(value(initial_value))
 
     def _apply_pyomo_transformations(self) -> None:
         """

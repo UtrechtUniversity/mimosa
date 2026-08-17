@@ -16,6 +16,7 @@ from mimosa.common import (
     Var,
     GeneralConstraint,
     GlobalEquation,
+    Constraint,
     NonNegativeReals,
     exp,
     tanh,
@@ -376,7 +377,9 @@ def get_constraints(
         GlobalEquation(
             m.slr_thermal_fast,
             lambda m, t: (
-                slr_thermal_expansion(
+                Constraint.Skip
+                if t == 0
+                else slr_thermal_expansion(
                     m.slr_thermal_fast[t - 1],
                     m.temperature[t - 1],
                     m.slr_thermal_fast_sensitivity,
@@ -384,14 +387,14 @@ def get_constraints(
                     m,
                     m.period_length[t],
                 )
-                if t > 0
-                else slr_initial_value(m.slr_thermal_fast_init, m)
             ),
         ),
         GlobalEquation(
             m.slr_thermal_slow,
             lambda m, t: (
-                slr_thermal_expansion(
+                Constraint.Skip
+                if t == 0
+                else slr_thermal_expansion(
                     m.slr_thermal_slow[t - 1],
                     m.temperature[t - 1],
                     m.slr_thermal_slow_sensitivity,
@@ -399,8 +402,6 @@ def get_constraints(
                     m,
                     m.period_length[t],
                 )
-                if t > 0
-                else slr_initial_value(m.slr_thermal_slow_init, m)
             ),
         ),
         GlobalEquation(
@@ -410,62 +411,62 @@ def get_constraints(
         GlobalEquation(
             m.slr_cumgsic,
             lambda m, t: (
-                slr_gsic(
+                Constraint.Skip
+                if t == 0
+                else slr_gsic(
                     m.slr_cumgsic[t - 1],
                     m.temperature[t - 1],
                     m,
                     m.period_length[t],
                 )
-                if t > 0
-                else slr_initial_value(m.slr_gsic_init, m)
             ),
         ),
         GlobalEquation(
             m.slr_cumgis,
             lambda m, t: (
-                slr_gis(
+                Constraint.Skip
+                if t == 0
+                else slr_gis(
                     m.slr_cumgis[t - 1],
                     m.temperature[t - 1],
                     m,
                     m.period_length[t],
                 )
-                if t > 0
-                else slr_initial_value(m.slr_gis_init, m)
             ),
         ),
         GlobalEquation(
             m.slr_antarctic_ocean_temp,
             lambda m, t: (
-                slr_antarctic_ocean_temperature(
+                Constraint.Skip
+                if t == 0
+                else slr_antarctic_ocean_temperature(
                     m.slr_antarctic_ocean_temp[t - 1],
                     m.temperature[t - 1],
                     m,
                     m.period_length[t],
                 )
-                if t > 0
-                else slr_initial_value(m.slr_ais_ocean_temp_init, m)
             ),
         ),
         GlobalEquation(
             m.slr_cumais,
             lambda m, t: (
-                slr_ais(
+                Constraint.Skip
+                if t == 0
+                else slr_ais(
                     m.slr_cumais[t - 1],
                     m.slr_antarctic_ocean_temp[t],
                     m,
                     m.period_length[t],
                 )
-                if t > 0
-                else slr_initial_value(m.slr_ais_init, m)
             ),
         ),
         GlobalEquation(
             m.slr_cumlws,
             lambda m, t: (
-                m.slr_cumlws[t - 1]
+                Constraint.Skip
+                if t == 0
+                else m.slr_cumlws[t - 1]
                 + m.period_length[t] * m.slr_lws_rate
-                if t > 0
-                else 0.0
             ),
         ),
         GlobalEquation(

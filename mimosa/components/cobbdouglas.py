@@ -11,6 +11,7 @@ from mimosa.common import (
     GeneralConstraint,
     RegionalEquation,
     GlobalEquation,
+    Constraint,
     value,
     soft_min,
     economics,
@@ -140,7 +141,9 @@ def get_constraints(
             RegionalEquation(
                 m.capital_stock,
                 lambda m, t, r: (
-                    m.capital_stock[t - 1, r]
+                    Constraint.Skip
+                    if t == 0
+                    else m.capital_stock[t - 1, r]
                     + m.period_length[t]
                     * economics.calc_dKdt(
                         m.capital_stock[t - 1, r],
@@ -148,8 +151,6 @@ def get_constraints(
                         m.investments[t - 1, r],
                         m.period_length[t],
                     )
-                    if t > 0
-                    else m.init_capitalstock_factor[r] * m.baseline_GDP[0, r]
                 ),
             ),
             RegionalEquation(

@@ -236,7 +236,12 @@ class Simulator:
                 # Check if we also need to loop over other dimensions (e.g. regions)
                 indices = equation.indices
                 if len(indices) == 1:
-                    value = equation(sim_m, t)
+                    value = equation.rhs(sim_m, t)
+                    if ".Skip" in str(value):
+                        # The SimulationObjectModel starts with values copied from
+                        # the concrete Pyomo model.  Preserve that value when the
+                        # defining transition equation is skipped (notably at t=0).
+                        continue
                     getattr(sim_m, equation.lhs)[t] = value
                 else:
                     # Loop over other indices
@@ -246,7 +251,9 @@ class Simulator:
                     ]
 
                     for remaining_idx in itertools.product(*remaining_index_values):
-                        value = equation(sim_m, t, *remaining_idx)
+                        value = equation.rhs(sim_m, t, *remaining_idx)
+                        if ".Skip" in str(value):
+                            continue
                         idx_with_t = (t,) + tuple(remaining_idx)
                         getattr(sim_m, equation.lhs)[idx_with_t] = value
 
