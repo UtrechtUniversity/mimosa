@@ -26,7 +26,7 @@ def init_params(adaptation_type, monetise_mortality):
     return params
 
 
-for monetise_mortality in [True, False]:
+for monetise_mortality in [False, True]:
 
     #### Run "mit" (Tier 1): CBA with no adaptation
     params_mit = init_params("noadaptation", monetise_mortality)
@@ -42,7 +42,7 @@ for monetise_mortality in [True, False]:
         sim_run_baseline, f"{PREFIX}_tier1_baseline_mortality_{monetise_mortality}"
     )
 
-    for adaptation_type in ["separate", "combined"]:
+    for adaptation_type in ["separate"]:  # "separate", "combined"
 
         #### Run "mit_ada" (Tier 1): CBA with adaptation optimised by MIMOSA
         params_mit_ada = init_params(adaptation_type, monetise_mortality)
