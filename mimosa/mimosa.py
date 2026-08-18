@@ -7,6 +7,7 @@ it creates an `instance` of the AbstractModel. This is then sent to the solver.
 Finally, the export functions are called here.
 """
 
+import time
 from typing import Any, Optional
 
 from mimosa.common import (
@@ -132,16 +133,21 @@ class MIMOSA:
                 keyed like the Pyomo variable, or `None` for zero.
 
         Returns:
-            SimulationObjectModel: Calculated simulation results.
+            SimulationObjectModel: Calculated simulation results. Its `runtime`
+                attribute contains the wall-clock duration of this call in seconds.
 
         Raises:
             ValueError: If a supplied name is not a control variable.
             AssertionError: If an array has the wrong dimensions.
         """
+        start_time = time.perf_counter()
+
         if not self.simulator.is_prepared:
             self.prepare_simulation()
 
-        return self.simulator.run(**control_variables_kwargs)
+        simulation_obj = self.simulator.run(**control_variables_kwargs)
+        simulation_obj.runtime = time.perf_counter() - start_time
+        return simulation_obj
 
     def run_nopolicy_baseline(self) -> SimulationObjectModel:
         """
@@ -223,7 +229,7 @@ class MIMOSA:
             self._params,
             self.concrete_model,
             filename,
-            solve_runtime=self.solve_runtime,
+            runtime=self.solve_runtime,
             **kwargs,
         )
 
@@ -260,6 +266,7 @@ class MIMOSA:
             simulation_obj,
             filename,
             scenario_type="simulation",
+            runtime=simulation_obj.runtime,
             **kwargs,
         )
 

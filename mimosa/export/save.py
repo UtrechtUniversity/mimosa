@@ -19,7 +19,7 @@ def save_output_pyomo(
     filename="run1",
     hash_suffix=False,
     folder="output",
-    solve_runtime=None,
+    runtime=None,
 ):
     # 2. Save the Pyomo variables and data functions
     all_variables = get_all_variables(m) + get_all_time_dependent_params(m)
@@ -31,7 +31,7 @@ def save_output_pyomo(
         "optimisation",
         hash_suffix,
         folder,
-        solve_runtime=solve_runtime,
+        runtime=runtime,
     )
 
 
@@ -43,7 +43,7 @@ def save_output(
     scenario_type="optimisation",
     hash_suffix=False,
     folder="output",
-    solve_runtime=None,
+    runtime=None,
 ):
     # 1. Create a unique identifier
     if hash_suffix:
@@ -75,8 +75,8 @@ def save_output(
             "Scenario type": scenario_type,
             **params,
         }
-        if solve_runtime is not None:
-            params_with_version["Runtime (seconds)"] = round(solve_runtime, 2)
+        if runtime is not None:
+            params_with_version["Runtime (seconds)"] = round(runtime, 2)
         with open(f"{path}.params.json", "w") as fh:
             json.dump(params_with_version, fh)
 

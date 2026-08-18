@@ -61,7 +61,7 @@ def test_runtime_is_numeric_top_level_export_metadata(tmp_path):
         model,
         "run",
         folder=str(tmp_path),
-        solve_runtime=12.3456,
+        runtime=12.3456,
     )
 
     with open(tmp_path / "run.csv.params.json") as param_file:
@@ -84,3 +84,40 @@ def test_runtime_is_omitted_when_no_solve_completed(tmp_path):
         exported = json.load(param_file)
 
     assert "Runtime (seconds)" not in exported
+
+
+def test_simulation_stores_its_own_wall_clock_runtime(monkeypatch):
+    simulation = SimpleNamespace()
+    model = MIMOSA.__new__(MIMOSA)
+    model.simulator = SimpleNamespace(
+        is_prepared=True,
+        run=lambda **kwargs: simulation,
+    )
+    timer_values = iter([20.0, 23.456])
+    monkeypatch.setattr("mimosa.mimosa.time.perf_counter", lambda: next(timer_values))
+
+    result = model.run_simulation(relative_abatement=0)
+
+    assert result is simulation
+    assert result.runtime == pytest.approx(3.456)
+
+
+def test_save_simulation_exports_that_simulation_runtime(monkeypatch):
+    captured = {}
+    model = MIMOSA.__new__(MIMOSA)
+    model._params = {"example setting": 42}
+    model.last_saved_simulation_filename = None
+    simulation = SimpleNamespace(
+        runtime=7.891,
+        all_vars_for_export=lambda: [],
+    )
+
+    def capture_save(*args, **kwargs):
+        captured.update(kwargs)
+
+    monkeypatch.setattr("mimosa.mimosa.save_output", capture_save)
+
+    model.save_simulation(simulation, "simulation")
+
+    assert captured["scenario_type"] == "simulation"
+    assert captured["runtime"] == pytest.approx(7.891)
