@@ -1,5 +1,6 @@
 import logging
 import logging.handlers
+import pandas as pd
 
 from mimosa import MIMOSA, load_params
 
@@ -13,6 +14,10 @@ root.addHandler(handler)
 
 PREFIX = "accreu"
 
+adaptation_readiness = pd.read_csv("data/adaptation_readiness.csv").set_index(
+    ["SSP", "Region"]
+)
+
 
 def init_params(adaptation_type, monetise_mortality):
     params = load_params()
@@ -24,6 +29,34 @@ def init_params(adaptation_type, monetise_mortality):
         "ACCREU_monetise_mortality"
     ] = monetise_mortality
     return params
+
+
+def reduce_adaptation_costs(model):
+    adaptation_vars = [
+        "labourprod_adaptation_costs_abs",
+        "slr_adaptation_costs_abs",
+        "riverine_adaptation_costs_abs",
+    ]
+
+    control_values = {
+        "relative_abatement": model.concrete_model.relative_abatement.extract_values()
+    }
+
+    def _get_adapt_readiness(t, r):
+        year = str(int(model.concrete_model.year(t)))
+        ssp = model.params["SSP"]
+        return adaptation_readiness.loc[(ssp, r), year]
+
+    for adapt_var in adaptation_vars:
+        values = getattr(model.concrete_model, adapt_var).extract_values()
+        # Reduce these values by the adaptation readiness in each year/region
+        reduced_values = {
+            (t, r): _get_adapt_readiness(t, r) * value
+            for (t, r), value in values.items()
+        }
+        control_values[adapt_var] = reduced_values
+
+    return control_values
 
 
 for monetise_mortality in [False, True]:
@@ -99,4 +132,17 @@ for monetise_mortality in [False, True]:
         model_mit_ada_unplanned.save_simulation(
             sim_mit_ada_unplanned,
             f"{PREFIX}_tier2_mit_ada_unplanned_adapt_{adaptation_type}_mortality_{monetise_mortality}",
+        )
+
+        #### Run "mit_ada_planned" (Tier 2): Take a MIMOSA optimisation run and reduce the optimal adaptation level by the readiness factor
+        params_mit_ada_planned = init_params(adaptation_type, monetise_mortality)
+        model_mit_ada_planned = MIMOSA(params_mit_ada_planned)
+
+        reduced_control_variables_values = reduce_adaptation_costs(model_mit_ada)
+        sim_mit_ada_planned = model_mit_ada_planned.run_simulation(
+            **reduced_control_variables_values
+        )
+        model_mit_ada_planned.save_simulation(
+            sim_mit_ada_planned,
+            f"{PREFIX}_tier2_mit_ada_planned_adapt_{adaptation_type}_mortality_{monetise_mortality}",
         )
