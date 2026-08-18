@@ -134,9 +134,7 @@ def add_derived_global_rows(rows, m, all_variables):
     attributes of the model. Global variables that already exist in the model are
     exported normally and are not replaced by this calculation.
     """
-    variables_by_name = {
-        useful_var.name: useful_var for useful_var in all_variables
-    }
+    variables_by_name = {useful_var.name: useful_var for useful_var in all_variables}
     existing_names = set(variables_by_name)
 
     people_dimensionality = quant.unit("people", pyomo=False).dimensionality
@@ -161,17 +159,12 @@ def add_derived_global_rows(rows, m, all_variables):
             global_values = [
                 sum(value(useful_var.var[t, r]) for r in m.regions) for t in m.t
             ]
-        elif (
-            unit_str == "fraction_of_GDP"
-            and "costs" in useful_var.name
-        ):
+        elif unit_str == "fraction_of_GDP" and "costs" in useful_var.name:
             absolute_costs = variables_by_name.get(f"{useful_var.name}_abs")
             global_values = []
             for t in m.t:
                 if absolute_costs is not None:
-                    numerator = sum(
-                        value(absolute_costs.var[t, r]) for r in m.regions
-                    )
+                    numerator = sum(value(absolute_costs.var[t, r]) for r in m.regions)
                 else:
                     numerator = sum(
                         value(useful_var.var[t, r]) * value(m.GDP_gross[t, r])
@@ -181,9 +174,7 @@ def add_derived_global_rows(rows, m, all_variables):
         else:
             continue
 
-        rows.append(
-            [global_name, "Global", useful_var.unit, *global_values]
-        )
+        rows.append([global_name, "Global", useful_var.unit, *global_values])
 
 
 def rows_to_dataframe(rows, m):
