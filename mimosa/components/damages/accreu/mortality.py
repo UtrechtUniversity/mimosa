@@ -75,6 +75,23 @@ def get_constraints(m, monetise_mortality=False):
         )
     )
 
+    ## Net mortality (heat + cold related):
+    m.mortality_net = Var(m.t, m.regions, units=quant.unit("billion people"))
+    m.global_mortality_net = Var(m.t, units=quant.unit("billion people"))
+    constraints.extend(
+        [
+            RegionalEquation(
+                m.mortality_net,
+                lambda m, t, r: m.mortality_cold_related[t, r]
+                + m.mortality_heat_related[t, r],
+            ),
+            GlobalEquation(
+                m.global_mortality_net,
+                lambda m, t: sum(m.mortality_net[t, r] for r in m.regions),
+            ),
+        ]
+    )
+
     # Calculate the monetary damages from mortality, using the value of a statistical life (VSL)
     m.mortality_svl_rel_gdp_per_cap = Param(
         doc="::economics.damages.accreu.mortality_svl_rel_gdp_cap"
