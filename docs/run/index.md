@@ -38,7 +38,7 @@ it is zero for the initial timestep.
 
 ### Reading the output
 
-Once the script above has finished running, it has produced two output files in the folder `output`: `run1.csv` and `run1.csv.params.json`. The latter is simply a JSON file with all the input parameter used for this particular run (for reproducibility). The former is a CSV file that contains all the output data. Every variable in MIMOSA is saved in this value in a format similar to [IAMC data format](https://pyam-iamc.readthedocs.io/en/stable/data.html):
+Once the script above has finished running, it has produced two output files in the folder `output`: `run1.csv` and `run1.csv.params.json`. The latter is a JSON file with all the input parameters used for this particular run (for reproducibility), together with the MIMOSA version, scenario type and runtime in seconds. For optimisation output, the runtime measures the complete `model.solve()` call and excludes model creation and prerunning. For simulation output, it measures the `model.run_simulation()` call that produced the saved result. The CSV file contains all the output data. Every variable in MIMOSA is saved in this file in a format similar to [IAMC data format](https://pyam-iamc.readthedocs.io/en/stable/data.html):
 
 :fontawesome-solid-file-csv: `output/run1.csv`
 

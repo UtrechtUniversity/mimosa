@@ -13,10 +13,26 @@ import mimosa
 from mimosa.common import Var, get_all_variables, get_all_time_dependent_params, value
 
 
-def save_output_pyomo(params, m, filename="run1", hash_suffix=False, folder="output"):
+def save_output_pyomo(
+    params,
+    m,
+    filename="run1",
+    hash_suffix=False,
+    folder="output",
+    runtime=None,
+):
     # 2. Save the Pyomo variables and data functions
     all_variables = get_all_variables(m) + get_all_time_dependent_params(m)
-    save_output(all_variables, params, m, filename, "optimisation", hash_suffix, folder)
+    save_output(
+        all_variables,
+        params,
+        m,
+        filename,
+        "optimisation",
+        hash_suffix,
+        folder,
+        runtime=runtime,
+    )
 
 
 def save_output(
@@ -27,6 +43,7 @@ def save_output(
     scenario_type="optimisation",
     hash_suffix=False,
     folder="output",
+    runtime=None,
 ):
     # 1. Create a unique identifier
     if hash_suffix:
@@ -58,6 +75,8 @@ def save_output(
             "Scenario type": scenario_type,
             **params,
         }
+        if runtime is not None:
+            params_with_version["Runtime (seconds)"] = round(runtime, 2)
         with open(f"{path}.params.json", "w") as fh:
             json.dump(params_with_version, fh)
 
