@@ -14,11 +14,27 @@ time:
     default: 2150
 
   dt:
-    descr: Timestep in years
+    descr: Initial timestep length in years
     type: float
     min: 0.5
     max: 20
     default: 5
+
+  periods:
+    descr: >-
+      Optional timestep changes, mapping each change year to the timestep length
+      in years used after that year
+    type: dict
+    keys:
+      type: int
+      min: 1901
+      max: 2300
+    values:
+      type: float
+      min: 0.5
+      max: 20
+    default:
+      2050: 10
 
 ##################
 

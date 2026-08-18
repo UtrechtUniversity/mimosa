@@ -382,6 +382,7 @@ def get_constraints(
                     m.slr_thermal_fast_sensitivity,
                     m.slr_thermal_fast_timescale,
                     m,
+                    m.period_length[t],
                 )
                 if t > 0
                 else slr_initial_value(m.slr_thermal_fast_init, m)
@@ -396,6 +397,7 @@ def get_constraints(
                     m.slr_thermal_slow_sensitivity,
                     m.slr_thermal_slow_timescale,
                     m,
+                    m.period_length[t],
                 )
                 if t > 0
                 else slr_initial_value(m.slr_thermal_slow_init, m)
@@ -408,7 +410,12 @@ def get_constraints(
         GlobalEquation(
             m.slr_cumgsic,
             lambda m, t: (
-                slr_gsic(m.slr_cumgsic[t - 1], m.temperature[t - 1], m)
+                slr_gsic(
+                    m.slr_cumgsic[t - 1],
+                    m.temperature[t - 1],
+                    m,
+                    m.period_length[t],
+                )
                 if t > 0
                 else slr_initial_value(m.slr_gsic_init, m)
             ),
@@ -416,7 +423,12 @@ def get_constraints(
         GlobalEquation(
             m.slr_cumgis,
             lambda m, t: (
-                slr_gis(m.slr_cumgis[t - 1], m.temperature[t - 1], m)
+                slr_gis(
+                    m.slr_cumgis[t - 1],
+                    m.temperature[t - 1],
+                    m,
+                    m.period_length[t],
+                )
                 if t > 0
                 else slr_initial_value(m.slr_gis_init, m)
             ),
@@ -428,6 +440,7 @@ def get_constraints(
                     m.slr_antarctic_ocean_temp[t - 1],
                     m.temperature[t - 1],
                     m,
+                    m.period_length[t],
                 )
                 if t > 0
                 else slr_initial_value(m.slr_ais_ocean_temp_init, m)
@@ -440,6 +453,7 @@ def get_constraints(
                     m.slr_cumais[t - 1],
                     m.slr_antarctic_ocean_temp[t],
                     m,
+                    m.period_length[t],
                 )
                 if t > 0
                 else slr_initial_value(m.slr_ais_init, m)
@@ -448,7 +462,8 @@ def get_constraints(
         GlobalEquation(
             m.slr_cumlws,
             lambda m, t: (
-                m.slr_cumlws[t - 1] + m.dt * m.slr_lws_rate
+                m.slr_cumlws[t - 1]
+                + m.period_length[t] * m.slr_lws_rate
                 if t > 0
                 else 0.0
             ),
@@ -481,20 +496,25 @@ def slr_initial_value(value_at_initial_year, m: AbstractModel):
     return value_at_initial_year * elapsed / calibration_period
 
 
-def relax_to_equilibrium(current, equilibrium, timescale, m: AbstractModel):
+def relax_to_equilibrium(current, equilibrium, timescale, period_length):
     """Exact update of a first-order response for one MIMOSA time step."""
 
-    persistence = exp(-m.dt / timescale)
+    persistence = exp(-period_length / timescale)
     return equilibrium + (current - equilibrium) * persistence
 
 
 def slr_thermal_expansion(
-    slr_thermal, temperature, sensitivity, timescale, m: AbstractModel
+    slr_thermal,
+    temperature,
+    sensitivity,
+    timescale,
+    m: AbstractModel,
+    period_length,
 ):
     """Update one thermal-expansion response box."""
 
     equilibrium = sensitivity * temperature
-    return relax_to_equilibrium(slr_thermal, equilibrium, timescale, m)
+    return relax_to_equilibrium(slr_thermal, equilibrium, timescale, period_length)
 
 
 def slr_gsic_equilibrium(temperature, m: AbstractModel):
@@ -505,11 +525,13 @@ def slr_gsic_equilibrium(temperature, m: AbstractModel):
     )
 
 
-def slr_gsic(cumgsic, temperature, m: AbstractModel):
+def slr_gsic(cumgsic, temperature, m: AbstractModel, period_length):
     """Relax the glacier contribution towards its finite equilibrium."""
 
     equilibrium = slr_gsic_equilibrium(temperature, m)
-    return relax_to_equilibrium(cumgsic, equilibrium, m.slr_gsic_timescale, m)
+    return relax_to_equilibrium(
+        cumgsic, equilibrium, m.slr_gsic_timescale, period_length
+    )
 
 
 def logistic(x):
@@ -537,15 +559,17 @@ def slr_gis_timescale(temperature, m: AbstractModel):
     )
 
 
-def slr_gis(cumgis, temperature, m: AbstractModel):
+def slr_gis(cumgis, temperature, m: AbstractModel, period_length):
     """Update the Greenland contribution using delayed equilibrium response."""
 
     equilibrium = slr_gis_equilibrium(temperature, m)
     timescale = slr_gis_timescale(temperature, m)
-    return relax_to_equilibrium(cumgis, equilibrium, timescale, m)
+    return relax_to_equilibrium(cumgis, equilibrium, timescale, period_length)
 
 
-def slr_antarctic_ocean_temperature(ocean_temperature, temperature, m):
+def slr_antarctic_ocean_temperature(
+    ocean_temperature, temperature, m, period_length
+):
     """Update the lagged Antarctic subsurface-ocean temperature proxy."""
 
     equilibrium = m.slr_ais_ocean_temp_scaling * temperature
@@ -553,7 +577,7 @@ def slr_antarctic_ocean_temperature(ocean_temperature, temperature, m):
         ocean_temperature,
         equilibrium,
         m.slr_ais_ocean_temp_timescale,
-        m,
+        period_length,
     )
 
 
@@ -571,8 +595,13 @@ def slr_ais_rate(ocean_temperature, m: AbstractModel):
     )
 
 
-def slr_ais(cumais, ocean_temperature, m: AbstractModel):
+def slr_ais(cumais, ocean_temperature, m: AbstractModel, period_length):
     """Update the Antarctic contribution, subject to its finite ice stock."""
 
     remaining_fraction = 1 - cumais / m.slr_ais_total_ice
-    return cumais + m.dt * slr_ais_rate(ocean_temperature, m) * remaining_fraction
+    return (
+        cumais
+        + period_length
+        * slr_ais_rate(ocean_temperature, m)
+        * remaining_fraction
+    )

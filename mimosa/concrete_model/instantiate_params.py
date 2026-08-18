@@ -1,8 +1,10 @@
 import numpy as np
+
 from mimosa.common import AbstractModel, quant, Param
 from mimosa.common.data import DataStore
 from mimosa.common.regional_params import RegionalParamStore
 from mimosa.common.config.parseconfig import get_nested
+from mimosa.common.timegrid import create_time_grid
 
 # Util to create a None-indexed dictionary for scalar components
 # (see https://pyomo.readthedocs.io/en/stable/working_abstractmodels/data/raw_dicts.html)
@@ -60,11 +62,10 @@ class InstantiatedModel:
     def _set_instance_data_main(self, instance_data) -> None:
         params = self.params
         t_start = params["time"]["start"]
-        t_end = params["time"]["end"]
-        dt = params["time"]["dt"]
-        num_years = int(np.ceil((t_end - t_start) / dt)) + 1
-        self.abstract_model.year = lambda t: t_start + t * dt
-        year2100 = int((2100 - t_start) / dt)
+        time_grid = create_time_grid(params["time"])
+        years = np.asarray(time_grid.years)
+        num_years = len(years)
+        self.abstract_model.year = lambda t: years[t]
 
         parameter_mapping = {}
 
@@ -112,10 +113,9 @@ class InstantiatedModel:
 
         parameter_mapping_manual = {
             "beginyear": V(t_start),
-            "dt": V(dt),
             "tf": V(num_years - 1),
             "t": V(range(num_years)),
-            "year2100": V(year2100),
+            "period_length": dict(enumerate(time_grid.period_lengths)),
             "regions": V(params["regions"].keys()),
         }
         parameter_mapping.update(parameter_mapping_manual)

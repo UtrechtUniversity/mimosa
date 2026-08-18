@@ -184,7 +184,8 @@ def _calc_ecpc_annual_debt_repayment(m, t, r, corrected=True):
 
     def _uncorrected(t_idx):
         if conv_year is False or conv_year == 0:
-            return m.effortsharing_ecpc_historical_debt[0, r] / (m.tf * m.dt)
+            total_years = m.year(value(m.tf)) - m.year(0)
+            return m.effortsharing_ecpc_historical_debt[0, r] / total_years
         if m.year(t_idx) >= conv_year or t_idx == 0:
             return 0.0
         s = t_idx - 1
@@ -197,7 +198,7 @@ def _calc_ecpc_annual_debt_repayment(m, t, r, corrected=True):
     if not corrected:
         return uncorrected_value
 
-    sum_repayments = sum(_uncorrected(s) * m.dt for s in m.t)
+    sum_repayments = sum(_uncorrected(s) * m.period_length[s] for s in m.t)
     return (
         uncorrected_value / sum_repayments * m.effortsharing_ecpc_historical_debt[0, r]
     )
