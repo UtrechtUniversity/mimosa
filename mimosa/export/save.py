@@ -76,7 +76,7 @@ def save_output(
             **params,
         }
         if solve_runtime is not None:
-            params_with_version["Runtime (seconds)"] = solve_runtime
+            params_with_version["Runtime (seconds)"] = round(solve_runtime, 2)
         with open(f"{path}.params.json", "w") as fh:
             json.dump(params_with_version, fh)
 

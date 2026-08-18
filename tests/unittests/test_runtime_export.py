@@ -61,13 +61,13 @@ def test_runtime_is_numeric_top_level_export_metadata(tmp_path):
         model,
         "run",
         folder=str(tmp_path),
-        solve_runtime=12.345,
+        solve_runtime=12.3456,
     )
 
     with open(tmp_path / "run.csv.params.json") as param_file:
         exported = json.load(param_file)
 
-    assert exported["Runtime (seconds)"] == pytest.approx(12.345)
+    assert exported["Runtime (seconds)"] == 12.35
     assert isinstance(exported["Runtime (seconds)"], float)
     assert "Runtime (seconds)" not in params
 
