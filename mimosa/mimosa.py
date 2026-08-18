@@ -45,6 +45,8 @@ class MIMOSA:
         model_context: Selected model components and their model options.
         simulator: Simulator associated with this model.
         status: Solver status after `solve()`; `None` before a solve starts.
+        solve_runtime: Wall-clock duration of the most recently completed
+            `solve()` call in seconds; `None` before a solve completes.
 
     """
 
@@ -61,6 +63,7 @@ class MIMOSA:
         self.build_model()
 
         self.status = None  # Not started yet
+        self.solve_runtime = None  # No completed solve has been timed yet
         self.last_saved_filename = None  # Nothing saved yes
         self.last_saved_simulation_filename = None  # Nothing saved yes
         self._extra_constraints_added = False
@@ -168,7 +171,7 @@ class MIMOSA:
 
         return nopolicy_baseline
 
-    @utils.timer("Model solve", True)
+    @utils.timer("Model solve", True, store_as="solve_runtime")
     def solve(
         self, verbose: bool = True, use_neos: bool = False, **kwargs: Any
     ) -> None:
@@ -186,6 +189,7 @@ class MIMOSA:
             SolverException: If the solver does not finish with status `OK`.
         """
         self.status = None  # Not started yet
+        self.solve_runtime = None  # Do not retain timing from an earlier solve
 
         if use_neos:
             results = self.solver.solve_neos(self.concrete_model, **kwargs)
@@ -215,7 +219,13 @@ class MIMOSA:
         """
         self.last_saved_filename = filename
         logger.info("Saving to %s", filename)
-        save_output_pyomo(self._params, self.concrete_model, filename, **kwargs)
+        save_output_pyomo(
+            self._params,
+            self.concrete_model,
+            filename,
+            solve_runtime=self.solve_runtime,
+            **kwargs,
+        )
 
     def save_simulation(
         self,
