@@ -49,6 +49,6 @@ These output files can be easily imported for plotting software (like using [Plo
 
 [Open the MIMOSA Dashboard :octicons-arrow-right-24:](https://dashboard-mimosa.onrender.com/){.md-button}
 
-??? info "Derived global cost variables"
+??? info "Derived global variables"
 
-    :::mimosa.export.save.add_derived_global_cost_rows
+    :::mimosa.export.save.add_derived_global_rows
