@@ -79,10 +79,46 @@ def var_to_row(rows, m, var, is_regional, unit):
 
 
 def add_derived_global_cost_rows(rows, m, all_variables):
-    """Add missing global counterparts of regional GDP-relative cost variables."""
-    variables_by_name = {
-        useful_var.name: useful_var for useful_var in all_variables
-    }
+    """
+    Add missing global cost series to the exported results.
+
+    Some cost variables are defined only by time and region because their global
+    counterparts are not needed while solving the model. To keep these variables
+    available at the global level without adding equations to the optimisation
+    problem, MIMOSA derives the corresponding series while exporting the results.
+
+    A variable is aggregated when it:
+
+    - is a Pyomo variable indexed by time and region;
+    - has `fraction_of_GDP` as its unit;
+    - contains `costs` in its name; and
+    - does not already have a `global_<variable name>` counterpart.
+
+    If an exported `<variable name>_abs` quantity exists, its regional values are
+    used as the numerator:
+
+    $$
+    \\text{global costs}_t =
+    \\frac{\\sum_r \\text{absolute costs}_{t,r}}
+    {\\text{global GDP gross}_t}.
+    $$
+
+    Otherwise, absolute regional costs are reconstructed from the GDP-relative
+    values:
+
+    $$
+    \\text{global costs}_t =
+    \\frac{\\sum_r \\left(\\text{costs}_{t,r}
+    \\cdot \\text{GDP gross}_{t,r}\\right)}
+    {\\text{global GDP gross}_t}.
+    $$
+
+    The resulting `global_*` rows are added only to the exported CSV file. They
+    are not added as Pyomo components and therefore cannot be accessed as
+    attributes of the model. Global variables that already exist in the model are
+    exported normally and are not replaced by this calculation.
+    """
+    variables_by_name = {useful_var.name: useful_var for useful_var in all_variables}
     existing_names = set(variables_by_name)
 
     for useful_var in all_variables:
@@ -102,9 +138,7 @@ def add_derived_global_cost_rows(rows, m, all_variables):
         global_values = []
         for t in m.t:
             if absolute_costs is not None:
-                numerator = sum(
-                    value(absolute_costs.var[t, r]) for r in m.regions
-                )
+                numerator = sum(value(absolute_costs.var[t, r]) for r in m.regions)
             else:
                 numerator = sum(
                     value(useful_var.var[t, r]) * value(m.GDP_gross[t, r])
@@ -112,9 +146,7 @@ def add_derived_global_cost_rows(rows, m, all_variables):
                 )
             global_values.append(numerator / value(m.global_GDP_gross[t]))
 
-        rows.append(
-            [global_name, "Global", useful_var.unit, *global_values]
-        )
+        rows.append([global_name, "Global", useful_var.unit, *global_values])
 
 
 def rows_to_dataframe(rows, m):
