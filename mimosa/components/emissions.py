@@ -62,7 +62,7 @@ def _set_baseline_emissions(m: AbstractModel) -> None:
     def _calc_cum_baseline_emissions(m, t, r):
         values_t = range(t + 1)
         values = [value(m.ssp_baseline_emissions[s, r]) for s in values_t]
-        years = value(m.beginyear) + np.array(values_t) * value(m.dt)
+        years = np.array([m.year(s) for s in values_t])
         return trapezoid(values, years)
 
     m.cumulative_baseline_emissions = Param(
@@ -241,9 +241,13 @@ def _get_emissions_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
                 lambda m, t: (
                     m.global_cumulative_emissions[t - 1]
                     + (
-                        (m.dt * (m.global_emissions[t] + m.global_emissions[t - 1]) / 2)
+                        (
+                            m.period_length[t]
+                            * (m.global_emissions[t] + m.global_emissions[t - 1])
+                            / 2
+                        )
                         if value(m.global_cumulative_emissions_trapz)
-                        else (m.dt * m.global_emissions[t])
+                        else (m.period_length[t] * m.global_emissions[t])
                     )
                     if t > 0
                     else 0
@@ -377,7 +381,7 @@ def _get_temperature_constraints(m: AbstractModel) -> Sequence[GeneralConstraint
     #         if value(m.perc_reversible_damages) < 1
     #         else Constraint.Skip,
     #         lambda m, t: m.overshootdot[t]
-    #         == (m.netnegative_emissions[t] if t <= value(m.year2100) and t > 0 else 0)
+    #         == (m.netnegative_emissions[t] if m.year(t) <= 2100 and t > 0 else 0)
     #         if value(m.perc_reversible_damages) < 1
     #         else Constraint.Skip,
     #     ]
@@ -534,7 +538,7 @@ def _get_inertia_and_budget_constraints(
             GlobalConstraint(
                 lambda m, t: (
                     m.global_emissions[t] - m.global_emissions[t - 1]
-                    >= m.dt
+                    >= m.period_length[t]
                     * m.inertia_global
                     * sum(m.ssp_baseline_emissions[0, r] for r in m.regions)
                     if value(m.inertia_global) is not False and t > 0
@@ -545,7 +549,9 @@ def _get_inertia_and_budget_constraints(
             RegionalConstraint(
                 lambda m, t, r: (
                     m.regional_emissions[t, r] - m.regional_emissions[t - 1, r]
-                    >= m.dt * m.inertia_regional * m.ssp_baseline_emissions[0, r]
+                    >= m.period_length[t]
+                    * m.inertia_regional
+                    * m.ssp_baseline_emissions[0, r]
                     if value(m.inertia_regional) is not False and t > 0
                     else Constraint.Skip
                 ),
@@ -570,7 +576,8 @@ def _get_inertia_and_budget_constraints(
             RegionalConstraint(
                 lambda m, t, r: (
                     m.regional_emissions[t, r] - m.regional_emissions[t - 1, r] <= 0
-                    if m.year(t - 1) > 2100
+                    if t > 0
+                    and m.year(t - 1) > 2100
                     and value(m.non_increasing_emissions_after_2100)
                     else Constraint.Skip
                 ),

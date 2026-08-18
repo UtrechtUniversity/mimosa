@@ -131,7 +131,8 @@ of the variable:
 GlobalEquation(
     m.cumulative_emissions,
     lambda m, t: (
-        m.cumulative_emissions[t - 1] + m.dt * m.global_emissions[t]
+        m.cumulative_emissions[t - 1]
+        + m.period_length[t] * m.global_emissions[t]
         if t > 0 else m.global_emissions[t]
     )
 )

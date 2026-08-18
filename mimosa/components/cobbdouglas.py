@@ -141,9 +141,12 @@ def get_constraints(
                 m.capital_stock,
                 lambda m, t, r: (
                     m.capital_stock[t - 1, r]
-                    + m.dt
+                    + m.period_length[t]
                     * economics.calc_dKdt(
-                        m.capital_stock[t - 1, r], m.dk, m.investments[t - 1, r], m.dt
+                        m.capital_stock[t - 1, r],
+                        m.dk,
+                        m.investments[t - 1, r],
+                        m.period_length[t],
                     )
                     if t > 0
                     else m.init_capitalstock_factor[r] * m.baseline_GDP[0, r]

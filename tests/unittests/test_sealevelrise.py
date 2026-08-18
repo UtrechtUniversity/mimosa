@@ -4,7 +4,6 @@ from mimosa.components import sealevelrise
 
 
 class MockAbstractModel:
-    dt = 5
     beginyear = 2025
     slr_reference_year = 1900
     slr_initial_year = 2025
@@ -54,16 +53,14 @@ def test_relaxation_is_time_step_invariant_for_constant_forcing(m):
     equilibrium = 0.5
     timescale = 100.0
 
-    m.dt = 10
     one_step = sealevelrise.relax_to_equilibrium(
-        initial, equilibrium, timescale, m
+        initial, equilibrium, timescale, 10
     )
 
-    m.dt = 1
     ten_steps = initial
     for _ in range(10):
         ten_steps = sealevelrise.relax_to_equilibrium(
-            ten_steps, equilibrium, timescale, m
+            ten_steps, equilibrium, timescale, 1
         )
 
     assert ten_steps == pytest.approx(one_step)
@@ -98,8 +95,12 @@ def test_antarctic_fast_response_activates_smoothly(m):
 
 def test_antarctic_update_is_limited_by_remaining_ice(m):
     ocean_temperature = 4.0
-    contribution_small = sealevelrise.slr_ais(0.1, ocean_temperature, m) - 0.1
-    contribution_large = sealevelrise.slr_ais(4.9, ocean_temperature, m) - 4.9
+    contribution_small = (
+        sealevelrise.slr_ais(0.1, ocean_temperature, m, 5) - 0.1
+    )
+    contribution_large = (
+        sealevelrise.slr_ais(4.9, ocean_temperature, m, 5) - 4.9
+    )
 
     assert contribution_large < contribution_small
     assert contribution_large > 0

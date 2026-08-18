@@ -48,7 +48,7 @@ def get_constraints(
                 lambda m, t: (
                     m.NPV[t]
                     == m.NPV[t - 1]
-                    + m.dt
+                    + m.period_length[t]
                     * exp(-m.PRTP * (m.year(t) - m.beginyear))
                     * (
                         sum(m.mitigation_costs_abs[t, r] for r in m.regions)
