@@ -16,15 +16,19 @@ def adaptation_effectiveness_fct(
     )
 
 
-def dmg_fct_linear(m, t, a, b):
+def dmg_fct_linear(m, t, a, b, xshift=0, remove_base=True):
 
     def fct(x):
         return a + b * x
 
-    return fct(m.temperature[t]) - fct(m.temperature[0])
+    x_t = m.temperature[t]
+    x_0 = m.temperature[0]
+    if remove_base:
+        return fct(x_t - xshift) - fct(x_0 - xshift)
+    return fct(x_t - xshift)
 
 
-def dmg_fct_power(m, t, a, b, c, x="temperature"):
+def dmg_fct_power(m, t, a, b, c, x="temperature", xshift=0, remove_base=True):
 
     if x not in ["temperature", "total_SLR"]:
         raise ValueError("x must be either 'temperature' or 'total_SLR'")
@@ -34,7 +38,9 @@ def dmg_fct_power(m, t, a, b, c, x="temperature"):
 
     x_t = getattr(m, x)[t]
     x_0 = getattr(m, x)[0]
-    return fct(x_t) - fct(x_0)
+    if remove_base:
+        return fct(x_t - xshift) - fct(x_0 - xshift)
+    return fct(x_t - xshift)
 
 
 def optimal_adaptation_costs_fct(gross_damages_abs, a, b, scale=0.01):

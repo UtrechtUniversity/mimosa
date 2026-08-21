@@ -31,19 +31,21 @@ def get_constraints(m, monetise_mortality=False):
     m.mortality_heat_related_constant = Param(
         m.regions, doc="regional::ACCREU.heat_related_mortality_perc_constant"
     )
-    m.mortality_heat_related_linear = Param(
-        m.regions, doc="regional::ACCREU.heat_related_mortality_perc_linear"
+    m.mortality_heat_related_prod = Param(
+        m.regions, doc="regional::ACCREU.heat_related_mortality_perc_prod"
     )
 
     constraints.append(
         RegionalEquation(
             m.mortality_heat_related,
             lambda m, t, r: m.population[t, r]
-            * dmg_fct_linear(
+            * dmg_fct_power(
                 m,
                 t,
                 m.mortality_heat_related_constant[r],
-                m.mortality_heat_related_linear[r],
+                m.mortality_heat_related_prod[r],
+                2,
+                xshift=1.1,
             ),
         )
     )
@@ -57,20 +59,17 @@ def get_constraints(m, monetise_mortality=False):
     m.mortality_cold_related_prod = Param(
         m.regions, doc="regional::ACCREU.cold_related_mortality_perc_prod"
     )
-    m.mortality_cold_related_power = Param(
-        m.regions, doc="regional::ACCREU.cold_related_mortality_perc_power"
-    )
 
     constraints.append(
         RegionalEquation(
             m.mortality_cold_related,
             lambda m, t, r: m.population[t, r]
-            * dmg_fct_power(
+            * dmg_fct_linear(
                 m,
                 t,
                 m.mortality_cold_related_constant[r],
                 m.mortality_cold_related_prod[r],
-                m.mortality_cold_related_power[r],
+                xshift=1.1,
             ),
         )
     )
