@@ -97,6 +97,22 @@ optimised_model.save_simulation(replay, "optimisation_replayed")
 
 The simulation recalculates variables from the copied controls; it does not continue or rerun the optimisation.
 
+Simulation variables provide the same `extract_values()` interface as Pyomo
+variables. This makes it possible to transfer controls from a simulation in the
+same way:
+
+```python
+control_values = {
+    name: getattr(previous_simulation, name).extract_values()
+    for name in original_model.simulator.control_variables
+}
+
+replay = sensitivity_model.run_simulation(**control_values)
+```
+
+The returned dictionary uses the model's index values as keys. For NumPy-based
+workflows, the underlying array remains available as `variable.values`.
+
 ## Use case 4: keep a policy fixed while changing assumptions
 
 To investigate how an already chosen policy performs under different assumptions, copy the controls from the original run into a newly configured model. For example, the following keeps the optimised controls fixed while changing the damage scale factor:
