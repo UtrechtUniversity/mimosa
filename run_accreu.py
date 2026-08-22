@@ -138,7 +138,6 @@ for monetise_mortality in [False, True]:
             sim_ada_planned,
             f"{PREFIX}_ada_planned_adapt_{adaptation_type}_mortality_{monetise_mortality}",
         )
-        continue
 
         #### Run "mit_ada": CBA with adaptation optimised by MIMOSA
         params_mit_ada = init_params(adaptation_type, monetise_mortality)
