@@ -148,6 +148,13 @@ def add_derived_global_rows(rows, m, all_variables):
     {\\text{global GDP gross}_t}.
     $$
 
+    Regional adaptation effectiveness variables measured as
+    `fraction_of_gross_damages` are weighted by the corresponding sector's
+    absolute gross damages. The corresponding gross-damage variable is inferred
+    from the name: `<sector>_avoided_damages_adapt` uses
+    `<sector>_damage_costs_gross`. If global gross damages are zero, the exported
+    avoided fraction is `NaN`.
+
     The resulting `global_*` rows are added only to the exported CSV file. They
     are not added as Pyomo components and therefore cannot be accessed as
     attributes of the model. Global variables that already exist in the model are
@@ -190,6 +197,35 @@ def add_derived_global_rows(rows, m, all_variables):
                         for r in m.regions
                     )
                 global_values.append(numerator / value(m.global_GDP_gross[t]))
+        elif unit_str == "fraction_of_gross_damages":
+            avoided_damages_suffix = "_avoided_damages_adapt"
+            if not useful_var.name.endswith(avoided_damages_suffix):
+                continue
+
+            sector_name = useful_var.name[: -len(avoided_damages_suffix)]
+            gross_damages = variables_by_name.get(
+                f"{sector_name}_damage_costs_gross"
+            )
+            if gross_damages is None:
+                continue
+
+            global_values = []
+            for t in m.t:
+                gross_damages_abs = {
+                    r: value(gross_damages.var[t, r])
+                    * value(m.GDP_gross[t, r])
+                    for r in m.regions
+                }
+                denominator = sum(gross_damages_abs.values())
+                numerator = sum(
+                    value(useful_var.var[t, r]) * gross_damages_abs[r]
+                    for r in m.regions
+                )
+                global_values.append(
+                    np.nan
+                    if np.isclose(denominator, 0.0)
+                    else numerator / denominator
+                )
         else:
             continue
 

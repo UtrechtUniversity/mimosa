@@ -1,3 +1,4 @@
+import numpy as np
 import pytest
 from pyomo.environ import ConcreteModel, Param, Set, Var
 
@@ -29,6 +30,29 @@ def _cost_model():
         model.regions,
         units=quant.unit("currency_unit"),
         initialize={(0, "A"): 10, (0, "B"): 30, (1, "A"): 20, (1, "B"): 30},
+    )
+    model.sector_damage_costs_gross = Var(
+        model.t,
+        model.regions,
+        units=quant.unit("fraction_of_GDP"),
+        initialize={(0, "A"): 0, (0, "B"): 0, (1, "A"): 0.1, (1, "B"): 0.2},
+    )
+    model.sector_avoided_damages_adapt = Var(
+        model.t,
+        model.regions,
+        units=quant.unit("fraction_of_gross_damages"),
+        initialize={
+            (0, "A"): 0.2,
+            (0, "B"): 0.8,
+            (1, "A"): 0.25,
+            (1, "B"): 0.75,
+        },
+    )
+    model.orphan_avoided_damages_adapt = Var(
+        model.t,
+        model.regions,
+        units=quant.unit("fraction_of_gross_damages"),
+        initialize=0.5,
     )
     model.other_costs = Var(
         model.t,
@@ -113,9 +137,17 @@ def test_add_derived_global_rows(simulation):
     rows_by_name = {row[0]: row for row in rows}
     assert set(rows_by_name) == {
         "global_sector_damage_costs",
+        "global_sector_damage_costs_gross",
+        "global_sector_avoided_damages_adapt",
         "global_other_costs",
         "global_heat_related_mortality",
     }
     assert rows_by_name["global_sector_damage_costs"][3:] == pytest.approx([0.1, 0.1])
+    assert rows_by_name["global_sector_damage_costs_gross"][3:] == pytest.approx(
+        [0, 0.16]
+    )
+    global_avoided = rows_by_name["global_sector_avoided_damages_adapt"][3:]
+    assert np.isnan(global_avoided[0])
+    assert global_avoided[1] == pytest.approx(0.625)
     assert rows_by_name["global_other_costs"][3:] == pytest.approx([0.175, 0.18])
     assert rows_by_name["global_heat_related_mortality"][3:] == pytest.approx([3, 7])
