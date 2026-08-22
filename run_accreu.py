@@ -12,7 +12,7 @@ root = logging.getLogger()
 root.setLevel("INFO")
 root.addHandler(handler)
 
-PREFIX = "accreu"
+PREFIX = "accreu_adaptunits"
 
 adaptation_readiness = pd.read_csv("data/adaptation_readiness.csv").set_index(
     ["SSP", "Region"]
@@ -105,7 +105,7 @@ for monetise_mortality in [False, True]:
             f"{PREFIX}_mit_then_ada_adapt_{adaptation_type}_mortality_{monetise_mortality}",
         )
 
-        #### Run "ada_unplanned": Take the adaptation-only run and just change the adaptation level
+        #### Run "ada_unplanned": Take the adaptation-only run and just change the adaptation level. The adaptation is therefore less effective then originally thought.
         params_ada_unplanned = init_params(adaptation_type, monetise_mortality)
         params_ada_unplanned["economics"]["damages"]["accreu"][
             "adaptation_effectiveness_scale_factor"
@@ -124,7 +124,11 @@ for monetise_mortality in [False, True]:
             f"{PREFIX}_ada_unplanned_adapt_{adaptation_type}_mortality_{monetise_mortality}",
         )
 
-        #### Run "ada_planned": Take a MIMOSA optimisation run and reduce the optimal adaptation level by the readiness factor
+        #### Run "ada_planned": Take a MIMOSA optimisation run and reduce the optimal adaptation level by the
+        # adaptation readiness factor (dependent on governance/institutional/socio-economic factors). Countries therefore
+        # have to spend less than the optimal amount, because they are unable to implement all the optimal adaptation
+        # measures. The resulting reduced damages are lower, but that's because the adaptation costs are lower.
+        # In ada_unplanned the adaptation costs are the same as optimal adaptation, just the effectiveness is reduced.
         params_ada_planned = init_params(adaptation_type, monetise_mortality)
         model_ada_planned = MIMOSA(params_ada_planned)
 
@@ -139,7 +143,7 @@ for monetise_mortality in [False, True]:
             f"{PREFIX}_ada_planned_adapt_{adaptation_type}_mortality_{monetise_mortality}",
         )
 
-        #### Run "mit_ada": CBA with adaptation optimised by MIMOSA
+        #### Run "mit_ada": CBA with mitigation and adaptation optimised at the same time by MIMOSA
         params_mit_ada = init_params(adaptation_type, monetise_mortality)
         model_mit_ada = MIMOSA(params_mit_ada)
         model_mit_ada.solve(ipopt_maxiter=10000)

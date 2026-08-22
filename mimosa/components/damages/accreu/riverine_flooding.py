@@ -97,7 +97,8 @@ def get_constraints(m, context: ModelContext):
                     lambda m, t, r: adaptation_effectiveness_fct(
                         m.riverine_adaptation_costs_abs[t, r],
                         m.riverine_adaptation_max_effectiveness[r],
-                        m.riverine_adaptation_cost_param[r],
+                        m.dollar_2017_MER_to_2010_PPP[r]
+                        * m.riverine_adaptation_cost_param[r],
                         m.adaptation_effectiveness_scale_factor,
                     ),
                 ),
@@ -127,7 +128,8 @@ def get_constraints(m, context: ModelContext):
                     lambda m, t, r: optimal_adaptation_costs_fct(
                         m.riverine_damage_costs_gross[t, r] * m.GDP_gross[t, r],
                         m.riverine_adaptation_max_effectiveness[r],
-                        m.riverine_adaptation_cost_param[r],
+                        m.dollar_2017_MER_to_2010_PPP[r]
+                        * m.riverine_adaptation_cost_param[r],
                     ),
                 )
             )
