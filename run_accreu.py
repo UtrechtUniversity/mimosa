@@ -4,7 +4,14 @@ import pandas as pd
 
 from mimosa import MIMOSA, load_params
 
-handler = logging.handlers.WatchedFileHandler("accreu.log")
+log_file = "accreu.log"
+
+# Add blank line to log file for easier debug:
+with open(log_file, "a") as f:
+    f.write("\n")
+
+
+handler = logging.handlers.WatchedFileHandler(log_file)
 handler.setFormatter(
     logging.Formatter("[%(levelname)s, %(asctime)s] %(name)s - %(message)s")
 )
@@ -12,7 +19,7 @@ root = logging.getLogger()
 root.setLevel("INFO")
 root.addHandler(handler)
 
-PREFIX = "accreu_adaptunits"
+PREFIX = "accreu"
 
 adaptation_readiness = pd.read_csv("data/adaptation_readiness.csv").set_index(
     ["SSP", "Region"]
