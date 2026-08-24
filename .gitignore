@@ -149,3 +149,4 @@ log_dynamicCB.txt
 run_current.py
 minimax.py
 run_test.py
+watch_log.sh
