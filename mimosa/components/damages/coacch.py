@@ -1,6 +1,6 @@
 """
 Model equations and constraints:
-Damage and adaptation costs, RICE specification
+Damage and adaptation costs, COACCH specification
 """
 
 from typing import Sequence
@@ -32,9 +32,9 @@ def get_constraints(
     \\text{damages}_{t,r} = \\text{damages}_{\\text{non-SLR},t,r} + \\text{damages}_{\\text{SLR},t,r}
     $$
 
-    :::mimosa.components.damages.coacch._get_constraints_temperature_dependent
+    :::mimosa.components.damages.coacch.get_constraints_temperature_dependent
 
-    :::mimosa.components.damages.coacch._get_constraints_slr
+    :::mimosa.components.damages.coacch.get_constraints_slr
 
 
 
@@ -49,23 +49,32 @@ def get_constraints(
     m.damage_costs = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
     m.damage_costs_abs = Var(m.t, m.regions, units=quant.unit("currency_unit"))
     m.damage_scale_factor = Param(doc="::economics.damages.scale factor")
-    m.damage_relative_global = Var(
+    m.non_market_damage_costs_abs = Param(
+        m.t, m.regions, initialize=0.0, units=quant.unit("currency_unit")
+    )
+    m.global_damage_costs = Var(
         m.t,
         units=quant.unit("fraction_of_GDP"),
+    )
+    m.adaptation_costs = Param(
+        m.t, m.regions, units=quant.unit("fraction_of_GDP"), initialize=0.0
+    )
+    m.adaptation_costs_abs = Param(
+        m.t, m.regions, units=quant.unit("currency_unit"), initialize=0.0
     )
     # Total damages are sum of non-SLR and SLR damages
     constraints.extend(
         [
             RegionalEquation(
                 m.damage_costs,
-                lambda m, t, r: m.damage_costs_non_slr[t, r] + m.damage_costs_slr[t, r],
+                lambda m, t, r: m.non_slr_damage_costs[t, r] + m.slr_damage_costs[t, r],
             ),
             RegionalEquation(
                 m.damage_costs_abs,
                 lambda m, t, r: m.damage_costs[t, r] * m.GDP_gross[t, r],
             ),
             GlobalEquation(
-                m.damage_relative_global,
+                m.global_damage_costs,
                 lambda m, t: (
                     sum(m.damage_costs_abs[t, r] for r in m.regions)
                     / m.global_GDP_gross[t]
@@ -75,15 +84,15 @@ def get_constraints(
     )
 
     # Get constraints for temperature dependent damages
-    constraints.extend(_get_constraints_temperature_dependent(m))
+    constraints.extend(get_constraints_temperature_dependent(m))
 
     # Get constraints for sea-level rise damages
-    constraints.extend(_get_constraints_slr(m))
+    constraints.extend(get_constraints_slr(m))
 
     return constraints
 
 
-def _get_constraints_temperature_dependent(
+def get_constraints_temperature_dependent(
     m: AbstractModel,
 ) -> Sequence[GeneralConstraint]:
     """
@@ -122,7 +131,7 @@ def _get_constraints_temperature_dependent(
     constraints = []
 
     # Damages not related to SLR (dependent on temperature)
-    m.damage_costs_non_slr = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
+    m.non_slr_damage_costs = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
 
     m.damage_noslr_form = Param(
         m.regions, within=Any, doc="regional::COACCH.NoSLR_form"
@@ -143,7 +152,7 @@ def _get_constraints_temperature_dependent(
     # the damage quantile
     constraints.append(
         RegionalEquation(
-            m.damage_costs_non_slr,
+            m.non_slr_damage_costs,
             lambda m, t, r: (
                 m.damage_scale_factor
                 * damage_fct(m.temperature[t] - 0.6, m.T0 - 0.6, m, r, is_slr=False)
@@ -154,7 +163,7 @@ def _get_constraints_temperature_dependent(
     return constraints
 
 
-def _get_constraints_slr(m: AbstractModel) -> Sequence[GeneralConstraint]:
+def get_constraints_slr(m: AbstractModel) -> Sequence[GeneralConstraint]:
     """
 
     ## Sea-level rise damages
@@ -206,7 +215,7 @@ def _get_constraints_slr(m: AbstractModel) -> Sequence[GeneralConstraint]:
     constraints = []
 
     # SLR damages
-    m.damage_costs_slr = Var(
+    m.slr_damage_costs = Var(
         m.t, m.regions, bounds=(-0.5, 0.7), units=quant.unit("fraction_of_GDP")
     )
 
@@ -246,7 +255,7 @@ def _get_constraints_slr(m: AbstractModel) -> Sequence[GeneralConstraint]:
     # Linear damage function for SLR damages, including adaptation costs
     constraints.append(
         RegionalEquation(
-            m.damage_costs_slr,
+            m.slr_damage_costs,
             lambda m, t, r: (
                 m.damage_scale_factor
                 * damage_fct(m.total_SLR[t], m.total_SLR[0], m, r, is_slr=True)

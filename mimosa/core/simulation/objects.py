@@ -82,6 +82,10 @@ class SimVar:
         """Returns all values as a dictionary with index values as keys."""
         return {index: self.get_indexed(index) for index in self.index}
 
+    def extract_values(self):
+        """Return index-value pairs using the same interface as a Pyomo variable."""
+        return self.get_all_indexed()
+
     def set_indexed(self, index, value):
         """Sets the value given the index value, not index position (e.g. 'USA' instead of 0)."""
         self.values[self._position_index(index)] = value
@@ -107,6 +111,8 @@ class SimVar:
 class SimulationObjectModel:
 
     def __init__(self, concrete_model):
+        # Populated by MIMOSA.run_simulation(); direct Simulator users leave it unset.
+        self.runtime = None
         # Recreate all variables and
         self.all_vars = []
         for var in concrete_model.component_objects([Var, Param]):

@@ -79,9 +79,7 @@ def test_sort_equations_orders_a_linear_dependency_chain():
     """A fully ordered dependency chain should produce its single valid order."""
     equations = {
         "emissions": _equation("emissions", ["control"]),
-        "cumulative_emissions": _equation(
-            "cumulative_emissions", ["emissions"]
-        ),
+        "cumulative_emissions": _equation("cumulative_emissions", ["emissions"]),
         "temperature": _equation("temperature", ["cumulative_emissions"]),
     }
 
@@ -101,9 +99,9 @@ def test_sort_equations_orders_branches_before_their_merge():
     """Independent branches may vary in order, but both must precede their consumer."""
     equations = {
         "regional_emissions": _equation("regional_emissions", ["control"]),
-        "mitigation_costs": _equation("mitigation_costs", ["control"]),
+        "mitigation_costs_abs": _equation("mitigation_costs_abs", ["control"]),
         "total_costs": _equation(
-            "total_costs", ["regional_emissions", "mitigation_costs"]
+            "total_costs", ["regional_emissions", "mitigation_costs_abs"]
         ),
     }
 
@@ -111,7 +109,7 @@ def test_sort_equations_orders_branches_before_their_merge():
     positions = {equation.name: i for i, equation in enumerate(ordered)}
 
     assert positions["regional_emissions"] < positions["total_costs"]
-    assert positions["mitigation_costs"] < positions["total_costs"]
+    assert positions["mitigation_costs_abs"] < positions["total_costs"]
 
 
 def test_previous_timestep_dependency_is_recorded_without_affecting_sort_order():
@@ -203,8 +201,7 @@ def test_calc_dependencies_detects_global_and_regional_variables():
     equation = RegionalEquation(
         model.output,
         lambda m, t, r: (
-            m.regional_input[t, r]
-            + m.global_input[t] * m.regional_factor[t, r]
+            m.regional_input[t, r] + m.global_input[t] * m.regional_factor[t, r]
         ),
     )
     _add_equation(model, equation)
@@ -340,6 +337,7 @@ def test_prepare_and_run_minimal_simulation_model():
     assert simulator.is_prepared is True
     result = simulator.run(control=np.array([1.0, 2.0, 3.0]))
 
+    assert result.control.extract_values() == {0: 1.0, 1: 2.0, 2: 3.0}
     np.testing.assert_allclose(result.flow.values, [2.0, 4.0, 6.0])
     np.testing.assert_allclose(result.stock.values, [0.0, 4.0, 10.0])
     np.testing.assert_allclose(result.standalone.values, [4.0, 9.0, 16.0])

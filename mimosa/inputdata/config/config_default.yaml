@@ -14,11 +14,27 @@ time:
     default: 2150
 
   dt:
-    descr: Timestep in years
+    descr: Initial timestep length in years
     type: float
     min: 0.5
     max: 20
     default: 5
+
+  periods:
+    descr: >-
+      Optional timestep changes, mapping each change year to the timestep length
+      in years used after that year
+    type: dict
+    keys:
+      type: int
+      min: 1901
+      max: 2300
+    values:
+      type: float
+      min: 0.5
+      max: 20
+    default:
+      2050: 10
 
 ##################
 
@@ -279,6 +295,27 @@ economics:
         combined damage functions (Only used for COACCH)
       type: bool
       default: False
+    
+    accreu:
+
+      mortality_svl_rel_gdp_cap:
+        descr: >-
+          If params['model']['damage module options']['ACCREU_monetise_mortality'], use this
+          value for the Statistical Value of Life (SVL), expressed as multiple of the GDP per capita.
+          Note: while this assumes a global value of the SVL in relative terms,
+          the dollar value of the SVL differs per country. This has ethical implications.
+        type: float
+        default: 117.59
+        can_be_false: False
+      
+      adaptation_effectiveness_scale_factor:
+        descr: >-
+          Scales the max. effectiveness factor for the sectoral adaptation. Used to analyse
+          the effects of a less effective adaptation.
+        type: float
+        default: 1
+        min: 0
+        max: 1
 
 ##################
 
@@ -424,13 +461,55 @@ temperature:
 ##################
 
 model structure:
+  sealevelrise options:
+    projection:
+      descr: >-
+        Deterministic sea-level-rise parameter set. The central set represents
+        an AR6-calibrated central response; low represents the lower part of
+        the AR6 likely range, and high is a low-likelihood, high-impact
+        sensitivity case. All sets share the same historical initial conditions.
+      type: enum
+      values:
+        - low
+        - central
+        - high
+      default: central
+
   damage module:
     descr: Damage module to be used
     type: enum
     values:
       - COACCH
+      - ACCREU
+      - ACCREU_CGE
       - nodamage
     default: COACCH
+  
+  damage module options:
+    ACCREU adaptation:
+      descr: >-
+        Whether adaptation should be on combined labour productivity and riverine flooding,
+        or separately
+      type: enum
+      values:
+        - combined
+        - separate
+        - noadaptation
+      default: combined
+    
+    ACCREU_adaptation_impose_optimal:
+      descr: >-
+        Calculate the optimal level of adaptation analytically, instead of letting MIMOSA
+        optimise it. Useful to have optimal adaptation in simulation mode.
+      type: bool
+      default: false
+    
+    ACCREU_monetise_mortality:
+        descr: >-
+          Flag for whether the mortality should be monetised using the SVL
+          (Statistical Value of Life)
+        type: bool
+        default: False
 
   emissiontrade module:
     descr: Emission trade module to be used
@@ -531,6 +610,12 @@ regional_parameter_files:
     COACCH:
       filename: inputdata/regionalparams/COACCH.csv
       regionstype: COACCH
+    ACCREU:
+      filename: inputdata/regionalparams/ACCREU.csv
+      regionstype: IMAGE26
+    ACCREU_CGE:
+      filename: inputdata/regionalparams/ACCREU_CGE.csv
+      regionstype: IMAGE26
 
 ##################
 

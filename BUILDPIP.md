@@ -1,5 +1,8 @@
 ## How to build pip package
 
+For the complete release, tagging and documentation-deployment process, see
+[RELEASING.md](RELEASING.md).
+
 1. Update mimosa/**init**.py to latest version number
 2. `pip install --upgrade build`
 3. `python -m build`
