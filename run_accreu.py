@@ -26,18 +26,18 @@ adaptation_readiness = pd.read_csv("data/adaptation_readiness.csv").set_index(
 )
 
 
-def init_params(adaptation_type, monetise_mortality):
+def init_params(adapt_calibration, monetise_mortality, adaptation_type="separate"):
     params = load_params()
     params["model structure"]["damage module"] = "ACCREU"
     params["model structure"]["damage module options"][
         "ACCREU_adaptation"
-    ] = adaptation_type
+    ] = adaptation_type  # "separate" or "combined"
     params["model structure"]["damage module options"][
         "ACCREU_monetise_mortality"
     ] = monetise_mortality
     params["model structure"]["damage module options"][
         "ACCREU_adaptation_calibration"
-    ] = "accreu"
+    ] = adapt_calibration  # "accreu", "literature", "literature_low", "literature_high"
     return params
 
 
@@ -84,10 +84,15 @@ for monetise_mortality in [False, True]:
         sim_run_baseline, f"{PREFIX}_baseline_mortality_{monetise_mortality}"
     )
 
-    for adaptation_type in ["separate"]:  # "separate", "combined"
+    for adapt_calibration in [
+        "accreu",
+        "literature",
+        "literature_low",
+        "literature_high",
+    ]:
 
         #### Run "ada": no-policy baseline with optimal adaptation
-        params_ada = init_params(adaptation_type, monetise_mortality)
+        params_ada = init_params(adapt_calibration, monetise_mortality)
         params_ada["model structure"]["damage module options"][
             "ACCREU_adaptation_impose_optimal"
         ] = True
@@ -95,11 +100,11 @@ for monetise_mortality in [False, True]:
         sim_ada = model_ada.run_nopolicy_baseline()
         model_ada.save_simulation(
             sim_ada,
-            f"{PREFIX}_ada_adapt_{adaptation_type}_mortality_{monetise_mortality}",
+            f"{PREFIX}_ada_adapt_adapt_calib_{adapt_calibration}_mortality_{monetise_mortality}",
         )
 
         #### Run "mit_then_ada": Given mitigation from run mit, optimise adaptation
-        params_mit_then_ada = init_params(adaptation_type, monetise_mortality)
+        params_mit_then_ada = init_params(adapt_calibration, monetise_mortality)
         params_mit_then_ada["model structure"]["damage module options"][
             "ACCREU_adaptation_impose_optimal"
         ] = True
@@ -112,11 +117,11 @@ for monetise_mortality in [False, True]:
         )
         model_mit_then_ada.save_simulation(
             sim_mit_then_ada,
-            f"{PREFIX}_mit_then_ada_adapt_{adaptation_type}_mortality_{monetise_mortality}",
+            f"{PREFIX}_mit_then_ada_adapt_adapt_calib_{adapt_calibration}_mortality_{monetise_mortality}",
         )
 
         #### Run "ada_unplanned": Take the adaptation-only run and just change the adaptation level. The adaptation is therefore less effective then originally thought.
-        params_ada_unplanned = init_params(adaptation_type, monetise_mortality)
+        params_ada_unplanned = init_params(adapt_calibration, monetise_mortality)
         params_ada_unplanned["economics"]["damages"]["accreu"][
             "adaptation_effectiveness_scale_factor"
         ] = 0.5
@@ -131,7 +136,7 @@ for monetise_mortality in [False, True]:
         )
         model_ada_unplanned.save_simulation(
             sim_ada_unplanned,
-            f"{PREFIX}_ada_unplanned_adapt_{adaptation_type}_mortality_{monetise_mortality}",
+            f"{PREFIX}_ada_unplanned_adapt_adapt_calib_{adapt_calibration}_mortality_{monetise_mortality}",
         )
 
         #### Run "ada_planned": Take a MIMOSA optimisation run and reduce the optimal adaptation level by the
@@ -139,7 +144,7 @@ for monetise_mortality in [False, True]:
         # have to spend less than the optimal amount, because they are unable to implement all the optimal adaptation
         # measures. The resulting reduced damages are lower, but that's because the adaptation costs are lower.
         # In ada_unplanned the adaptation costs are the same as optimal adaptation, just the effectiveness is reduced.
-        params_ada_planned = init_params(adaptation_type, monetise_mortality)
+        params_ada_planned = init_params(adapt_calibration, monetise_mortality)
         model_ada_planned = MIMOSA(params_ada_planned)
 
         reduced_control_variables_values = reduce_adaptation_costs(
@@ -150,19 +155,19 @@ for monetise_mortality in [False, True]:
         )
         model_ada_planned.save_simulation(
             sim_ada_planned,
-            f"{PREFIX}_ada_planned_adapt_{adaptation_type}_mortality_{monetise_mortality}",
+            f"{PREFIX}_ada_planned_adapt_adapt_calib_{adapt_calibration}_mortality_{monetise_mortality}",
         )
 
         #### Run "mit_ada": CBA with mitigation and adaptation optimised at the same time by MIMOSA
-        params_mit_ada = init_params(adaptation_type, monetise_mortality)
+        params_mit_ada = init_params(adapt_calibration, monetise_mortality)
         model_mit_ada = MIMOSA(params_mit_ada)
         model_mit_ada.solve(ipopt_maxiter=10000)
         model_mit_ada.save(
-            f"{PREFIX}_mit_ada_adapt_{adaptation_type}_mortality_{monetise_mortality}"
+            f"{PREFIX}_mit_ada_adapt_adapt_calib_{adapt_calibration}_mortality_{monetise_mortality}"
         )
 
         # #### Run "mit_ada_unplanned": Take a MIMOSA optimisation run and just change the adaptation level
-        # params_mit_ada_unplanned = init_params(adaptation_type, monetise_mortality)
+        # params_mit_ada_unplanned = init_params(adapt_calibration, monetise_mortality)
         # params_mit_ada_unplanned["economics"]["damages"]["accreu"][
         #     "adaptation_effectiveness_scale_factor"
         # ] = 0.5
@@ -178,11 +183,11 @@ for monetise_mortality in [False, True]:
         # )
         # model_mit_ada_unplanned.save_simulation(
         #     sim_mit_ada_unplanned,
-        #     f"{PREFIX}_mit_ada_unplanned_adapt_{adaptation_type}_mortality_{monetise_mortality}",
+        #     f"{PREFIX}_mit_ada_unplanned_adapt_adapt_calib_{adapt_calibration}_mortality_{monetise_mortality}",
         # )
 
         # #### Run "mit_ada_planned": Take a MIMOSA optimisation run and reduce the optimal adaptation level by the readiness factor
-        # params_mit_ada_planned = init_params(adaptation_type, monetise_mortality)
+        # params_mit_ada_planned = init_params(adapt_calibration, monetise_mortality)
         # model_mit_ada_planned = MIMOSA(params_mit_ada_planned)
 
         # reduced_control_variables_values = reduce_adaptation_costs(params_mit_ada_planned["SSP", model_mit_ada.concrete_model)
@@ -191,5 +196,5 @@ for monetise_mortality in [False, True]:
         # )
         # model_mit_ada_planned.save_simulation(
         #     sim_mit_ada_planned,
-        #     f"{PREFIX}_mit_ada_planned_adapt_{adaptation_type}_mortality_{monetise_mortality}",
+        #     f"{PREFIX}_mit_ada_planned_adapt_adapt_calib_{adapt_calibration}_mortality_{monetise_mortality}",
         # )
