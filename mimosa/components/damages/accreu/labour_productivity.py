@@ -20,6 +20,7 @@ from mimosa.common import (
 from .utils import (
     adaptation_effectiveness_fct,
     dmg_fct_linear,
+    get_adaptation_calibration,
     optimal_adaptation_costs_fct,
 )
 
@@ -30,6 +31,10 @@ def get_constraints(m, context: ModelContext):
     constraints = []
 
     adaptation_type = context.option("damage", "ACCREU adaptation")
+    adaptation_calibration = get_adaptation_calibration(
+        context.option("damage", "ACCREU_adaptation_calibration", default="accreu"),
+        "labourprod",
+    )
 
     ## Gross damages:
 
@@ -113,8 +118,10 @@ def get_constraints(m, context: ModelContext):
                     m.labourprod_avoided_damages_adapt,
                     lambda m, t, r: adaptation_effectiveness_fct(
                         m.labourprod_adaptation_costs_abs[t, r],
-                        m.labourprod_adaptation_max_effectiveness[r],
+                        m.labourprod_adaptation_max_effectiveness[r]
+                        * adaptation_calibration.max_effectiveness_scale,
                         m.labourprod_adaptation_cost_param[r]
+                        * adaptation_calibration.cost_param_scale
                         / m.dollar_2017_MER_to_2010_PPP[r],
                         m.adaptation_effectiveness_scale_factor,
                     ),
@@ -144,8 +151,11 @@ def get_constraints(m, context: ModelContext):
                     m.labourprod_adaptation_costs_abs,
                     lambda m, t, r: optimal_adaptation_costs_fct(
                         m.labourprod_damage_costs_gross[t, r] * m.GDP_gross[t, r],
-                        m.labourprod_adaptation_max_effectiveness[r],
+                        m.labourprod_adaptation_max_effectiveness[r]
+                        * adaptation_calibration.max_effectiveness_scale
+                        * m.adaptation_effectiveness_scale_factor,
                         m.labourprod_adaptation_cost_param[r]
+                        * adaptation_calibration.cost_param_scale
                         / m.dollar_2017_MER_to_2010_PPP[r],
                     ),
                 )

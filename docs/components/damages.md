@@ -9,6 +9,43 @@ Climate impacts in MIMOSA are calculated using the [COACCH](https://www.coacch.e
 
 :::mimosa.components.damages.coacch.get_constraints
 
+## ACCREU adaptation calibration
+
+When the ACCREU damage module uses separate adaptation by sector, its adaptation
+curves can use either the original source-model calibration or a literature-based
+realised-effectiveness calibration:
+
+```yaml
+model structure:
+  damage module: ACCREU
+  damage module options:
+    ACCREU adaptation: separate
+    ACCREU_adaptation_calibration: literature
+```
+
+The default value is `accreu`, which preserves the original coefficients. The
+`literature` setting retains the original regional rankings but applies the
+following sectoral factors:
+
+| Sector | Maximum-effectiveness factor | Cost-parameter factor |
+|---|---:|---:|
+| Labour productivity | 1.000 | 1.000 |
+| Riverine flooding | 0.618 | 1.000 |
+| Sea-level rise | 0.659 | 0.250 |
+
+The cost parameter is the coefficient `b` in
+`E(C) = Emax * (1 - exp(-b * C))`. A factor below one therefore makes a given
+effectiveness more expensive. The literature calibration targets approximate
+global discounted benefit-cost ratios of 2.4, 5, and 8 at a 5% discount rate for
+labour productivity, riverine flooding, and sea-level rise. These are calibration
+targets rather than statistical estimates of the coefficients. The benchmarks are
+based on [IPCC AR6 WGII Chapter 9](https://www.ipcc.ch/report/ar6/wg2/chapter/chapter-9/),
+the [World Bank flood-resilience review](https://documents1.worldbank.org/curated/en/099122325103032001/pdf/P178843-a69ab123-c5a7-4a7e-8686-82b20fe83ac7.pdf),
+and [IPCC AR6 WGII Cross-Chapter Paper 2](https://www.ipcc.ch/report/ar6/wg2/downloads/report/IPCC_AR6_WGII_FD_CCP2.pdf).
+
+The literature calibration requires `ACCREU adaptation: separate`, because the
+combined labour-river curve does not have an independently assessed calibration.
+
 
 ## Damage functions and coefficients
 

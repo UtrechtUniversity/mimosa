@@ -300,8 +300,8 @@ economics:
 
       mortality_svl_rel_gdp_cap:
         descr: >-
-          If params['model']['damage module options']['ACCREU_monetise_mortality'], use this
-          value for the Statistical Value of Life (SVL), expressed as multiple of the GDP per capita.
+          If the ACCREU_monetise_mortality option is enabled, use this value for
+          the Statistical Value of Life (SVL), expressed as multiple of GDP per capita.
           Note: while this assumes a global value of the SVL in relative terms,
           the dollar value of the SVL differs per country. This has ethical implications.
         type: float
@@ -503,6 +503,18 @@ model structure:
         optimise it. Useful to have optimal adaptation in simulation mode.
       type: bool
       default: false
+
+    ACCREU_adaptation_calibration:
+      descr: >-
+        Calibration of the sectoral ACCREU adaptation curves. "accreu" uses the
+        original source-model coefficients. "literature" uses realised-effectiveness
+        caps and cost multipliers calibrated to literature benefit-cost ratios at a
+        5% discount rate. The literature calibration requires separate adaptation.
+      type: enum
+      values:
+        - accreu
+        - literature
+      default: accreu
     
     ACCREU_monetise_mortality:
         descr: >-

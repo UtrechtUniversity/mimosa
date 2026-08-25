@@ -20,6 +20,7 @@ from mimosa.common import (
 from .utils import (
     adaptation_effectiveness_fct,
     dmg_fct_power,
+    get_adaptation_calibration,
     optimal_adaptation_costs_fct,
 )
 
@@ -29,6 +30,10 @@ def get_constraints(m, context: ModelContext):
 
     constraints = []
     adaptation_type = context.option("damage", "ACCREU adaptation")
+    adaptation_calibration = get_adaptation_calibration(
+        context.option("damage", "ACCREU_adaptation_calibration", default="accreu"),
+        "slr",
+    )
 
     ## Gross damages:
 
@@ -99,8 +104,10 @@ def get_constraints(m, context: ModelContext):
                     m.slr_avoided_damages_adapt,
                     lambda m, t, r: adaptation_effectiveness_fct(
                         m.slr_adaptation_costs_abs[t, r],
-                        m.slr_adaptation_max_effectiveness[r],
+                        m.slr_adaptation_max_effectiveness[r]
+                        * adaptation_calibration.max_effectiveness_scale,
                         m.slr_adaptation_cost_param[r]
+                        * adaptation_calibration.cost_param_scale
                         / m.dollar_2017_MER_to_2010_PPP[r],
                         m.adaptation_effectiveness_scale_factor,
                     ),
@@ -130,8 +137,11 @@ def get_constraints(m, context: ModelContext):
                     m.slr_adaptation_costs_abs,
                     lambda m, t, r: optimal_adaptation_costs_fct(
                         m.slr_damage_costs_gross[t, r] * m.GDP_gross[t, r],
-                        m.slr_adaptation_max_effectiveness[r],
+                        m.slr_adaptation_max_effectiveness[r]
+                        * adaptation_calibration.max_effectiveness_scale
+                        * m.adaptation_effectiveness_scale_factor,
                         m.slr_adaptation_cost_param[r]
+                        * adaptation_calibration.cost_param_scale
                         / m.dollar_2017_MER_to_2010_PPP[r],
                         scale=0.00001,
                     ),

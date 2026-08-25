@@ -28,6 +28,7 @@ from . import (
     mortality,
     combined_nslr_adaptation,
 )
+from .utils import validate_adaptation_calibration
 
 
 def get_constraints(
@@ -46,6 +47,12 @@ def get_constraints(
     # In the config, the user can choose whether to use the separate adaptation module for ACCREU or not.
     # This is done using the parameter params["model structure"]["damage module options"]["ACCREU adaptation"] = "separate" or "combined"
     adaptation_type = context.option("damage", "ACCREU adaptation")
+    adaptation_calibration = context.option(
+        "damage", "ACCREU_adaptation_calibration", default="accreu"
+    )
+    # Validate the calibration here so invalid combinations fail before model
+    # construction has added a partial set of adaptation equations.
+    validate_adaptation_calibration(adaptation_calibration, adaptation_type)
 
     if adaptation_type != "noadaptation":
         m.adaptation_effectiveness_scale_factor = Param(

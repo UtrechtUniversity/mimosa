@@ -117,7 +117,8 @@ def get_constraints(m, context: ModelContext):
                 m.combined_labprod_riv_adaptation_costs_abs,
                 lambda m, t, r: optimal_adaptation_costs_fct(
                     m.combined_labprod_riv_damage_costs_gross[t, r] * m.GDP_gross[t, r],
-                    m.combined_labprod_riv_adaptation_max_effectiveness[r],
+                    m.combined_labprod_riv_adaptation_max_effectiveness[r]
+                    * m.adaptation_effectiveness_scale_factor,
                     m.combined_labprod_riv_adaptation_cost_param[r]
                     / m.dollar_2017_MER_to_2010_PPP[r],
                 ),
