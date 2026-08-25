@@ -28,7 +28,7 @@ from . import (
     mortality,
     combined_nslr_adaptation,
 )
-from .utils import validate_adaptation_calibration
+from .utils import get_adaptation_options
 
 
 def get_constraints(
@@ -46,13 +46,8 @@ def get_constraints(
 
     # In the config, the user can choose whether to use the separate adaptation module for ACCREU or not.
     # This is done using the parameter params["model structure"]["damage module options"]["ACCREU adaptation"] = "separate" or "combined"
-    adaptation_type = context.option("damage", "ACCREU adaptation")
-    adaptation_calibration = context.option(
-        "damage", "ACCREU_adaptation_calibration", default="accreu"
-    )
-    # Validate the calibration here so invalid combinations fail before model
-    # construction has added a partial set of adaptation equations.
-    validate_adaptation_calibration(adaptation_calibration, adaptation_type)
+    adaptation_options = get_adaptation_options(context)
+    adaptation_type = adaptation_options.adaptation_type
 
     if adaptation_type != "noadaptation":
         m.adaptation_effectiveness_scale_factor = Param(
@@ -68,18 +63,20 @@ def get_constraints(
     )
 
     # Get constraints for sea-level rise damages
-    constraints.extend(sealevelrise.get_constraints(m, context))
+    constraints.extend(sealevelrise.get_constraints(m, adaptation_options))
 
     # Get constraints for riverine flooding damages
-    constraints.extend(riverine_flooding.get_constraints(m, context))
+    constraints.extend(riverine_flooding.get_constraints(m, adaptation_options))
 
     # Get constraints for labour productivity damages
-    constraints.extend(labour_productivity.get_constraints(m, context))
+    constraints.extend(labour_productivity.get_constraints(m, adaptation_options))
 
     if adaptation_type == "combined":
         # Get constraints for combined adaptation costs, which combines labour productivity and riverine flooding adaptation costs
         # Only if the user has chosen to use the combined adaptation module for ACCREU
-        constraints.extend(combined_nslr_adaptation.get_constraints(m, context))
+        constraints.extend(
+            combined_nslr_adaptation.get_constraints(m, adaptation_options)
+        )
 
     # Get constraints for mortality
     monetise_mortality = context.option("damage", "ACCREU_monetise_mortality")
@@ -131,7 +128,6 @@ def get_constraints(
     )
 
     if adaptation_type != "noadaptation":
-
         m.adaptation_costs = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
         m.adaptation_costs_abs = Var(m.t, m.regions, units=quant.unit("currency_unit"))
         m.global_adaptation_costs = Var(

@@ -14,27 +14,24 @@ from mimosa.common import (
     log,
     quant,
     NonNegativeReals,
-    ModelContext,
 )
 
 from .utils import (
+    AdaptationOptions,
     adaptation_effectiveness_fct,
     dmg_fct_linear,
-    get_adaptation_calibration,
+    effective_adaptation_curve,
     optimal_adaptation_costs_fct,
 )
 
 
-def get_constraints(m, context: ModelContext):
+def get_constraints(m, adaptation_options: AdaptationOptions):
     """TODO"""
 
     constraints = []
 
-    adaptation_type = context.option("damage", "ACCREU adaptation")
-    adaptation_calibration = get_adaptation_calibration(
-        context.option("damage", "ACCREU_adaptation_calibration", default="accreu"),
-        "labourprod",
-    )
+    adaptation_type = adaptation_options.adaptation_type
+    adaptation_calibration = adaptation_options.calibrations["labourprod"]
 
     ## Gross damages:
 
@@ -85,7 +82,6 @@ def get_constraints(m, context: ModelContext):
     ## Adaptation (only for costs, doesn't apply to benefits):
 
     if adaptation_type == "separate":
-
         m.labourprod_adaptation_costs_abs = Var(
             m.t,
             m.regions,
@@ -110,7 +106,6 @@ def get_constraints(m, context: ModelContext):
             m.regions,
             doc="regional::ACCREU.labourprod_adapt_eff_cost_param",
         )
-
         constraints.extend(
             [
                 # Adaptation effectiveness function
@@ -118,12 +113,13 @@ def get_constraints(m, context: ModelContext):
                     m.labourprod_avoided_damages_adapt,
                     lambda m, t, r: adaptation_effectiveness_fct(
                         m.labourprod_adaptation_costs_abs[t, r],
-                        m.labourprod_adaptation_max_effectiveness[r]
-                        * adaptation_calibration.max_effectiveness_scale,
-                        m.labourprod_adaptation_cost_param[r]
-                        * adaptation_calibration.cost_param_scale
-                        / m.dollar_2017_MER_to_2010_PPP[r],
-                        m.adaptation_effectiveness_scale_factor,
+                        *effective_adaptation_curve(
+                            m,
+                            r,
+                            m.labourprod_adaptation_max_effectiveness[r],
+                            m.labourprod_adaptation_cost_param[r],
+                            adaptation_calibration,
+                        ),
                     ),
                 ),
                 # Adaptation costs as a fraction of GDP
@@ -141,22 +137,20 @@ def get_constraints(m, context: ModelContext):
             ]
         )
 
-        impose_optimal_adaptation = context.option(
-            "damage", "ACCREU_adaptation_impose_optimal"
-        )
-        if impose_optimal_adaptation:
+        if adaptation_options.impose_optimal:
             constraints.append(
                 # Calculate analytically the optimal level of adaptation
                 RegionalEquation(
                     m.labourprod_adaptation_costs_abs,
                     lambda m, t, r: optimal_adaptation_costs_fct(
                         m.labourprod_damage_costs_gross[t, r] * m.GDP_gross[t, r],
-                        m.labourprod_adaptation_max_effectiveness[r]
-                        * adaptation_calibration.max_effectiveness_scale
-                        * m.adaptation_effectiveness_scale_factor,
-                        m.labourprod_adaptation_cost_param[r]
-                        * adaptation_calibration.cost_param_scale
-                        / m.dollar_2017_MER_to_2010_PPP[r],
+                        *effective_adaptation_curve(
+                            m,
+                            r,
+                            m.labourprod_adaptation_max_effectiveness[r],
+                            m.labourprod_adaptation_cost_param[r],
+                            adaptation_calibration,
+                        ),
                     ),
                 )
             )
@@ -180,14 +174,12 @@ def get_constraints(m, context: ModelContext):
 
 
 def gross_dmg_fct_labourprod(m, t, r):
-
     a = m.labourprod_damages_gross_constant[r]
     b = m.labourprod_damages_gross_linear[r]
     return dmg_fct_linear(m, t, a, b)
 
 
 def benefits_dmg_fct_labourprod(m, t, r):
-
     a = m.labourprod_damages_benefits_constant[r]
     b = m.labourprod_damages_benefits_linear[r]
     return dmg_fct_linear(m, t, a, b)

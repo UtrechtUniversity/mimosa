@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Mapping
 
 from mimosa.common import exp, log, soft_min
 
@@ -9,11 +10,19 @@ class AdaptationCalibration:
     cost_param_scale: float
 
 
+@dataclass(frozen=True)
+class AdaptationOptions:
+    adaptation_type: str
+    impose_optimal: bool
+    calibrations: Mapping[str, AdaptationCalibration]
+
+
 ADAPTATION_CALIBRATIONS = {
     "accreu": {
         "labourprod": AdaptationCalibration(1.0, 1.0),
         "riverine": AdaptationCalibration(1.0, 1.0),
         "slr": AdaptationCalibration(1.0, 1.0),
+        "combined": AdaptationCalibration(1.0, 1.0),
     },
     # Conservative end of the literature envelope: lower realised
     # effectiveness and higher implementation costs.
@@ -21,14 +30,17 @@ ADAPTATION_CALIBRATIONS = {
         "labourprod": AdaptationCalibration(0.741, 0.167),
         "riverine": AdaptationCalibration(0.412, 0.167),
         "slr": AdaptationCalibration(0.439, 0.125),
+        "combined": AdaptationCalibration(0.645, 0.167),
     },
     # Literature calibration targets discounted global BCRs of approximately
-    # 2.4, 5, and 8 at 5% for labour, riverine flooding, and SLR respectively.
+    # 2.4, 5, 8, and 4.3 at 5% for labour, riverine flooding, SLR, and combined
+    # labour-river adaptation respectively.
     # Regional rankings are retained by scaling the ACCREU maxima uniformly.
     "literature": {
         "labourprod": AdaptationCalibration(1.0, 1.0),
         "riverine": AdaptationCalibration(0.618, 1.0),
         "slr": AdaptationCalibration(0.659, 0.25),
+        "combined": AdaptationCalibration(0.889, 1.0),
     },
     # Optimistic end of the literature envelope: higher realised
     # effectiveness and lower implementation costs.
@@ -36,6 +48,7 @@ ADAPTATION_CALIBRATIONS = {
         "labourprod": AdaptationCalibration(1.977, 2.0),
         "riverine": AdaptationCalibration(0.721, 2.0),
         "slr": AdaptationCalibration(0.933, 0.5),
+        "combined": AdaptationCalibration(1.25, 4.0),
     },
 }
 
@@ -53,34 +66,63 @@ def get_adaptation_calibration(calibration, sector):
         raise ValueError(f"Unknown ACCREU adaptation sector: {sector}") from exc
 
 
-def validate_adaptation_calibration(calibration, adaptation_type):
-    """Validate a calibration name and its compatibility with model structure."""
+def validate_adaptation_calibration(calibration):
+    """Validate an adaptation calibration name."""
 
     get_adaptation_calibration(calibration, "slr")
-    if calibration.startswith("literature") and adaptation_type == "combined":
-        raise ValueError(
-            "The literature ACCREU adaptation calibration requires "
-            "'ACCREU adaptation: separate'."
-        )
 
 
-def adaptation_effectiveness_fct(
-    adapt_costs, max_effectiveness, cost_param, effectiveness_scale_factor=1
+def get_adaptation_options(context):
+    """Read and validate all ACCREU adaptation options once."""
+
+    adaptation_type = context.option("damage", "ACCREU adaptation")
+    calibration_name = context.option(
+        "damage", "ACCREU_adaptation_calibration", default="accreu"
+    )
+    validate_adaptation_calibration(calibration_name)
+
+    sectors = ["labourprod", "riverine", "slr"]
+    if adaptation_type == "combined":
+        sectors.append("combined")
+
+    return AdaptationOptions(
+        adaptation_type=adaptation_type,
+        impose_optimal=context.option("damage", "ACCREU_adaptation_impose_optimal"),
+        calibrations={
+            sector: get_adaptation_calibration(calibration_name, sector)
+            for sector in sectors
+        },
+    )
+
+
+def effective_adaptation_curve(
+    m, r, source_max_effectiveness, source_cost_param, calibration
 ):
+    """Return adaptation curve coefficients in MIMOSA's model units."""
+
+    effective_max = (
+        source_max_effectiveness
+        * calibration.max_effectiveness_scale
+        * m.adaptation_effectiveness_scale_factor
+    )
+    effective_cost_param = (
+        source_cost_param
+        * calibration.cost_param_scale
+        / m.dollar_2017_MER_to_2010_PPP[r]
+    )
+    return effective_max, effective_cost_param
+
+
+def adaptation_effectiveness_fct(adapt_costs, max_effectiveness, cost_param):
     """
     Adaptation effectiveness function, based on the fitted function in ACCREU:
     Avoided damages = max_effectiveness * (1 - exp(-cost_param * adapt_costs))
     """
 
-    return (
-        effectiveness_scale_factor
-        * max_effectiveness
-        * (1 - exp(-cost_param * adapt_costs))
-    )
+    return max_effectiveness * (1 - exp(-cost_param * adapt_costs))
 
 
 def dmg_fct_linear(m, t, a, b, xshift=0, remove_base=True):
-
     def fct(x):
         return a + b * x
 
@@ -92,7 +134,6 @@ def dmg_fct_linear(m, t, a, b, xshift=0, remove_base=True):
 
 
 def dmg_fct_power(m, t, a, b, c, x="temperature", xshift=0, remove_base=True):
-
     if x not in ["temperature", "total_SLR"]:
         raise ValueError("x must be either 'temperature' or 'total_SLR'")
 

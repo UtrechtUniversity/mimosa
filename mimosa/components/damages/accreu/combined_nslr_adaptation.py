@@ -14,22 +14,24 @@ from mimosa.common import (
     log,
     quant,
     NonNegativeReals,
-    ModelContext,
 )
 
 from .utils import (
+    AdaptationOptions,
     adaptation_effectiveness_fct,
+    effective_adaptation_curve,
     optimal_adaptation_costs_fct,
 )
 
 
-def get_constraints(m, context: ModelContext):
+def get_constraints(m, adaptation_options: AdaptationOptions):
     """
     Adaptation for the non-SLR damages combined (labour productivity + riverine flooding).
 
     """
 
     constraints = []
+    adaptation_calibration = adaptation_options.calibrations["combined"]
 
     ## Gross damages:
 
@@ -71,7 +73,6 @@ def get_constraints(m, context: ModelContext):
         m.regions,
         doc="regional::ACCREU.combined_adapt_eff_cost_param",
     )
-
     constraints.extend(
         [
             # Adaptation effectiveness function
@@ -79,10 +80,13 @@ def get_constraints(m, context: ModelContext):
                 m.combined_labprod_riv_avoided_damages_adapt,
                 lambda m, t, r: adaptation_effectiveness_fct(
                     m.combined_labprod_riv_adaptation_costs_abs[t, r],
-                    m.combined_labprod_riv_adaptation_max_effectiveness[r],
-                    m.combined_labprod_riv_adaptation_cost_param[r]
-                    / m.dollar_2017_MER_to_2010_PPP[r],
-                    m.adaptation_effectiveness_scale_factor,
+                    *effective_adaptation_curve(
+                        m,
+                        r,
+                        m.combined_labprod_riv_adaptation_max_effectiveness[r],
+                        m.combined_labprod_riv_adaptation_cost_param[r],
+                        adaptation_calibration,
+                    ),
                 ),
             ),
             # Adaptation costs as a fraction of GDP
@@ -107,20 +111,20 @@ def get_constraints(m, context: ModelContext):
         ]
     )
 
-    impose_optimal_adaptation = context.option(
-        "damage", "ACCREU_adaptation_impose_optimal"
-    )
-    if impose_optimal_adaptation:
+    if adaptation_options.impose_optimal:
         constraints.append(
             # Calculate analytically the optimal level of adaptation
             RegionalEquation(
                 m.combined_labprod_riv_adaptation_costs_abs,
                 lambda m, t, r: optimal_adaptation_costs_fct(
                     m.combined_labprod_riv_damage_costs_gross[t, r] * m.GDP_gross[t, r],
-                    m.combined_labprod_riv_adaptation_max_effectiveness[r]
-                    * m.adaptation_effectiveness_scale_factor,
-                    m.combined_labprod_riv_adaptation_cost_param[r]
-                    / m.dollar_2017_MER_to_2010_PPP[r],
+                    *effective_adaptation_curve(
+                        m,
+                        r,
+                        m.combined_labprod_riv_adaptation_max_effectiveness[r],
+                        m.combined_labprod_riv_adaptation_cost_param[r],
+                        adaptation_calibration,
+                    ),
                 ),
             )
         )

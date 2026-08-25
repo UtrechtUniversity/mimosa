@@ -510,7 +510,7 @@ model structure:
         original source-model coefficients. The three "literature" options use
         realised-effectiveness caps and cost multipliers calibrated to the low,
         central, and high ends of literature benefit-cost ranges at a 5% discount
-        rate. Literature calibrations require separate adaptation.
+        rate. They apply to both separate and combined adaptation.
       type: enum
       values:
         - accreu

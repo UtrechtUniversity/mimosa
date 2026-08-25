@@ -11,15 +11,15 @@ Climate impacts in MIMOSA are calculated using the [COACCH](https://www.coacch.e
 
 ## ACCREU adaptation calibration
 
-When the ACCREU damage module uses separate adaptation by sector, its adaptation
-curves can use either the original source-model calibration or low, central, and
-high literature-based realised-effectiveness calibrations:
+The ACCREU adaptation curves can use either the original source-model calibration
+or low, central, and high literature-based realised-effectiveness calibrations.
+This applies to both separate and combined adaptation:
 
 ```yaml
 model structure:
   damage module: ACCREU
   damage module options:
-    ACCREU adaptation: separate
+    ACCREU adaptation: combined
     ACCREU_adaptation_calibration: literature
 ```
 
@@ -32,19 +32,23 @@ following sectoral factors:
 | `literature_low` | Labour productivity | 0.741 | 0.167 | 2.0 |
 |  | Riverine flooding | 0.412 | 0.167 | 2.1 |
 |  | Sea-level rise | 0.439 | 0.125 | 4.7 |
+|  | Combined labour and riverine | 0.645 | 0.167 | 2.5 |
 | `literature` | Labour productivity | 1.000 | 1.000 | 2.4 |
 |  | Riverine flooding | 0.618 | 1.000 | 4.6 |
 |  | Sea-level rise | 0.659 | 0.250 | 7.8 |
+|  | Combined labour and riverine | 0.889 | 1.000 | 4.3 |
 | `literature_high` | Labour productivity | 1.977 | 2.000 | 3.7 |
 |  | Riverine flooding | 0.721 | 2.000 | 6.9 |
 |  | Sea-level rise | 0.933 | 0.500 | 14.0 |
+|  | Combined labour and riverine | 1.250 | 4.000 | 8.8 |
 
 The cost parameter is the coefficient `b` in
 `E(C) = Emax * (1 - exp(-b * C))`. A factor below one therefore makes a given
 effectiveness more expensive. `literature_low` represents the conservative end
 of the evidence range (lower realised effectiveness and higher cost), while
 `literature_high` represents the optimistic end (higher realised effectiveness
-and lower cost). The central `literature` calibration is unchanged. These are
+and lower cost). The previously available separate-sector central calibration is
+unchanged. These are
 calibration targets rather than statistical estimates of the coefficients. The
 benchmarks are
 based on [IPCC AR6 WGII Chapter 9](https://www.ipcc.ch/report/ar6/wg2/chapter/chapter-9/),
@@ -53,8 +57,44 @@ and [IPCC AR6 WGII Cross-Chapter Paper 2](https://www.ipcc.ch/report/ar6/wg2/dow
 The reported BCRs cover 2020--2100 and weight discounted annual flows by the
 model's actual period lengths: five years through 2050 and ten years thereafter.
 
-The literature calibration requires `ACCREU adaptation: separate`, because the
-combined labour-river curve does not have an independently assessed calibration.
+### Combined adaptation calibration
+
+The combined curve protects gross labour-productivity and riverine-flood damages.
+It does not protect mortality, so it is not literally a calibration of every
+non-SLR impact in ACCREU. Under the default MIMOSA scenario, labour productivity
+accounts for 70.9% and riverine flooding for 29.1% of their combined discounted
+gross damages through 2100. These shares give the low and central combined
+maximum-effectiveness factors:
+
+`0.709 * 0.741 + 0.291 * 0.412 = 0.645`
+
+`0.709 * 1.000 + 0.291 * 0.618 = 0.889`
+
+The same weighted calculation gives 1.612 for the high calibration, but this
+would raise the maximum avoided-damage share above one in some regions. The high
+factor is therefore capped at 1.250, which keeps the largest regional maximum at
+approximately 0.93. Its cost-parameter factor is raised to 4.000 to place its BCR
+near the upper part of the literature range while respecting this physical cap.
+
+| Combined calibration | Global BCR at 5% | Discounted realised effectiveness |
+|---|---:|---:|
+| `literature_low` | 2.45 | 10% |
+| `literature` | 4.29 | 29% |
+| `literature_high` | 8.84 | 51% |
+
+The combined BCR envelope is anchored in several independent assessments. IPCC
+AR6 WGII reports BCRs of 1--11.5 at a 5% discount rate for 19 Green Climate Fund
+adaptation projects, with a median of 2.4 and an aggregate ratio of 3.5. The
+[Global Commission on Adaptation](https://gca.org/4-things-to-know-about-the-global-adaptation-challenge/)
+reports a cross-sector range of 2--10, while the World Bank's
+[*Lifelines* report](https://documents1.worldbank.org/curated/en/111181560974989791/pdf/Lifelines-The-Resilient-Infrastructure-Opportunity.pdf)
+reports approximately four dollars of benefit per dollar invested in resilient
+infrastructure. See [IPCC AR6 WGII Chapter 9](https://www.ipcc.ch/report/ar6/wg2/chapter/chapter-9/).
+The [UNEP Adaptation Gap Report 2025](https://www.unep.org/resources/adaptation-gap-report-2025)
+provides global cost estimates but no corresponding avoided-damage percentage;
+the combined maximum-effectiveness factors should therefore be interpreted as a
+transparent translation of the BCR evidence, not as directly estimated physical
+coefficients.
 
 
 ## Damage functions and coefficients
