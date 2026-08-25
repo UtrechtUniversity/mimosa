@@ -75,7 +75,7 @@ def validate_adaptation_calibration(calibration):
 def get_adaptation_options(context):
     """Read and validate all ACCREU adaptation options once."""
 
-    adaptation_type = context.option("damage", "ACCREU adaptation")
+    adaptation_type = context.option("damage", "ACCREU_adaptation")
     calibration_name = context.option(
         "damage", "ACCREU_adaptation_calibration", default="accreu"
     )

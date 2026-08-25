@@ -31,7 +31,7 @@ def test_effective_adaptation_curve_applies_all_scale_factors():
 
 def test_adaptation_options_are_read_once_and_include_sector_calibrations():
     values = {
-        "ACCREU adaptation": "combined",
+        "ACCREU_adaptation": "combined",
         "ACCREU_adaptation_calibration": "accreu",
         "ACCREU_adaptation_impose_optimal": True,
     }
@@ -53,7 +53,7 @@ def test_adaptation_options_are_read_once_and_include_sector_calibrations():
         "combined",
     }
     assert calls == [
-        ("damage", "ACCREU adaptation"),
+        ("damage", "ACCREU_adaptation"),
         ("damage", "ACCREU_adaptation_calibration"),
         ("damage", "ACCREU_adaptation_impose_optimal"),
     ]

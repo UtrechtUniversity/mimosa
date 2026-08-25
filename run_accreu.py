@@ -30,11 +30,14 @@ def init_params(adaptation_type, monetise_mortality):
     params = load_params()
     params["model structure"]["damage module"] = "ACCREU"
     params["model structure"]["damage module options"][
-        "ACCREU adaptation"
+        "ACCREU_adaptation"
     ] = adaptation_type
     params["model structure"]["damage module options"][
         "ACCREU_monetise_mortality"
     ] = monetise_mortality
+    params["model structure"]["damage module options"][
+        "ACCREU_adaptation_calibration"
+    ] = "accreu"
     return params
 
 

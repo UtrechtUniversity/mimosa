@@ -31,7 +31,7 @@ def test_literature_adaptation_calibration_matches_bcr_benchmarks(
     params = load_params()
     params["model structure"]["damage module"] = "ACCREU"
     options = params["model structure"]["damage module options"]
-    options["ACCREU adaptation"] = "separate"
+    options["ACCREU_adaptation"] = "separate"
     options["ACCREU_adaptation_calibration"] = calibration
     options["ACCREU_adaptation_impose_optimal"] = True
 
@@ -76,7 +76,7 @@ def test_combined_literature_calibration_matches_bcr_benchmarks(calibration, bcr
     params = load_params()
     params["model structure"]["damage module"] = "ACCREU"
     options = params["model structure"]["damage module options"]
-    options["ACCREU adaptation"] = "combined"
+    options["ACCREU_adaptation"] = "combined"
     options["ACCREU_adaptation_calibration"] = calibration
     options["ACCREU_adaptation_impose_optimal"] = True
 

@@ -486,7 +486,7 @@ model structure:
     default: COACCH
   
   damage module options:
-    ACCREU adaptation:
+    ACCREU_adaptation:
       descr: >-
         Whether adaptation should be on combined labour productivity and riverine flooding,
         or separately
