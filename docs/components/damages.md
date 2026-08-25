@@ -12,8 +12,8 @@ Climate impacts in MIMOSA are calculated using the [COACCH](https://www.coacch.e
 ## ACCREU adaptation calibration
 
 When the ACCREU damage module uses separate adaptation by sector, its adaptation
-curves can use either the original source-model calibration or a literature-based
-realised-effectiveness calibration:
+curves can use either the original source-model calibration or low, central, and
+high literature-based realised-effectiveness calibrations:
 
 ```yaml
 model structure:
@@ -24,24 +24,34 @@ model structure:
 ```
 
 The default value is `accreu`, which preserves the original coefficients. The
-`literature` setting retains the original regional rankings but applies the
+three literature settings retain the original regional rankings but apply the
 following sectoral factors:
 
-| Sector | Maximum-effectiveness factor | Cost-parameter factor |
-|---|---:|---:|
-| Labour productivity | 1.000 | 1.000 |
-| Riverine flooding | 0.618 | 1.000 |
-| Sea-level rise | 0.659 | 0.250 |
+| Calibration | Sector | Maximum-effectiveness factor | Cost-parameter factor | Approximate global BCR at 5% |
+|---|---|---:|---:|---:|
+| `literature_low` | Labour productivity | 0.741 | 0.167 | 2.0 |
+|  | Riverine flooding | 0.412 | 0.167 | 2.1 |
+|  | Sea-level rise | 0.439 | 0.125 | 4.7 |
+| `literature` | Labour productivity | 1.000 | 1.000 | 2.4 |
+|  | Riverine flooding | 0.618 | 1.000 | 4.6 |
+|  | Sea-level rise | 0.659 | 0.250 | 7.8 |
+| `literature_high` | Labour productivity | 1.977 | 2.000 | 3.7 |
+|  | Riverine flooding | 0.721 | 2.000 | 6.9 |
+|  | Sea-level rise | 0.933 | 0.500 | 14.0 |
 
 The cost parameter is the coefficient `b` in
 `E(C) = Emax * (1 - exp(-b * C))`. A factor below one therefore makes a given
-effectiveness more expensive. The literature calibration targets approximate
-global discounted benefit-cost ratios of 2.4, 5, and 8 at a 5% discount rate for
-labour productivity, riverine flooding, and sea-level rise. These are calibration
-targets rather than statistical estimates of the coefficients. The benchmarks are
+effectiveness more expensive. `literature_low` represents the conservative end
+of the evidence range (lower realised effectiveness and higher cost), while
+`literature_high` represents the optimistic end (higher realised effectiveness
+and lower cost). The central `literature` calibration is unchanged. These are
+calibration targets rather than statistical estimates of the coefficients. The
+benchmarks are
 based on [IPCC AR6 WGII Chapter 9](https://www.ipcc.ch/report/ar6/wg2/chapter/chapter-9/),
 the [World Bank flood-resilience review](https://documents1.worldbank.org/curated/en/099122325103032001/pdf/P178843-a69ab123-c5a7-4a7e-8686-82b20fe83ac7.pdf),
 and [IPCC AR6 WGII Cross-Chapter Paper 2](https://www.ipcc.ch/report/ar6/wg2/downloads/report/IPCC_AR6_WGII_FD_CCP2.pdf).
+The reported BCRs cover 2020--2100 and weight discounted annual flows by the
+model's actual period lengths: five years through 2050 and ten years thereafter.
 
 The literature calibration requires `ACCREU adaptation: separate`, because the
 combined labour-river curve does not have an independently assessed calibration.

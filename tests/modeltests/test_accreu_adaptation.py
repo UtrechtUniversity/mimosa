@@ -1,14 +1,38 @@
 import numpy as np
+import pytest
 
 from mimosa import MIMOSA, load_params
 
 
-def test_literature_adaptation_calibration_matches_bcr_benchmarks():
+@pytest.mark.parametrize(
+    ("calibration", "bcr_ranges"),
+    [
+        (
+            "literature_low",
+            {"labourprod": (1.8, 2.2), "riverine": (1.8, 2.5), "slr": (4.0, 5.5)},
+        ),
+        (
+            "literature",
+            {"labourprod": (2.2, 2.6), "riverine": (4.0, 5.2), "slr": (7.0, 8.5)},
+        ),
+        (
+            "literature_high",
+            {
+                "labourprod": (3.3, 4.1),
+                "riverine": (6.2, 7.5),
+                "slr": (12.5, 15.5),
+            },
+        ),
+    ],
+)
+def test_literature_adaptation_calibration_matches_bcr_benchmarks(
+    calibration, bcr_ranges
+):
     params = load_params()
     params["model structure"]["damage module"] = "ACCREU"
     options = params["model structure"]["damage module options"]
     options["ACCREU adaptation"] = "separate"
-    options["ACCREU_adaptation_calibration"] = "literature"
+    options["ACCREU_adaptation_calibration"] = calibration
     options["ACCREU_adaptation_impose_optimal"] = True
 
     model = MIMOSA(params, prerun=False)
@@ -36,6 +60,5 @@ def test_literature_adaptation_calibration_matches_bcr_benchmarks():
             costs * weights
         )
 
-    assert 2.2 < bcrs["labourprod"] < 2.6
-    assert 4.0 < bcrs["riverine"] < 5.2
-    assert 7.0 < bcrs["slr"] < 8.5
+    for sector, bcr_range in bcr_ranges.items():
+        assert bcr_range[0] < bcrs[sector] < bcr_range[1]

@@ -15,6 +15,13 @@ ADAPTATION_CALIBRATIONS = {
         "riverine": AdaptationCalibration(1.0, 1.0),
         "slr": AdaptationCalibration(1.0, 1.0),
     },
+    # Conservative end of the literature envelope: lower realised
+    # effectiveness and higher implementation costs.
+    "literature_low": {
+        "labourprod": AdaptationCalibration(0.741, 0.167),
+        "riverine": AdaptationCalibration(0.412, 0.167),
+        "slr": AdaptationCalibration(0.439, 0.125),
+    },
     # Literature calibration targets discounted global BCRs of approximately
     # 2.4, 5, and 8 at 5% for labour, riverine flooding, and SLR respectively.
     # Regional rankings are retained by scaling the ACCREU maxima uniformly.
@@ -22,6 +29,13 @@ ADAPTATION_CALIBRATIONS = {
         "labourprod": AdaptationCalibration(1.0, 1.0),
         "riverine": AdaptationCalibration(0.618, 1.0),
         "slr": AdaptationCalibration(0.659, 0.25),
+    },
+    # Optimistic end of the literature envelope: higher realised
+    # effectiveness and lower implementation costs.
+    "literature_high": {
+        "labourprod": AdaptationCalibration(1.977, 2.0),
+        "riverine": AdaptationCalibration(0.721, 2.0),
+        "slr": AdaptationCalibration(0.933, 0.5),
     },
 }
 
@@ -43,7 +57,7 @@ def validate_adaptation_calibration(calibration, adaptation_type):
     """Validate a calibration name and its compatibility with model structure."""
 
     get_adaptation_calibration(calibration, "slr")
-    if calibration == "literature" and adaptation_type == "combined":
+    if calibration.startswith("literature") and adaptation_type == "combined":
         raise ValueError(
             "The literature ACCREU adaptation calibration requires "
             "'ACCREU adaptation: separate'."

@@ -507,13 +507,16 @@ model structure:
     ACCREU_adaptation_calibration:
       descr: >-
         Calibration of the sectoral ACCREU adaptation curves. "accreu" uses the
-        original source-model coefficients. "literature" uses realised-effectiveness
-        caps and cost multipliers calibrated to literature benefit-cost ratios at a
-        5% discount rate. The literature calibration requires separate adaptation.
+        original source-model coefficients. The three "literature" options use
+        realised-effectiveness caps and cost multipliers calibrated to the low,
+        central, and high ends of literature benefit-cost ranges at a 5% discount
+        rate. Literature calibrations require separate adaptation.
       type: enum
       values:
         - accreu
+        - literature_low
         - literature
+        - literature_high
       default: accreu
     
     ACCREU_monetise_mortality:
