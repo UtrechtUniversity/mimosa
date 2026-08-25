@@ -7,7 +7,7 @@ from mimosa.common import exp, log, soft_min
 @dataclass(frozen=True)
 class AdaptationCalibration:
     max_effectiveness_scale: float
-    cost_param_scale: float
+    cost_multiplier: float
 
 
 @dataclass(frozen=True)
@@ -27,10 +27,10 @@ ADAPTATION_CALIBRATIONS = {
     # Conservative end of the literature envelope: lower realised
     # effectiveness and higher implementation costs.
     "literature_low": {
-        "labourprod": AdaptationCalibration(0.741, 0.167),
-        "riverine": AdaptationCalibration(0.412, 0.167),
-        "slr": AdaptationCalibration(0.439, 0.125),
-        "combined": AdaptationCalibration(0.645, 0.167),
+        "labourprod": AdaptationCalibration(0.741, 6.0),
+        "riverine": AdaptationCalibration(0.412, 6.0),
+        "slr": AdaptationCalibration(0.439, 8.0),
+        "combined": AdaptationCalibration(0.645, 6.0),
     },
     # Literature calibration targets discounted global BCRs of approximately
     # 2.4, 5, 8, and 4.3 at 5% for labour, riverine flooding, SLR, and combined
@@ -39,16 +39,16 @@ ADAPTATION_CALIBRATIONS = {
     "literature": {
         "labourprod": AdaptationCalibration(1.0, 1.0),
         "riverine": AdaptationCalibration(0.618, 1.0),
-        "slr": AdaptationCalibration(0.659, 0.25),
+        "slr": AdaptationCalibration(0.659, 4.0),
         "combined": AdaptationCalibration(0.889, 1.0),
     },
     # Optimistic end of the literature envelope: higher realised
     # effectiveness and lower implementation costs.
     "literature_high": {
-        "labourprod": AdaptationCalibration(1.977, 2.0),
-        "riverine": AdaptationCalibration(0.721, 2.0),
-        "slr": AdaptationCalibration(0.933, 0.5),
-        "combined": AdaptationCalibration(1.25, 4.0),
+        "labourprod": AdaptationCalibration(1.977, 0.5),
+        "riverine": AdaptationCalibration(0.721, 0.5),
+        "slr": AdaptationCalibration(0.933, 2.0),
+        "combined": AdaptationCalibration(1.25, 0.25),
     },
 }
 
@@ -107,7 +107,7 @@ def effective_adaptation_curve(
     )
     effective_cost_param = (
         source_cost_param
-        * calibration.cost_param_scale
+        / calibration.cost_multiplier
         / m.dollar_2017_MER_to_2010_PPP[r]
     )
     return effective_max, effective_cost_param

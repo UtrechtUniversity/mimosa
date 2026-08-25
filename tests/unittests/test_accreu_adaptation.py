@@ -26,7 +26,7 @@ def test_effective_adaptation_curve_applies_all_scale_factors():
     )
 
     assert effective_max == pytest.approx(0.8 * 0.933 * 0.5)
-    assert effective_cost_param == pytest.approx(4.0 * 0.5 / 2.0)
+    assert effective_cost_param == pytest.approx(4.0 / 2.0 / 2.0)
 
 
 def test_adaptation_options_are_read_once_and_include_sector_calibrations():
@@ -64,33 +64,33 @@ def test_accreu_calibration_preserves_source_coefficients(sector):
     calibration = get_adaptation_calibration("accreu", sector)
 
     assert calibration.max_effectiveness_scale == 1
-    assert calibration.cost_param_scale == 1
+    assert calibration.cost_multiplier == 1
 
 
 @pytest.mark.parametrize(
-    ("calibration", "sector", "max_scale", "cost_scale"),
+    ("calibration", "sector", "max_scale", "cost_multiplier"),
     [
-        ("literature_low", "labourprod", 0.741, 0.167),
-        ("literature_low", "riverine", 0.412, 0.167),
-        ("literature_low", "slr", 0.439, 0.125),
-        ("literature_low", "combined", 0.645, 0.167),
+        ("literature_low", "labourprod", 0.741, 6.0),
+        ("literature_low", "riverine", 0.412, 6.0),
+        ("literature_low", "slr", 0.439, 8.0),
+        ("literature_low", "combined", 0.645, 6.0),
         ("literature", "labourprod", 1.0, 1.0),
         ("literature", "riverine", 0.618, 1.0),
-        ("literature", "slr", 0.659, 0.25),
+        ("literature", "slr", 0.659, 4.0),
         ("literature", "combined", 0.889, 1.0),
-        ("literature_high", "labourprod", 1.977, 2.0),
-        ("literature_high", "riverine", 0.721, 2.0),
-        ("literature_high", "slr", 0.933, 0.5),
-        ("literature_high", "combined", 1.25, 4.0),
+        ("literature_high", "labourprod", 1.977, 0.5),
+        ("literature_high", "riverine", 0.721, 0.5),
+        ("literature_high", "slr", 0.933, 2.0),
+        ("literature_high", "combined", 1.25, 0.25),
     ],
 )
 def test_literature_calibration_uses_sector_specific_factors(
-    calibration, sector, max_scale, cost_scale
+    calibration, sector, max_scale, cost_multiplier
 ):
     factors = get_adaptation_calibration(calibration, sector)
 
     assert factors.max_effectiveness_scale == pytest.approx(max_scale)
-    assert factors.cost_param_scale == pytest.approx(cost_scale)
+    assert factors.cost_multiplier == pytest.approx(cost_multiplier)
 
 
 @pytest.mark.parametrize(
