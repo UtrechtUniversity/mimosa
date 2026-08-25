@@ -3,7 +3,7 @@ title: "Assignment 4: Exploring Climate Policy with MIMOSA"
 course: "Systems Thinking, Scenarios and Indicators for Sustainable Development (GEO4-2331)"
 academic_year: "[20XX-20XX]"
 status: "First discussion draft"
-version: "0.1"
+version: "0.2"
 ---
 
 # Assignment 4: Exploring Climate Policy with MIMOSA
@@ -18,7 +18,7 @@ version: "0.1"
 
 Climate change is a complex systems problem. Emissions, technological change, economic development, climate impacts, adaptation, international cooperation, inequality, and ethical choices interact across regions and over long periods. Integrated Assessment Models (IAMs) provide simplified quantitative representations of some of these interactions. They are used to explore scenarios, compare policy strategies, estimate climate damages and mitigation costs, and investigate the consequences of alternative assumptions.
 
-In this assignment, your group will work directly with **MIMOSA**, an open-source regional cost-benefit IAM developed at Utrecht University. The course version of MIMOSA represents 26 world regions and connects socioeconomic development, CO2 emissions, mitigation, temperature change, sea-level rise, sectoral climate impacts, adaptation, economic development, and welfare. It also includes alternative approaches to effort sharing, inequality, emissions trading, and international financial transfers.
+In this assignment, your group will work directly with **MIMOSA 1.3.2**, an open-source regional cost-benefit IAM developed at Utrecht University. The course version of MIMOSA represents 26 world regions and connects socioeconomic development, CO2 emissions, mitigation, temperature change, sea-level rise, sectoral climate impacts, adaptation, economic development, and welfare. It also includes alternative approaches to effort sharing, inequality, emissions trading, and international financial transfers.
 
 MIMOSA does not predict what will happen. Nor does an optimized model result identify an objectively correct policy. Every result is conditional on the model structure, input data, parameter values, objective, and ethical assumptions. Your task is therefore not simply to run the model. You will use it as a scientific experiment: formulate a focused question, design transparent scenario comparisons, interpret causal mechanisms, test uncertainty, and critically assess what the model includes and excludes.
 
@@ -104,9 +104,10 @@ The course version of MIMOSA connects:
 - regional mitigation and aggregate mitigation costs;
 - technological learning in mitigation costs;
 - cumulative CO2 emissions and global mean temperature;
-- sea-level rise;
+- sea-level rise, including low, central, and low-likelihood high-impact physical-response cases;
 - regional climate impacts on labour productivity, riverine flooding, sea-level rise, and heat- and cold-related mortality;
 - sectoral adaptation expenditure, effectiveness, avoided damages, and residual damages;
+- an alternative aggregate ACCREU-CGE damage representation for structural comparisons;
 - capital, GDP, consumption, and welfare;
 - alternative welfare formulations, discounting, and inequality aversion;
 - effort-sharing regimes, emissions trading, and financial transfers.
@@ -144,6 +145,8 @@ All groups begin with a guided common exercise. Unless an alternative is approve
 
 Your group should not run every possible parameter combination. A small, well-justified experiment is scientifically stronger than a large collection of unexplained model runs.
 
+The standard course horizon is 2100. Groups studying sea-level rise, delayed damages, or long-lived adaptation should include an additional analysis through 2150 and explain how the longer horizon changes the decision problem.
+
 ### 5.4 Minimum analytical requirements
 
 Every project must:
@@ -152,6 +155,7 @@ Every project must:
 - examine results over time rather than only in one endpoint year;
 - compare global results with at least three contrasting regions;
 - distinguish direct sectoral impacts, adaptation costs, avoided damages, and residual damages where applicable;
+- explain how every reported global indicator was aggregated from regional results;
 - explain at least one result using the causal structure of the model;
 - investigate at least one unexpected or counterintuitive result;
 - report model settings and units clearly;
@@ -172,18 +176,21 @@ Possible research questions include:
 - Does decision order matter when mitigation is chosen before adaptation rather than jointly?
 - Which regions and impact sectors rely most strongly on adaptation?
 - What happens when adaptation is less effective than decision-makers expected?
+- How do institutional and socioeconomic readiness constraints change implemented adaptation and regional residual damages?
 - Does access to effective adaptation reduce optimal mitigation, and is that outcome equitable?
 
 Suggested experiments include:
 
 - no mitigation and no adaptation;
 - mitigation only;
-- adaptation only;
+- adaptation only with technically optimal sectoral expenditure;
 - jointly optimized mitigation and adaptation;
 - mitigation followed by adaptation;
-- planned versus realized adaptation effectiveness.
+- readiness-constrained adaptation, in which implemented expenditure is scaled by an exogenous regional readiness factor;
+- an unplanned effectiveness shortfall, in which expenditure is held fixed but realized avoided damages are lower;
+- re-optimization with advance knowledge of lower adaptation effectiveness.
 
-Important limitations to consider include the stylized adaptation-effectiveness curves, the absence of an explicit adaptation-capital stock, and the treatment of institutional or financial barriers.
+The readiness factors depend on SSP, region, and year but are imposed by a scenario-construction helper rather than generated endogenously by MIMOSA. They should not be interpreted as predictions of governance or institutional development. Important limitations also include the stylized adaptation-effectiveness curves, the absence of an explicit adaptation-capital stock, and the simplified treatment of institutional and financial barriers.
 
 ### Topic B: Agriculture beyond GDP
 
@@ -248,10 +255,11 @@ Possible research questions include:
 - How does mortality monetization affect optimal mitigation and adaptation?
 - How do equal and income-scaled VSL assumptions redistribute the represented benefits of climate policy?
 - What do avoided cold-related deaths imply for the timing or regional distribution of policy benefits?
+- Can a small net mortality effect conceal large but opposing heat- and cold-related changes or strong regional inequalities?
 - Is excluding mortality from the objective more neutral than monetizing it?
 - How would a focus on deaths, years of life lost, or non-monetary health indicators change the interpretation?
 
-Always report physical mortality alongside monetary values. A VSL represents willingness to pay for small changes in mortality risk; it is not the price of an identifiable person's life. A VOLY analysis is only defensible when changes in years of life lost can be estimated. Do not infer this from total deaths alone.
+Always report heat-related, cold-related, and net physical mortality alongside monetary values. The course model uses a quadratic heat response and a linear cold response; these are reduced-form relationships rather than a complete epidemiological model. A VSL represents willingness to pay for small changes in mortality risk; it is not the price of an identifiable person's life. A VOLY analysis is only defensible when changes in years of life lost can be estimated. Do not infer this from total deaths alone.
 
 ### Topic E: Is there a robust optimal climate policy?
 
@@ -262,6 +270,8 @@ Possible research questions include:
 - Which assumptions have the largest effect on the optimal temperature or emissions pathway?
 - Is there a policy that performs acceptably across multiple plausible futures?
 - How do discounting, climate sensitivity, damage uncertainty, technological learning, and adaptation effectiveness interact?
+- How does the optimal policy differ between bottom-up sectoral ACCREU damages and aggregate ACCREU-CGE damages?
+- Does a policy remain robust across the low, central, and low-likelihood high-impact sea-level-rise responses?
 - Does the optimal result change when inequality aversion or the welfare objective changes?
 - How do limits on rapid mitigation or negative emissions affect the result?
 
@@ -273,6 +283,8 @@ This topic must go beyond changing one parameter at a time. Develop a structured
 - normative uncertainty.
 
 The final result should include a robustness comparison rather than only a collection of optimal pathways.
+
+The sectoral `ACCREU` and aggregate `ACCREU_CGE` modules are alternative structural representations, not nested versions of the same model. `ACCREU_CGE` includes aggregate direct and indirect economy-wide effects but currently has no explicit adaptation, mortality valuation, or sectoral decomposition. Do not add experimental agriculture or ecosystem-service damages to ACCREU-CGE without explicit approval because this may double-count impacts.
 
 ### Topic F: Effort sharing, inequality, and climate finance
 
@@ -432,6 +444,7 @@ Follow the approved experiment plan, but document any necessary changes. Maintai
 - optimization or simulation status;
 - warnings or failed runs;
 - output filename;
+- runtime recorded in the saved parameter file;
 - notes on interpretation.
 
 Do not silently discard failed or unexpected results. Determine whether they reflect a technical problem, an infeasible scenario, or meaningful model behaviour.

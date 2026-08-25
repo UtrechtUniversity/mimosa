@@ -2,7 +2,7 @@
 title: "Scaffolding MIMOSA Extensions for Assignment 4"
 audience: "Instructors, teaching assistants, and advanced student groups"
 status: "Technical design draft"
-model_version: "feat_accreu_adaptation_sectoral_damages"
+model_version: "MIMOSA 1.3.2; course branch stsi_course_material"
 ---
 
 # Scaffolding MIMOSA Extensions for Assignment 4
@@ -48,34 +48,36 @@ This keeps the extension scientifically demanding while making coding difficulty
 
 ## 2. Target architecture
 
-This guide targets the course branch based on:
+This guide targets:
 
 ```text
-feat_accreu_adaptation_sectoral_damages
+MIMOSA 1.3.2 on stsi_course_material
 ```
 
-In that branch, the ACCREU damage package contains separate modules for:
+The course uses sector-specific adaptation within ACCREU. Other diagnostic adaptation configurations in the repository are outside the course design. The relevant damage package contains:
 
 ```text
 mimosa/components/damages/accreu/
 |-- all_damages.py
+|-- cge_damages.py
 |-- labour_productivity.py
 |-- riverine_flooding.py
 |-- sealevelrise.py
 |-- mortality.py
-|-- combined_nslr_adaptation.py
 `-- utils.py
 ```
 
 `all_damages.py` constructs the sector modules and aggregates them into:
 
-- `damage_costs`: market damage and adaptation costs as a fraction of GDP;
-- `damage_costs_abs`: the corresponding absolute market cost;
+- `damage_costs`: residual market damages as a fraction of GDP, excluding adaptation expenditure;
+- `damage_costs_abs`: the corresponding absolute residual market damage;
+- `adaptation_costs`: adaptation expenditure as a fraction of GDP;
+- `adaptation_costs_abs`: adaptation expenditure in currency units;
 - `non_market_damage_costs_abs`: monetized mortality in the current implementation;
 - `market_and_non_market_damage_costs_abs`: combined reporting;
 - `market_and_non_market_damage_costs`: combined reporting relative to GDP.
 
-The Cobb-Douglas component subtracts market damages and mitigation costs in `GDP_net`, while non-market damages are subtracted from consumption. An extension must therefore state explicitly whether it affects:
+The Cobb-Douglas component subtracts residual market damages, adaptation expenditure, and mitigation costs in `GDP_net`, while non-market damages are subtracted from consumption. An extension must therefore state explicitly whether it affects:
 
 1. a reported physical indicator only;
 2. market production or GDP;
@@ -84,6 +86,8 @@ The Cobb-Douglas component subtracts market damages and mitigation costs in `GDP
 5. a new decision variable and its costs.
 
 Do not add an outcome to the objective merely because it can be expressed in dollars.
+
+`ACCREU_CGE` is an alternative aggregate damage module rather than another sector inside ACCREU. It represents direct and indirect economy-wide effects but currently has no explicit adaptation, mortality valuation, or sectoral decomposition. Course impact extensions should normally be connected only to sectoral `ACCREU`. Indicator-only outputs may be calculated alongside an ACCREU-CGE experiment, but monetized additions require an explicit double-counting review.
 
 ## 3. Recommended course-extension structure
 
@@ -227,6 +231,8 @@ Document whether each value is:
 - regional or global;
 - empirical, literature-derived, or deliberately illustrative.
 
+The ACCREU adaptation-effectiveness cost parameters originate in 2017 market-exchange-rate dollars and are converted regionally to MIMOSA's 2010 PPP currency basis. New monetary extension parameters must document their price year and MER/PPP basis. Do not copy a dollar coefficient into the model without an explicit conversion rule.
+
 Students should not be asked to invent 26 regional coefficients without data.
 
 ### 5.4 Minimal agriculture component
@@ -317,7 +323,7 @@ For the GDP-only representation, instructors can add the agriculture market term
 
 ```python
 base_market_damage = (
-    m.labourprod_damage_costs[t, r]
+    m.labourprod_damage_costs_net[t, r]
     + m.riverine_damage_costs[t, r]
     + m.slr_damage_costs[t, r]
 )
@@ -326,6 +332,8 @@ return base_market_damage + m.agriculture_market_damage_costs[t, r]
 ```
 
 Do not ask students to edit this aggregation. Provide a model option that turns the term on or off.
+
+Use `labourprod_damage_costs_net`, not `labourprod_damage_costs`, because the net variable also contains the modelled temperature-related productivity benefit. Adaptation expenditure remains in `adaptation_costs` and must not be added to `damage_costs` a second time.
 
 For an indicator-only representation, calculate and export `agriculture_yield_loss` and `food_security_pressure` but do not add either to `damage_costs`.
 
@@ -513,7 +521,13 @@ This creates path dependence and can represent slow recovery or irreversibility.
 
 ### 7.1 Current ACCREU behaviour
 
-The ACCREU branch calculates regional heat- and cold-related changes in mortality. When monetization is active, it calculates a regional VSL proportional to GDP per capita and subtracts the resulting non-market cost from consumption.
+The current ACCREU component calculates regional heat-related mortality with a quadratic temperature response and cold-related mortality with a linear response. It also reports:
+
+```text
+mortality_net = mortality_heat_related + mortality_cold_related
+```
+
+When monetization is active, the model calculates a regional VSL proportional to GDP per capita and subtracts the resulting non-market cost from consumption. Saved CSV files also contain derived global physical mortality rows.
 
 This provides a useful starting point but should be made selectable for the assignment.
 
@@ -554,10 +568,7 @@ RegionalEquation(
     m.mortality_damage_costs_abs,
     lambda m, t, r: (
         m.mortality_vsl_global
-        * (
-            m.mortality_heat_related[t, r]
-            + m.mortality_cold_related[t, r]
-        )
+        * m.mortality_net[t, r]
     ),
 )
 ```
@@ -584,7 +595,9 @@ Until these data and dimensions are added, VOLY should remain an advanced concep
 
 ### 7.6 Mortality validity checks
 
-- Heat and cold mortality changes are reported separately.
+- Heat, cold, and net mortality changes are reported separately.
+- Net mortality equals the sum of the heat and cold components in every region and period.
+- Global mortality in the exported CSV equals the sum of regional physical mortality, not a population-weighted mean.
 - Negative cold mortality is labelled avoided mortality, not negative deaths.
 - Physical mortality results are identical across valuation options.
 - `physical_only` does not alter consumption.
@@ -611,6 +624,23 @@ Common double-counting risks include:
 - non-use biodiversity value presented as if it were also an ecosystem-service value.
 
 If overlap cannot be ruled out, keep the extension as an output-only indicator and discuss the consequences rather than adding it to total damages.
+
+### 8.1 Adaptation implementation scenarios
+
+The merged branch contains `data/adaptation_readiness.csv`, with SSP-, region-, and year-specific factors, and a helper in `run_accreu.py` that scales the three course adaptation controls. Expose this through a prepared notebook function rather than asking students to run the full batch script.
+
+Keep the implementation mechanisms and decision timing distinct:
+
+| Scenario | Expenditure | Effectiveness curve | Interpretation |
+|---|---|---|---|
+| Technically optimal adaptation | Analytically calculated | Reference | Benchmark without implementation constraint |
+| Readiness-constrained adaptation | Optimal expenditure multiplied by readiness | Reference | Exogenous limitation on implementation capacity |
+| Unplanned effectiveness shortfall | Fixed at the previously selected pathway | Maximum avoided-damage effectiveness scaled down | Adaptation performs worse than anticipated |
+| Informed re-optimization | Chosen again by the model | Lower effectiveness known in advance | Decision-maker anticipates the shortfall |
+
+Readiness-constrained adaptation is a scenario construction outside the core equations. It does not endogenize governance, finance, institutional learning, or adaptation capacity. Before course release, document the provenance and construction of the readiness factors, and prevent students from interpreting them as forecasts.
+
+For all four scenarios, compare adaptation expenditure, avoided damages, residual damages, total direct costs, and welfare. Lower expenditure reduces adaptation cost but normally increases residual damage, so the direction of the combined welfare effect must be calculated rather than asserted.
 
 ## 9. Making student editing safe
 
@@ -688,7 +718,10 @@ Check:
 - equation identities;
 - regional dimensions;
 - results under zero and high test parameters;
-- dependency ordering without circular same-period equations.
+- dependency ordering without circular same-period equations;
+- equality of `mortality_net` and the heat-plus-cold components;
+- readiness factors of zero and one;
+- fixed expenditure under an unplanned-effectiveness experiment.
 
 ### 10.3 Optimization smoke tests
 
@@ -698,7 +731,7 @@ Use a short horizon first:
 params["time"]["end"] = 2050
 ```
 
-Confirm solver success for every course option. Then test the final 2100 configurations supplied to students.
+Confirm solver success for every course option. Then test the final 2100 configurations supplied to students and the 2150 configurations used for sea-level-rise projects.
 
 ### 10.4 Scientific regression tests
 
@@ -709,7 +742,9 @@ Save a small reviewed reference table containing values such as:
 - global and selected regional damage shares;
 - sectoral adaptation spending;
 - physical mortality;
-- agriculture and biodiversity indicators.
+- agriculture and biodiversity indicators;
+- low, central, and high sea-level-rise responses;
+- sectoral ACCREU and aggregate ACCREU-CGE damage results.
 
 Tests should use tolerances and detect unintended changes when the course branch is updated.
 
@@ -722,7 +757,9 @@ Run the exact notebook students receive from top to bottom in a clean environmen
 - filenames are unique;
 - figures have correct labels and units;
 - expensive cells are marked;
-- error messages tell students what to do next.
+- error messages tell students what to do next;
+- saved parameter files contain the scenario type, MIMOSA version, and runtime;
+- derived `global_*` CSV rows use the intended sum or weighting rule.
 
 ## 11. Suggested scaffold packages
 
@@ -752,12 +789,19 @@ Grades should be based on scientific quality, not package level.
 ## 12. Release checklist for the course branch
 
 - [ ] ACCREU reference scenarios solve in the final environment.
+- [ ] The ACCREU-CGE structural comparison runs and is clearly labelled as an alternative damage representation.
+- [ ] Low, central, and high sea-level-rise cases run through the required horizon.
+- [ ] Readiness-constrained and unplanned-effectiveness scenarios preserve their intended controls.
+- [ ] The readiness dataset has documented provenance, construction, and limitations.
 - [ ] Student-facing parameter names match the notebook and guide.
 - [ ] Agriculture and biodiversity can be enabled independently.
 - [ ] Indicator-only options do not change optimization results.
 - [ ] Market and non-market aggregation is documented and tested.
 - [ ] Equal and income-scaled mortality valuation both work.
 - [ ] Units are visible in exported output.
+- [ ] Damage costs and adaptation expenditure are separate in equations, figures, and legends.
+- [ ] Derived global mortality, cost, and avoided-damage rows pass aggregation checks.
+- [ ] Saved parameter files include model version, scenario type, and runtime.
 - [ ] No extension duplicates an existing damage channel without an explicit warning.
 - [ ] The 2100 reference run time is acceptable or results are cached.
 - [ ] All student-editable sections have tests and reset instructions.
