@@ -100,7 +100,7 @@ for monetise_mortality in [False, True]:
         sim_ada = model_ada.run_nopolicy_baseline()
         model_ada.save_simulation(
             sim_ada,
-            f"{PREFIX}_ada_adapt_adapt_calib_{adapt_calibration}_mortality_{monetise_mortality}",
+            f"{PREFIX}_ada_adapt_calib_{adapt_calibration}_mortality_{monetise_mortality}",
         )
 
         #### Run "mit_then_ada": Given mitigation from run mit, optimise adaptation
@@ -117,7 +117,7 @@ for monetise_mortality in [False, True]:
         )
         model_mit_then_ada.save_simulation(
             sim_mit_then_ada,
-            f"{PREFIX}_mit_then_ada_adapt_adapt_calib_{adapt_calibration}_mortality_{monetise_mortality}",
+            f"{PREFIX}_mit_then_ada_adapt_calib_{adapt_calibration}_mortality_{monetise_mortality}",
         )
 
         #### Run "ada_unplanned": Take the adaptation-only run and just change the adaptation level. The adaptation is therefore less effective then originally thought.
@@ -136,7 +136,7 @@ for monetise_mortality in [False, True]:
         )
         model_ada_unplanned.save_simulation(
             sim_ada_unplanned,
-            f"{PREFIX}_ada_unplanned_adapt_adapt_calib_{adapt_calibration}_mortality_{monetise_mortality}",
+            f"{PREFIX}_ada_unplanned_adapt_calib_{adapt_calibration}_mortality_{monetise_mortality}",
         )
 
         #### Run "ada_planned": Take a MIMOSA optimisation run and reduce the optimal adaptation level by the
@@ -155,7 +155,7 @@ for monetise_mortality in [False, True]:
         )
         model_ada_planned.save_simulation(
             sim_ada_planned,
-            f"{PREFIX}_ada_planned_adapt_adapt_calib_{adapt_calibration}_mortality_{monetise_mortality}",
+            f"{PREFIX}_ada_planned_adapt_calib_{adapt_calibration}_mortality_{monetise_mortality}",
         )
 
         #### Run "mit_ada": CBA with mitigation and adaptation optimised at the same time by MIMOSA
@@ -163,7 +163,7 @@ for monetise_mortality in [False, True]:
         model_mit_ada = MIMOSA(params_mit_ada)
         model_mit_ada.solve(ipopt_maxiter=10000)
         model_mit_ada.save(
-            f"{PREFIX}_mit_ada_adapt_adapt_calib_{adapt_calibration}_mortality_{monetise_mortality}"
+            f"{PREFIX}_mit_ada_adapt_calib_{adapt_calibration}_mortality_{monetise_mortality}"
         )
 
         # #### Run "mit_ada_unplanned": Take a MIMOSA optimisation run and just change the adaptation level
@@ -183,7 +183,7 @@ for monetise_mortality in [False, True]:
         # )
         # model_mit_ada_unplanned.save_simulation(
         #     sim_mit_ada_unplanned,
-        #     f"{PREFIX}_mit_ada_unplanned_adapt_adapt_calib_{adapt_calibration}_mortality_{monetise_mortality}",
+        #     f"{PREFIX}_mit_ada_unplanned_adapt_calib_{adapt_calibration}_mortality_{monetise_mortality}",
         # )
 
         # #### Run "mit_ada_planned": Take a MIMOSA optimisation run and reduce the optimal adaptation level by the readiness factor
@@ -196,5 +196,5 @@ for monetise_mortality in [False, True]:
         # )
         # model_mit_ada_planned.save_simulation(
         #     sim_mit_ada_planned,
-        #     f"{PREFIX}_mit_ada_planned_adapt_adapt_calib_{adapt_calibration}_mortality_{monetise_mortality}",
+        #     f"{PREFIX}_mit_ada_planned_adapt_calib_{adapt_calibration}_mortality_{monetise_mortality}",
         # )
