@@ -543,7 +543,7 @@ model structure:
       - globalcosts
     default: utility
 
-  tipping points options:
+  tippingpoints options:
     include ALL:
       descr: Include all available tipping elements
       type: bool
