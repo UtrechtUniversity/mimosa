@@ -1,6 +1,13 @@
 It can be useful to run MIMOSA without mitigation: a baseline run. We distinguish two types: a no-policy scenario with damages, which shows the consequences of climate change without mitigation, and a baseline in which damages do not affect GDP.
 
-These are simulation runs rather than optimisation runs. The model equations are evaluated with the control variables set to zero, without calling `solve()`. Use `run_nopolicy_baseline()` for both variants: besides returning the simulation result, it stores the no-policy damage costs used to calculate avoided damages in policy runs. See [Simulation and optimisation](simulation.md#use-case-1-create-a-no-policy-reference-run) for the difference between `run_nopolicy_baseline()` and the more general `run_simulation()` method.
+These are simulation runs rather than optimisation runs. Mitigation and
+adaptation are disabled without calling `solve()`. Use
+`run_nopolicy_baseline()` for both variants: besides returning the simulation
+result, it stores the no-policy damage costs used to calculate avoided damages
+in policy runs. For ACCREU models configured with analytical adaptation, MIMOSA
+uses a temporary `noadaptation` model for this reference. See
+[Simulation and optimisation](simulation.md#use-case-1-create-a-no-policy-reference-run)
+for the difference between `run_nopolicy_baseline()` and `run_simulation()`.
 
 === "No policy scenario with damages"
 

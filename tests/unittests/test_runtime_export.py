@@ -94,6 +94,7 @@ def test_runtime_is_omitted_when_no_solve_completed(tmp_path):
 def test_simulation_stores_its_own_wall_clock_runtime(monkeypatch):
     simulation = SimpleNamespace()
     model = MIMOSA.__new__(MIMOSA)
+    model._params = {"example setting": 42}
     model.simulator = SimpleNamespace(
         is_prepared=True,
         run=lambda **kwargs: simulation,
@@ -105,6 +106,7 @@ def test_simulation_stores_its_own_wall_clock_runtime(monkeypatch):
 
     assert result is simulation
     assert result.runtime == pytest.approx(3.456)
+    assert result.params == model._params
 
 
 def test_save_simulation_exports_that_simulation_runtime(monkeypatch):
@@ -126,3 +128,24 @@ def test_save_simulation_exports_that_simulation_runtime(monkeypatch):
 
     assert captured["scenario_type"] == "simulation"
     assert captured["runtime"] == pytest.approx(7.891)
+
+
+def test_save_simulation_uses_parameters_from_the_simulation(monkeypatch):
+    captured = {}
+    model = MIMOSA.__new__(MIMOSA)
+    model._params = {"model": "parameters"}
+    model.last_saved_simulation_filename = None
+    simulation = SimpleNamespace(
+        params={"simulation": "parameters"},
+        runtime=1.0,
+        all_vars_for_export=lambda: [],
+    )
+
+    monkeypatch.setattr(
+        "mimosa.mimosa.save_output",
+        lambda variables, params, *args, **kwargs: captured.update(params=params),
+    )
+
+    model.save_simulation(simulation, "simulation")
+
+    assert captured["params"] == {"simulation": "parameters"}

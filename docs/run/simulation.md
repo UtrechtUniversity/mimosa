@@ -47,7 +47,8 @@ With the default components, this prints a list containing `relative_abatement`.
 
 ## Use case 1: create a no-policy reference run
 
-Use `run_nopolicy_baseline()` when all control variables should be zero and the result represents the no-policy reference:
+Use `run_nopolicy_baseline()` when mitigation and adaptation should both be
+disabled and the result represents the no-policy reference:
 
 ```python
 from mimosa import MIMOSA, load_params
@@ -59,7 +60,13 @@ baseline = model.run_nopolicy_baseline()
 model.save_simulation(baseline, "baseline_nopolicy")
 ```
 
-Calling `run_simulation()` without arguments also evaluates the model with all controls set to zero. The difference is that `run_nopolicy_baseline()` additionally stores the resulting damage costs in `nopolicy_damage_costs`. MIMOSA uses this reference to calculate avoided damages in policy runs. Therefore, use `run_nopolicy_baseline()` when the result is intended to be the no-policy reference, and use `run_simulation()` for other prescribed scenarios.
+Calling `run_simulation()` without arguments evaluates the configured model with
+all controls set to zero. Usually this matches the no-policy run. With analytical
+ACCREU adaptation, however, its adaptation equations remain active, producing an
+adaptation-only scenario. In that case `run_nopolicy_baseline()` internally uses
+a temporary `noadaptation` model. It stores that model's damage costs in
+`nopolicy_damage_costs`, giving all subsequent policy simulations the same
+no-mitigation, no-adaptation reference.
 
 When MIMOSA is created with the default `prerun=True`, it already calculates this reference internally to prepare the optimisation model. Calling `run_nopolicy_baseline()` explicitly gives you the simulation result so that you can inspect or save it.
 

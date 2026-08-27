@@ -30,7 +30,6 @@ def test_one_call_sequential_cba_matches_manual_two_model_workflow():
 
     manual_model = MIMOSA(params)
     controls = manual_model._extract_compatible_controls(mitigation_model)
-    manual_model._transfer_nopolicy_damage_baseline(mitigation_model)
     manual_result = manual_model.run_simulation(**controls)
 
     workflow_model = MIMOSA(params)

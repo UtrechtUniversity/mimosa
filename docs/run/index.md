@@ -38,10 +38,11 @@ model.solve()
 model.save("run_accreu_cba")
 ```
 
-For an adaptation-only baseline, select `analytical_optimum` and call
-`run_nopolicy_baseline()`; the CBA strategy is not used. The sequential strategy
-rejects a fixed carbon budget. Transferred pathways remain available as
-`model.workflow_control_values` for diagnostics.
+For an adaptation-only scenario, select `analytical_optimum` and call
+`run_simulation()` without controls. `run_nopolicy_baseline()` always disables
+both mitigation and adaptation so avoided damages have a consistent reference.
+The sequential strategy rejects a fixed carbon budget. Transferred pathways
+remain available as `model.workflow_control_values` for diagnostics.
 
 ### Configuring the time grid
 

@@ -151,22 +151,23 @@ class MIMOSA:
 
         simulation_obj = self.simulator.run(**control_variables_kwargs)
         simulation_obj.runtime = time.perf_counter() - start_time
+        simulation_obj.params = self._params
         return simulation_obj
 
     def run_nopolicy_baseline(self) -> SimulationObjectModel:
         """
         Run and store the no-policy reference used for avoided damages.
 
-        All control variables are set to zero. The resulting damage costs are
-        stored in the Pyomo model as `nopolicy_damage_costs` for subsequent policy
-        runs.
+        Mitigation and adaptation are both disabled. The resulting damage costs
+        are stored in the Pyomo model as `nopolicy_damage_costs` for subsequent
+        policy runs. An ACCREU model with analytical adaptation uses a temporary
+        no-adaptation model for this reference.
 
         Returns:
             SimulationObjectModel: No-policy simulation results.
         """
 
-        # Run simulator with default relative abatement set to 0
-        nopolicy_baseline = self.run_simulation()
+        nopolicy_baseline = self._run_nopolicy_baseline_simulation()
 
         # Store the no-policy baseline damage costs in the concrete model
         m = self.concrete_model
@@ -189,6 +190,23 @@ class MIMOSA:
             self.prepare_simulation()
 
         return nopolicy_baseline
+
+    def _run_nopolicy_baseline_simulation(self) -> SimulationObjectModel:
+        """Evaluate a reference without mitigation or analytical adaptation."""
+
+        if not self._uses_analytical_accreu_adaptation():
+            return self.run_simulation()
+
+        baseline_params = deepcopy(self._params)
+        baseline_options = baseline_params["model structure"][
+            "damage module options"
+        ]
+        baseline_options["ACCREU_adaptation"] = "noadaptation"
+        baseline_options["ACCREU_adaptation_determination"] = "solver_control"
+        baseline_options["ACCREU_CBA_strategy"] = "joint"
+
+        baseline_model = MIMOSA(baseline_params, prerun=False)
+        return baseline_model.run_simulation()
 
     @utils.timer("Model solve", True, store_as="solve_runtime")
     def solve(
@@ -259,6 +277,19 @@ class MIMOSA:
 
         return strategy == "mitigation_then_adaptation"
 
+    def _uses_analytical_accreu_adaptation(self) -> bool:
+        """Return whether ACCREU adaptation is defined analytically."""
+
+        return (
+            self.model_context.module("damage") == "ACCREU"
+            and self.model_context.option("damage", "ACCREU_adaptation")
+            != "noadaptation"
+            and self.model_context.option(
+                "damage", "ACCREU_adaptation_determination"
+            )
+            == "analytical_optimum"
+        )
+
     def _solve_accreu_mitigation_then_adaptation(
         self, verbose: bool = True, use_neos: bool = False, **kwargs: Any
     ) -> None:
@@ -285,7 +316,6 @@ class MIMOSA:
         mitigation_model.solve(verbose=verbose, use_neos=use_neos, **kwargs)
 
         control_values = self._extract_compatible_controls(mitigation_model)
-        self._transfer_nopolicy_damage_baseline(mitigation_model)
         final_result = self.run_simulation(**control_values)
         self.simulator.initialize_pyomo_model(self.concrete_model, final_result)
 
@@ -336,14 +366,6 @@ class MIMOSA:
             control_values[name] = source_values
 
         return control_values
-
-    def _transfer_nopolicy_damage_baseline(self, source_model: "MIMOSA") -> None:
-        """Use the source stage's no-mitigation, no-adaptation damage baseline."""
-
-        baseline_values = (
-            source_model.concrete_model.nopolicy_damage_costs.extract_values()
-        )
-        self.concrete_model.nopolicy_damage_costs.store_values(baseline_values)
 
     def save(self, filename: Optional[str] = None, **kwargs: Any) -> None:
         """
@@ -402,7 +424,7 @@ class MIMOSA:
         logger.info("Saving simulation to %s", filename)
         save_output(
             simulation_obj.all_vars_for_export(),
-            self._params,
+            getattr(simulation_obj, "params", None) or self._params,
             simulation_obj,
             filename,
             scenario_type="simulation",
