@@ -19,7 +19,7 @@ root = logging.getLogger()
 root.setLevel("INFO")
 root.addHandler(handler)
 
-PREFIX = "accreu_workflows"
+PREFIX = "accreu"
 
 adaptation_readiness = pd.read_csv("data/adaptation_readiness.csv").set_index(
     ["SSP", "Region"]
