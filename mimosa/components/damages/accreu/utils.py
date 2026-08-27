@@ -13,14 +13,14 @@ class AdaptationCalibration:
 @dataclass(frozen=True)
 class AdaptationOptions:
     adaptation_type: str
-    cba_strategy: str
+    determination: str
     calibrations: Mapping[str, AdaptationCalibration]
 
     @property
-    def impose_optimal(self):
+    def uses_analytical_adaptation(self):
         """Whether adaptation is calculated analytically rather than optimised."""
 
-        return self.cba_strategy == "mitigation_then_adaptation"
+        return self.determination == "analytical_optimum"
 
 
 ADAPTATION_CALIBRATIONS = {
@@ -93,7 +93,9 @@ def get_adaptation_options(context):
 
     return AdaptationOptions(
         adaptation_type=adaptation_type,
-        cba_strategy=context.option("damage", "ACCREU_CBA_strategy"),
+        determination=context.option(
+            "damage", "ACCREU_adaptation_determination"
+        ),
         calibrations={
             sector: get_adaptation_calibration(calibration_name, sector)
             for sector in sectors

@@ -33,7 +33,7 @@ def test_adaptation_options_are_read_once_and_include_sector_calibrations():
     values = {
         "ACCREU_adaptation": "combined",
         "ACCREU_adaptation_calibration": "accreu",
-        "ACCREU_CBA_strategy": "mitigation_then_adaptation",
+        "ACCREU_adaptation_determination": "analytical_optimum",
     }
     calls = []
 
@@ -45,8 +45,8 @@ def test_adaptation_options_are_read_once_and_include_sector_calibrations():
     options = get_adaptation_options(Context())
 
     assert options.adaptation_type == "combined"
-    assert options.impose_optimal is True
-    assert options.cba_strategy == "mitigation_then_adaptation"
+    assert options.uses_analytical_adaptation is True
+    assert options.determination == "analytical_optimum"
     assert set(options.calibrations) == {
         "labourprod",
         "riverine",
@@ -56,7 +56,7 @@ def test_adaptation_options_are_read_once_and_include_sector_calibrations():
     assert calls == [
         ("damage", "ACCREU_adaptation"),
         ("damage", "ACCREU_adaptation_calibration"),
-        ("damage", "ACCREU_CBA_strategy"),
+        ("damage", "ACCREU_adaptation_determination"),
     ]
 
 

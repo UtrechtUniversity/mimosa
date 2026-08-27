@@ -16,11 +16,12 @@ With this code, the default parameter values are used (see [Parameter reference]
 
 ### ACCREU cost-benefit analysis
 
-An ACCREU model with adaptation uses an ordered cost-benefit workflow by
-default. One call to `solve()` first optimises mitigation without adaptation,
-then evaluates analytical optimal adaptation along the resulting mitigation
-pathway. The final values are loaded into the public model, so they can be saved
-with the normal `save()` method:
+ACCREU adaptation expenditure is a solver control by default, and `solve()`
+therefore optimises mitigation and adaptation jointly. To use the ordered
+cost-benefit workflow, select analytical adaptation and the sequential strategy.
+One call to `solve()` then first optimises mitigation without adaptation and
+evaluates analytical optimal adaptation along the resulting pathway. The final
+values are loaded into the public model, so they can be saved normally:
 
 ```python
 from mimosa import MIMOSA, load_params
@@ -29,17 +30,18 @@ params = load_params()
 params["model structure"]["damage module"] = "ACCREU"
 options = params["model structure"]["damage module options"]
 options["ACCREU_adaptation"] = "separate"
+options["ACCREU_adaptation_determination"] = "analytical_optimum"
+options["ACCREU_CBA_strategy"] = "mitigation_then_adaptation"
 
 model = MIMOSA(params)
 model.solve()
 model.save("run_accreu_cba")
 ```
 
-Set `options["ACCREU_CBA_strategy"] = "joint"` to let the optimiser choose
-mitigation and adaptation simultaneously. The sequential strategy is intended
-for CBA and rejects a fixed carbon budget; use `joint` for carbon-budget runs.
-The transferred pathways remain available as `model.workflow_control_values`
-for diagnostics.
+For an adaptation-only baseline, select `analytical_optimum` and call
+`run_nopolicy_baseline()`; the CBA strategy is not used. The sequential strategy
+rejects a fixed carbon budget. Transferred pathways remain available as
+`model.workflow_control_values` for diagnostics.
 
 ### Configuring the time grid
 

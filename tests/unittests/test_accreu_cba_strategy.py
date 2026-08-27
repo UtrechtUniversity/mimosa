@@ -7,7 +7,12 @@ from mimosa.common.config.parseconfig import check_params
 from mimosa.core.helpers import ComponentConfig, ModelContext
 
 
-def _context(module="ACCREU", adaptation="separate", strategy="mitigation_then_adaptation"):
+def _context(
+    module="ACCREU",
+    adaptation="separate",
+    strategy="mitigation_then_adaptation",
+    determination="analytical_optimum",
+):
     return ModelContext(
         components={
             "damage": ComponentConfig(
@@ -15,6 +20,7 @@ def _context(module="ACCREU", adaptation="separate", strategy="mitigation_then_a
                 options={
                     "ACCREU_adaptation": adaptation,
                     "ACCREU_CBA_strategy": strategy,
+                    "ACCREU_adaptation_determination": determination,
                 },
             )
         }
@@ -22,26 +28,47 @@ def _context(module="ACCREU", adaptation="separate", strategy="mitigation_then_a
 
 
 @pytest.mark.parametrize(
-    ("module", "adaptation", "strategy", "expected"),
+    ("module", "adaptation", "strategy", "determination", "expected"),
     [
-        ("ACCREU", "separate", "mitigation_then_adaptation", True),
-        ("ACCREU", "combined", "joint", False),
-        ("ACCREU", "noadaptation", "mitigation_then_adaptation", False),
-        ("COACCH", "separate", "mitigation_then_adaptation", False),
+        (
+            "ACCREU",
+            "separate",
+            "mitigation_then_adaptation",
+            "analytical_optimum",
+            True,
+        ),
+        ("ACCREU", "combined", "joint", "solver_control", False),
+        (
+            "ACCREU",
+            "noadaptation",
+            "mitigation_then_adaptation",
+            "solver_control",
+            False,
+        ),
+        (
+            "COACCH",
+            "separate",
+            "mitigation_then_adaptation",
+            "solver_control",
+            False,
+        ),
     ],
 )
-def test_sequential_workflow_selection(module, adaptation, strategy, expected):
+def test_sequential_workflow_selection(
+    module, adaptation, strategy, determination, expected
+):
     model = MIMOSA.__new__(MIMOSA)
-    model.model_context = _context(module, adaptation, strategy)
+    model.model_context = _context(module, adaptation, strategy, determination)
 
     assert model._uses_sequential_accreu_cba() is expected
 
 
-def test_strategy_defaults_and_validation():
+def test_cba_configuration_defaults_and_validation():
     params = load_params()
     options = params["model structure"]["damage module options"]
 
-    assert options["ACCREU_CBA_strategy"] == "mitigation_then_adaptation"
+    assert options["ACCREU_CBA_strategy"] == "joint"
+    assert options["ACCREU_adaptation_determination"] == "solver_control"
 
     for value in ["mitigation_then_adaptation", "joint"]:
         params = load_params()
@@ -58,12 +85,55 @@ def test_strategy_defaults_and_validation():
     with pytest.raises(ValueError):
         check_params(params)
 
+    for value in ["solver_control", "analytical_optimum"]:
+        params = load_params()
+        params["model structure"]["damage module options"][
+            "ACCREU_adaptation_determination"
+        ] = value
+        assert check_params(params)["model structure"][
+            "damage module options"
+        ]["ACCREU_adaptation_determination"] == value
+
+    params["model structure"]["damage module options"][
+        "ACCREU_adaptation_determination"
+    ] = "unknown"
+    with pytest.raises(ValueError):
+        check_params(params)
+
+
+@pytest.mark.parametrize(
+    ("strategy", "determination", "required"),
+    [
+        ("mitigation_then_adaptation", "solver_control", "analytical_optimum"),
+        ("joint", "analytical_optimum", "solver_control"),
+    ],
+)
+def test_solve_rejects_incompatible_strategy_and_determination(
+    strategy, determination, required
+):
+    model = MIMOSA.__new__(MIMOSA)
+    model.model_context = _context(
+        strategy=strategy, determination=determination
+    )
+    model.status = "old status"
+    model.solve_runtime = 10
+    model.workflow_control_values = {"old": "controls"}
+
+    with pytest.raises(ValueError, match=required):
+        model.solve(verbose=False)
+
+    assert model.status is None
+    assert model.solve_runtime is None
+    assert model.workflow_control_values is None
+
 
 def test_sequential_workflow_copies_params_forwards_options_and_replays(monkeypatch):
     params = load_params()
     params["model structure"]["damage module"] = "ACCREU"
     options = params["model structure"]["damage module options"]
     options["ACCREU_adaptation"] = "separate"
+    options["ACCREU_adaptation_determination"] = "analytical_optimum"
+    options["ACCREU_CBA_strategy"] = "mitigation_then_adaptation"
 
     model = MIMOSA.__new__(MIMOSA)
     model._params = params
@@ -80,6 +150,10 @@ def test_sequential_workflow_copies_params_forwards_options_and_replays(monkeypa
         assert stage_params is not params
         assert stage_options["ACCREU_adaptation"] == "noadaptation"
         assert stage_options["ACCREU_CBA_strategy"] == "joint"
+        assert (
+            stage_options["ACCREU_adaptation_determination"]
+            == "solver_control"
+        )
         mitigation_model.solve = lambda **kwargs: calls.append(("solve", kwargs))
         return mitigation_model
 
@@ -105,6 +179,7 @@ def test_sequential_workflow_copies_params_forwards_options_and_replays(monkeypa
     )
 
     assert options["ACCREU_adaptation"] == "separate"
+    assert options["ACCREU_adaptation_determination"] == "analytical_optimum"
     assert options["ACCREU_CBA_strategy"] == "mitigation_then_adaptation"
     assert calls == [
         (
@@ -181,20 +256,20 @@ def test_control_transfer_validates_names_grids_and_indices():
 
 
 @pytest.mark.parametrize(
-    ("strategy", "expected_adaptation_controls"),
+    ("determination", "expected_adaptation_controls"),
     [
-        ("mitigation_then_adaptation", False),
-        ("joint", True),
+        ("analytical_optimum", False),
+        ("solver_control", True),
     ],
 )
-def test_strategy_determines_whether_adaptation_is_a_control(
-    strategy, expected_adaptation_controls
+def test_determination_option_controls_whether_adaptation_is_a_control(
+    determination, expected_adaptation_controls
 ):
     params = load_params()
     params["model structure"]["damage module"] = "ACCREU"
     options = params["model structure"]["damage module options"]
     options["ACCREU_adaptation"] = "separate"
-    options["ACCREU_CBA_strategy"] = strategy
+    options["ACCREU_adaptation_determination"] = determination
 
     model = MIMOSA(params, prerun=False)
     model.prepare_simulation()

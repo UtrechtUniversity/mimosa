@@ -21,6 +21,7 @@ model structure:
   damage module options:
     ACCREU_adaptation: combined
     ACCREU_adaptation_calibration: literature
+    ACCREU_adaptation_determination: analytical_optimum
     ACCREU_CBA_strategy: mitigation_then_adaptation
 ```
 

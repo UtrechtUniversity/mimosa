@@ -120,7 +120,7 @@ def get_constraints(m, adaptation_options: AdaptationOptions):
             ]
         )
 
-        if adaptation_options.impose_optimal:
+        if adaptation_options.uses_analytical_adaptation:
             constraints.append(
                 # Calculate analytically the optimal level of adaptation
                 RegionalEquation(

@@ -225,13 +225,30 @@ class MIMOSA:
     def _uses_sequential_accreu_cba(self) -> bool:
         """Return whether this model selects the ordered ACCREU CBA workflow."""
 
-        return (
-            self.model_context.module("damage") == "ACCREU"
-            and self.model_context.option("damage", "ACCREU_adaptation")
-            != "noadaptation"
-            and self.model_context.option("damage", "ACCREU_CBA_strategy")
-            == "mitigation_then_adaptation"
+        if (
+            self.model_context.module("damage") != "ACCREU"
+            or self.model_context.option("damage", "ACCREU_adaptation")
+            == "noadaptation"
+        ):
+            return False
+
+        strategy = self.model_context.option("damage", "ACCREU_CBA_strategy")
+        determination = self.model_context.option(
+            "damage", "ACCREU_adaptation_determination"
         )
+        required_determination = (
+            "analytical_optimum"
+            if strategy == "mitigation_then_adaptation"
+            else "solver_control"
+        )
+        if determination != required_determination:
+            raise ValueError(
+                f"ACCREU_CBA_strategy='{strategy}' requires "
+                "ACCREU_adaptation_determination="
+                f"'{required_determination}', not '{determination}'."
+            )
+
+        return strategy == "mitigation_then_adaptation"
 
     def _solve_accreu_mitigation_then_adaptation(
         self, verbose: bool = True, use_neos: bool = False, **kwargs: Any
@@ -242,7 +259,9 @@ class MIMOSA:
             raise ValueError(
                 "ACCREU_CBA_strategy='mitigation_then_adaptation' is only "
                 "available for cost-benefit analysis without a fixed carbon budget. "
-                "Use ACCREU_CBA_strategy='joint' for a carbon-budget run."
+                "Use ACCREU_CBA_strategy='joint' with "
+                "ACCREU_adaptation_determination='solver_control' for a "
+                "carbon-budget run."
             )
 
         mitigation_params = deepcopy(self._params)
@@ -251,6 +270,7 @@ class MIMOSA:
         ]
         mitigation_options["ACCREU_adaptation"] = "noadaptation"
         mitigation_options["ACCREU_CBA_strategy"] = "joint"
+        mitigation_options["ACCREU_adaptation_determination"] = "solver_control"
 
         mitigation_model = MIMOSA(mitigation_params)
         mitigation_model.solve(verbose=verbose, use_neos=use_neos, **kwargs)

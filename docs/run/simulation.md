@@ -20,12 +20,12 @@ Simulation is especially useful for:
 
 Simulation does not determine whether a pathway is optimal. It also does not enforce ordinary Pyomo constraints (like a carbon budget), so supplied controls may produce a result that would be infeasible in an optimisation.
 
-The default ACCREU cost-benefit strategy uses simulation internally after its
-mitigation optimisation. `MIMOSA.solve()` transfers the optimised controls into
-the analytical-adaptation model, evaluates the final pathway, and loads those
-values back into the public Pyomo model. This internal replay is why the ordered
-strategy is not available with a fixed carbon budget: simulation does not enforce
-that constraint.
+The ACCREU `mitigation_then_adaptation` strategy uses simulation internally after
+its mitigation optimisation. `MIMOSA.solve()` transfers the optimised controls
+into the analytical-adaptation model, evaluates the final pathway, and loads
+those values back into the public Pyomo model. This internal replay is why the
+ordered strategy is not available with a fixed carbon budget: simulation does
+not enforce that constraint.
 
 ## Control variables
 

@@ -495,19 +495,30 @@ model structure:
         - combined
         - separate
         - noadaptation
-      default: combined
+      default: separate
     
     ACCREU_CBA_strategy:
       descr: >-
-        How mitigation and adaptation are determined in an ACCREU cost-benefit
-        analysis. The sequential strategy first optimises mitigation without
-        adaptation and then calculates analytical optimal adaptation for that
-        pathway. The joint strategy optimises both controls simultaneously.
+        How solve() coordinates mitigation and adaptation in an ACCREU
+        cost-benefit analysis. The sequential strategy first optimises mitigation
+        without adaptation and then calculates analytical optimal adaptation for
+        that pathway. The joint strategy uses the ordinary one-model solve path.
       type: enum
       values:
         - mitigation_then_adaptation
         - joint
-      default: mitigation_then_adaptation
+      default: joint
+
+    ACCREU_adaptation_determination:
+      descr: >-
+        How ACCREU adaptation expenditure is determined. With solver_control it
+        is a free optimisation or simulation control. With analytical_optimum it
+        is calculated from the analytical optimal-adaptation equation.
+      type: enum
+      values:
+        - solver_control
+        - analytical_optimum
+      default: solver_control
 
     ACCREU_adaptation_calibration:
       descr: >-

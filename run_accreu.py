@@ -93,6 +93,9 @@ for monetise_mortality in [False, True]:
 
         #### Run "ada": no-policy baseline with optimal adaptation
         params_ada = init_params(monetise_mortality, adapt_calibration)
+        params_ada["model structure"]["damage module options"][
+            "ACCREU_adaptation_determination"
+        ] = "analytical_optimum"
         model_ada = MIMOSA(params_ada)
         sim_ada = model_ada.run_nopolicy_baseline()
         model_ada.save_simulation(
@@ -102,6 +105,12 @@ for monetise_mortality in [False, True]:
 
         #### Run "mit_then_ada": optimise mitigation, then calculate adaptation
         params_mit_then_ada = init_params(monetise_mortality, adapt_calibration)
+        params_mit_then_ada["model structure"]["damage module options"][
+            "ACCREU_adaptation_determination"
+        ] = "analytical_optimum"
+        params_mit_then_ada["model structure"]["damage module options"][
+            "ACCREU_CBA_strategy"
+        ] = "mitigation_then_adaptation"
         model_mit_then_ada = MIMOSA(params_mit_then_ada)
         model_mit_then_ada.solve()
         model_mit_then_ada.save(
