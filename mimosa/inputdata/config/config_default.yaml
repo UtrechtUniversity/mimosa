@@ -497,12 +497,17 @@ model structure:
         - noadaptation
       default: combined
     
-    ACCREU_adaptation_impose_optimal:
+    ACCREU_CBA_strategy:
       descr: >-
-        Calculate the optimal level of adaptation analytically, instead of letting MIMOSA
-        optimise it. Useful to have optimal adaptation in simulation mode.
-      type: bool
-      default: false
+        How mitigation and adaptation are determined in an ACCREU cost-benefit
+        analysis. The sequential strategy first optimises mitigation without
+        adaptation and then calculates analytical optimal adaptation for that
+        pathway. The joint strategy optimises both controls simultaneously.
+      type: enum
+      values:
+        - mitigation_then_adaptation
+        - joint
+      default: mitigation_then_adaptation
 
     ACCREU_adaptation_calibration:
       descr: >-

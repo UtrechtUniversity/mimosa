@@ -18,6 +18,8 @@ def test_solve_stores_wall_clock_runtime(monkeypatch):
     )
     model.status = None
     model.solve_runtime = None
+    model.workflow_control_values = None
+    monkeypatch.setattr(model, "_uses_sequential_accreu_cba", lambda: False)
 
     timer_values = iter([100.0, 112.345])
     monkeypatch.setattr(
@@ -39,6 +41,8 @@ def test_failed_resolve_clears_previous_runtime(monkeypatch):
     model.solver = SimpleNamespace(solve_ipopt=fail_to_solve)
     model.status = "ok"
     model.solve_runtime = 12.345
+    model.workflow_control_values = {"old": "values"}
+    monkeypatch.setattr(model, "_uses_sequential_accreu_cba", lambda: False)
     monkeypatch.setattr("mimosa.common.utils.time.perf_counter", lambda: 100.0)
 
     with pytest.raises(RuntimeError, match="solver failed"):
@@ -46,6 +50,7 @@ def test_failed_resolve_clears_previous_runtime(monkeypatch):
 
     assert model.status is None
     assert model.solve_runtime is None
+    assert model.workflow_control_values is None
 
 
 def test_runtime_is_numeric_top_level_export_metadata(tmp_path):

@@ -8,6 +8,7 @@ Finally, the export functions are called here.
 """
 
 import time
+from copy import deepcopy
 from typing import Any, Optional
 
 from mimosa.common import (
@@ -48,6 +49,8 @@ class MIMOSA:
         status: Solver status after `solve()`; `None` before a solve starts.
         solve_runtime: Wall-clock duration of the most recently completed
             `solve()` call in seconds; `None` before a solve completes.
+        workflow_control_values: Controls transferred by the most recent
+            sequential workflow; `None` for an ordinary solve.
 
     """
 
@@ -65,6 +68,7 @@ class MIMOSA:
 
         self.status = None  # Not started yet
         self.solve_runtime = None  # No completed solve has been timed yet
+        self.workflow_control_values = None
         self.last_saved_filename = None  # Nothing saved yes
         self.last_saved_simulation_filename = None  # Nothing saved yes
         self._extra_constraints_added = False
@@ -196,6 +200,19 @@ class MIMOSA:
         """
         self.status = None  # Not started yet
         self.solve_runtime = None  # Do not retain timing from an earlier solve
+        self.workflow_control_values = None
+
+        if self._uses_sequential_accreu_cba():
+            self._solve_accreu_mitigation_then_adaptation(
+                verbose=verbose, use_neos=use_neos, **kwargs
+            )
+        else:
+            self._solve_model_normally(verbose=verbose, use_neos=use_neos, **kwargs)
+
+    def _solve_model_normally(
+        self, verbose: bool = True, use_neos: bool = False, **kwargs: Any
+    ) -> None:
+        """Run one ordinary optimisation without workflow orchestration."""
 
         if use_neos:
             results = self.solver.solve_neos(self.concrete_model, **kwargs)
@@ -204,6 +221,91 @@ class MIMOSA:
                 self.concrete_model, verbose=verbose, **kwargs
             )
         self.status = results.solver.status
+
+    def _uses_sequential_accreu_cba(self) -> bool:
+        """Return whether this model selects the ordered ACCREU CBA workflow."""
+
+        return (
+            self.model_context.module("damage") == "ACCREU"
+            and self.model_context.option("damage", "ACCREU_adaptation")
+            != "noadaptation"
+            and self.model_context.option("damage", "ACCREU_CBA_strategy")
+            == "mitigation_then_adaptation"
+        )
+
+    def _solve_accreu_mitigation_then_adaptation(
+        self, verbose: bool = True, use_neos: bool = False, **kwargs: Any
+    ) -> None:
+        """Optimise mitigation first, then evaluate analytical adaptation."""
+
+        if self._params["emissions"]["carbonbudget"] is not False:
+            raise ValueError(
+                "ACCREU_CBA_strategy='mitigation_then_adaptation' is only "
+                "available for cost-benefit analysis without a fixed carbon budget. "
+                "Use ACCREU_CBA_strategy='joint' for a carbon-budget run."
+            )
+
+        mitigation_params = deepcopy(self._params)
+        mitigation_options = mitigation_params["model structure"][
+            "damage module options"
+        ]
+        mitigation_options["ACCREU_adaptation"] = "noadaptation"
+        mitigation_options["ACCREU_CBA_strategy"] = "joint"
+
+        mitigation_model = MIMOSA(mitigation_params)
+        mitigation_model.solve(verbose=verbose, use_neos=use_neos, **kwargs)
+
+        control_values = self._extract_compatible_controls(mitigation_model)
+        final_result = self.run_simulation(**control_values)
+        self.simulator.initialize_pyomo_model(self.concrete_model, final_result)
+
+        self.workflow_control_values = control_values
+        self.status = mitigation_model.status
+
+    def _extract_compatible_controls(self, source_model: "MIMOSA") -> dict:
+        """Extract controls after validating replay compatibility."""
+
+        if not source_model.simulator.is_prepared:
+            source_model.prepare_simulation()
+        if not self.simulator.is_prepared:
+            self.prepare_simulation()
+
+        source_controls = set(source_model.simulator.control_variables)
+        target_controls = set(self.simulator.control_variables)
+        if source_controls != target_controls:
+            raise ValueError(
+                "Cannot transfer controls between ACCREU CBA stages: "
+                f"source controls are {sorted(source_controls)}, while target "
+                f"controls are {sorted(target_controls)}."
+            )
+
+        for index_name in ("t", "regions"):
+            source_values = tuple(
+                getattr(source_model.concrete_model, index_name).ordered_data()
+            )
+            target_values = tuple(
+                getattr(self.concrete_model, index_name).ordered_data()
+            )
+            if source_values != target_values:
+                raise ValueError(
+                    "Cannot transfer controls between ACCREU CBA stages: "
+                    f"the {index_name} indices are incompatible."
+                )
+
+        control_values = {}
+        for name in sorted(target_controls):
+            source_values = getattr(
+                source_model.concrete_model, name
+            ).extract_values()
+            target_keys = set(getattr(self.concrete_model, name).extract_values())
+            if set(source_values) != target_keys:
+                raise ValueError(
+                    "Cannot transfer control "
+                    f"'{name}' between ACCREU CBA stages: its indices are incompatible."
+                )
+            control_values[name] = source_values
+
+        return control_values
 
     def save(self, filename: Optional[str] = None, **kwargs: Any) -> None:
         """

@@ -21,6 +21,7 @@ model structure:
   damage module options:
     ACCREU_adaptation: combined
     ACCREU_adaptation_calibration: literature
+    ACCREU_CBA_strategy: mitigation_then_adaptation
 ```
 
 The default value is `accreu`, which preserves the original coefficients. The

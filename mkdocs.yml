@@ -37,6 +37,7 @@ nav:
       - Units: extending/units.md
   - Release notes:
       - Overview: release_notes/index.md
+      - Version 1.5.0: release_notes/1.5.0.md
       - Version 1.4.0: release_notes/1.4.0.md
       - Version 1.3.2: release_notes/1.3.2.md
       - Version 1.3.1: release_notes/1.3.1.md

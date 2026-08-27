@@ -1,7 +1,57 @@
+from copy import deepcopy
+
 import numpy as np
 import pytest
 
 from mimosa import MIMOSA, load_params
+
+
+@pytest.mark.ipopt
+def test_one_call_sequential_cba_matches_manual_two_model_workflow():
+    params = load_params()
+    params["time"]["end"] = 2050
+    params["time"]["periods"] = {}
+    params["model structure"]["damage module"] = "ACCREU"
+    options = params["model structure"]["damage module options"]
+    options["ACCREU_adaptation"] = "separate"
+    options["ACCREU_CBA_strategy"] = "mitigation_then_adaptation"
+
+    mitigation_params = deepcopy(params)
+    mitigation_options = mitigation_params["model structure"][
+        "damage module options"
+    ]
+    mitigation_options["ACCREU_adaptation"] = "noadaptation"
+    mitigation_options["ACCREU_CBA_strategy"] = "joint"
+
+    mitigation_model = MIMOSA(mitigation_params)
+    mitigation_model.solve(verbose=False)
+
+    manual_model = MIMOSA(params)
+    controls = manual_model._extract_compatible_controls(mitigation_model)
+    manual_result = manual_model.run_simulation(**controls)
+
+    workflow_model = MIMOSA(params)
+    workflow_model.solve(verbose=False)
+
+    for variable in [
+        "relative_abatement",
+        "temperature",
+        "adaptation_costs_abs",
+        "damage_costs_abs",
+        "total_direct_costs_abs",
+    ]:
+        workflow_variable = getattr(workflow_model.concrete_model, variable)
+        workflow_values = np.asarray(
+            list(workflow_variable.extract_values().values())
+        )
+        manual_values = np.asarray(
+            list(getattr(manual_result, variable).extract_values().values())
+        )
+        np.testing.assert_allclose(
+            workflow_values, manual_values, rtol=1e-7, atol=1e-9
+        )
+
+    assert workflow_model.status == mitigation_model.status
 
 
 @pytest.mark.parametrize(
@@ -33,7 +83,7 @@ def test_literature_adaptation_calibration_matches_bcr_benchmarks(
     options = params["model structure"]["damage module options"]
     options["ACCREU_adaptation"] = "separate"
     options["ACCREU_adaptation_calibration"] = calibration
-    options["ACCREU_adaptation_impose_optimal"] = True
+    options["ACCREU_CBA_strategy"] = "mitigation_then_adaptation"
 
     model = MIMOSA(params, prerun=False)
     simulation = model.run_simulation()
@@ -78,7 +128,7 @@ def test_combined_literature_calibration_matches_bcr_benchmarks(calibration, bcr
     options = params["model structure"]["damage module options"]
     options["ACCREU_adaptation"] = "combined"
     options["ACCREU_adaptation_calibration"] = calibration
-    options["ACCREU_adaptation_impose_optimal"] = True
+    options["ACCREU_CBA_strategy"] = "mitigation_then_adaptation"
 
     simulation = MIMOSA(params, prerun=False).run_simulation()
 

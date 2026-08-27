@@ -14,6 +14,33 @@ With this code, the default parameter values are used (see [Parameter reference]
      Note that if you use the NEOS solver, use the syntax `model1.solve(use_neos=True, neos_email="your.email@email.com")`
 4.   Export the output to the file output/run1.csv
 
+### ACCREU cost-benefit analysis
+
+An ACCREU model with adaptation uses an ordered cost-benefit workflow by
+default. One call to `solve()` first optimises mitigation without adaptation,
+then evaluates analytical optimal adaptation along the resulting mitigation
+pathway. The final values are loaded into the public model, so they can be saved
+with the normal `save()` method:
+
+```python
+from mimosa import MIMOSA, load_params
+
+params = load_params()
+params["model structure"]["damage module"] = "ACCREU"
+options = params["model structure"]["damage module options"]
+options["ACCREU_adaptation"] = "separate"
+
+model = MIMOSA(params)
+model.solve()
+model.save("run_accreu_cba")
+```
+
+Set `options["ACCREU_CBA_strategy"] = "joint"` to let the optimiser choose
+mitigation and adaptation simultaneously. The sequential strategy is intended
+for CBA and rejects a fixed carbon budget; use `joint` for carbon-budget runs.
+The transferred pathways remain available as `model.workflow_control_values`
+for diagnostics.
+
 ### Configuring the time grid
 
 The `time.dt` parameter sets the initial timestep length, while `time.periods`
