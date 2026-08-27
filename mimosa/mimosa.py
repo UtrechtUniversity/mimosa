@@ -170,14 +170,23 @@ class MIMOSA:
 
         # Store the no-policy baseline damage costs in the concrete model
         m = self.concrete_model
+        added_avoided_damage_equations = False
         if not self._extra_constraints_added:
-            for constraint in avoided_damages.get_constraints(m):
-                add_constraint(m, constraint.to_pyomo_constraint(m), constraint.name)
+            avoided_damage_equations = avoided_damages.get_constraints(m)
+            for equation in avoided_damage_equations:
+                add_constraint(m, equation.to_pyomo_constraint(m), equation.name)
+            self.equations.extend(avoided_damage_equations)
             self._extra_constraints_added = True
+            added_avoided_damage_equations = True
 
         m.nopolicy_damage_costs.store_values(
             nopolicy_baseline.damage_costs.get_all_indexed()
         )
+
+        # Avoided damages are added only after the baseline is available. Include
+        # their equations in subsequent simulation runs as well as in Pyomo solves.
+        if added_avoided_damage_equations:
+            self.prepare_simulation()
 
         return nopolicy_baseline
 
@@ -276,6 +285,7 @@ class MIMOSA:
         mitigation_model.solve(verbose=verbose, use_neos=use_neos, **kwargs)
 
         control_values = self._extract_compatible_controls(mitigation_model)
+        self._transfer_nopolicy_damage_baseline(mitigation_model)
         final_result = self.run_simulation(**control_values)
         self.simulator.initialize_pyomo_model(self.concrete_model, final_result)
 
@@ -326,6 +336,14 @@ class MIMOSA:
             control_values[name] = source_values
 
         return control_values
+
+    def _transfer_nopolicy_damage_baseline(self, source_model: "MIMOSA") -> None:
+        """Use the source stage's no-mitigation, no-adaptation damage baseline."""
+
+        baseline_values = (
+            source_model.concrete_model.nopolicy_damage_costs.extract_values()
+        )
+        self.concrete_model.nopolicy_damage_costs.store_values(baseline_values)
 
     def save(self, filename: Optional[str] = None, **kwargs: Any) -> None:
         """

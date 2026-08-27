@@ -19,7 +19,7 @@ root = logging.getLogger()
 root.setLevel("INFO")
 root.addHandler(handler)
 
-PREFIX = "accreu"
+PREFIX = "accreu_workflows"
 
 adaptation_readiness = pd.read_csv("data/adaptation_readiness.csv").set_index(
     ["SSP", "Region"]
@@ -97,7 +97,7 @@ for monetise_mortality in [False, True]:
             "ACCREU_adaptation_determination"
         ] = "analytical_optimum"
         model_ada = MIMOSA(params_ada)
-        sim_ada = model_ada.run_nopolicy_baseline()
+        sim_ada = model_ada.run_simulation()
         model_ada.save_simulation(
             sim_ada,
             f"{PREFIX}_ada_adapt_calib_{adapt_calibration}_mortality_{monetise_mortality}",

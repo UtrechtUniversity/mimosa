@@ -165,6 +165,11 @@ def test_sequential_workflow_copies_params_forwards_options_and_replays(monkeypa
     )
     monkeypatch.setattr(
         model,
+        "_transfer_nopolicy_damage_baseline",
+        lambda source: calls.append(("transfer baseline", source)),
+    )
+    monkeypatch.setattr(
+        model,
         "run_simulation",
         lambda **controls: calls.append(("simulate", controls)) or replay_result,
     )
@@ -190,6 +195,7 @@ def test_sequential_workflow_copies_params_forwards_options_and_replays(monkeypa
                 "neos_email": "user@example.com",
             },
         ),
+        ("transfer baseline", mitigation_model),
         ("simulate", {"relative_abatement": {0: 0.5}}),
         ("initialize", model.concrete_model, replay_result),
     ]

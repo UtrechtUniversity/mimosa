@@ -30,6 +30,7 @@ def test_one_call_sequential_cba_matches_manual_two_model_workflow():
 
     manual_model = MIMOSA(params)
     controls = manual_model._extract_compatible_controls(mitigation_model)
+    manual_model._transfer_nopolicy_damage_baseline(mitigation_model)
     manual_result = manual_model.run_simulation(**controls)
 
     workflow_model = MIMOSA(params)
@@ -40,6 +41,8 @@ def test_one_call_sequential_cba_matches_manual_two_model_workflow():
         "temperature",
         "adaptation_costs_abs",
         "damage_costs_abs",
+        "avoided_damage_costs",
+        "global_avoided_damage_costs",
         "total_direct_costs_abs",
     ]:
         workflow_variable = getattr(workflow_model.concrete_model, variable)
@@ -54,6 +57,24 @@ def test_one_call_sequential_cba_matches_manual_two_model_workflow():
         )
 
     assert workflow_model.status == mitigation_model.status
+
+    mitigation_baseline = mitigation_model.concrete_model.nopolicy_damage_costs
+    baseline_values = np.asarray(list(mitigation_baseline.extract_values().values()))
+    workflow_damage_values = np.asarray(
+        list(workflow_model.concrete_model.damage_costs.extract_values().values())
+    )
+    workflow_avoided_values = np.asarray(
+        list(
+            workflow_model.concrete_model.avoided_damage_costs.extract_values().values()
+        )
+    )
+    np.testing.assert_allclose(
+        workflow_avoided_values,
+        baseline_values - workflow_damage_values,
+        rtol=1e-7,
+        atol=1e-9,
+    )
+    assert np.isfinite(workflow_avoided_values).all()
 
 
 @pytest.mark.parametrize(
