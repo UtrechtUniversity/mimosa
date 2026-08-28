@@ -67,6 +67,15 @@ class InstantiatedModel:
         num_years = len(years)
         self.abstract_model.year = lambda t: years[t]
 
+        pulse_year = params["emissions"]["pulse"]["year"]
+        pulse_amount = quant(
+            params["emissions"]["pulse"]["amount"], "emissions_unit"
+        )
+        if pulse_amount != 0 and pulse_year not in years:
+            raise ValueError(
+                f"Emissions pulse year {pulse_year} is not on the model time grid."
+            )
+
         parameter_mapping = {}
 
         # Attempt to set parameter values automatically from their doc value

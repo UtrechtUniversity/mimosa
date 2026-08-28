@@ -320,6 +320,20 @@ economics:
 ##################
 
 emissions:
+  pulse:
+    year:
+      descr: Year in which an exogenous CO2 pulse is released
+      type: int
+      min: 1900
+      max: 2300
+      default: 2025
+
+    amount:
+      descr: Exogenous CO2 pulse added directly to cumulative emissions
+      type: quantity
+      unit: emissions_unit
+      default: 0 GtCO2
+
   carbonbudget:
     descr: >-
       Value of the carbon budget. Example: "800 GtCO2" (the unit is important).
