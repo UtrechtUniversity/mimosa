@@ -11,13 +11,11 @@ import sys
 
 import numpy as np
 
-
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPOSITORY_ROOT))
 
 from mimosa import MIMOSA, load_params  # noqa: E402
 from mimosa.common import trapezoid  # noqa: E402
-
 
 PULSE_YEAR = 2030
 PULSE_SIZE = 1.0  # GtCO2
@@ -50,10 +48,7 @@ def extract_optimal_controls(model):
 def global_damages(simulation, t):
     """Return global absolute damages in trillion USD2010 per year."""
 
-    return sum(
-        simulation.damage_costs_abs[t, region]
-        for region in simulation.regions
-    )
+    return sum(simulation.damage_costs_abs[t, region] for region in simulation.regions)
 
 
 def calculate_discounted_damage_scc(
@@ -65,15 +60,10 @@ def calculate_discounted_damage_scc(
 ):
     """Calculate the pulse-year SCC in USD2010 per tCO2."""
 
-    years = np.asarray(
-        [positive_pulse.year(t) for t in positive_pulse.t], dtype=float
-    )
+    years = np.asarray([positive_pulse.year(t) for t in positive_pulse.t], dtype=float)
     marginal_damages = np.asarray(
         [
-            (
-                global_damages(positive_pulse, t)
-                - global_damages(negative_pulse, t)
-            )
+            (global_damages(positive_pulse, t) - global_damages(negative_pulse, t))
             / (2 * pulse_size)
             for t in positive_pulse.t
         ]
@@ -81,9 +71,7 @@ def calculate_discounted_damage_scc(
 
     included = years >= pulse_year
     included_years = years[included]
-    discount_factors = np.exp(
-        -discount_rate * (included_years - pulse_year)
-    )
+    discount_factors = np.exp(-discount_rate * (included_years - pulse_year))
     discounted_damages = trapezoid(
         marginal_damages[included] * discount_factors,
         included_years,
