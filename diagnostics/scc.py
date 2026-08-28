@@ -67,13 +67,10 @@ def extract_optimal_controls(model):
 def global_climate_costs(simulation, t, include_adaptation_costs=False):
     """Return global damages, optionally including adaptation expenditure."""
 
-    costs = sum(
-        simulation.damage_costs_abs[t, region] for region in simulation.regions
-    )
+    costs = sum(simulation.damage_costs_abs[t, region] for region in simulation.regions)
     if include_adaptation_costs:
         costs += sum(
-            simulation.adaptation_costs_abs[t, region]
-            for region in simulation.regions
+            simulation.adaptation_costs_abs[t, region] for region in simulation.regions
         )
     return costs
 
@@ -93,9 +90,7 @@ def global_sector_costs(
     )
     if adaptation_cost_variable and hasattr(simulation, adaptation_cost_variable):
         adaptation_costs = getattr(simulation, adaptation_cost_variable)
-        costs += sum(
-            adaptation_costs[t, region] for region in simulation.regions
-        )
+        costs += sum(adaptation_costs[t, region] for region in simulation.regions)
     return costs
 
 
@@ -148,6 +143,7 @@ def calculate_scc_breakdown(
 
     negative = simulate_with_pulse(params, -pulse_size, controls)
     positive = simulate_with_pulse(params, pulse_size, controls)
+
     sccs = {
         "total": calculate_discounted_cost_scc(
             negative,
@@ -177,31 +173,11 @@ def calculate_scc_breakdown(
     return sccs
 
 
-def calculate_scc_for_controls(
-    params,
-    controls=None,
-    include_adaptation_costs=False,
-    pulse_size=PULSE_SIZE,
-):
-    """Calculate only the total SCC for the supplied policy controls."""
-
-    negative = simulate_with_pulse(params, -pulse_size, controls)
-    positive = simulate_with_pulse(params, pulse_size, controls)
-    return calculate_discounted_cost_scc(
-        negative,
-        positive,
-        partial(
-            global_climate_costs,
-            include_adaptation_costs=include_adaptation_costs,
-        ),
-        pulse_size=pulse_size,
-    )
-
-
 def base_params(damage_module):
     """Load parameters shared by all SCC scenarios for a damage module."""
 
     params = load_params()
+    params["emissions"]["baseline carbon intensity"] = False
     params["economics"]["damages"]["ignore damages"] = False
     params["model structure"]["damage module"] = damage_module
     return params
@@ -235,9 +211,7 @@ def calculate_coacch_sccs(pulse_size=PULSE_SIZE):
     params = base_params("COACCH")
 
     sccs = {
-        "baseline": calculate_scc_breakdown(
-            params, "COACCH", pulse_size=pulse_size
-        )
+        "baseline": calculate_scc_breakdown(params, "COACCH", pulse_size=pulse_size)
     }
 
     model = MIMOSA(deepcopy(params))
@@ -280,18 +254,6 @@ def calculate_accreu_sccs(pulse_size=PULSE_SIZE):
     sccs["ada"] = calculate_scc_breakdown(
         adaptation_params,
         "ACCREU",
-        include_adaptation_costs=True,
-        pulse_size=pulse_size,
-    )
-
-    # mit_ada: jointly optimal mitigation and adaptation, held fixed for each pulse
-    joint_model = MIMOSA(deepcopy(params))
-    joint_model.solve(verbose=False)
-    joint_controls = extract_optimal_controls(joint_model)
-    sccs["mit_ada"] = calculate_scc_breakdown(
-        params,
-        "ACCREU",
-        joint_controls,
         include_adaptation_costs=True,
         pulse_size=pulse_size,
     )
