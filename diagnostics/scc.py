@@ -15,7 +15,7 @@ REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPOSITORY_ROOT))
 
 from mimosa import MIMOSA, load_params  # noqa: E402
-from mimosa.common import trapezoid  # noqa: E402
+from mimosa.common import quant, trapezoid  # noqa: E402
 
 PULSE_YEAR = 2030
 PULSE_SIZE = 1.0  # GtCO2
@@ -77,8 +77,13 @@ def calculate_discounted_damage_scc(
         included_years,
     )
 
-    # 1 trillion USD / GtCO2 = 1000 USD / tCO2.
-    return discounted_damages * 1000
+    # Convert to $/tCO2 using built-in unit handling
+    scc_units = (
+        positive_pulse.damage_costs_abs.unit
+        * quant.unit("yr", pyomo=False)
+        / quant.unit("emissions_unit", pyomo=False)
+    )
+    return (discounted_damages * scc_units).to("USD2010/tCO2").magnitude
 
 
 def calculate_scc_for_controls(params, controls=None):
