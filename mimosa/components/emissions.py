@@ -158,10 +158,20 @@ def _get_emissions_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
         \\text{cumulative emissions}_{t} = \\text{cumulative emissions}_{t-1} + \\Delta t \\cdot \\text{global emissions}_{t}
         $$
 
+    ## Exogenous emissions pulse
+
+    A one-off exogenous CO<sub>2</sub> pulse can be added directly to cumulative
+    emissions. Its amount is a stock in GtCO<sub>2</sub>, so it is independent of
+    the model timestep. The pulse affects temperature and subsequent damages, but
+    does not directly alter regional emissions or mitigation costs. By default
+    its amount is zero.
+
 
     ## Parameters defined in this module
     - param::use_carbon_intensity_for_baseline
     - param::cumulative_emissions_trapz
+    - param::emissions_pulse_year
+    - param::emissions_pulse_amount
 
     [^1]: The effect of other greenhouse gases is implicitly accounted for in the TCRE which
         translates cumulative CO<sub>2</sub> emissions into temperature change. This assumes a linear
@@ -197,6 +207,8 @@ def _get_emissions_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     m.global_cumulative_emissions_trapz = Param(
         doc="::emissions.cumulative_emissions_trapz"
     )
+    m.emissions_pulse_year = Param(doc="::emissions.pulse.year")
+    m.emissions_pulse_amount = Param(doc="::emissions.pulse.amount")
 
     constraints.extend(
         [
@@ -239,18 +251,28 @@ def _get_emissions_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
             GlobalEquation(
                 m.global_cumulative_emissions,
                 lambda m, t: (
-                    m.global_cumulative_emissions[t - 1]
-                    + (
-                        (
-                            m.period_length[t]
-                            * (m.global_emissions[t] + m.global_emissions[t - 1])
-                            / 2
+                    (
+                        m.global_cumulative_emissions[t - 1]
+                        + (
+                            (
+                                m.period_length[t]
+                                * (
+                                    m.global_emissions[t]
+                                    + m.global_emissions[t - 1]
+                                )
+                                / 2
+                            )
+                            if value(m.global_cumulative_emissions_trapz)
+                            else (m.period_length[t] * m.global_emissions[t])
                         )
-                        if value(m.global_cumulative_emissions_trapz)
-                        else (m.period_length[t] * m.global_emissions[t])
+                        if t > 0
+                        else 0
                     )
-                    if t > 0
-                    else 0
+                    + (
+                        m.emissions_pulse_amount
+                        if m.year(t) == value(m.emissions_pulse_year)
+                        else 0
+                    )
                 ),
             ),
         ]

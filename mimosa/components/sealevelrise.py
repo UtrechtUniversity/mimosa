@@ -241,7 +241,7 @@ def get_constraints(
     formulation or parameters, regenerate both tables from the repository root:
 
     ```shell
-    python docs/scripts/generate_slr_benchmark.py
+    python diagnostics/slr_ar6.py
     ```
 
     A model test compares the committed CSV files with a fresh calculation so
