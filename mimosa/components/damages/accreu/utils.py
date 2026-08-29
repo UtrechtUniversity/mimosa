@@ -93,9 +93,7 @@ def get_adaptation_options(context):
 
     return AdaptationOptions(
         adaptation_type=adaptation_type,
-        determination=context.option(
-            "damage", "ACCREU_adaptation_determination"
-        ),
+        determination=context.option("damage", "ACCREU_adaptation_determination"),
         calibrations={
             sector: get_adaptation_calibration(calibration_name, sector)
             for sector in sectors
@@ -155,7 +153,7 @@ def dmg_fct_power(m, t, a, b, c, x="temperature", xshift=0, remove_base=True):
     return fct(x_t - xshift)
 
 
-def optimal_adaptation_costs_fct(gross_damages_abs, a, b, scale=0.01):
+def optimal_adaptation_costs_fct(gross_damages_abs, a, b, scale=0.001):
     if a * b == 0:
         return 0
     return soft_min(log(a * b * soft_min(gross_damages_abs, scale)) / b, scale)
