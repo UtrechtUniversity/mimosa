@@ -65,6 +65,8 @@ SECTORS = {
 OUTPUT_DIRECTORY = REPOSITORY_ROOT / "output"
 TABLE_OUTPUT = OUTPUT_DIRECTORY / "adaptation_bcr.csv"
 PLOT_OUTPUT = OUTPUT_DIRECTORY / "adaptation_bcr.html"
+REGIONAL_TABLE_OUTPUT = OUTPUT_DIRECTORY / "adaptation_bcr_regional.csv"
+REGIONAL_PLOT_OUTPUT = OUTPUT_DIRECTORY / "adaptation_bcr_regional.html"
 
 BENEFITS_COLUMN = "avoided damages (trillion USD2010)"
 COSTS_COLUMN = "adaptation costs (trillion USD2010)"
@@ -120,9 +122,10 @@ def discount_factors(simulation, params, ramsey_reference=None):
     ) ** (-elasmu)
 
 
-def sector_bcr(simulation, weights, variable_names):
+def sector_bcr(simulation, weights, variable_names, regions=None):
     """Calculate discounted benefits, costs, net benefits and average BCR."""
 
+    regions = simulation.regions if regions is None else regions
     gross_name, effectiveness_name, costs_name = variable_names
     gross_damages = getattr(simulation, gross_name)
     effectiveness = getattr(simulation, effectiveness_name)
@@ -134,14 +137,14 @@ def sector_bcr(simulation, weights, variable_names):
                 gross_damages[t, r]
                 * simulation.GDP_gross[t, r]
                 * effectiveness[t, r]
-                for r in simulation.regions
+                for r in regions
             )
             for t in simulation.t
         ]
     )
     costs = np.asarray(
         [
-            sum(adaptation_costs[t, r] for r in simulation.regions)
+            sum(adaptation_costs[t, r] for r in regions)
             for t in simulation.t
         ]
     )
@@ -151,14 +154,15 @@ def sector_bcr(simulation, weights, variable_names):
         BENEFITS_COLUMN: benefits_pv,
         COSTS_COLUMN: costs_pv,
         NET_BENEFITS_COLUMN: benefits_pv - costs_pv,
-        "BCR": benefits_pv / costs_pv,
+        "BCR": benefits_pv / costs_pv if costs_pv > 0 else np.nan,
     }
 
 
 def calculate_bcrs():
-    """Calculate the global BCR table for all adaptation configurations."""
+    """Calculate global and regional BCR tables."""
 
-    rows = []
+    global_rows = []
+    regional_rows = []
     ramsey_reference = (
         no_adaptation_reference(accreu_params("separate"))
         if DISCOUNTING == "ramsey"
@@ -181,10 +185,13 @@ def calculate_bcrs():
             )
 
             sector_results = []
+            regional_sector_results = {
+                region: [] for region in simulation.regions
+            }
             for sector, variable_names in sectors.items():
                 result = sector_bcr(simulation, weights, variable_names)
                 sector_results.append(result)
-                rows.append(
+                global_rows.append(
                     {
                         "adaptation type": adaptation_type,
                         "calibration": calibration,
@@ -192,6 +199,23 @@ def calculate_bcrs():
                         **result,
                     }
                 )
+                for region in simulation.regions:
+                    regional_result = sector_bcr(
+                        simulation,
+                        weights,
+                        variable_names,
+                        regions=(region,),
+                    )
+                    regional_sector_results[region].append(regional_result)
+                    regional_rows.append(
+                        {
+                            "adaptation type": adaptation_type,
+                            "calibration": calibration,
+                            "region": region,
+                            "sector": sector,
+                            **regional_result,
+                        }
+                    )
 
             total_benefits = sum(
                 result[BENEFITS_COLUMN] for result in sector_results
@@ -199,7 +223,7 @@ def calculate_bcrs():
             total_costs = sum(
                 result[COSTS_COLUMN] for result in sector_results
             )
-            rows.append(
+            global_rows.append(
                 {
                     "adaptation type": adaptation_type,
                     "calibration": calibration,
@@ -210,7 +234,24 @@ def calculate_bcrs():
                     "BCR": total_benefits / total_costs,
                 }
             )
-    return pd.DataFrame(rows)
+            for region, results in regional_sector_results.items():
+                regional_benefits = sum(
+                    result[BENEFITS_COLUMN] for result in results
+                )
+                regional_costs = sum(result[COSTS_COLUMN] for result in results)
+                regional_rows.append(
+                    {
+                        "adaptation type": adaptation_type,
+                        "calibration": calibration,
+                        "region": region,
+                        "sector": "Total",
+                        BENEFITS_COLUMN: regional_benefits,
+                        COSTS_COLUMN: regional_costs,
+                        NET_BENEFITS_COLUMN: regional_benefits - regional_costs,
+                        "BCR": regional_benefits / regional_costs,
+                    }
+                )
+    return pd.DataFrame(global_rows), pd.DataFrame(regional_rows)
 
 
 def create_figure(results):
@@ -258,12 +299,79 @@ def create_figure(results):
     return figure
 
 
+def create_regional_figure(results):
+    """Create regional BCR heatmaps by adaptation type and calibration."""
+
+    subplot_titles = [
+        f"{adaptation_type}: {calibration}"
+        for adaptation_type in SECTORS
+        for calibration in CALIBRATIONS
+    ]
+    figure = make_subplots(
+        rows=2,
+        cols=4,
+        subplot_titles=subplot_titles,
+        shared_yaxes=True,
+        vertical_spacing=0.12,
+        horizontal_spacing=0.04,
+    )
+    regions = list(results["region"].drop_duplicates())
+
+    for row, adaptation_type in enumerate(SECTORS, start=1):
+        sectors = [*SECTORS[adaptation_type], "Total"]
+        for column, calibration in enumerate(CALIBRATIONS, start=1):
+            subset = results[
+                (results["adaptation type"] == adaptation_type)
+                & (results["calibration"] == calibration)
+            ]
+            bcrs = subset.pivot(index="region", columns="sector", values="BCR")
+            bcrs = bcrs.reindex(index=regions, columns=sectors)
+            figure.add_trace(
+                go.Heatmap(
+                    x=sectors,
+                    y=regions,
+                    z=bcrs.values,
+                    coloraxis="coloraxis",
+                    hovertemplate=(
+                        "Region=%{y}<br>Sector=%{x}<br>"
+                        "BCR=%{z:.2f}<extra></extra>"
+                    ),
+                ),
+                row=row,
+                col=column,
+            )
+
+    discounting_label = (
+        f"{DISCOUNT_RATE:.0%} fixed discounting"
+        if DISCOUNTING == "fixed"
+        else "Ramsey discounting"
+    )
+    figure.update_xaxes(tickangle=-30)
+    figure.update_layout(
+        title=(
+            f"Regional ACCREU adaptation BCRs through {FINAL_YEAR} "
+            f"({discounting_label})"
+        ),
+        coloraxis={"colorscale": "Viridis", "colorbar": {"title": "BCR"}},
+        template="plotly_white",
+        height=900,
+        width=1800,
+    )
+    return figure
+
+
 if __name__ == "__main__":
-    bcrs = calculate_bcrs()
-    print(bcrs.to_string(index=False, float_format=lambda value: f"{value:.3f}"))
+    global_bcrs, regional_bcrs = calculate_bcrs()
+    print(
+        global_bcrs.to_string(index=False, float_format=lambda value: f"{value:.3f}")
+    )
 
     OUTPUT_DIRECTORY.mkdir(parents=True, exist_ok=True)
-    bcrs.to_csv(TABLE_OUTPUT, index=False)
-    create_figure(bcrs).write_html(PLOT_OUTPUT)
+    global_bcrs.to_csv(TABLE_OUTPUT, index=False)
+    regional_bcrs.to_csv(REGIONAL_TABLE_OUTPUT, index=False)
+    create_figure(global_bcrs).write_html(PLOT_OUTPUT)
+    create_regional_figure(regional_bcrs).write_html(REGIONAL_PLOT_OUTPUT)
     print(f"Wrote {TABLE_OUTPUT.relative_to(REPOSITORY_ROOT)}")
     print(f"Wrote {PLOT_OUTPUT.relative_to(REPOSITORY_ROOT)}")
+    print(f"Wrote {REGIONAL_TABLE_OUTPUT.relative_to(REPOSITORY_ROOT)}")
+    print(f"Wrote {REGIONAL_PLOT_OUTPUT.relative_to(REPOSITORY_ROOT)}")
