@@ -19,9 +19,14 @@ sys.path.insert(0, str(REPOSITORY_ROOT))
 
 from mimosa import MIMOSA, load_params  # noqa: E402
 
-DISCOUNTING = "fixed"  # "fixed" or "ramsey"
-DISCOUNT_RATE = 0.05
 FINAL_YEAR = 2100
+
+DISCOUNTING_OPTIONS = {
+    "3%": ("fixed", 0.03),
+    "5%": ("fixed", 0.05),
+    "Ramsey": ("ramsey", None),
+}
+DEFAULT_DISCOUNTING = "5%"
 
 CALIBRATIONS = (
     "accreu",
@@ -97,14 +102,20 @@ def no_adaptation_reference(params):
     return MIMOSA(reference_params, prerun=False).run_simulation()
 
 
-def discount_factors(simulation, params, ramsey_reference=None):
+def discount_factors(
+    simulation,
+    params,
+    discounting,
+    discount_rate=None,
+    ramsey_reference=None,
+):
     """Return fixed or Ramsey discount factors from the first model year."""
 
     years = np.asarray([simulation.year(t) for t in simulation.t], dtype=float)
-    if DISCOUNTING == "fixed":
-        return 1 / (1 + DISCOUNT_RATE) ** (years - years[0])
-    if DISCOUNTING != "ramsey":
-        raise ValueError("DISCOUNTING must be 'fixed' or 'ramsey'.")
+    if discounting == "fixed":
+        return 1 / (1 + discount_rate) ** (years - years[0])
+    if discounting != "ramsey":
+        raise ValueError("Discounting must be 'fixed' or 'ramsey'.")
     if ramsey_reference is None:
         raise ValueError("Ramsey discounting requires an unadapted reference run.")
 
@@ -163,11 +174,7 @@ def calculate_bcrs():
 
     global_rows = []
     regional_rows = []
-    ramsey_reference = (
-        no_adaptation_reference(accreu_params("separate"))
-        if DISCOUNTING == "ramsey"
-        else None
-    )
+    ramsey_reference = no_adaptation_reference(accreu_params("separate"))
     for adaptation_type, sectors in SECTORS.items():
         for calibration in CALIBRATIONS:
             params = accreu_params(adaptation_type, calibration)
@@ -178,123 +185,187 @@ def calculate_bcrs():
             period_lengths = np.asarray(
                 [simulation.period_length[t] for t in simulation.t]
             )
-            weights = (
-                period_lengths
-                * discount_factors(simulation, params, ramsey_reference)
-                * through_final_year
-            )
 
-            sector_results = []
-            regional_sector_results = {
-                region: [] for region in simulation.regions
-            }
-            for sector, variable_names in sectors.items():
-                result = sector_bcr(simulation, weights, variable_names)
-                sector_results.append(result)
+            for discounting_label, (
+                discounting,
+                discount_rate,
+            ) in DISCOUNTING_OPTIONS.items():
+                weights = (
+                    period_lengths
+                    * discount_factors(
+                        simulation,
+                        params,
+                        discounting,
+                        discount_rate,
+                        ramsey_reference,
+                    )
+                    * through_final_year
+                )
+
+                sector_results = []
+                regional_sector_results = {
+                    region: [] for region in simulation.regions
+                }
+                for sector, variable_names in sectors.items():
+                    result = sector_bcr(simulation, weights, variable_names)
+                    sector_results.append(result)
+                    global_rows.append(
+                        {
+                            "discounting": discounting_label,
+                            "adaptation type": adaptation_type,
+                            "calibration": calibration,
+                            "sector": sector,
+                            **result,
+                        }
+                    )
+                    for region in simulation.regions:
+                        regional_result = sector_bcr(
+                            simulation,
+                            weights,
+                            variable_names,
+                            regions=(region,),
+                        )
+                        regional_sector_results[region].append(regional_result)
+                        regional_rows.append(
+                            {
+                                "discounting": discounting_label,
+                                "adaptation type": adaptation_type,
+                                "calibration": calibration,
+                                "region": region,
+                                "sector": sector,
+                                **regional_result,
+                            }
+                        )
+
+                total_benefits = sum(
+                    result[BENEFITS_COLUMN] for result in sector_results
+                )
+                total_costs = sum(
+                    result[COSTS_COLUMN] for result in sector_results
+                )
                 global_rows.append(
                     {
+                        "discounting": discounting_label,
                         "adaptation type": adaptation_type,
                         "calibration": calibration,
-                        "sector": sector,
-                        **result,
+                        "sector": "Total",
+                        BENEFITS_COLUMN: total_benefits,
+                        COSTS_COLUMN: total_costs,
+                        NET_BENEFITS_COLUMN: total_benefits - total_costs,
+                        "BCR": total_benefits / total_costs,
                     }
                 )
-                for region in simulation.regions:
-                    regional_result = sector_bcr(
-                        simulation,
-                        weights,
-                        variable_names,
-                        regions=(region,),
+                for region, results in regional_sector_results.items():
+                    regional_benefits = sum(
+                        result[BENEFITS_COLUMN] for result in results
                     )
-                    regional_sector_results[region].append(regional_result)
+                    regional_costs = sum(
+                        result[COSTS_COLUMN] for result in results
+                    )
                     regional_rows.append(
                         {
+                            "discounting": discounting_label,
                             "adaptation type": adaptation_type,
                             "calibration": calibration,
                             "region": region,
-                            "sector": sector,
-                            **regional_result,
+                            "sector": "Total",
+                            BENEFITS_COLUMN: regional_benefits,
+                            COSTS_COLUMN: regional_costs,
+                            NET_BENEFITS_COLUMN: regional_benefits - regional_costs,
+                            "BCR": regional_benefits / regional_costs,
                         }
                     )
-
-            total_benefits = sum(
-                result[BENEFITS_COLUMN] for result in sector_results
-            )
-            total_costs = sum(
-                result[COSTS_COLUMN] for result in sector_results
-            )
-            global_rows.append(
-                {
-                    "adaptation type": adaptation_type,
-                    "calibration": calibration,
-                    "sector": "Total",
-                    BENEFITS_COLUMN: total_benefits,
-                    COSTS_COLUMN: total_costs,
-                    NET_BENEFITS_COLUMN: total_benefits - total_costs,
-                    "BCR": total_benefits / total_costs,
-                }
-            )
-            for region, results in regional_sector_results.items():
-                regional_benefits = sum(
-                    result[BENEFITS_COLUMN] for result in results
-                )
-                regional_costs = sum(result[COSTS_COLUMN] for result in results)
-                regional_rows.append(
-                    {
-                        "adaptation type": adaptation_type,
-                        "calibration": calibration,
-                        "region": region,
-                        "sector": "Total",
-                        BENEFITS_COLUMN: regional_benefits,
-                        COSTS_COLUMN: regional_costs,
-                        NET_BENEFITS_COLUMN: regional_benefits - regional_costs,
-                        "BCR": regional_benefits / regional_costs,
-                    }
-                )
     return pd.DataFrame(global_rows), pd.DataFrame(regional_rows)
 
 
 def create_figure(results):
     """Create grouped BCR bars for separate and combined adaptation."""
 
-    discounting_label = (
-        f"{DISCOUNT_RATE:.0%} fixed discounting"
-        if DISCOUNTING == "fixed"
-        else "Ramsey discounting"
-    )
     figure = make_subplots(
         rows=1,
         cols=2,
         subplot_titles=("Separate adaptation", "Combined adaptation"),
     )
     colors = ("#636EFA", "#EF553B", "#00CC96", "#AB63FA")
-    for column, adaptation_type in enumerate(SECTORS, start=1):
-        subset = results[results["adaptation type"] == adaptation_type]
-        for calibration, color in zip(CALIBRATIONS, colors):
-            calibration_results = subset[subset["calibration"] == calibration]
-            figure.add_trace(
-                go.Bar(
-                    x=calibration_results["sector"],
-                    y=calibration_results["BCR"],
-                    name=calibration,
-                    legendgroup=calibration,
-                    showlegend=column == 1,
-                    marker_color=color,
-                    hovertemplate="%{x}<br>BCR=%{y:.2f}<extra>%{fullData.name}</extra>",
-                ),
-                row=1,
-                col=column,
-            )
+    trace_discounting = []
+    for discounting_label in DISCOUNTING_OPTIONS:
+        discounting_results = results[
+            results["discounting"] == discounting_label
+        ]
+        for column, adaptation_type in enumerate(SECTORS, start=1):
+            subset = discounting_results[
+                discounting_results["adaptation type"] == adaptation_type
+            ]
+            for calibration, color in zip(CALIBRATIONS, colors):
+                calibration_results = subset[
+                    subset["calibration"] == calibration
+                ]
+                figure.add_trace(
+                    go.Bar(
+                        x=calibration_results["sector"],
+                        y=calibration_results["BCR"],
+                        name=calibration,
+                        legendgroup=calibration,
+                        showlegend=column == 1,
+                        marker_color=color,
+                        hovertemplate=(
+                            "%{x}<br>BCR=%{y:.2f}"
+                            "<extra>%{fullData.name}</extra>"
+                        ),
+                        visible=discounting_label == DEFAULT_DISCOUNTING,
+                    ),
+                    row=1,
+                    col=column,
+                )
+                trace_discounting.append(discounting_label)
+
+    for column in range(1, 3):
         figure.add_hline(y=1, line_dash="dash", line_color="black", row=1, col=column)
+
+    buttons = []
+    for discounting_label in DISCOUNTING_OPTIONS:
+        buttons.append(
+            {
+                "label": discounting_label,
+                "method": "update",
+                "args": [
+                    {
+                        "visible": [
+                            trace_label == discounting_label
+                            for trace_label in trace_discounting
+                        ]
+                    },
+                    {
+                        "title.text": (
+                            f"Global ACCREU adaptation BCRs through {FINAL_YEAR} "
+                            f"({discounting_label} discounting)"
+                        )
+                    },
+                ],
+            }
+        )
 
     figure.update_yaxes(title_text="Benefit-cost ratio", rangemode="tozero")
     figure.update_layout(
         title=(
             f"Global ACCREU adaptation BCRs through {FINAL_YEAR} "
-            f"({discounting_label})"
+            f"({DEFAULT_DISCOUNTING} discounting)"
         ),
         barmode="group",
         template="plotly_white",
+        updatemenus=[
+            {
+                "type": "buttons",
+                "direction": "right",
+                "buttons": buttons,
+                "active": list(DISCOUNTING_OPTIONS).index(DEFAULT_DISCOUNTING),
+                "x": 0.5,
+                "xanchor": "center",
+                "y": 1.18,
+                "yanchor": "top",
+            }
+        ],
+        margin={"t": 140},
     )
     return figure
 
@@ -335,52 +406,81 @@ def create_regional_figure(results):
         horizontal_spacing=0.04,
     )
     regions = list(results["region"].drop_duplicates())
+    trace_discounting = []
 
-    for row, adaptation_type in enumerate(SECTORS, start=1):
-        sectors = [*SECTORS[adaptation_type], "Total"]
-        for column, calibration in enumerate(CALIBRATIONS, start=1):
-            subset = results[
-                (results["adaptation type"] == adaptation_type)
-                & (results["calibration"] == calibration)
-            ]
-            bcrs = subset.pivot(index="region", columns="sector", values="BCR")
-            bcrs = bcrs.reindex(index=regions, columns=sectors)
-            category_values = np.where(
-                bcrs.isna(),
-                np.nan,
-                np.digitize(bcrs.values, (0, 1, 2, 5, 10, 25)),
-            )
-            labels = np.full(bcrs.shape, "", dtype=object)
-            valid = ~bcrs.isna().values
-            labels[valid] = [f"{value:.1f}" for value in bcrs.values[valid]]
-            figure.add_trace(
-                go.Heatmap(
-                    x=sectors,
-                    y=regions,
-                    z=category_values,
-                    customdata=bcrs.values,
-                    text=labels,
-                    texttemplate="%{text}",
-                    coloraxis="coloraxis",
-                    hovertemplate=(
-                        "Region=%{y}<br>Sector=%{x}<br>"
-                        "BCR=%{customdata:.2f}<extra></extra>"
+    for discounting_label in DISCOUNTING_OPTIONS:
+        discounting_results = results[
+            results["discounting"] == discounting_label
+        ]
+        for row, adaptation_type in enumerate(SECTORS, start=1):
+            sectors = [*SECTORS[adaptation_type], "Total"]
+            for column, calibration in enumerate(CALIBRATIONS, start=1):
+                subset = discounting_results[
+                    (discounting_results["adaptation type"] == adaptation_type)
+                    & (discounting_results["calibration"] == calibration)
+                ]
+                bcrs = subset.pivot(
+                    index="region", columns="sector", values="BCR"
+                )
+                bcrs = bcrs.reindex(index=regions, columns=sectors)
+                category_values = np.where(
+                    bcrs.isna(),
+                    np.nan,
+                    np.digitize(bcrs.values, (0, 1, 2, 5, 10, 25)),
+                )
+                labels = np.full(bcrs.shape, "", dtype=object)
+                valid = ~bcrs.isna().values
+                labels[valid] = [
+                    f"{value:.1f}" for value in bcrs.values[valid]
+                ]
+                figure.add_trace(
+                    go.Heatmap(
+                        x=sectors,
+                        y=regions,
+                        z=category_values,
+                        customdata=bcrs.values,
+                        text=labels,
+                        texttemplate="%{text}",
+                        coloraxis="coloraxis",
+                        hovertemplate=(
+                            "Region=%{y}<br>Sector=%{x}<br>"
+                            "BCR=%{customdata:.2f}<extra></extra>"
+                        ),
+                        visible=discounting_label == DEFAULT_DISCOUNTING,
                     ),
-                ),
-                row=row,
-                col=column,
-            )
+                    row=row,
+                    col=column,
+                )
+                trace_discounting.append(discounting_label)
 
-    discounting_label = (
-        f"{DISCOUNT_RATE:.0%} fixed discounting"
-        if DISCOUNTING == "fixed"
-        else "Ramsey discounting"
-    )
+    buttons = []
+    for discounting_label in DISCOUNTING_OPTIONS:
+        buttons.append(
+            {
+                "label": discounting_label,
+                "method": "update",
+                "args": [
+                    {
+                        "visible": [
+                            trace_label == discounting_label
+                            for trace_label in trace_discounting
+                        ]
+                    },
+                    {
+                        "title.text": (
+                            f"Regional ACCREU adaptation BCRs through "
+                            f"{FINAL_YEAR} ({discounting_label} discounting)"
+                        )
+                    },
+                ],
+            }
+        )
+
     figure.update_xaxes(tickangle=-30)
     figure.update_layout(
         title=(
             f"Regional ACCREU adaptation BCRs through {FINAL_YEAR} "
-            f"({discounting_label})"
+            f"({DEFAULT_DISCOUNTING} discounting)"
         ),
         coloraxis={
             "cmin": -0.5,
@@ -395,6 +495,19 @@ def create_regional_figure(results):
         template="plotly_white",
         height=1400,
         width=1800,
+        updatemenus=[
+            {
+                "type": "buttons",
+                "direction": "right",
+                "buttons": buttons,
+                "active": list(DISCOUNTING_OPTIONS).index(DEFAULT_DISCOUNTING),
+                "x": 0.5,
+                "xanchor": "center",
+                "y": 1.10,
+                "yanchor": "top",
+            }
+        ],
+        margin={"t": 150},
     )
     return figure
 
