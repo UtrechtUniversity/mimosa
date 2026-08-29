@@ -302,6 +302,25 @@ def create_figure(results):
 def create_regional_figure(results):
     """Create regional BCR heatmaps by adaptation type and calibration."""
 
+    bcr_categories = ("< 0", "0–1", "1–2", "2–5", "5–10", "10–25", "> 25")
+    category_colors = (
+        "#f4a3a8",
+        "#fdd49e",
+        "#fff7bc",
+        "#c7e9c0",
+        "#7fcdbb",
+        "#74a9cf",
+        "#bcbddc",
+    )
+    category_colorscale = []
+    for index, color in enumerate(category_colors):
+        category_colorscale.extend(
+            [
+                (index / len(category_colors), color),
+                ((index + 1) / len(category_colors), color),
+            ]
+        )
+
     subplot_titles = [
         f"{adaptation_type}: {calibration}"
         for adaptation_type in SECTORS
@@ -326,15 +345,26 @@ def create_regional_figure(results):
             ]
             bcrs = subset.pivot(index="region", columns="sector", values="BCR")
             bcrs = bcrs.reindex(index=regions, columns=sectors)
+            category_values = np.where(
+                bcrs.isna(),
+                np.nan,
+                np.digitize(bcrs.values, (0, 1, 2, 5, 10, 25)),
+            )
+            labels = np.full(bcrs.shape, "", dtype=object)
+            valid = ~bcrs.isna().values
+            labels[valid] = [f"{value:.1f}" for value in bcrs.values[valid]]
             figure.add_trace(
                 go.Heatmap(
                     x=sectors,
                     y=regions,
-                    z=bcrs.values,
+                    z=category_values,
+                    customdata=bcrs.values,
+                    text=labels,
+                    texttemplate="%{text}",
                     coloraxis="coloraxis",
                     hovertemplate=(
                         "Region=%{y}<br>Sector=%{x}<br>"
-                        "BCR=%{z:.2f}<extra></extra>"
+                        "BCR=%{customdata:.2f}<extra></extra>"
                     ),
                 ),
                 row=row,
@@ -352,9 +382,18 @@ def create_regional_figure(results):
             f"Regional ACCREU adaptation BCRs through {FINAL_YEAR} "
             f"({discounting_label})"
         ),
-        coloraxis={"colorscale": "Viridis", "colorbar": {"title": "BCR"}},
+        coloraxis={
+            "cmin": -0.5,
+            "cmax": 6.5,
+            "colorscale": category_colorscale,
+            "colorbar": {
+                "title": "BCR",
+                "tickvals": list(range(len(bcr_categories))),
+                "ticktext": bcr_categories,
+            },
+        },
         template="plotly_white",
-        height=900,
+        height=1400,
         width=1800,
     )
     return figure
