@@ -18,9 +18,10 @@ sys.path.insert(0, str(REPOSITORY_ROOT))
 from mimosa import MIMOSA, load_params  # noqa: E402
 from mimosa.common import quant, trapezoid  # noqa: E402
 
-PULSE_YEAR = 2030
+PULSE_YEAR = 2025
 PULSE_SIZE = 1.0  # GtCO2
-DISCOUNT_RATE = 0.03
+DISCOUNTING = "ramsey"  # "fixed" or "ramsey"
+DISCOUNT_RATE = 0.03  # only for "fixed" discounting
 
 SECTORS = {
     "COACCH": {
@@ -94,6 +95,33 @@ def global_sector_costs(
     return costs
 
 
+def ramsey_discount_factors(
+    simulation,
+    prtp,
+    elasmu,
+    pulse_year=PULSE_YEAR,
+):
+    """Calculate Ramsey discount factors from an unpulsed simulation."""
+
+    years = np.asarray([simulation.year(t) for t in simulation.t], dtype=float)
+    consumption_per_capita = np.asarray(
+        [
+            sum(simulation.consumption[t, region] for region in simulation.regions)
+            / sum(simulation.population[t, region] for region in simulation.regions)
+            for t in simulation.t
+        ]
+    )
+    pulse_index = np.flatnonzero(years == pulse_year)
+    if len(pulse_index) != 1:
+        raise ValueError(f"Pulse year {pulse_year} must occur once on the time grid.")
+
+    pulse_consumption = consumption_per_capita[pulse_index[0]]
+    # Equivalent to cumulatively applying PRTP + elasmu * d(log(c)) / dt.
+    return np.exp(-prtp * (years - pulse_year)) * (
+        consumption_per_capita / pulse_consumption
+    ) ** (-elasmu)
+
+
 def calculate_discounted_cost_scc(
     negative_pulse,
     positive_pulse,
@@ -101,6 +129,7 @@ def calculate_discounted_cost_scc(
     pulse_year=PULSE_YEAR,
     pulse_size=PULSE_SIZE,
     discount_rate=DISCOUNT_RATE,
+    discount_factors=None,
 ):
     """Discount a central-difference stream of global costs."""
 
@@ -118,9 +147,14 @@ def calculate_discounted_cost_scc(
 
     included = years >= pulse_year
     included_years = years[included]
-    discount_factors = np.exp(-discount_rate * (included_years - pulse_year))
+    if discount_factors is None:
+        included_discount_factors = np.exp(
+            -discount_rate * (included_years - pulse_year)
+        )
+    else:
+        included_discount_factors = np.asarray(discount_factors)[included]
     discounted_costs = trapezoid(
-        marginal_costs[included] * discount_factors,
+        marginal_costs[included] * included_discount_factors,
         included_years,
     )
 
@@ -138,12 +172,25 @@ def calculate_scc_breakdown(
     controls=None,
     include_adaptation_costs=False,
     pulse_size=PULSE_SIZE,
+    discounting=DISCOUNTING,
 ):
     """Calculate the total and sectoral SCCs for supplied policy controls."""
+
+    if discounting not in {"fixed", "ramsey"}:
+        raise ValueError("Discounting must be 'fixed' or 'ramsey'.")
 
     negative = simulate_with_pulse(params, -pulse_size, controls)
     positive = simulate_with_pulse(params, pulse_size, controls)
 
+    if discounting == "fixed":
+        discount_factors = None
+    elif discounting == "ramsey":
+        unpulsed = simulate_with_pulse(params, 0, controls)
+        discount_factors = ramsey_discount_factors(
+            unpulsed,
+            params["economics"]["PRTP"],
+            params["economics"]["elasmu"],
+        )
     sccs = {
         "total": calculate_discounted_cost_scc(
             negative,
@@ -153,6 +200,7 @@ def calculate_scc_breakdown(
                 include_adaptation_costs=include_adaptation_costs,
             ),
             pulse_size=pulse_size,
+            discount_factors=discount_factors,
         )
     }
     for sector, (damage_variable, adaptation_cost_variable) in SECTORS[
@@ -169,6 +217,7 @@ def calculate_scc_breakdown(
                 adaptation_cost_variable=adaptation_cost_variable,
             ),
             pulse_size=pulse_size,
+            discount_factors=discount_factors,
         )
     return sccs
 
@@ -205,25 +254,40 @@ def analytical_adaptation(params):
     return params
 
 
-def calculate_coacch_sccs(pulse_size=PULSE_SIZE):
+def calculate_coacch_sccs(
+    pulse_size=PULSE_SIZE,
+    discounting=DISCOUNTING,
+):
     """Calculate COACCH baseline and fixed-optimal-path SCC values."""
 
     params = base_params("COACCH")
 
     sccs = {
-        "baseline": calculate_scc_breakdown(params, "COACCH", pulse_size=pulse_size)
+        "baseline": calculate_scc_breakdown(
+            params,
+            "COACCH",
+            pulse_size=pulse_size,
+            discounting=discounting,
+        )
     }
 
     model = MIMOSA(deepcopy(params))
     model.solve(verbose=False)
     controls = extract_optimal_controls(model)
     sccs["optimal"] = calculate_scc_breakdown(
-        params, "COACCH", controls, pulse_size=pulse_size
+        params,
+        "COACCH",
+        controls,
+        pulse_size=pulse_size,
+        discounting=discounting,
     )
     return sccs
 
 
-def calculate_accreu_sccs(pulse_size=PULSE_SIZE):
+def calculate_accreu_sccs(
+    pulse_size=PULSE_SIZE,
+    discounting=DISCOUNTING,
+):
     """Calculate the four standard ACCREU policy-scenario SCC values."""
 
     params = base_params("ACCREU")
@@ -235,6 +299,7 @@ def calculate_accreu_sccs(pulse_size=PULSE_SIZE):
             params_without_adaptation,
             "ACCREU",
             pulse_size=pulse_size,
+            discounting=discounting,
         )
     }
 
@@ -247,6 +312,7 @@ def calculate_accreu_sccs(pulse_size=PULSE_SIZE):
         "ACCREU",
         mitigation_controls,
         pulse_size=pulse_size,
+        discounting=discounting,
     )
 
     # ada: no mitigation and analytical adaptation, recalculated for each pulse
@@ -256,6 +322,7 @@ def calculate_accreu_sccs(pulse_size=PULSE_SIZE):
         "ACCREU",
         include_adaptation_costs=True,
         pulse_size=pulse_size,
+        discounting=discounting,
     )
     return sccs
 

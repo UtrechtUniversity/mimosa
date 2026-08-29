@@ -7,6 +7,7 @@ from diagnostics.scc import (
     calculate_discounted_cost_scc,
     global_climate_costs,
     global_sector_costs,
+    ramsey_discount_factors,
 )
 from mimosa.common import quant
 
@@ -104,3 +105,27 @@ def test_global_sector_costs_include_sector_adaptation_expenditure():
     )
 
     assert costs == pytest.approx(0.1 * 2.0 + 0.2 * 3.0 + 1.0 + 2.0)
+
+
+def test_ramsey_discount_factors_use_global_per_capita_consumption():
+    simulation = DamageSimulation()
+    simulation.consumption = {
+        (t, region): value
+        for t, value in enumerate((1.0, 2.0, 4.0))
+        for region in simulation.regions
+    }
+    simulation.population = {
+        (t, region): 1.0 for t in simulation.t for region in simulation.regions
+    }
+
+    factors = ramsey_discount_factors(
+        simulation,
+        prtp=0.01,
+        elasmu=2.0,
+        pulse_year=2030,
+    )
+
+    expected = np.exp(-0.01 * (np.asarray([2025, 2030, 2040]) - 2030)) * np.asarray(
+        [0.5, 1.0, 2.0]
+    ) ** -2.0
+    np.testing.assert_allclose(factors, expected)
