@@ -173,16 +173,17 @@ for monetise_mortality in [False, True]:
         )
 
         #### Run "mit_late_ada": Same as mit_ada, but mitigation is delayed until after 2050
-        params_mit_late_ada = init_params(monetise_mortality, adapt_calibration)
-        params_mit_late_ada["model structure"]["damage module options"][
-            "ACCREU_adaptation_determination"
-        ] = "analytical_optimum"
-        params_mit_late_ada["emissions"]["delay_mitigation_until_year"] = 2050
-        model_mit_late_ada = MIMOSA(params_mit_late_ada)
-        model_mit_late_ada.solve()
-        model_mit_late_ada.save(
-            f"{PREFIX}_mit_late_ada_adapt_calib_{adapt_calibration}_mortality_{monetise_mortality}"
-        )
+        if adapt_calibration == "accreu":
+            params_mit_late_ada = init_params(monetise_mortality, adapt_calibration)
+            params_mit_late_ada["model structure"]["damage module options"][
+                "ACCREU_adaptation_determination"
+            ] = "analytical_optimum"
+            params_mit_late_ada["emissions"]["delay_mitigation_until_year"] = 2050
+            model_mit_late_ada = MIMOSA(params_mit_late_ada)
+            model_mit_late_ada.solve()
+            model_mit_late_ada.save(
+                f"{PREFIX}_mit_late_ada_adapt_calib_{adapt_calibration}_mortality_{monetise_mortality}"
+            )
 
         # #### Run "mit_ada_unplanned": Take a MIMOSA optimisation run and just change the adaptation level
         # params_mit_ada_unplanned = init_params(monetise_mortality, adapt_calibration)
