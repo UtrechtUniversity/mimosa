@@ -70,8 +70,10 @@ SECTORS = {
 OUTPUT_DIRECTORY = REPOSITORY_ROOT / "output"
 TABLE_OUTPUT = OUTPUT_DIRECTORY / "adaptation_bcr.csv"
 PLOT_OUTPUT = OUTPUT_DIRECTORY / "adaptation_bcr.html"
+PNG_OUTPUT = OUTPUT_DIRECTORY / "adaptation_bcr_5pct.png"
 REGIONAL_TABLE_OUTPUT = OUTPUT_DIRECTORY / "adaptation_bcr_regional.csv"
 REGIONAL_PLOT_OUTPUT = OUTPUT_DIRECTORY / "adaptation_bcr_regional.html"
+REGIONAL_PNG_OUTPUT = OUTPUT_DIRECTORY / "adaptation_bcr_regional_5pct.png"
 
 BENEFITS_COLUMN = "avoided damages (trillion USD2010)"
 COSTS_COLUMN = "adaptation costs (trillion USD2010)"
@@ -512,6 +514,13 @@ def create_regional_figure(results):
     return figure
 
 
+def write_default_png(figure, output_path):
+    """Write the initially selected (5%) view without interactive buttons."""
+
+    figure.layout.updatemenus = []
+    figure.write_image(output_path, scale=2)
+
+
 if __name__ == "__main__":
     global_bcrs, regional_bcrs = calculate_bcrs()
     print(
@@ -521,9 +530,15 @@ if __name__ == "__main__":
     OUTPUT_DIRECTORY.mkdir(parents=True, exist_ok=True)
     global_bcrs.to_csv(TABLE_OUTPUT, index=False)
     regional_bcrs.to_csv(REGIONAL_TABLE_OUTPUT, index=False)
-    create_figure(global_bcrs).write_html(PLOT_OUTPUT)
-    create_regional_figure(regional_bcrs).write_html(REGIONAL_PLOT_OUTPUT)
+    global_figure = create_figure(global_bcrs)
+    regional_figure = create_regional_figure(regional_bcrs)
+    global_figure.write_html(PLOT_OUTPUT)
+    regional_figure.write_html(REGIONAL_PLOT_OUTPUT)
+    write_default_png(global_figure, PNG_OUTPUT)
+    write_default_png(regional_figure, REGIONAL_PNG_OUTPUT)
     print(f"Wrote {TABLE_OUTPUT.relative_to(REPOSITORY_ROOT)}")
     print(f"Wrote {PLOT_OUTPUT.relative_to(REPOSITORY_ROOT)}")
+    print(f"Wrote {PNG_OUTPUT.relative_to(REPOSITORY_ROOT)}")
     print(f"Wrote {REGIONAL_TABLE_OUTPUT.relative_to(REPOSITORY_ROOT)}")
     print(f"Wrote {REGIONAL_PLOT_OUTPUT.relative_to(REPOSITORY_ROOT)}")
+    print(f"Wrote {REGIONAL_PNG_OUTPUT.relative_to(REPOSITORY_ROOT)}")
