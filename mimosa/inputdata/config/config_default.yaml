@@ -317,6 +317,13 @@ economics:
         min: 0
         max: 1
 
+      delay_adaptation_until_year: &delay_until_year
+        descr: Delays adaptation until after this given year. If false, no constraint on adaptation is set.
+        type: int
+        min: 2030
+        can_be_false: True
+        default: False
+
 ##################
 
 emissions:
@@ -402,11 +409,8 @@ emissions:
     default: True
 
   delay_mitigation_until_year:
+    <<: *delay_until_year
     descr: Delays mitigation until after this given year. If false, mitigation is always available.
-    type: int
-    min: 2030
-    can_be_false: True
-    default: False
 
 ##################
 

@@ -153,7 +153,9 @@ def dmg_fct_power(m, t, a, b, c, x="temperature", xshift=0, remove_base=True):
     return fct(x_t - xshift)
 
 
-def optimal_adaptation_costs_fct(gross_damages_abs, a, b, scale=0.001):
+def optimal_adaptation_costs_fct(m, t, gross_damages_abs, a, b, scale=0.001):
     if a * b == 0:
+        return 0
+    if m.delay_adaptation_year is not False and m.year(t) <= m.delay_adaptation_year:
         return 0
     return soft_min(log(a * b * soft_min(gross_damages_abs, scale)) / b, scale)

@@ -129,6 +129,8 @@ def get_constraints(m, adaptation_options: AdaptationOptions):
                 RegionalEquation(
                     m.slr_adaptation_costs_abs,
                     lambda m, t, r: optimal_adaptation_costs_fct(
+                        m,
+                        t,
                         m.slr_damage_costs_gross[t, r] * m.GDP_gross[t, r],
                         *effective_adaptation_curve(
                             m,

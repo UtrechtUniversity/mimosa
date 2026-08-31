@@ -134,6 +134,9 @@ def get_constraints(
             m.t,
             units=quant.unit("fraction_of_GDP"),
         )
+        m.delay_adaptation_year = Param(
+            doc="::economics.damages.accreu.delay_adaptation_until_year"
+        )
         constraints.extend(
             [
                 # Adaptation costs:
