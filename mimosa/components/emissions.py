@@ -198,6 +198,20 @@ def _get_emissions_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
         bounds=lambda m, t, r: (0, 0) if t == 0 else (0, 2.5),
         units=quant.unit("fraction_of_baseline_emissions"),
     )
+
+    # If set, delay mitigation until after a given year by setting a bound on relative_abatement:
+    m.delay_mitigation_year = Param(doc="::emissions.delay_mitigation_until_year")
+    constraints.append(
+        RegionalConstraint(
+            lambda m, t, r: (
+                m.relative_abatement[t, r] <= 0.001
+                if m.delay_mitigation_year is not False
+                and m.year(t) <= m.delay_mitigation_year
+                else Constraint.Skip
+            )
+        )
+    )
+
     m.regional_emission_reductions = Var(
         m.t, m.regions, units=quant.unit("emissionsrate_unit")
     )
@@ -563,13 +577,19 @@ def _get_inertia_and_budget_constraints(
                 ),
                 name="global_inertia",
             ),
+            # Regional inertia (skipped for when mitigation is delayed, since there is no mitigation in that period)
             RegionalConstraint(
                 lambda m, t, r: (
                     m.regional_emissions[t, r] - m.regional_emissions[t - 1, r]
                     >= m.period_length[t]
                     * m.inertia_regional
                     * m.ssp_baseline_emissions[0, r]
-                    if value(m.inertia_regional) is not False and t > 0
+                    if value(m.inertia_regional) is not False
+                    and t > 0
+                    and (
+                        m.delay_mitigation_year is False
+                        or m.year(t) >= m.delay_mitigation_year
+                    )
                     else Constraint.Skip
                 ),
                 name="regional_inertia",
