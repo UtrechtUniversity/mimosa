@@ -38,6 +38,7 @@ def _context(
             True,
         ),
         ("ACCREU", "combined", "joint", "solver_control", False),
+        ("ACCREU", "separate", "joint", "analytical_optimum", False),
         (
             "ACCREU",
             "noadaptation",
@@ -101,30 +102,43 @@ def test_cba_configuration_defaults_and_validation():
         check_params(params)
 
 
-@pytest.mark.parametrize(
-    ("strategy", "determination", "required"),
-    [
-        ("mitigation_then_adaptation", "solver_control", "analytical_optimum"),
-        ("joint", "analytical_optimum", "solver_control"),
-    ],
-)
-def test_solve_rejects_incompatible_strategy_and_determination(
-    strategy, determination, required
-):
+def test_sequential_solve_rejects_solver_control_adaptation():
     model = MIMOSA.__new__(MIMOSA)
     model.model_context = _context(
-        strategy=strategy, determination=determination
+        strategy="mitigation_then_adaptation", determination="solver_control"
     )
     model.status = "old status"
     model.solve_runtime = 10
     model.workflow_control_values = {"old": "controls"}
 
-    with pytest.raises(ValueError, match=required):
+    with pytest.raises(ValueError, match="analytical_optimum"):
         model.solve(verbose=False)
 
     assert model.status is None
     assert model.solve_runtime is None
     assert model.workflow_control_values is None
+
+
+def test_joint_analytical_adaptation_uses_ordinary_solve(monkeypatch):
+    calls = []
+    model = MIMOSA.__new__(MIMOSA)
+    model.model_context = _context(
+        strategy="joint", determination="analytical_optimum"
+    )
+    model.status = None
+    model.solve_runtime = None
+    model.workflow_control_values = None
+    monkeypatch.setattr(
+        model,
+        "_solve_model_normally",
+        lambda **kwargs: calls.append(kwargs),
+    )
+
+    model.solve(verbose=False, ipopt_maxiter=123)
+
+    assert calls == [
+        {"verbose": False, "use_neos": False, "ipopt_maxiter": 123}
+    ]
 
 
 def test_sequential_workflow_copies_params_forwards_options_and_replays(monkeypatch):

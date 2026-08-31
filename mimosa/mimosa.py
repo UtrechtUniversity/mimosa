@@ -263,16 +263,14 @@ class MIMOSA:
         determination = self.model_context.option(
             "damage", "ACCREU_adaptation_determination"
         )
-        required_determination = (
-            "analytical_optimum"
-            if strategy == "mitigation_then_adaptation"
-            else "solver_control"
-        )
-        if determination != required_determination:
+        if (
+            strategy == "mitigation_then_adaptation"
+            and determination != "analytical_optimum"
+        ):
             raise ValueError(
-                f"ACCREU_CBA_strategy='{strategy}' requires "
+                "ACCREU_CBA_strategy='mitigation_then_adaptation' requires "
                 "ACCREU_adaptation_determination="
-                f"'{required_determination}', not '{determination}'."
+                f"'analytical_optimum', not '{determination}'."
             )
 
         return strategy == "mitigation_then_adaptation"
@@ -299,9 +297,7 @@ class MIMOSA:
             raise ValueError(
                 "ACCREU_CBA_strategy='mitigation_then_adaptation' is only "
                 "available for cost-benefit analysis without a fixed carbon budget. "
-                "Use ACCREU_CBA_strategy='joint' with "
-                "ACCREU_adaptation_determination='solver_control' for a "
-                "carbon-budget run."
+                "Use ACCREU_CBA_strategy='joint' for a carbon-budget run."
             )
 
         mitigation_params = deepcopy(self._params)

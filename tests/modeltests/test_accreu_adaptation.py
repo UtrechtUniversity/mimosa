@@ -7,6 +7,31 @@ from mimosa import MIMOSA, load_params
 
 
 @pytest.mark.ipopt
+def test_joint_cba_supports_analytical_adaptation():
+    params = load_params()
+    params["time"]["end"] = 2050
+    params["time"]["periods"] = {}
+    params["model structure"]["damage module"] = "ACCREU"
+    options = params["model structure"]["damage module options"]
+    options["ACCREU_adaptation_determination"] = "analytical_optimum"
+
+    model = MIMOSA(params)
+
+    assert model._uses_sequential_accreu_cba() is False
+    assert not any(
+        "adaptation" in name for name in model.simulator.control_variables
+    )
+
+    model.solve(verbose=False)
+
+    adaptation_values = np.asarray(
+        list(model.concrete_model.adaptation_costs_abs.extract_values().values())
+    )
+    assert np.isfinite(adaptation_values).all()
+    assert np.any(adaptation_values > 0)
+
+
+@pytest.mark.ipopt
 def test_one_call_sequential_cba_matches_manual_two_model_workflow():
     params = load_params()
     params["time"]["end"] = 2050

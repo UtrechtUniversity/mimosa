@@ -44,6 +44,12 @@ both mitigation and adaptation so avoided damages have a consistent reference.
 The sequential strategy rejects a fixed carbon budget. Transferred pathways
 remain available as `model.workflow_control_values` for diagnostics.
 
+The `joint` strategy also supports `analytical_optimum`. In that combination,
+MIMOSA performs one ordinary optimisation: the solver chooses mitigation while
+adaptation responds through its analytical optimum equations. This differs from
+`mitigation_then_adaptation`, which first chooses mitigation in a model without
+adaptation.
+
 ### Configuring the time grid
 
 The `time.dt` parameter sets the initial timestep length, while `time.periods`

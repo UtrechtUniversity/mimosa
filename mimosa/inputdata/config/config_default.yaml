@@ -516,7 +516,8 @@ model structure:
         How solve() coordinates mitigation and adaptation in an ACCREU
         cost-benefit analysis. The sequential strategy first optimises mitigation
         without adaptation and then calculates analytical optimal adaptation for
-        that pathway. The joint strategy uses the ordinary one-model solve path.
+        that pathway. The joint strategy uses the ordinary one-model solve path,
+        with adaptation either chosen by the solver or determined analytically.
       type: enum
       values:
         - mitigation_then_adaptation
