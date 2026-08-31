@@ -195,7 +195,7 @@ def _get_emissions_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
         m.t,
         m.regions,
         initialize=0,
-        bounds=(0, 2.5),
+        bounds=lambda m, t, r: (0, 0) if t == 0 else (0, 2.5),
         units=quant.unit("fraction_of_baseline_emissions"),
     )
     m.regional_emission_reductions = Var(
@@ -234,8 +234,6 @@ def _get_emissions_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
                         if value(m.use_carbon_intensity_for_baseline)
                         else m.ssp_baseline_emissions[t, r]
                     )
-                    if t > 0
-                    else m.ssp_baseline_emissions[0, r]
                 ),
             ),
             RegionalEquation(
@@ -256,10 +254,7 @@ def _get_emissions_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
                         + (
                             (
                                 m.period_length[t]
-                                * (
-                                    m.global_emissions[t]
-                                    + m.global_emissions[t - 1]
-                                )
+                                * (m.global_emissions[t] + m.global_emissions[t - 1])
                                 / 2
                             )
                             if value(m.global_cumulative_emissions_trapz)
