@@ -22,6 +22,7 @@ from .utils import (
     dmg_fct_linear,
     effective_adaptation_curve,
     optimal_adaptation_costs_fct,
+    get_delayed_adaptation_constraint,
 )
 
 
@@ -105,6 +106,9 @@ def get_constraints(m, adaptation_options: AdaptationOptions):
         m.labourprod_adaptation_cost_param = Param(
             m.regions,
             doc="regional::ACCREU.labourprod_adapt_eff_cost_param",
+        )
+        constraints.append(
+            get_delayed_adaptation_constraint("labourprod_adaptation_costs")
         )
         constraints.extend(
             [

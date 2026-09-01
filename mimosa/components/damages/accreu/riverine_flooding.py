@@ -21,6 +21,7 @@ from .utils import (
     adaptation_effectiveness_fct,
     effective_adaptation_curve,
     optimal_adaptation_costs_fct,
+    get_delayed_adaptation_constraint,
 )
 
 
@@ -88,6 +89,9 @@ def get_constraints(m, adaptation_options: AdaptationOptions):
         m.riverine_adaptation_cost_param = Param(
             m.regions,
             doc="regional::ACCREU.riverine_adapt_eff_cost_param",
+        )
+        constraints.append(
+            get_delayed_adaptation_constraint("riverine_adaptation_costs")
         )
         constraints.extend(
             [

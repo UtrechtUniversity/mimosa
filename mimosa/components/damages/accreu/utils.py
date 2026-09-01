@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Mapping
 
-from mimosa.common import exp, log, soft_min
+from mimosa.common import exp, log, soft_min, RegionalConstraint, Constraint, value
 
 
 @dataclass(frozen=True)
@@ -159,3 +159,16 @@ def optimal_adaptation_costs_fct(m, t, gross_damages_abs, a, b, scale=0.001):
     if m.delay_adaptation_year is not False and m.year(t) <= m.delay_adaptation_year:
         return 0
     return soft_min(log(a * b * soft_min(gross_damages_abs, scale)) / b, scale)
+
+
+def get_delayed_adaptation_constraint(varname, threshold=0.00005):
+
+    constraint = RegionalConstraint(
+        lambda m, t, r: (
+            getattr(m, varname)[t, r] <= threshold
+            if value(m.delay_adaptation_year) is not False
+            and m.year(t) <= m.delay_adaptation_year
+            else Constraint.Skip
+        )
+    )
+    return constraint

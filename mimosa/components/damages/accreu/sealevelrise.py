@@ -22,6 +22,7 @@ from .utils import (
     dmg_fct_power,
     effective_adaptation_curve,
     optimal_adaptation_costs_fct,
+    get_delayed_adaptation_constraint,
 )
 
 
@@ -92,6 +93,7 @@ def get_constraints(m, adaptation_options: AdaptationOptions):
             m.regions,
             doc="regional::ACCREU.slr_adapt_eff_cost_param",
         )
+        constraints.append(get_delayed_adaptation_constraint("slr_adaptation_costs"))
         constraints.extend(
             [
                 # Adaptation effectiveness function
