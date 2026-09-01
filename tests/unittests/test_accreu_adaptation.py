@@ -1,11 +1,14 @@
 from types import SimpleNamespace
 
 import pytest
+from pyomo.environ import Any, ConcreteModel, Param, Set, Var, value
 
 from mimosa.components.damages.accreu.utils import (
     effective_adaptation_curve,
     get_adaptation_calibration,
     get_adaptation_options,
+    get_delayed_adaptation_constraint,
+    optimal_adaptation_costs_fct,
     validate_adaptation_calibration,
 )
 
@@ -112,3 +115,61 @@ def test_adaptation_calibration_rejects_unknown_values(calibration, sector, mess
 def test_literature_calibration_supports_combined_adaptation(calibration):
     validate_adaptation_calibration(calibration)
     get_adaptation_calibration(calibration, "combined")
+
+
+def _delayed_adaptation_model(delay_year):
+    model = ConcreteModel()
+    model.t = Set(initialize=[0, 1, 2, 3], ordered=True)
+    model.regions = Set(initialize=["A", "B"], ordered=True)
+    model.year = lambda t: 2025 + 5 * t
+    model.delay_adaptation_year = Param(initialize=delay_year, within=Any)
+    model.sector_adaptation_costs = Var(
+        model.t, model.regions, initialize=0.00005
+    )
+    model.delayed_adaptation = get_delayed_adaptation_constraint(
+        "sector_adaptation_costs"
+    ).to_pyomo_constraint(model)
+    return model
+
+
+def test_delayed_adaptation_constraint_applies_through_delay_year():
+    model = _delayed_adaptation_model(2035)
+
+    assert set(model.delayed_adaptation) == {
+        (0, "A"),
+        (0, "B"),
+        (1, "A"),
+        (1, "B"),
+        (2, "A"),
+        (2, "B"),
+    }
+    for constraint in model.delayed_adaptation.values():
+        assert constraint.lower is None
+        assert value(constraint.upper) == pytest.approx(0.00005)
+
+
+def test_delayed_adaptation_constraint_is_skipped_when_disabled():
+    model = _delayed_adaptation_model(False)
+
+    assert len(model.delayed_adaptation) == 0
+
+
+@pytest.mark.parametrize(
+    ("year", "is_delayed"),
+    [(2030, True), (2035, True), (2040, False)],
+)
+def test_analytical_adaptation_uses_same_delay_year_boundary(year, is_delayed):
+    model = SimpleNamespace(delay_adaptation_year=2035, year=lambda _t: year)
+
+    result = optimal_adaptation_costs_fct(
+        model,
+        0,
+        gross_damages_abs=10,
+        a=0.5,
+        b=2,
+    )
+
+    if is_delayed:
+        assert result == 0
+    else:
+        assert result > 0
