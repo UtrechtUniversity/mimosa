@@ -205,7 +205,7 @@ def _get_emissions_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
         RegionalConstraint(
             lambda m, t, r: (
                 m.relative_abatement[t, r] <= 0.001
-                if m.delay_mitigation_year is not False
+                if value(m.delay_mitigation_year) is not False
                 and m.year(t) <= m.delay_mitigation_year
                 else Constraint.Skip
             )
@@ -587,7 +587,7 @@ def _get_inertia_and_budget_constraints(
                     if value(m.inertia_regional) is not False
                     and t > 0
                     and (
-                        m.delay_mitigation_year is False
+                        value(m.delay_mitigation_year) is False
                         or m.year(t) >= m.delay_mitigation_year
                     )
                     else Constraint.Skip
