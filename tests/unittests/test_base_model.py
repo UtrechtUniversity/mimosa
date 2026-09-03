@@ -17,6 +17,8 @@ def test_create_base_model_defines_shared_sets_and_inputs():
         "global_population",
         "baseline_GDP",
         "global_baseline_GDP",
+        "gdp_ppp_2010_div_gdp_mer_2010",
+        "dollar_2017_MER_to_2010_PPP",
         "ssp_baseline_emissions",
         "MAC_SSP_calibration_factor",
     ):

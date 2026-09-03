@@ -8,6 +8,7 @@ from diagnostics.scc import (
     global_climate_costs,
     global_sector_costs,
     ramsey_discount_factors,
+    regional_cost_in_currency,
 )
 from mimosa.common import quant
 
@@ -129,3 +130,29 @@ def test_ramsey_discount_factors_use_global_per_capita_consumption():
         [0.5, 1.0, 2.0]
     ) ** -2.0
     np.testing.assert_allclose(factors, expected)
+
+
+def test_regional_scc_cost_currency_conversion():
+    simulation = DamageSimulation()
+    simulation.dollar_2017_MER_to_2010_PPP = {"A": 2.0}
+
+    assert regional_cost_in_currency(
+        simulation, 100.0, "A", "USD2010 PPP"
+    ) == pytest.approx(100.0)
+    assert regional_cost_in_currency(
+        simulation, 100.0, "A", "USD2017 MER"
+    ) == pytest.approx(50.0)
+
+
+def test_global_scc_costs_are_converted_before_regional_aggregation():
+    simulation = damage_simulation([100.0, 0.0, 0.0])
+    simulation.dollar_2017_MER_to_2010_PPP = {"A": 2.0, "B": 4.0}
+
+    assert global_climate_costs(
+        simulation, 0, output_currency="USD2017 MER"
+    ) == pytest.approx(75.0)
+
+
+def test_regional_scc_cost_rejects_unknown_currency():
+    with pytest.raises(ValueError, match="Output currency"):
+        regional_cost_in_currency(DamageSimulation(), 100.0, "A", "USD")

@@ -39,6 +39,14 @@ def create_base_model() -> AbstractModel:
         initialize=lambda m, t: sum(m.baseline_GDP[t, r] for r in m.regions),
         units=quant.unit("currency_unit"),
     )
+    # Regional factor to convert 2017 MER dollars to 2010 PPP dollars.
+    m.gdp_ppp_2010_div_gdp_mer_2010 = Param(
+        m.regions, doc="regional::economics.gdp_ppp_2010_div_gdp_mer_2010"
+    )
+    m.dollar_2017_MER_to_2010_PPP = Param(
+        m.regions,
+        initialize=lambda m, r: 0.89632 * m.gdp_ppp_2010_div_gdp_mer_2010[r],
+    )
     m.ssp_baseline_emissions = Param(
         m.t,
         m.regions,

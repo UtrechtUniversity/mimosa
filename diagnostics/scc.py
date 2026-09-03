@@ -22,6 +22,9 @@ PULSE_YEAR = 2025
 PULSE_SIZE = 1.0  # GtCO2
 DISCOUNTING = "ramsey"  # "fixed" or "ramsey"
 DISCOUNT_RATE = 0.03  # only for "fixed" discounting
+SCC_CURRENCY = "USD2010 PPP"  # "USD2010 PPP" or "USD2017 MER"
+SCC_CURRENCIES = {"USD2010 PPP", "USD2017 MER"}
+END_YEAR = 2100
 
 SECTORS = {
     "COACCH": {
@@ -65,13 +68,31 @@ def extract_optimal_controls(model):
     }
 
 
-def global_climate_costs(simulation, t, include_adaptation_costs=False):
+def regional_cost_in_currency(simulation, cost, region, output_currency):
+    """Convert one region's 2010 PPP cost to the requested currency."""
+
+    if output_currency == "USD2010 PPP":
+        return cost
+    if output_currency == "USD2017 MER":
+        return cost / simulation.dollar_2017_MER_to_2010_PPP[region]
+    raise ValueError(f"Output currency must be one of {sorted(SCC_CURRENCIES)}.")
+
+
+def global_climate_costs(
+    simulation,
+    t,
+    include_adaptation_costs=False,
+    output_currency=SCC_CURRENCY,
+):
     """Return global damages, optionally including adaptation expenditure."""
 
-    costs = sum(simulation.damage_costs_abs[t, region] for region in simulation.regions)
-    if include_adaptation_costs:
-        costs += sum(
-            simulation.adaptation_costs_abs[t, region] for region in simulation.regions
+    costs = 0
+    for region in simulation.regions:
+        regional_cost = simulation.damage_costs_abs[t, region]
+        if include_adaptation_costs:
+            regional_cost += simulation.adaptation_costs_abs[t, region]
+        costs += regional_cost_in_currency(
+            simulation, regional_cost, region, output_currency
         )
     return costs
 
@@ -81,17 +102,24 @@ def global_sector_costs(
     t,
     damage_variable,
     adaptation_cost_variable=None,
+    output_currency=SCC_CURRENCY,
 ):
     """Return one sector's global damages and adaptation expenditure."""
 
     damage_costs = getattr(simulation, damage_variable)
-    costs = sum(
-        damage_costs[t, region] * simulation.GDP_gross[t, region]
-        for region in simulation.regions
+    adaptation_costs = (
+        getattr(simulation, adaptation_cost_variable)
+        if adaptation_cost_variable and hasattr(simulation, adaptation_cost_variable)
+        else None
     )
-    if adaptation_cost_variable and hasattr(simulation, adaptation_cost_variable):
-        adaptation_costs = getattr(simulation, adaptation_cost_variable)
-        costs += sum(adaptation_costs[t, region] for region in simulation.regions)
+    costs = 0
+    for region in simulation.regions:
+        regional_cost = damage_costs[t, region] * simulation.GDP_gross[t, region]
+        if adaptation_costs is not None:
+            regional_cost += adaptation_costs[t, region]
+        costs += regional_cost_in_currency(
+            simulation, regional_cost, region, output_currency
+        )
     return costs
 
 
@@ -173,11 +201,14 @@ def calculate_scc_breakdown(
     include_adaptation_costs=False,
     pulse_size=PULSE_SIZE,
     discounting=DISCOUNTING,
+    output_currency=SCC_CURRENCY,
 ):
     """Calculate the total and sectoral SCCs for supplied policy controls."""
 
     if discounting not in {"fixed", "ramsey"}:
         raise ValueError("Discounting must be 'fixed' or 'ramsey'.")
+    if output_currency not in SCC_CURRENCIES:
+        raise ValueError(f"Output currency must be one of {sorted(SCC_CURRENCIES)}.")
 
     negative = simulate_with_pulse(params, -pulse_size, controls)
     positive = simulate_with_pulse(params, pulse_size, controls)
@@ -198,6 +229,7 @@ def calculate_scc_breakdown(
             partial(
                 global_climate_costs,
                 include_adaptation_costs=include_adaptation_costs,
+                output_currency=output_currency,
             ),
             pulse_size=pulse_size,
             discount_factors=discount_factors,
@@ -215,6 +247,7 @@ def calculate_scc_breakdown(
                 global_sector_costs,
                 damage_variable=damage_variable,
                 adaptation_cost_variable=adaptation_cost_variable,
+                output_currency=output_currency,
             ),
             pulse_size=pulse_size,
             discount_factors=discount_factors,
@@ -226,6 +259,7 @@ def base_params(damage_module):
     """Load parameters shared by all SCC scenarios for a damage module."""
 
     params = load_params()
+    params["time"]["end"] = END_YEAR
     params["emissions"]["baseline carbon intensity"] = False
     params["economics"]["damages"]["ignore damages"] = False
     params["model structure"]["damage module"] = damage_module
@@ -257,6 +291,7 @@ def analytical_adaptation(params):
 def calculate_coacch_sccs(
     pulse_size=PULSE_SIZE,
     discounting=DISCOUNTING,
+    output_currency=SCC_CURRENCY,
 ):
     """Calculate COACCH baseline and fixed-optimal-path SCC values."""
 
@@ -268,6 +303,7 @@ def calculate_coacch_sccs(
             "COACCH",
             pulse_size=pulse_size,
             discounting=discounting,
+            output_currency=output_currency,
         )
     }
 
@@ -280,6 +316,7 @@ def calculate_coacch_sccs(
         controls,
         pulse_size=pulse_size,
         discounting=discounting,
+        output_currency=output_currency,
     )
     return sccs
 
@@ -287,6 +324,7 @@ def calculate_coacch_sccs(
 def calculate_accreu_sccs(
     pulse_size=PULSE_SIZE,
     discounting=DISCOUNTING,
+    output_currency=SCC_CURRENCY,
 ):
     """Calculate the four standard ACCREU policy-scenario SCC values."""
 
@@ -300,6 +338,7 @@ def calculate_accreu_sccs(
             "ACCREU",
             pulse_size=pulse_size,
             discounting=discounting,
+            output_currency=output_currency,
         )
     }
 
@@ -313,6 +352,7 @@ def calculate_accreu_sccs(
         mitigation_controls,
         pulse_size=pulse_size,
         discounting=discounting,
+        output_currency=output_currency,
     )
 
     # ada: no mitigation and analytical adaptation, recalculated for each pulse
@@ -323,23 +363,32 @@ def calculate_accreu_sccs(
         include_adaptation_costs=True,
         pulse_size=pulse_size,
         discounting=discounting,
+        output_currency=output_currency,
     )
     return sccs
 
 
-def print_sccs(damage_module, sccs):
+def print_sccs(damage_module, sccs, output_currency=SCC_CURRENCY):
     """Print labelled SCC results for one damage module."""
 
     for scenario, breakdown in sccs.items():
         print(
             f"{damage_module} {scenario} SCC in {PULSE_YEAR}: "
-            f"{breakdown['total']:.2f} USD2010/tCO2"
+            f"{breakdown['total']:.2f} {output_currency}/tCO2"
         )
         for sector, scc in breakdown.items():
             if sector != "total":
-                print(f"  {sector}: {scc:.2f} USD2010/tCO2")
+                print(f"  {sector}: {scc:.2f} {output_currency}/tCO2")
 
 
 if __name__ == "__main__":
-    print_sccs("COACCH", calculate_coacch_sccs())
-    print_sccs("ACCREU", calculate_accreu_sccs())
+    print_sccs(
+        "COACCH",
+        calculate_coacch_sccs(output_currency=SCC_CURRENCY),
+        SCC_CURRENCY,
+    )
+    print_sccs(
+        "ACCREU",
+        calculate_accreu_sccs(output_currency=SCC_CURRENCY),
+        SCC_CURRENCY,
+    )

@@ -54,14 +54,6 @@ def get_constraints(
             doc="::economics.damages.accreu.adaptation_effectiveness_scale_factor"
         )
 
-    # Factor to convert 2017 MER dollars to 2010 PPP dollars:
-    m.gdp_ppp_2010_div_gdp_mer_2010 = Param(
-        m.regions, doc="regional::economics.gdp_ppp_2010_div_gdp_mer_2010"
-    )
-    m.dollar_2017_MER_to_2010_PPP = Param(
-        m.regions, initialize=lambda m, r: 0.89632 * m.gdp_ppp_2010_div_gdp_mer_2010[r]
-    )
-
     # Get constraints for sea-level rise damages
     constraints.extend(sealevelrise.get_constraints(m, adaptation_options))
 
