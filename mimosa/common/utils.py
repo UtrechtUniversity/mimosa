@@ -5,6 +5,7 @@ Common functions and utilities
 import os
 import time
 import yaml
+from functools import wraps
 from mimosa.common import logger
 
 
@@ -19,19 +20,25 @@ def first(dictionary):
     return dictionary[firstk(dictionary)]
 
 
-def timer(name, log=False):
+def timer(name, log=False, store_as=None):
     """Decorator which times functions
 
     Arguments:
         name {str} -- Description of the function
+        log {bool} -- Log the elapsed time in addition to printing it
+        store_as {str | None} -- Attribute name on the first argument in which to
+            store the elapsed time
     """
 
     def decorator(fct):
+        @wraps(fct)
         def wrapper(*args, **kwargs):
-            time1 = time.time()
+            time1 = time.perf_counter()
             result = fct(*args, **kwargs)
-            time2 = time.time()
-            message = "{} took {:.3g} seconds.".format(name, time2 - time1)
+            elapsed = time.perf_counter() - time1
+            if store_as is not None:
+                setattr(args[0], store_as, elapsed)
+            message = "{} took {:.3g} seconds.".format(name, elapsed)
             if log:
                 logger.info(message)
             print(message)

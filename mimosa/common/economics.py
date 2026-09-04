@@ -8,7 +8,6 @@ from mimosa.common import value
 def get_TFP_value(m, t, r):
 
     alpha = value(m.alpha)
-    dt = value(m.dt)
     dk = value(m.dk)
     sr = value(m.sr)
 
@@ -19,9 +18,10 @@ def get_TFP_value(m, t, r):
             capital = value(m.init_capitalstock_factor[r] * m.baseline_GDP[0, r])
         else:
             # For the subsequent years, calculate the capital stock with the stock growth formula
+            period_length = value(m.period_length[s])
             investments = sr * baseline_gdp
-            dKdt = calc_dKdt(capital, dk, investments, dt)
-            capital = dKdt * dt + capital
+            dKdt = calc_dKdt(capital, dk, investments, period_length)
+            capital = dKdt * period_length + capital
         baseline_gdp = value(m.baseline_GDP[s, r])
 
     # Calculate the TFP using the Cobb-Douglas equation

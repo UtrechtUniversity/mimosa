@@ -14,11 +14,27 @@ time:
     default: 2150
 
   dt:
-    descr: Timestep in years
+    descr: Initial timestep length in years
     type: float
     min: 0.5
     max: 20
     default: 5
+
+  periods:
+    descr: >-
+      Optional timestep changes, mapping each change year to the timestep length
+      in years used after that year
+    type: dict
+    keys:
+      type: int
+      min: 1901
+      max: 2300
+    values:
+      type: float
+      min: 0.5
+      max: 20
+    default:
+      2050: 10
 
 ##################
 
@@ -283,6 +299,20 @@ economics:
 ##################
 
 emissions:
+  pulse:
+    year:
+      descr: Year in which an exogenous CO2 pulse is released
+      type: int
+      min: 1900
+      max: 2300
+      default: 2025
+
+    amount:
+      descr: Exogenous CO2 pulse added directly to cumulative emissions
+      type: quantity
+      unit: emissions_unit
+      default: 0 GtCO2
+
   carbonbudget:
     descr: >-
       Value of the carbon budget. Example: "800 GtCO2" (the unit is important).
@@ -349,6 +379,13 @@ emissions:
       approximation is usually still acceptable.
     type: bool
     default: True
+
+  delay_mitigation_until_year:
+    descr: Delays mitigation until after this given year. If false, mitigation is always available.
+    type: int
+    min: 2030
+    can_be_false: True
+    default: False
 
 ##################
 
@@ -489,6 +526,20 @@ temperature:
 ##################
 
 model structure:
+  sealevelrise options:
+    projection:
+      descr: >-
+        Deterministic sea-level-rise parameter set. The central set represents
+        an AR6-calibrated central response; low represents the lower part of
+        the AR6 likely range, and high is a low-likelihood, high-impact
+        sensitivity case. All sets share the same historical initial conditions.
+      type: enum
+      values:
+        - low
+        - central
+        - high
+      default: central
+
   damage module:
     descr: Damage module to be used
     type: enum

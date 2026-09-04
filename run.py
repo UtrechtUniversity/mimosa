@@ -12,25 +12,24 @@ params["emissions"]["non increasing emissions after 2100"] = False
 PFAT_prob_245 = 0.857
 LABC_prob_245 = 0.69
 AMOC_prob_245 = 0.183
-AMAZ_prob_245 = 0.141  
+AMAZ_prob_245 = 0.141
 
 PFAT_rand = random()
 LABC_rand = random()
 AMOC_rand = random()
 AMAZ_rand = random()
 
-if (PFAT_rand < PFAT_prob_245):
+if PFAT_rand < PFAT_prob_245:
     params["model structure"]["tippingpoints options"]["include PFAT"] = True
 
-if (LABC_rand < LABC_prob_245):
+if LABC_rand < LABC_prob_245:
     params["model structure"]["tippingpoints options"]["include LABC"] = True
 
-if (AMOC_rand < AMOC_prob_245):
+if AMOC_rand < AMOC_prob_245:
     params["model structure"]["tippingpoints options"]["include AMOC"] = True
 
-if (AMAZ_rand < AMAZ_prob_245):
+if AMAZ_rand < AMAZ_prob_245:
     params["model structure"]["tippingpoints options"]["include AMAZ"] = True
-
 
 
 model1 = MIMOSA(params)

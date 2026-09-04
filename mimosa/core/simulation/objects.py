@@ -107,6 +107,8 @@ class SimVar:
 class SimulationObjectModel:
 
     def __init__(self, concrete_model):
+        # Populated by MIMOSA.run_simulation(); direct Simulator users leave it unset.
+        self.runtime = None
         # Recreate all variables and
         self.all_vars = []
         for var in concrete_model.component_objects([Var, Param]):

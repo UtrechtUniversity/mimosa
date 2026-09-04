@@ -10,13 +10,29 @@ import numpy as np
 import pandas as pd
 
 import mimosa
-from mimosa.common import get_all_variables, get_all_time_dependent_params, value
+from mimosa.common import Var, get_all_variables, get_all_time_dependent_params, value
 
 
-def save_output_pyomo(params, m, filename="run1", hash_suffix=False, folder="output"):
+def save_output_pyomo(
+    params,
+    m,
+    filename="run1",
+    hash_suffix=False,
+    folder="output",
+    runtime=None,
+):
     # 2. Save the Pyomo variables and data functions
     all_variables = get_all_variables(m) + get_all_time_dependent_params(m)
-    save_output(all_variables, params, m, filename, "optimisation", hash_suffix, folder)
+    save_output(
+        all_variables,
+        params,
+        m,
+        filename,
+        "optimisation",
+        hash_suffix,
+        folder,
+        runtime=runtime,
+    )
 
 
 def save_output(
@@ -27,6 +43,7 @@ def save_output(
     scenario_type="optimisation",
     hash_suffix=False,
     folder="output",
+    runtime=None,
 ):
     # 1. Create a unique identifier
     if hash_suffix:
@@ -37,6 +54,7 @@ def save_output(
     rows = []
     for useful_var in all_variables:
         var_to_row(rows, m, useful_var.var, useful_var.is_regional, useful_var.unit)
+    add_derived_global_cost_rows(rows, m, all_variables)
     dataframe = rows_to_dataframe(rows, m)
 
     # add_param_columns(df, params, id, experiment)
@@ -57,6 +75,8 @@ def save_output(
             "Scenario type": scenario_type,
             **params,
         }
+        if runtime is not None:
+            params_with_version["Runtime (seconds)"] = round(runtime, 2)
         with open(f"{path}.params.json", "w") as fh:
             json.dump(params_with_version, fh)
 
@@ -75,6 +95,83 @@ def var_to_row(rows, m, var, is_regional, unit):
             rows.append([name, r, unit] + [value(var[t, r]) for t in m.t])
     else:
         rows.append([name, "Global", unit] + [value(var[t]) for t in m.t])
+
+
+def add_derived_global_cost_rows(rows, m, all_variables):
+    """
+    Add missing global cost series to the exported results.
+
+    Some cost variables are defined only by time and region because their global
+    counterparts are not needed while solving the model. To keep these variables
+    available at the global level without adding equations to the optimisation
+    problem, MIMOSA derives the corresponding series while exporting the results.
+
+    A variable is aggregated when it:
+
+    - is a Pyomo variable indexed by time and region;
+    - has `fraction_of_GDP` as its unit;
+    - contains `costs` in its name; and
+    - does not already have a `global_<variable name>` counterpart.
+
+    If an exported `<variable name>_abs` quantity exists, its regional values are
+    used as the numerator:
+
+    $$
+    \\text{global costs}_t =
+    \\frac{\\sum_r \\text{absolute costs}_{t,r}}
+    {\\text{global GDP gross}_t}.
+    $$
+
+    Otherwise, absolute regional costs are reconstructed from the GDP-relative
+    values:
+
+    $$
+    \\text{global costs}_t =
+    \\frac{\\sum_r \\left(\\text{costs}_{t,r}
+    \\cdot \\text{GDP gross}_{t,r}\\right)}
+    {\\text{global GDP gross}_t}.
+    $$
+
+    The resulting `global_*` rows are added only to the exported CSV file. They
+    are not added as Pyomo components and therefore cannot be accessed as
+    attributes of the model. Global variables that already exist in the model are
+    exported normally and are not replaced by this calculation.
+    """
+    variables_by_name = {
+        useful_var.name: useful_var for useful_var in all_variables
+    }
+    existing_names = set(variables_by_name)
+
+    for useful_var in all_variables:
+        source_var = getattr(useful_var.var, "_var", useful_var.var)
+        global_name = f"global_{useful_var.name}"
+
+        if (
+            getattr(source_var, "ctype", None) is not Var
+            or useful_var.indices != ["t", "regions"]
+            or str(useful_var.unit) != "fraction_of_GDP"
+            or "costs" not in useful_var.name
+            or global_name in existing_names
+        ):
+            continue
+
+        absolute_costs = variables_by_name.get(f"{useful_var.name}_abs")
+        global_values = []
+        for t in m.t:
+            if absolute_costs is not None:
+                numerator = sum(
+                    value(absolute_costs.var[t, r]) for r in m.regions
+                )
+            else:
+                numerator = sum(
+                    value(useful_var.var[t, r]) * value(m.GDP_gross[t, r])
+                    for r in m.regions
+                )
+            global_values.append(numerator / value(m.global_GDP_gross[t]))
+
+        rows.append(
+            [global_name, "Global", useful_var.unit, *global_values]
+        )
 
 
 def rows_to_dataframe(rows, m):
