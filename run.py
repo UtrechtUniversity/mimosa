@@ -4,7 +4,6 @@ from random import random
 # First run MIMOSA in optimisation mode
 
 params = load_params()
-params["time"]["dt"] = 10
 params["time"]["end"] = 2300
 params["emissions"]["non increasing emissions after 2100"] = False
 
