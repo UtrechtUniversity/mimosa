@@ -1,5 +1,5 @@
 from mimosa import MIMOSA, load_params
-from random import random
+from numpy import random
 
 # First run MIMOSA in optimisation mode
 
@@ -8,31 +8,28 @@ params["time"]["dt"] = 10
 params["time"]["end"] = 2300
 params["emissions"]["non increasing emissions after 2100"] = False
 
-# From Deutloff et al. (2025)
-PFAT_prob_245 = 0.857
-LABC_prob_245 = 0.69
-AMOC_prob_245 = 0.183
-AMAZ_prob_245 = 0.141  
+# Values are from Deutloff et al. (2025)
+# and can be accessed in the file "Code/Read Data/Constants_new.py"
+# from Deutloff's published code
+AMAZ_sample = random.lognormal(mean=1.25, sigma=0.33, size=1000)
+AMOC_sample = random.triangular(left=0.36, mode=2.64, right=9.85, size=1000)
+LABC_sample = random.lognormal(mean=0.59, sigma=0.33, size=1000)
+PFAT_sample = random.lognormal(mean=0.41, sigma=0.25, size=1000)
 
-PFAT_rand = random()
-LABC_rand = random()
-AMOC_rand = random()
-AMAZ_rand = random()
+AMAZ_tipping_temp = random.choice(AMAZ_sample)
+AMOC_tipping_temp = random.choice(AMOC_sample)
+LABC_tipping_temp = random.choice(LABC_sample)
+PFAT_tipping_temp = random.choice(PFAT_sample)
 
-if (PFAT_rand < PFAT_prob_245):
-    params["model structure"]["tippingpoints options"]["include PFAT"] = True
+params["model structure"]["tippingpoints options"]["include ALL"] = True
 
-if (LABC_rand < LABC_prob_245):
-    params["model structure"]["tippingpoints options"]["include LABC"] = True
-
-if (AMOC_rand < AMOC_prob_245):
-    params["model structure"]["tippingpoints options"]["include AMOC"] = True
-
-if (AMAZ_rand < AMAZ_prob_245):
-    params["model structure"]["tippingpoints options"]["include AMAZ"] = True
+params["tippingpoints"]["AMAZ"]["threshold"] = AMAZ_tipping_temp
+params["tippingpoints"]["AMOC"]["threshold"] = AMOC_tipping_temp
+params["tippingpoints"]["LABC"]["threshold"] = LABC_tipping_temp
+params["tippingpoints"]["PFAT"]["threshold"] = PFAT_tipping_temp
 
 
 
 model1 = MIMOSA(params)
 model1.solve()
-model1.save("tipping_points_with_probability")
+model1.save("CDF_thresholds_run5")

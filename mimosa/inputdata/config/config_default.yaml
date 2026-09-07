@@ -372,6 +372,11 @@ tippingpoints:
         - 0.5
         - 0.95
       default: 0.5
+  
+    threshold:
+      descr: Threshold temperature beyond which the element tips
+      type: float
+      default: 1.5
 
   LABC:
     threshold_quantile:
@@ -383,6 +388,11 @@ tippingpoints:
         - 0.95
       default: 0.5
 
+    threshold:
+      descr: Threshold temperature beyond which the element tips
+      type: float
+      default: 1.8
+
 
   AMOC:
     threshold_quantile:
@@ -393,6 +403,11 @@ tippingpoints:
         - 0.5
         - 0.95
       default: 0.5
+
+    threshold:
+      descr: Threshold temperature beyond which the element tips
+      type: float
+      default: 4.0
 
 
   AMAZ:
@@ -413,6 +428,11 @@ tippingpoints:
         - 0.5
         - 0.95
       default: 0.5
+
+    threshold:
+      descr: Threshold temperature beyond which the element tips
+      type: float
+      default: 3.5
       
 
 ##################

@@ -38,6 +38,7 @@ def get_constraints(
     include_AMOC = context.option("tippingpoints", "include AMOC")
     include_AMAZ = context.option("tippingpoints", "include AMAZ")
 
+
     # if user specifies inclusion of PFAT tipping element in model structure
     # OR if user specifies including of ALL tipping elements in model structure
     if include_PFAT or include_ALL:
@@ -110,6 +111,8 @@ def get_PFAT_constraints(m: AbstractModel):
     # degree of severity quantile for the effects of crossing the PFAT tipping threshold
     # user can specify value as 0.05, 0.5, or 0.95 (from confidence interval)
     m.PFAT_severity_quantile = Param(doc="::tippingpoints.PFAT.severity_quantile")
+    # temperature to use as tipping threshold
+    m.PFAT_threshold = Param(doc="::tippingpoints.PFAT.threshold")
 
     constraints = [
         GlobalEquation(
@@ -119,6 +122,7 @@ def get_PFAT_constraints(m: AbstractModel):
                     m.PFAT_threshold_quantile,
                     m.temperature[t],
                     m.PFAT_severity_quantile,
+                    m.PFAT_threshold,
                     m,
                 )
                 if t > 0
@@ -135,6 +139,8 @@ def get_LABC_constraints(m: AbstractModel):
     # Var for additional GMST temperature anomaly due to LABC tipping element
     m.tipping_temps_LABC = Var(m.t, units=quant.unit("degC_above_PI"))
     m.LABC_threshold_quantile = Param(doc="::tippingpoints.LABC.threshold_quantile")
+    m.LABC_threshold = Param(doc="::tippingpoints.LABC.threshold")
+    
 
     constraints = [
             GlobalEquation(
@@ -143,6 +149,7 @@ def get_LABC_constraints(m: AbstractModel):
                     calc_global_temp_LABC(
                         m.LABC_threshold_quantile,
                         m.temperature[t],
+                        m.LABC_threshold,
                         m,
                     )
                     if t > 0
@@ -159,6 +166,8 @@ def get_AMOC_constraints(m: AbstractModel):
     # Var for additional GMST temperature anomaly due to AMOC tipping element
     m.tipping_temps_AMOC = Var(m.t, units=quant.unit("degC_above_PI"))
     m.AMOC_threshold_quantile = Param(doc="::tippingpoints.AMOC.threshold_quantile")
+    m.AMOC_threshold = Param(doc="::tippingpoints.AMOC.threshold")
+    
 
     constraints = [
             GlobalEquation(
@@ -167,6 +176,7 @@ def get_AMOC_constraints(m: AbstractModel):
                     calc_global_temp_AMOC(
                         m.AMOC_threshold_quantile,
                         m.temperature[t],
+                        m.AMOC_threshold,
                         m,
                     )
                     if t > 0
@@ -184,6 +194,8 @@ def get_AMAZ_constraints(m: AbstractModel):
     m.tipping_temps_AMAZ = Var(m.t, units=quant.unit("degC_above_PI"))
     m.AMAZ_threshold_quantile = Param(doc="::tippingpoints.AMAZ.threshold_quantile")
     m.AMAZ_severity_quantile = Param(doc="::tippingpoints.AMAZ.severity_quantile")
+    m.AMAZ_threshold = Param(doc="::tippingpoints.AMAZ.threshold")
+    
 
     constraints = [
             GlobalEquation(
@@ -193,6 +205,7 @@ def get_AMAZ_constraints(m: AbstractModel):
                         m.AMAZ_threshold_quantile,
                         m.temperature[t],
                         m.AMAZ_severity_quantile,
+                        m.AMAZ_threshold,
                         m,
                     )
                     if t > 0
@@ -209,10 +222,12 @@ def get_AMAZ_constraints(m: AbstractModel):
 # calculates the temperature anomaly from exceeding the PFAT tipping threshold
 # uses estimate of 13 - 25 GtC released per degree Celsius over threshold (Anderson McKay 2022)
 # this function uses the user-specified severity to determine which value to use
+# TODO: Turetsky et al. (2020) estimates around 20% of these emissions will be methane (CH4)
 def calc_global_temp_PFAT(
     PFAT_threshold_quantile,
     temp_current,
     PFAT_severity_quantile,
+    PFAT_threshold,
     m: AbstractModel,
 ):
 
@@ -230,21 +245,9 @@ def calc_global_temp_PFAT(
         # TODO: remove severity = 19.0 once we figure out how to throw an error
         severity = 19.0
 
-    # setting temperature threshold at which tipping occurs from Anderson McKay confidence interval
-    # the default value is the tipping threshold corresponding to the 50th percentile
-    threshold = 1.5
-    # if user has selected 5th percentile, threshold is set to 1.0 deg C
-    if PFAT_threshold_quantile == 0.05:
-        threshold = 1.0
-    # if user has selected 95th percentile, threshold is set to 2.3 deg C
-    elif PFAT_threshold_quantile == 0.95:
-        threshold = 2.3
-    # if any other value is entered, throw error
-    else:
-        # TODO: Throw error
-        # TODO: remove threshold = 1.5 once we figure out how to throw an error
-        threshold = 1.5
-
+    # setting temperature threshold at which tipping occurs
+    threshold = PFAT_threshold
+    
     # conversion factor to convert GtC to GtCO2 (molecular weight of CO2 / molecular weight of C)
     conversion_factor = 44.0 / 12.0
 
@@ -263,20 +266,10 @@ def calc_global_temp_PFAT(
 #       the tipping temperature LABC_threshold has been exceeded.
 #       This is NOT accurate...Too bad!
 def calc_global_temp_LABC(
-    LABC_threshold_quantile, temp_current, m: AbstractModel
+    LABC_threshold_quantile, temp_current, LABC_threshold, m: AbstractModel
 ):
 
-    # setting temperature threshold at which tipping occurs from Anderson McKay confidence interval
-    # default value is temperature corresponding to 50th percentile
-    threshold = 1.8
-    if LABC_threshold_quantile == 0.05:
-        threshold = 1.1
-    elif LABC_threshold_quantile == 0.95:
-        threshold = 3.8
-    else:
-        # TODO: Throw error
-        # TODO: Remove threshold value after figuring out how to throw error
-        threshold = 1.8
+    threshold = LABC_threshold
 
     # temperature anomaly is multiplied by -1.0 because LABC leads to global cooling
     temp_total = -1.0 * (soft_switch(temp_current - threshold) * 0.46)
@@ -287,22 +280,12 @@ def calc_global_temp_LABC(
 # calculates the temperature anomaly from exceeding the AMOC tipping threshold
 # uses estimate of 0.54 degrees C of global cooling (Anderson McKay 2022)
 def calc_global_temp_AMOC(
-    AMOC_threshold_quantile, temp_current, m: AbstractModel
+    AMOC_threshold_quantile, temp_current, AMOC_threshold, m: AbstractModel
 ):
 
-    # setting temperature threshold at which tipping occurs from Anderson McKay confidence interval
-    # default value is temperature corresponding to 50th percentile
-    threshold = 4.0
-    if AMOC_threshold_quantile == 0.05:
-        threshold = 1.4
-    elif AMOC_threshold_quantile == 0.95:
-        threshold = 8.0
-    else:
-        # TODO: Throw error
-        # TODO: Remove threshold value after figuring out how to throw error
-        threshold = 4.0
+    threshold = AMOC_threshold
 
-    # temperature anomaly is multiplied by -1.0 because AMOC leads to global cooling
+    # temperature anomaly is multiplied by -1.0 because AMOC collapse leads to global cooling
     temp_total = -1.0 * (soft_switch(temp_current - threshold) * 0.54)
     return temp_total
 
@@ -315,6 +298,7 @@ def calc_global_temp_AMAZ(
     AMAZ_threshold_quantile,
     temp_current,
     AMAZ_severity_quantile,
+    AMAZ_threshold,
     m: AbstractModel,
 ):
 
@@ -328,16 +312,7 @@ def calc_global_temp_AMAZ(
         # TODO: Remove severity setting after figuring out how to throw error
         severity = 52.5
 
-    # setting temperature threshold at which tipping occurs from Anderson McKay confidence interval
-    threshold = 3.5
-    if AMAZ_threshold_quantile == 0.05:
-        threshold = 2.0
-    elif AMAZ_threshold_quantile == 0.95:
-        threshold = 6.0
-    else:
-        # TODO: Throw error
-        # TODO: Remove threshold setting after figuring out how to throw error
-        threshold = 3.5
+    threshold = AMAZ_threshold
 
     temp_total = soft_switch(temp_current - threshold) * severity * m.TCRE
     return temp_total
