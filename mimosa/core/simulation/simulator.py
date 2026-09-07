@@ -159,8 +159,10 @@ class Simulator:
         n_t = len(sim_m.t)
         n_r = len(sim_m.regions)
 
-        bounds = [[(0, xmax)] for xmax in 0.75 + np.linspace(0, 1.5, n_t)]
-        bounds = sum(bounds, [])
+        bounds = [
+            (0, 0) if t == 0 else (0, xmax)
+            for t, xmax in enumerate(0.75 + np.linspace(0, 1.5, n_t))
+        ]
 
         p = 0.7
         x0 = np.array([p * b[0] + (1 - p) * b[1] for b in bounds])

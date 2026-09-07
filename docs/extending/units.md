@@ -37,7 +37,8 @@ example, is expressed using `m`.
     $$
 
     The same distinction applies to economic quantities: MIMOSA's `currency_unit` is an annual
-    flow, as used for GDP and yearly costs.
+    flow, as used for GDP and yearly costs. Use `m.period_length[t]` for $\Delta t$ because the
+    configured timestep length can vary over the model horizon.
 
 ## Adding units to variables and parameters
 

@@ -8,11 +8,10 @@ def test_create_base_model_defines_shared_sets_and_inputs():
     assert model.regions.isordered()
     for name in (
         "beginyear",
-        "dt",
         "tf",
         "t",
+        "period_length",
         "year",
-        "year2100",
         "regions",
         "population",
         "global_population",

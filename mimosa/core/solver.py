@@ -1,4 +1,8 @@
 import os
+from pyomo.common.collections import ComponentSet
+from pyomo.core.expr.visitor import identify_variables
+from pyomo.environ import Constraint, Objective, TransformationFactory
+
 from mimosa.common import (
     SolverFactory,
     SolverManagerFactory,
@@ -38,6 +42,8 @@ class Solver:
         Raises:
             SolverException if solver status is not "OK"
         """
+
+        _deactivate_trivial_constraints_if_required(concrete_model)
 
         # Create an IPOPT solver instance
         opt: OptSolver = SolverFactory("ipopt")
@@ -105,3 +111,41 @@ class Solver:
 
 class SolverException(Exception):
     """Raised when Pyomo solver does not exit with status OK"""
+
+
+def _deactivate_trivial_constraints_if_required(model):
+    """Remove constant constraints only when IPOPT would reject the model.
+
+    Fixed-variable propagation can leave satisfied constant equalities active.
+    Usually these are harmless, and removing them can adversely change sparse
+    solver ordering. If active equalities outnumber the unfixed variables that
+    occur in the optimization problem, however, IPOPT refuses to start. In that
+    case deactivating verified trivial constraints restores the true structural
+    degrees of freedom.
+    """
+
+    relevant_variables = ComponentSet()
+    active_equalities = 0
+
+    for constraint in model.component_data_objects(Constraint, active=True):
+        if constraint.equality:
+            active_equalities += 1
+        relevant_variables.update(
+            variable
+            for variable in identify_variables(
+                constraint.body, include_fixed=False
+            )
+            if not variable.fixed
+        )
+
+    for objective in model.component_data_objects(Objective, active=True):
+        relevant_variables.update(
+            variable
+            for variable in identify_variables(objective.expr, include_fixed=False)
+            if not variable.fixed
+        )
+
+    if len(relevant_variables) < active_equalities:
+        TransformationFactory("contrib.deactivate_trivial_constraints").apply_to(
+            model
+        )

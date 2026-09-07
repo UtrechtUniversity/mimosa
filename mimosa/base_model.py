@@ -9,11 +9,10 @@ def create_base_model() -> AbstractModel:
 
     # Time and region
     m.beginyear = Param()
-    m.dt = Param()
     m.tf = Param()
     m.t = Set()
+    m.period_length = Param(m.t)
     m.year = None  # Initialised with concrete instance
-    m.year2100 = Param()
 
     m.regions = Set(ordered=True)
 

@@ -10,6 +10,7 @@ import pandas as pd
 from scipy.interpolate import interp1d
 
 from mimosa.common import quant
+from mimosa.common.timegrid import create_time_grid
 from .utils import UnitValues, extrapolate
 
 
@@ -49,10 +50,13 @@ class DataStore:
             self.cached_data[filename] = {}
 
     def _create_data_years(self):
-        beginyear = self.params["time"]["start"]
-        endyear = self.params["time"]["end"] + 50  # Make sure extrapolation goes well
-        dt = self.params["time"]["dt"]
-        self.data_years = np.arange(beginyear, endyear, dt)
+        time_grid = create_time_grid(self.params["time"])
+        resolution = min(time_grid.period_lengths[1:])
+        # Sampling at the finest configured resolution includes every model year
+        # and provides headroom for downstream extrapolation.
+        self.data_years = np.arange(
+            time_grid.years[0], time_grid.end + 50, resolution
+        )
 
     def _create_data_values(self, var_info) -> Dict[str, UnitValues]:
         regions = self.params["regions"]

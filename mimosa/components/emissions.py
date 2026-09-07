@@ -62,7 +62,7 @@ def _set_baseline_emissions(m: AbstractModel) -> None:
     def _calc_cum_baseline_emissions(m, t, r):
         values_t = range(t + 1)
         values = [value(m.ssp_baseline_emissions[s, r]) for s in values_t]
-        years = value(m.beginyear) + np.array(values_t) * value(m.dt)
+        years = np.array([m.year(s) for s in values_t])
         return trapezoid(values, years)
 
     m.cumulative_baseline_emissions = Param(
@@ -158,10 +158,20 @@ def _get_emissions_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
         \\text{cumulative emissions}_{t} = \\text{cumulative emissions}_{t-1} + \\Delta t \\cdot \\text{global emissions}_{t}
         $$
 
+    ## Exogenous emissions pulse
+
+    A one-off exogenous CO<sub>2</sub> pulse can be added directly to cumulative
+    emissions. Its amount is a stock in GtCO<sub>2</sub>, so it is independent of
+    the model timestep. The pulse affects temperature and subsequent damages, but
+    does not directly alter regional emissions or mitigation costs. By default
+    its amount is zero.
+
 
     ## Parameters defined in this module
     - param::use_carbon_intensity_for_baseline
     - param::cumulative_emissions_trapz
+    - param::emissions_pulse_year
+    - param::emissions_pulse_amount
 
     [^1]: The effect of other greenhouse gases is implicitly accounted for in the TCRE which
         translates cumulative CO<sub>2</sub> emissions into temperature change. This assumes a linear
@@ -185,9 +195,23 @@ def _get_emissions_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
         m.t,
         m.regions,
         initialize=0,
-        bounds=(0, 2.5),
+        bounds=lambda m, t, r: (0, 0) if t == 0 else (0, 2.5),
         units=quant.unit("fraction_of_baseline_emissions"),
     )
+
+    # If set, delay mitigation until after a given year by setting a bound on relative_abatement:
+    m.delay_mitigation_year = Param(doc="::emissions.delay_mitigation_until_year")
+    constraints.append(
+        RegionalConstraint(
+            lambda m, t, r: (
+                m.relative_abatement[t, r] <= 0.001
+                if m.delay_mitigation_year is not False
+                and m.year(t) <= m.delay_mitigation_year
+                else Constraint.Skip
+            )
+        )
+    )
+
     m.regional_emission_reductions = Var(
         m.t, m.regions, units=quant.unit("emissionsrate_unit")
     )
@@ -197,6 +221,8 @@ def _get_emissions_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     m.global_cumulative_emissions_trapz = Param(
         doc="::emissions.cumulative_emissions_trapz"
     )
+    m.emissions_pulse_year = Param(doc="::emissions.pulse.year")
+    m.emissions_pulse_amount = Param(doc="::emissions.pulse.amount")
 
     constraints.extend(
         [
@@ -222,8 +248,6 @@ def _get_emissions_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
                         if value(m.use_carbon_intensity_for_baseline)
                         else m.ssp_baseline_emissions[t, r]
                     )
-                    if t > 0
-                    else m.ssp_baseline_emissions[0, r]
                 ),
             ),
             RegionalEquation(
@@ -239,14 +263,25 @@ def _get_emissions_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
             GlobalEquation(
                 m.global_cumulative_emissions,
                 lambda m, t: (
-                    m.global_cumulative_emissions[t - 1]
-                    + (
-                        (m.dt * (m.global_emissions[t] + m.global_emissions[t - 1]) / 2)
-                        if value(m.global_cumulative_emissions_trapz)
-                        else (m.dt * m.global_emissions[t])
+                    (
+                        m.global_cumulative_emissions[t - 1]
+                        + (
+                            (
+                                m.period_length[t]
+                                * (m.global_emissions[t] + m.global_emissions[t - 1])
+                                / 2
+                            )
+                            if value(m.global_cumulative_emissions_trapz)
+                            else (m.period_length[t] * m.global_emissions[t])
+                        )
+                        if t > 0
+                        else 0
                     )
-                    if t > 0
-                    else 0
+                    + (
+                        m.emissions_pulse_amount
+                        if m.year(t) == value(m.emissions_pulse_year)
+                        else 0
+                    )
                 ),
             ),
         ]
@@ -377,7 +412,7 @@ def _get_temperature_constraints(m: AbstractModel) -> Sequence[GeneralConstraint
     #         if value(m.perc_reversible_damages) < 1
     #         else Constraint.Skip,
     #         lambda m, t: m.overshootdot[t]
-    #         == (m.netnegative_emissions[t] if t <= value(m.year2100) and t > 0 else 0)
+    #         == (m.netnegative_emissions[t] if m.year(t) <= 2100 and t > 0 else 0)
     #         if value(m.perc_reversible_damages) < 1
     #         else Constraint.Skip,
     #     ]
@@ -534,7 +569,7 @@ def _get_inertia_and_budget_constraints(
             GlobalConstraint(
                 lambda m, t: (
                     m.global_emissions[t] - m.global_emissions[t - 1]
-                    >= m.dt
+                    >= m.period_length[t]
                     * m.inertia_global
                     * sum(m.ssp_baseline_emissions[0, r] for r in m.regions)
                     if value(m.inertia_global) is not False and t > 0
@@ -542,11 +577,19 @@ def _get_inertia_and_budget_constraints(
                 ),
                 name="global_inertia",
             ),
+            # Regional inertia (skipped for when mitigation is delayed, since there is no mitigation in that period)
             RegionalConstraint(
                 lambda m, t, r: (
                     m.regional_emissions[t, r] - m.regional_emissions[t - 1, r]
-                    >= m.dt * m.inertia_regional * m.ssp_baseline_emissions[0, r]
-                    if value(m.inertia_regional) is not False and t > 0
+                    >= m.period_length[t]
+                    * m.inertia_regional
+                    * m.ssp_baseline_emissions[0, r]
+                    if value(m.inertia_regional) is not False
+                    and t > 0
+                    and (
+                        m.delay_mitigation_year is False
+                        or m.year(t) >= m.delay_mitigation_year
+                    )
                     else Constraint.Skip
                 ),
                 name="regional_inertia",
@@ -570,7 +613,8 @@ def _get_inertia_and_budget_constraints(
             RegionalConstraint(
                 lambda m, t, r: (
                     m.regional_emissions[t, r] - m.regional_emissions[t - 1, r] <= 0
-                    if m.year(t - 1) > 2100
+                    if t > 0
+                    and m.year(t - 1) > 2100
                     and value(m.non_increasing_emissions_after_2100)
                     else Constraint.Skip
                 ),

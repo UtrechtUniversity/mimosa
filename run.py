@@ -4,7 +4,6 @@ from numpy import random
 # First run MIMOSA in optimisation mode
 
 params = load_params()
-params["time"]["dt"] = 10
 params["time"]["end"] = 2300
 params["emissions"]["non increasing emissions after 2100"] = False
 
@@ -27,7 +26,6 @@ params["tippingpoints"]["AMAZ"]["threshold"] = AMAZ_tipping_temp
 params["tippingpoints"]["AMOC"]["threshold"] = AMOC_tipping_temp
 params["tippingpoints"]["LABC"]["threshold"] = LABC_tipping_temp
 params["tippingpoints"]["PFAT"]["threshold"] = PFAT_tipping_temp
-
 
 
 model1 = MIMOSA(params)

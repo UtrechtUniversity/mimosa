@@ -1,10 +1,15 @@
 """
-Model equations and constraints:
-Sea level rise (height of sea level rise, not SLR damages)
-From RICE 2010
+Global mean sea-level rise (height, not sea-level-rise damages).
+
+The component is a deterministic reduced-complexity model inspired by the
+response equations in BRICK, SURFER, SIMPLE, and LARMIP-2. Its central parameter
+set is intended to reproduce the order of magnitude and component balance of
+IPCC AR6 median projections. All contributions use 1900 as their common
+reference year.
 """
 
 from typing import Sequence
+
 from mimosa.common import (
     AbstractModel,
     Param,
@@ -12,223 +17,591 @@ from mimosa.common import (
     GeneralConstraint,
     GlobalEquation,
     NonNegativeReals,
+    exp,
+    tanh,
     quant,
     ModelContext,
 )
 
 
+# Coherent deterministic response sets. Historical initial conditions and ice
+# potentials are deliberately shared: these sets describe uncertainty in future
+# physical response, rather than uncertainty in observed present-day sea level.
+SLR_PROJECTION_PARAMETER_SETS = {
+    "low": {
+        "thermal_fast_sensitivity": 0.075,
+        "thermal_slow_sensitivity": 0.255,
+        "thermal_fast_timescale": 42.5,
+        "thermal_slow_timescale": 425.0,
+        "gsic_temp_sensitivity": 2.4,
+        "gsic_timescale": 120.0,
+        "gis_threshold": 2.0,
+        "gis_transition_width": 0.7,
+        "gis_base_timescale": 6500.0,
+        "gis_timescale_sensitivity": 0.2,
+        "ais_ocean_temp_scaling": 0.45,
+        "ais_ocean_temp_timescale": 50.0,
+        "ais_background_rate": 0.0009,
+        "ais_temp_sensitivity": 0.0002,
+        "ais_fast_rate": 0.0,
+        "ais_fast_threshold": 3.0,
+        "ais_fast_transition_width": 0.2,
+    },
+    "central": {
+        "thermal_fast_sensitivity": 0.080,
+        "thermal_slow_sensitivity": 0.270,
+        "thermal_fast_timescale": 40.0,
+        "thermal_slow_timescale": 400.0,
+        "gsic_temp_sensitivity": 2.0,
+        "gsic_timescale": 110.0,
+        "gis_threshold": 1.8,
+        "gis_transition_width": 0.6,
+        "gis_base_timescale": 6000.0,
+        "gis_timescale_sensitivity": 0.3,
+        "ais_ocean_temp_scaling": 0.60,
+        "ais_ocean_temp_timescale": 30.0,
+        "ais_background_rate": 0.0011,
+        "ais_temp_sensitivity": 0.00025,
+        "ais_fast_rate": 0.005,
+        "ais_fast_threshold": 2.5,
+        "ais_fast_transition_width": 0.15,
+    },
+    "high": {
+        "thermal_fast_sensitivity": 0.100,
+        "thermal_slow_sensitivity": 0.340,
+        "thermal_fast_timescale": 30.0,
+        "thermal_slow_timescale": 300.0,
+        "gsic_temp_sensitivity": 1.6,
+        "gsic_timescale": 140.0,
+        "gis_threshold": 1.4,
+        "gis_transition_width": 0.5,
+        "gis_base_timescale": 4000.0,
+        "gis_timescale_sensitivity": 0.4,
+        "ais_ocean_temp_scaling": 0.80,
+        "ais_ocean_temp_timescale": 20.0,
+        "ais_background_rate": 0.0012,
+        "ais_temp_sensitivity": 0.00035,
+        "ais_fast_rate": 0.012,
+        "ais_fast_threshold": 1.8,
+        "ais_fast_transition_width": 0.12,
+    },
+}
+
+
 def get_constraints(
     m: AbstractModel, context: ModelContext
 ) -> Sequence[GeneralConstraint]:
-    """
-    The sea-level rise (SLR) module is based on the AD-RICE 2012 model ([Kelly de Bruin, 2014](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2600006)),
-    which in itself is based on RICE 2010. It consists of sea-level rise contributions from thermal expansion, glaciers and small ice caps (GSIC),
-    and the Greenland ice sheet (GIS). Sea-level rise from Antarctica is not included due to the high uncertainty involved.
+    r"""
+    The sea-level-rise (SLR) component represents thermal expansion, glaciers,
+    the Greenland ice sheet (GIS), the Antarctic ice sheet (AIS), and future
+    changes in land-water storage (LWS). The formulation is deliberately small
+    and deterministic so it can be evaluated both by the MIMOSA simulator and
+    as part of the Pyomo optimisation model.
+
+    All component values are expressed as metres above the 1900 global mean
+    sea-level reference. The values at the model start are linearly interpolated
+    between zero in 1900 and the central 2025 estimates below. This makes the
+    reference year explicit and prevents a run starting before 2025 from using
+    2025 sea-level values.
+
+    The component option `projection` selects a coherent `low`, `central`, or
+    `high` deterministic response set. The sets use identical historical
+    initial conditions, but different sensitivities, response times, and AIS
+    fast-response assumptions. The default is `central`.
+
+    The projection can be selected before model construction with:
+
+    ```python
+    params["model structure"]["sealevelrise options"]["projection"] = "high"
+    ```
 
     # Thermal expansion
 
-    :::mimosa.components.sealevelrise.slr_thermal_expansion
-        options:
-            show_source: false
-
-    The initial sea-level rise due to thermal expansion (at time $t=0$) is calculated as:
-
-    :::mimosa.components.sealevelrise.slr_thermal_expansion_init
-        options:
-            show_source: false
-
-
-    with the following parameters:
-
-    | Name | Description | Value |
-    | --- | --- | --- |
-    | $a$ | Adjustment rate for thermal expansion | 0.024076 |
-    | $\\text{equil. rate}_{\\text{thermal}}$ | Equilibrium rate for thermal expansion | 0.5 m / °C  |
-    | $\\text{SLR}_{\\text{thermal,init}}$ | Initial sea-level rise due to thermal expansion | 0.092067 m |
-
-
-
-    # Glaciers and small ice caps (GSIC)
-
-    :::mimosa.components.sealevelrise.slr_gsic
-        options:
-            show_source: false
-
-    with as initial value:
+    Thermal expansion is represented by a fast and a slow response box. Each
+    box relaxes towards a temperature-dependent equilibrium:
 
     $$
-    \\text{SLR}_{\\text{GSIC},0} = 0.015
+    S_{i,t}=\beta_i T_{t-1}+
+    \left(S_{i,t-1}-\beta_i T_{t-1}\right)e^{-\Delta t/\tau_i},
+    \qquad i\in\{\text{fast},\text{slow}\}.
     $$
 
-    and with the following parameters:
+    The exact exponential update makes the response independent of the chosen
+    numerical time step for a constant temperature forcing.
 
-    | Name | Description | Value |
-    | --- | --- | --- |
-    | $\\text{melt rate}$ | Melt rate | 0.0008 m / year |
-    | $\\text{total ice}_{\\text{GSIC}}$ | Total ice | 0.26 m |
-    | $\\text{equil. temp}_{\\text{GSIC}}$ | Equilibrium temperature | -1 °C |
+    This two-timescale equation is a reduced-form approximation chosen for
+    MIMOSA, rather than a direct reproduction of an ocean model. The first-order
+    relaxation form follows BRICK v0.2 (Wong et al., 2017, Sect. 3.2.4,
+    Eqs. 9--10). Splitting it into fast and slow boxes represents the upper- and
+    deep-ocean distinction in SURFER v2.0 (Martínez Montero et al., 2022,
+    Sects. 2.3.1 and 2.4.3). MIMOSA's equilibrium sensitivities and response
+    times are calibrated jointly against the AR6 thermal-expansion contributions
+    in Table 9.9 of Fox-Kemper et al. (2021); they are not the coefficients from
+    either BRICK or SURFER.
 
+    # Glaciers
 
-    # Greenland ice sheet (GIS)
-
-    :::mimosa.components.sealevelrise.slr_gis
-        options:
-            show_source: false
-
-    with as initial value:
+    The glacier contribution relaxes towards the capped equilibrium proposed
+    by Martínez Montero et al. (2022):
 
     $$
-    \\text{SLR}_{\\text{GIS},0} = 0.006
+    S^*_{\mathrm{GL}}(T)=P_{\mathrm{GL}}
+    \tanh\left(\frac{T}{\zeta_{\mathrm{GL}}}\right),
     $$
 
-    and with the following parameters:
+    $$
+    S_{\mathrm{GL},t}=S^*_{\mathrm{GL}}(T_{t-1})+
+    \left(S_{\mathrm{GL},t-1}-S^*_{\mathrm{GL}}(T_{t-1})\right)
+    e^{-\Delta t/\tau_{\mathrm{GL}}}.
+    $$
 
-    | Name | Description | Value |
-    | --- | --- | --- |
-    | $\\text{melt rate above thresh}$ | Melt rate above threshold | 1.1186 m / year |
-    | $\\text{init melt rate}$ | Initial melt rate | 0.6 m / year |
-    | $\\text{init ice volume}$ | Initial ice volume | 7.3 m |
+    This replaces the previous formulation, in which all glaciers eventually
+    melted under any sustained temperature above -1 degree C.
+
+    # Greenland ice sheet
+
+    Greenland follows a SIMPLE-style delayed equilibrium. Its equilibrium
+    contribution is a normalised logistic function bounded by the ice sheet's
+    sea-level potential. Its response time decreases smoothly with warming:
+
+    $$
+    S^*_{\mathrm{GIS}}(T)=P_{\mathrm{GIS}}
+    \frac{\sigma((T-T_c)/w)-\sigma(-T_c/w)}
+         {1-\sigma(-T_c/w)},
+    $$
+
+    $$
+    \tau_{\mathrm{GIS}}(T)=\tau_0e^{-\gamma T}.
+    $$
+
+    # Antarctic ice sheet
+
+    A single lagged Antarctic subsurface-ocean temperature proxy drives the AIS
+    response. A smooth threshold term represents the possibility of faster ice
+    loss at high warming while retaining differentiability for optimisation:
+
+    $$
+    T_{A,t}=\lambda_A T_{t-1}+
+    \left(T_{A,t-1}-\lambda_A T_{t-1}\right)e^{-\Delta t/\tau_A},
+    $$
+
+    $$
+    S_{\mathrm{AIS},t}=S_{\mathrm{AIS},t-1}+\Delta t
+    \left[r_0+r_1T_{A,t}+r_f\sigma((T_{A,t}-T_{crit})/w_A)\right]
+    \left(1-\frac{S_{\mathrm{AIS},t-1}}{P_{\mathrm{AIS}}}\right).
+    $$
+
+    The scaling and delay between global surface warming and Antarctic
+    subsurface-ocean warming are motivated by LARMIP-2 (Levermann et al., 2020,
+    Sect. 2.2). The AIS rate equation itself is a deliberately simpler MIMOSA
+    parameterisation, not a reproduction of LARMIP-2 or SURFER. Its smooth fast
+    term is inspired by the threshold representation of uncertain rapid
+    Antarctic disintegration in Wong et al. (2017). The ordinary background and
+    temperature-response rates are calibrated against the AR6 AIS contributions
+    in Table 9.9. The high parameter set is intended as a low-likelihood,
+    high-impact sensitivity case and not as the upper endpoint of the AR6 likely
+    range.
+
+    # Land-water storage
+
+    AR6 projects an approximately scenario-independent land-water contribution
+    of 0.03 m between 1995--2014 and 2100. Because the historical contribution
+    is already implicit in MIMOSA's 2025 initial total, only its future anomaly
+    is added explicitly:
+
+    $$
+    S_{\mathrm{LWS},t}=S_{\mathrm{LWS},t-1}+\Delta t\,r_{\mathrm{LWS}},
+    \qquad r_{\mathrm{LWS}}=0.0004\ \mathrm{m\,yr^{-1}}.
+    $$
 
     # Total sea-level rise
 
-    The total sea-level rise is the sum of the contributions from thermal expansion, GSIC, and GIS:
-
     $$
-    \\text{SLR}_t = \\text{SLR}_{\\text{thermal},t} + \\text{SLR}_{\\text{GSIC},t} + \\text{SLR}_{\\text{GIS},t}
+    S_t=S_{\mathrm{thermal},t}+S_{\mathrm{GL},t}
+        +S_{\mathrm{GIS},t}+S_{\mathrm{AIS},t}+S_{\mathrm{LWS},t}.
     $$
 
+    ## Calibration against IPCC AR6
 
+    The process papers motivate the compact equation forms; they do not imply
+    that every coefficient is transferred unchanged. The three coherent
+    parameter sets are outcome-calibrated against AR6 WGI Table 9.9 and the
+    warming-level assessment in Chapter 12. Consequently, increasing the
+    glacier or ordinary AIS response remains consistent with the cited equation
+    structure while bringing total SLR into the assessed AR6 ranges. The
+    following benchmark prescribes a linear warming path from 1.27 degrees C in
+    2025 to the stated 2100 warming level. Values are metres relative to 1900:
+
+    <div class="tiny_table table_first_col_header" markdown>
+    {{ read_csv_macro("docs/assets/data/slr_ar6_benchmark.csv") }}
+    </div>
+
+    The MIMOSA columns in this table and the component table below are generated
+    directly from the current component equations. After changing the SLR
+    formulation or parameters, regenerate both tables from the repository root:
+
+    ```shell
+    python diagnostics/slr_ar6.py
+    ```
+
+    A model test compares the committed CSV files with a fresh calculation so
+    that outdated documentation is detected automatically.
+
+    AR6 Chapter 12 reports the warming-level values relative to 1995--2014.
+    The table adds the assessed 0.158 m rise from 1900 to 1995--2014, following
+    the AR6 Summary for Policymakers. The comparison is a calibration diagnostic,
+    not a claim that a warming level uniquely determines SLR: the preceding
+    temperature pathway and rate of warming also affect the lagged components.
+
+    Under this diagnostic, the low set tracks the lower edge of the AR6 likely
+    range and central remains within it. High exceeds the likely range at 3 and
+    4 degrees C by design, representing rapid Antarctic loss. For transparency,
+    the central 2100 component values at 2, 3, and 4 degrees C respectively are:
+
+    <div class="tiny_table table_first_col_header" markdown>
+    {{ read_csv_macro("docs/assets/data/slr_ar6_components.csv") }}
+    </div>
+
+    References:
+
+    - [Fox-Kemper et al. (2021), IPCC AR6 WGI Chapter 9](https://www.ipcc.ch/report/ar6/wg1/chapter/chapter-9/).
+    - [IPCC AR6 WGI Chapter 12, climate impact-driver projections](https://www.ipcc.ch/report/ar6/wg1/chapter/chapter-12/).
+    - [IPCC AR6 WGI Summary for Policymakers](https://www.ipcc.ch/report/ar6/wg1/chapter/summary-for-policymakers/).
+    - [Bakker, Applegate and Keller (2016), SIMPLE](https://doi.org/10.1016/j.envsoft.2016.05.003).
+    - [Martínez Montero et al. (2022), SURFER v2.0](https://doi.org/10.5194/gmd-15-8059-2022).
+    - [Wong et al. (2017), BRICK v0.2](https://doi.org/10.5194/gmd-10-2741-2017).
+    - [Levermann et al. (2020), LARMIP-2](https://doi.org/10.5194/esd-11-35-2020).
+    - [Wong, Bakker and Keller (2017), Antarctic fast dynamics](https://doi.org/10.1007/s10584-017-2039-4).
     """
 
-    # Parameters and variables necessary for sea level rise
+    projection = context.option("sealevelrise", "projection", default="central")
+    try:
+        slr_params = SLR_PROJECTION_PARAMETER_SETS[projection]
+    except KeyError as exc:
+        valid = ", ".join(SLR_PROJECTION_PARAMETER_SETS)
+        raise ValueError(
+            f"Unknown SLR projection parameter set '{projection}'. "
+            f"Expected one of: {valid}."
+        ) from exc
+
+    # A common reference year and rounded central component values at the
+    # default model start. Their 0.23 m sum is consistent with the assessed
+    # historical rise and recent component trends. Values are metres of global
+    # mean SLR above the 1900 reference.
+    m.slr_reference_year = Param(initialize=1900)
+    m.slr_initial_year = Param(initialize=2025)
+
+    # Thermal expansion: fast upper-ocean and slow deep-ocean response boxes.
+    m.slr_thermal_fast = Var(m.t, within=NonNegativeReals, units=quant.unit("m"))
+    m.slr_thermal_slow = Var(m.t, within=NonNegativeReals, units=quant.unit("m"))
     m.slr_thermal = Var(m.t, within=NonNegativeReals, units=quant.unit("m"))
-    m.slr_thermal_equil = Param(initialize=0.5)  # Equilibrium
-    m.slr_thermal_init = Param(
-        initialize=0.0920666936642
-    )  # Initial SLR due to thermal expansion
-    m.slr_thermal_adjust_rate = Param(initialize=0.024076141150722)  # Adjustment rate
+    m.slr_thermal_fast_init = Param(initialize=0.045)
+    m.slr_thermal_slow_init = Param(initialize=0.025)
+    m.slr_thermal_fast_sensitivity = Param(
+        initialize=slr_params["thermal_fast_sensitivity"]
+    )
+    m.slr_thermal_slow_sensitivity = Param(
+        initialize=slr_params["thermal_slow_sensitivity"]
+    )
+    m.slr_thermal_fast_timescale = Param(
+        initialize=slr_params["thermal_fast_timescale"]
+    )
+    m.slr_thermal_slow_timescale = Param(
+        initialize=slr_params["thermal_slow_timescale"]
+    )
 
+    # Glaciers. The 0.32 m potential follows the AR6 parametric extrapolation.
     m.slr_cumgsic = Var(m.t, within=NonNegativeReals, units=quant.unit("m"))
-    m.slr_gsic_melt_rate = Param(initialize=0.0008)  # Melt rate
-    m.slr_gsic_total_ice = Param(initialize=0.26)  # Total ice
-    m.slr_gsic_equil_temp = Param(initialize=-1)  # Equilibrium temperature
+    m.slr_gsic_init = Param(initialize=0.090)
+    m.slr_gsic_total_ice = Param(initialize=0.32)
+    m.slr_gsic_temp_sensitivity = Param(
+        initialize=slr_params["gsic_temp_sensitivity"]
+    )
+    m.slr_gsic_timescale = Param(initialize=slr_params["gsic_timescale"])
 
+    # Greenland. The potential is the sea-level equivalent of the full ice
+    # sheet; the remaining parameters govern equilibrium and response speed.
     m.slr_cumgis = Var(m.t, within=NonNegativeReals, units=quant.unit("m"))
-    m.slr_gis_melt_rate_above_thresh = Param(
-        initialize=1.11860082
-    )  # Melt rate above threshold
-    m.slr_gis_init_melt_rate = Param(initialize=0.6)  # Initial melt rate
-    m.slr_gis_init_ice_vol = Param(initialize=7.3)  # Initial ice volume
+    m.slr_gis_init = Param(initialize=0.045)
+    m.slr_gis_total_ice = Param(initialize=7.3)
+    m.slr_gis_threshold = Param(initialize=slr_params["gis_threshold"])
+    m.slr_gis_transition_width = Param(
+        initialize=slr_params["gis_transition_width"]
+    )
+    m.slr_gis_base_timescale = Param(
+        initialize=slr_params["gis_base_timescale"]
+    )
+    m.slr_gis_timescale_sensitivity = Param(
+        initialize=slr_params["gis_timescale_sensitivity"]
+    )
+
+    # Antarctica. The proxy temperature is in degrees C above pre-industrial;
+    # rates are metres of sea-level equivalent per year.
+    m.slr_antarctic_ocean_temp = Var(
+        m.t, units=quant.unit("degC_above_PI")
+    )
+    m.slr_ais_ocean_temp_init = Param(initialize=0.30)
+    m.slr_ais_ocean_temp_scaling = Param(
+        initialize=slr_params["ais_ocean_temp_scaling"]
+    )
+    m.slr_ais_ocean_temp_timescale = Param(
+        initialize=slr_params["ais_ocean_temp_timescale"]
+    )
+    m.slr_cumais = Var(m.t, within=NonNegativeReals, units=quant.unit("m"))
+    m.slr_ais_init = Param(initialize=0.025)
+    # Effective vulnerable Antarctic stock, rather than the full AIS potential.
+    m.slr_ais_total_ice = Param(initialize=5.0)
+    m.slr_ais_background_rate = Param(
+        initialize=slr_params["ais_background_rate"]
+    )
+    m.slr_ais_temp_sensitivity = Param(
+        initialize=slr_params["ais_temp_sensitivity"]
+    )
+    m.slr_ais_fast_rate = Param(initialize=slr_params["ais_fast_rate"])
+    m.slr_ais_fast_threshold = Param(
+        initialize=slr_params["ais_fast_threshold"]
+    )
+    m.slr_ais_fast_transition_width = Param(
+        initialize=slr_params["ais_fast_transition_width"]
+    )
+
+    # Future land-water-storage anomaly. Its historical contribution is
+    # implicit in the common 2025 initial total, avoiding double counting.
+    m.slr_cumlws = Var(m.t, within=NonNegativeReals, units=quant.unit("m"))
+    m.slr_lws_rate = Param(initialize=0.0004)
 
     m.total_SLR = Var(m.t, within=NonNegativeReals, units=quant.unit("m"))
 
-    # Constraints relating to SLR
     constraints = [
-        # Thermal expansion
         GlobalEquation(
-            m.slr_thermal,
+            m.slr_thermal_fast,
             lambda m, t: (
-                slr_thermal_expansion(m.slr_thermal[t - 1], m.temperature[t - 1], m)
+                slr_thermal_expansion(
+                    m.slr_thermal_fast[t - 1],
+                    m.temperature[t - 1],
+                    m.slr_thermal_fast_sensitivity,
+                    m.slr_thermal_fast_timescale,
+                    m,
+                    m.period_length[t],
+                )
                 if t > 0
-                else slr_thermal_expansion_init(m)
+                else slr_initial_value(m.slr_thermal_fast_init, m)
             ),
         ),
-        # GSIC
+        GlobalEquation(
+            m.slr_thermal_slow,
+            lambda m, t: (
+                slr_thermal_expansion(
+                    m.slr_thermal_slow[t - 1],
+                    m.temperature[t - 1],
+                    m.slr_thermal_slow_sensitivity,
+                    m.slr_thermal_slow_timescale,
+                    m,
+                    m.period_length[t],
+                )
+                if t > 0
+                else slr_initial_value(m.slr_thermal_slow_init, m)
+            ),
+        ),
+        GlobalEquation(
+            m.slr_thermal,
+            lambda m, t: m.slr_thermal_fast[t] + m.slr_thermal_slow[t],
+        ),
         GlobalEquation(
             m.slr_cumgsic,
             lambda m, t: (
-                slr_gsic(m.slr_cumgsic[t - 1], m.temperature[t - 1], m)
+                slr_gsic(
+                    m.slr_cumgsic[t - 1],
+                    m.temperature[t - 1],
+                    m,
+                    m.period_length[t],
+                )
                 if t > 0
-                else 0.015
+                else slr_initial_value(m.slr_gsic_init, m)
             ),
         ),
-        # GIS
         GlobalEquation(
             m.slr_cumgis,
             lambda m, t: (
-                slr_gis(m.slr_cumgis[t - 1], m.temperature[t - 1], m)
+                slr_gis(
+                    m.slr_cumgis[t - 1],
+                    m.temperature[t - 1],
+                    m,
+                    m.period_length[t],
+                )
                 if t > 0
-                else 0.006
+                else slr_initial_value(m.slr_gis_init, m)
             ),
         ),
-        # Total SLR is sum of each contributing factors
+        GlobalEquation(
+            m.slr_antarctic_ocean_temp,
+            lambda m, t: (
+                slr_antarctic_ocean_temperature(
+                    m.slr_antarctic_ocean_temp[t - 1],
+                    m.temperature[t - 1],
+                    m,
+                    m.period_length[t],
+                )
+                if t > 0
+                else slr_initial_value(m.slr_ais_ocean_temp_init, m)
+            ),
+        ),
+        GlobalEquation(
+            m.slr_cumais,
+            lambda m, t: (
+                slr_ais(
+                    m.slr_cumais[t - 1],
+                    m.slr_antarctic_ocean_temp[t],
+                    m,
+                    m.period_length[t],
+                )
+                if t > 0
+                else slr_initial_value(m.slr_ais_init, m)
+            ),
+        ),
+        GlobalEquation(
+            m.slr_cumlws,
+            lambda m, t: (
+                m.slr_cumlws[t - 1]
+                + m.period_length[t] * m.slr_lws_rate
+                if t > 0
+                else 0.0
+            ),
+        ),
         GlobalEquation(
             m.total_SLR,
-            lambda m, t: (m.slr_thermal[t] + m.slr_cumgsic[t] + m.slr_cumgis[t]),
+            lambda m, t: (
+                m.slr_thermal[t]
+                + m.slr_cumgsic[t]
+                + m.slr_cumgis[t]
+                + m.slr_cumais[t]
+                + m.slr_cumlws[t]
+            ),
         ),
     ]
 
     return constraints
 
 
-def slr_thermal_expansion_init(m):
+def slr_initial_value(value_at_initial_year, m: AbstractModel):
+    """Interpolate a component value from the common reference year.
+
+    The central initial values are specified for 2025. Linear interpolation is
+    used only for model initialisation; projected changes after the model start
+    are governed by the component response equations.
     """
-    $$
-    \\text{SLR}_{\\text{thermal},0} = \\text{SLR}_{\\text{thermal,init}} + a \\cdot (\\text{temperature}_{t=0} \\cdot \\text{equil. rate}_{\\text{thermal}} - \\text{SLR}_{\\text{thermal,init}})
-    $$
-    """
-    return m.slr_thermal_init + m.slr_thermal_adjust_rate * (
-        m.T0 * m.slr_thermal_equil - m.slr_thermal_init
+
+    elapsed = m.beginyear - m.slr_reference_year
+    calibration_period = m.slr_initial_year - m.slr_reference_year
+    return value_at_initial_year * elapsed / calibration_period
+
+
+def relax_to_equilibrium(current, equilibrium, timescale, period_length):
+    """Exact update of a first-order response for one MIMOSA time step."""
+
+    persistence = exp(-period_length / timescale)
+    return equilibrium + (current - equilibrium) * persistence
+
+
+def slr_thermal_expansion(
+    slr_thermal,
+    temperature,
+    sensitivity,
+    timescale,
+    m: AbstractModel,
+    period_length,
+):
+    """Update one thermal-expansion response box."""
+
+    equilibrium = sensitivity * temperature
+    return relax_to_equilibrium(slr_thermal, equilibrium, timescale, period_length)
+
+
+def slr_gsic_equilibrium(temperature, m: AbstractModel):
+    """Temperature-dependent equilibrium glacier contribution."""
+
+    return m.slr_gsic_total_ice * tanh(
+        temperature / m.slr_gsic_temp_sensitivity
     )
 
 
-def slr_thermal_expansion(slr_thermal, temperature, m: AbstractModel):
-    """
-    The sea-level rise due to thermal expansion is calculated as follows:
+def slr_gsic(cumgsic, temperature, m: AbstractModel, period_length):
+    """Relax the glacier contribution towards its finite equilibrium."""
 
-    $$
-    \\text{SLR}_{\\text{thermal}, t} = \\text{SLR}_{\\text{thermal},t-1} \\cdot (1 - a)^{\\frac{\\Delta t}{10}} + \\text{temperature}_{t-1} \\cdot a \\cdot \\tfrac{\\Delta t}{10} \\cdot \\text{equil. rate}_{\\text{thermal}}
-    $$
-    """
-
-    equilib = m.slr_thermal_equil
-    adjust_rate = m.slr_thermal_adjust_rate
-
-    return (1 - adjust_rate) ** (m.dt / 10) * slr_thermal + adjust_rate * (
-        m.dt / 10
-    ) * (temperature * equilib)
-
-
-def slr_gsic(cumgsic, temperature, m: AbstractModel):
-    """
-    Next, melting of glaciers and small ice caps (GSIC) contribute to sea-level rise according to:
-
-    $$
-    \\begin{align*}
-    \\text{SLR}_{\\text{GSIC}, t} &= \\text{ SLR}_{\\text{GSIC}, t-1}\\\\
-    +\\ &\\text{melt rate}\\cdot \\Delta t  \\cdot \\frac{\\text{total ice}_{\\text{GSIC}} - \\text{SLR}_{\\text{GSIC}, t-1}}{\\text{total ice}_{\\text{GSIC}}} \\cdot (\\text{temperature}_{t-1} - \\text{equil. temp}_{\\text{GSIC}})
-    \\end{align*}
-    $$
-    """
-
-    melt_rate = m.slr_gsic_melt_rate
-    total_ice = m.slr_gsic_total_ice
-    equil_temp = m.slr_gsic_equil_temp
-
-    return cumgsic + melt_rate / total_ice * m.dt * (total_ice - cumgsic) * (
-        temperature - equil_temp
+    equilibrium = slr_gsic_equilibrium(temperature, m)
+    return relax_to_equilibrium(
+        cumgsic, equilibrium, m.slr_gsic_timescale, period_length
     )
 
 
-def slr_gis(cumgis, temperature, m: AbstractModel):
-    """
-    
-    The Greenland ice sheet (GIS) contributes to sea-level rise according to:
+def logistic(x):
+    """Numerically safe logistic for the moderate exponents used here."""
 
-    $$
-    \\begin{align*}
-    \\text{SLR}_{\\text{GIS}, t} &= \\text{SLR}_{\\text{GIS}, t-1}\\\\
-    +\\ &\\tfrac{\\Delta t}{10} \\cdot \\tfrac{1}{100} \\cdot (\\text{melt rate above thresh} \\cdot \\text{temperature}_{t-1} + \\text{init melt rate}) \\\\
-    & \\cdot \\left(1 - \\frac{\\text{SLR}_{\\text{GIS}, t-1}}{\\text{init ice volume}}\\right)
-    \\end{align*}
-    $$
+    return 1 / (1 + exp(-x))
 
-    """
 
-    melt_rate_above_thresh = m.slr_gis_melt_rate_above_thresh
-    init_melt_rate = m.slr_gis_init_melt_rate
-    init_ice_vol = m.slr_gis_init_ice_vol
+def slr_gis_equilibrium(temperature, m: AbstractModel):
+    """Bounded Greenland equilibrium contribution, normalised at 0 degree C."""
 
-    return cumgis + (m.dt / 10) * (1 / 100) * (
-        melt_rate_above_thresh * temperature + init_melt_rate
-    ) * (1 - cumgis / init_ice_vol)
+    threshold = m.slr_gis_threshold
+    width = m.slr_gis_transition_width
+    preindustrial = logistic(-threshold / width)
+    warmed = logistic((temperature - threshold) / width)
+    fraction_melted = (warmed - preindustrial) / (1 - preindustrial)
+    return m.slr_gis_total_ice * fraction_melted
+
+
+def slr_gis_timescale(temperature, m: AbstractModel):
+    """Greenland response time, decreasing smoothly as warming increases."""
+
+    return m.slr_gis_base_timescale * exp(
+        -m.slr_gis_timescale_sensitivity * temperature
+    )
+
+
+def slr_gis(cumgis, temperature, m: AbstractModel, period_length):
+    """Update the Greenland contribution using delayed equilibrium response."""
+
+    equilibrium = slr_gis_equilibrium(temperature, m)
+    timescale = slr_gis_timescale(temperature, m)
+    return relax_to_equilibrium(cumgis, equilibrium, timescale, period_length)
+
+
+def slr_antarctic_ocean_temperature(
+    ocean_temperature, temperature, m, period_length
+):
+    """Update the lagged Antarctic subsurface-ocean temperature proxy."""
+
+    equilibrium = m.slr_ais_ocean_temp_scaling * temperature
+    return relax_to_equilibrium(
+        ocean_temperature,
+        equilibrium,
+        m.slr_ais_ocean_temp_timescale,
+        period_length,
+    )
+
+
+def slr_ais_rate(ocean_temperature, m: AbstractModel):
+    """Antarctic contribution rate in metres of sea level per year."""
+
+    fast_fraction = logistic(
+        (ocean_temperature - m.slr_ais_fast_threshold)
+        / m.slr_ais_fast_transition_width
+    )
+    return (
+        m.slr_ais_background_rate
+        + m.slr_ais_temp_sensitivity * ocean_temperature
+        + m.slr_ais_fast_rate * fast_fraction
+    )
+
+
+def slr_ais(cumais, ocean_temperature, m: AbstractModel, period_length):
+    """Update the Antarctic contribution, subject to its finite ice stock."""
+
+    remaining_fraction = 1 - cumais / m.slr_ais_total_ice
+    return (
+        cumais
+        + period_length
+        * slr_ais_rate(ocean_temperature, m)
+        * remaining_fraction
+    )
