@@ -37,6 +37,7 @@ def get_constraints(
     include_LABC = context.option("tippingpoints", "include LABC")
     include_AMOC = context.option("tippingpoints", "include AMOC")
     include_AMAZ = context.option("tippingpoints", "include AMAZ")
+    include_AWSI = context.option("tippingpoints", "include AWSI")
 
 
     # if user specifies inclusion of PFAT tipping element in model structure
@@ -81,6 +82,17 @@ def get_constraints(
             m.t, units=quant.unit("degC_above_PI"), initialize=0.0
         )
 
+
+    # if user specifies inclusion of AWSI tipping element in model structure
+    # OR if user specifies including of ALL tipping elements in model structure
+    if include_AWSI or include_ALL:
+            # ALL the AWSI stuff
+            constraints.extend(get_AWSI_constraints(m))
+    else:
+        m.tipping_temps_AWSI = Param(
+            m.t, units=quant.unit("degC_above_PI"), initialize=0.0
+        )
+
     
 
     #####################################################
@@ -94,6 +106,7 @@ def get_constraints(
                     + m.tipping_temps_LABC[t]
                     + m.tipping_temps_AMOC[t]
                     + m.tipping_temps_AMAZ[t]
+                    + m.tipping_temps_AWSI[t]
                 ),
             ),
         ]
@@ -105,9 +118,6 @@ def get_constraints(
 def get_PFAT_constraints(m: AbstractModel):
     # Var for additional GMST temperature anomaly due to PFAT tipping element
     m.tipping_temps_PFAT = Var(m.t, units=quant.unit("degC_above_PI"))
-    # temperature tipping threshold quantile for PFAT tipping element
-    # user can specify a value of 0.05, 0.5, or 0.95
-    m.PFAT_threshold_quantile = Param(doc="::tippingpoints.PFAT.threshold_quantile")
     # degree of severity quantile for the effects of crossing the PFAT tipping threshold
     # user can specify value as 0.05, 0.5, or 0.95 (from confidence interval)
     m.PFAT_severity_quantile = Param(doc="::tippingpoints.PFAT.severity_quantile")
@@ -119,10 +129,10 @@ def get_PFAT_constraints(m: AbstractModel):
             m.tipping_temps_PFAT,
             lambda m, t: (
                 calc_global_temp_PFAT(
-                    m.PFAT_threshold_quantile,
                     m.temperature[t],
                     m.PFAT_severity_quantile,
                     m.PFAT_threshold,
+                    m.year,
                     m,
                 )
                 if t > 0
@@ -138,7 +148,6 @@ def get_PFAT_constraints(m: AbstractModel):
 def get_LABC_constraints(m: AbstractModel):
     # Var for additional GMST temperature anomaly due to LABC tipping element
     m.tipping_temps_LABC = Var(m.t, units=quant.unit("degC_above_PI"))
-    m.LABC_threshold_quantile = Param(doc="::tippingpoints.LABC.threshold_quantile")
     m.LABC_threshold = Param(doc="::tippingpoints.LABC.threshold")
     
 
@@ -147,7 +156,6 @@ def get_LABC_constraints(m: AbstractModel):
                 m.tipping_temps_LABC,
                 lambda m, t: (
                     calc_global_temp_LABC(
-                        m.LABC_threshold_quantile,
                         m.temperature[t],
                         m.LABC_threshold,
                         m,
@@ -165,7 +173,6 @@ def get_LABC_constraints(m: AbstractModel):
 def get_AMOC_constraints(m: AbstractModel):
     # Var for additional GMST temperature anomaly due to AMOC tipping element
     m.tipping_temps_AMOC = Var(m.t, units=quant.unit("degC_above_PI"))
-    m.AMOC_threshold_quantile = Param(doc="::tippingpoints.AMOC.threshold_quantile")
     m.AMOC_threshold = Param(doc="::tippingpoints.AMOC.threshold")
     
 
@@ -174,7 +181,6 @@ def get_AMOC_constraints(m: AbstractModel):
                 m.tipping_temps_AMOC,
                 lambda m, t: (
                     calc_global_temp_AMOC(
-                        m.AMOC_threshold_quantile,
                         m.temperature[t],
                         m.AMOC_threshold,
                         m,
@@ -192,7 +198,6 @@ def get_AMOC_constraints(m: AbstractModel):
 def get_AMAZ_constraints(m: AbstractModel):
     # Var for additional GMST temperature anomaly due to AMAZ tipping element
     m.tipping_temps_AMAZ = Var(m.t, units=quant.unit("degC_above_PI"))
-    m.AMAZ_threshold_quantile = Param(doc="::tippingpoints.AMAZ.threshold_quantile")
     m.AMAZ_severity_quantile = Param(doc="::tippingpoints.AMAZ.severity_quantile")
     m.AMAZ_threshold = Param(doc="::tippingpoints.AMAZ.threshold")
     
@@ -202,7 +207,6 @@ def get_AMAZ_constraints(m: AbstractModel):
                 m.tipping_temps_AMAZ,
                 lambda m, t: (
                     calc_global_temp_AMAZ(
-                        m.AMAZ_threshold_quantile,
                         m.temperature[t],
                         m.AMAZ_severity_quantile,
                         m.AMAZ_threshold,
@@ -217,56 +221,76 @@ def get_AMAZ_constraints(m: AbstractModel):
     return constraints
 
 
+def get_AWSI_constraints(m: AbstractModel):
+    # Var for additional GMST temperature anomaly due to AWSI tipping element
+    m.tipping_temps_AWSI = Var(m.t, units=quant.unit("degC_above_PI"))
+    m.AWSI_threshold = Param(doc="::tippingpoints.AWSI.threshold")
+    
+
+    constraints = [
+            GlobalEquation(
+                m.tipping_temps_AWSI,
+                lambda m, t: (
+                    calc_global_temp_AWSI(
+                        m.temperature[t],
+                        m.AWSI_threshold,
+                        m,
+                    )
+                    if t > 0
+                    else 0
+                ),
+            ),
+        ]
+
+    return constraints
+
+
 
 ###############################
-# calculates the temperature anomaly from exceeding the PFAT tipping threshold
-# uses estimate of 13 - 25 GtC released per degree Celsius over threshold (Anderson McKay 2022)
-# this function uses the user-specified severity to determine which value to use
-# TODO: Turetsky et al. (2020) estimates around 20% of these emissions will be methane (CH4)
+# calculates the global temperature anomaly from exceeding the PFAT tipping threshold
+# uses estimates of CO2 and CH4 release from Turetsky et al. (2020), which correspond to RCP-4.5
+# NOTE: Anderson-McKay (2022) uses Turetsky as a source but provides a wider range of carbon release values
+# TODO: values are only valid up to the year 2100
 def calc_global_temp_PFAT(
-    PFAT_threshold_quantile,
     temp_current,
     PFAT_severity_quantile,
     PFAT_threshold,
+    year_current,
     m: AbstractModel,
 ):
 
-    # we initialize the severity to be 19 GtC per deg C, the 50th percentile value
-    severity = 19.0
-    # if user has selected 5th percentile, severity is set to 13 GtC
-    if PFAT_severity_quantile == 0.05:
-        severity = 13.0
-    # if user has selected 95th percentile, severity is set to 25 GtC
-    elif PFAT_severity_quantile == 0.95:
-        severity = 25.0
-    # if any other value is entered, set severity to median by default
-    else:
-        # TODO: Throw error
-        # TODO: remove severity = 19.0 once we figure out how to throw an error
-        severity = 19.0
-
+    # this value represents the sum of Turetsky's estimates for carbon released as both CO2 and methane
+    # CO2: 2.3 petagrams of carbon per degree C
+    # CH4: 2330 teragrams of carbon per degree C
+    # result is of order 10^9 tons (gigatons) of carbon (NOT of CO2)
+    # TODO: these values are only valid up to the year 2100
+    carbon_release = 4.63
+    
     # setting temperature threshold at which tipping occurs
+    # this value is provided by the stochastic probability draw in run.py
     threshold = PFAT_threshold
     
-    # conversion factor to convert GtC to GtCO2 (molecular weight of CO2 / molecular weight of C)
-    conversion_factor = 44.0 / 12.0
+    # conversion factor to convert carbon to CO2 (molecular weight of CO2 / molecular weight of C)
+    CO2_conversion_factor = 44.0 / 12.0
 
-    # temperature increase above PFAT threshold multiplied by GtC per degree C increase
-    # this is then multiplied by a conversion factor to get GtCO2
-    # multiplied by TCRE to get units of degrees C
-    temp_total = (soft_switch(temp_current - threshold) * severity * conversion_factor * m.TCRE)
+    # temperature increase above PFAT threshold multiplied by amount of carbon release per degree
+    # this is then multiplied by a conversion factor to get value in terms of CO2
+    # then multiplied by TCRE to get units of degrees C
+    # multiplication by 0.8 represents Turetsky's estimate that 20% of emissions will be offset by
+    # vegetation regrowth as boreal region warms
+    temp_total = 0.8 * (soft_switch(temp_current - threshold) * carbon_release * CO2_conversion_factor 
+                        * m.TCRE) 
 
     return temp_total
 
 
+
 ###############################
 # calculates the temperature anomaly from exceeding the LABC tipping threshold
-# uses estimate of 0.46 degrees C of global cooling (Anderson McKay 2022)
-# TODO: The change in GMST is currently represented as being proportional to the amount by which
-#       the tipping temperature LABC_threshold has been exceeded.
-#       This is NOT accurate...Too bad!
+# uses estimate of 0.46 degrees C of global cooling in total (Anderson McKay 2022)
+# TODO: This is likely wrong (what happens when temp_current exceeds threshold by more than 1.0 degC?)
 def calc_global_temp_LABC(
-    LABC_threshold_quantile, temp_current, LABC_threshold, m: AbstractModel
+    temp_current, LABC_threshold, m: AbstractModel
 ):
 
     threshold = LABC_threshold
@@ -276,11 +300,12 @@ def calc_global_temp_LABC(
     return temp_total
 
 
+
 ###############################
 # calculates the temperature anomaly from exceeding the AMOC tipping threshold
 # uses estimate of 0.54 degrees C of global cooling (Anderson McKay 2022)
 def calc_global_temp_AMOC(
-    AMOC_threshold_quantile, temp_current, AMOC_threshold, m: AbstractModel
+    temp_current, AMOC_threshold, m: AbstractModel
 ):
 
     threshold = AMOC_threshold
@@ -294,8 +319,9 @@ def calc_global_temp_AMOC(
 # calculates the temperature anomaly from exceeding the AMAZ tipping threshold
 # uses estimate of 30-75 GtC (Anderson McKay 2022)
 # TODO: only valid to 2100, use other numbers for up to 2300
+# TODO: Anderson McKay suggests that threshold temperature will likely be lower when accounting for
+#       the effects of deforestation
 def calc_global_temp_AMAZ(
-    AMAZ_threshold_quantile,
     temp_current,
     AMAZ_severity_quantile,
     AMAZ_threshold,
@@ -314,5 +340,24 @@ def calc_global_temp_AMAZ(
 
     threshold = AMAZ_threshold
 
-    temp_total = soft_switch(temp_current - threshold) * severity * m.TCRE
+    # needed to convert from gigatons carbon to gigatons CO2
+    CO2_conversion_factor = 44.0 / 12.0
+
+    temp_total = soft_switch(temp_current - threshold) * CO2_conversion_factor * severity * m.TCRE
+    return temp_total
+
+
+
+
+###############################
+# calculates the global temperature anomaly from exceeding the AWSI tipping threshold
+def calc_global_temp_AWSI(
+    temp_current,
+    AWSI_threshold,
+    m: AbstractModel,
+):
+
+    threshold = AWSI_threshold
+
+    temp_total = (soft_switch(temp_current - threshold) * 0.60)
     return temp_total

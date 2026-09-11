@@ -392,15 +392,6 @@ emissions:
 tippingpoints:
 
   PFAT:
-    threshold_quantile:
-      descr: Quantile for PFAT tipping temperature threshold
-      type: enum
-      values:
-        - 0.05
-        - 0.5
-        - 0.95
-      default: 0.5
-
     severity_quantile:
       descr: Quantile for the intensity of effects from crossing PFAT tipping threshold
       type: enum
@@ -416,15 +407,6 @@ tippingpoints:
       default: 1.5
 
   LABC:
-    threshold_quantile:
-      descr: Quantile for LABC tipping temperature threshold
-      type: enum
-      values:
-        - 0.05
-        - 0.5
-        - 0.95
-      default: 0.5
-
     threshold:
       descr: Threshold temperature beyond which the element tips
       type: float
@@ -432,15 +414,6 @@ tippingpoints:
 
 
   AMOC:
-    threshold_quantile:
-      descr: Quantile for AMOC tipping temperature threshold
-      type: enum
-      values:
-        - 0.05
-        - 0.5
-        - 0.95
-      default: 0.5
-
     threshold:
       descr: Threshold temperature beyond which the element tips
       type: float
@@ -448,15 +421,6 @@ tippingpoints:
 
 
   AMAZ:
-    threshold_quantile:
-      descr: Quantile for AMAZ tipping temperature threshold
-      type: enum
-      values:
-        - 0.05
-        - 0.5
-        - 0.95
-      default: 0.5
-
     severity_quantile:
       descr: Quantile for the intensity of effects from crossing AMAZ tipping threshold
       type: enum
@@ -470,6 +434,13 @@ tippingpoints:
       descr: Threshold temperature beyond which the element tips
       type: float
       default: 3.5
+
+  AWSI:
+    threshold:
+      descr: Threshold temperature beyond which the element tips
+      type: float
+      default: 6.3
+
       
 
 ##################
@@ -637,6 +608,11 @@ model structure:
 
     include AMAZ:
       descr: Include AMAZ tipping element
+      type: bool
+      default: False
+
+    include AWSI:
+      descr: Include AWSI tipping element
       type: bool
       default: False
     
