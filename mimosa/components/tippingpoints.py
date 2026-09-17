@@ -244,7 +244,7 @@ def get_PFAT_constraints(m: AbstractModel):
                     m.temperature[t],
                     m.PFAT_severity_quantile,
                     m.PFAT_threshold,
-                    m.year,
+                    m.year(t),
                     m,
                 )
                 if t > 0
@@ -323,7 +323,6 @@ def calc_global_temp_AWSI(
 ###############################
 # calculates the temperature anomaly from exceeding the LABC tipping threshold
 # uses estimate of 0.46 degrees C of global cooling in total (Anderson McKay 2022)
-# TODO: This is likely wrong (what happens when temp_current exceeds threshold by more than 1.0 degC?)
 def calc_global_temp_LABC(
     temp_current, LABC_threshold, m: AbstractModel
 ):
@@ -338,9 +337,8 @@ def calc_global_temp_LABC(
 
 ###############################
 # calculates the global temperature anomaly from exceeding the PFAT tipping threshold
-# uses estimates of CO2 and CH4 release from Turetsky et al. (2020), which correspond to RCP-4.5
-# NOTE: Anderson-McKay (2022) uses Turetsky as a source but provides a wider range of carbon release values
-# TODO: values are only valid up to the year 2100
+# uses estimates of carbon-equivalent release from Anderson-McKay (2022)
+# severity quantile corresponds to the range of carbon-equivalent release values provided in this paper
 def calc_global_temp_PFAT(
     temp_current,
     PFAT_severity_quantile,
@@ -349,12 +347,22 @@ def calc_global_temp_PFAT(
     m: AbstractModel,
 ):
 
-    # this value represents the sum of Turetsky's estimates for carbon released as both CO2 and methane
-    # CO2: 2.3 petagrams of carbon per degree C
-    # CH4: 2330 teragrams of carbon per degree C
-    # result is of order 10^9 tons (gigatons) of carbon (NOT of CO2)
-    # TODO: these values are only valid up to the year 2100
-    carbon_release = 4.63
+    # we treat the range of carbon release values in Anderson-McKay as a 95% confidence interval
+    # units are GtC
+    carbon_release = 10.5
+    if (PFAT_severity_quantile == 0.05):
+         carbon_release = 7.0
+    elif (PFAT_severity_quantile == 0.95):
+         carbon_release = 14.0
+
+    # after the year 2100, we use the values for carbon release between 2100 and 2300
+    if (year_current > 2100 and PFAT_severity_quantile == 0.5):
+         carbon_release = 26.5
+    elif (year_current > 2100 and PFAT_severity_quantile == 0.05):
+         carbon_release = 18.0
+    elif (year_current > 2100 and PFAT_severity_quantile == 0.95):
+         carbon_release = 35.0
+    
     
     # setting temperature threshold at which tipping occurs
     # this value is provided by the stochastic probability draw in run.py
@@ -363,12 +371,10 @@ def calc_global_temp_PFAT(
     # conversion factor to convert carbon to CO2 (molecular weight of CO2 / molecular weight of C)
     CO2_conversion_factor = 44.0 / 12.0
 
-    # temperature increase above PFAT threshold multiplied by amount of carbon release per degree
+    # temperature increase above PFAT threshold multiplied by amount of carbon release
     # this is then multiplied by a conversion factor to get value in terms of CO2
     # then multiplied by TCRE to get units of degrees C
-    # multiplication by 0.8 represents Turetsky's estimate that 20% of emissions will be offset by
-    # vegetation regrowth as boreal region warms
-    temp_total = 0.8 * (soft_switch(temp_current - threshold) * carbon_release * CO2_conversion_factor 
+    temp_total = (soft_switch(temp_current - threshold) * carbon_release * CO2_conversion_factor 
                         * m.TCRE) 
 
     return temp_total
