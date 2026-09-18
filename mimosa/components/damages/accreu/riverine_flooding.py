@@ -155,7 +155,7 @@ def gross_dmg_fct_riverine(m, t, r):
     def fct(x):
         return a + b * x + c * x**2
 
-    return fct(m.temperature[t]) - fct(m.temperature[0])
+    return (fct(m.temperature[t]) - fct(m.temperature[0])) * m.damage_scale_factor
 
 
 # def gross_dmg_fct_riverine(m, t, r):

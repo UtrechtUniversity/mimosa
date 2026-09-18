@@ -48,6 +48,7 @@ def get_constraints(
     # This is done using the parameter params["model structure"]["damage module options"]["ACCREU_adaptation"] = "separate" or "combined"
     adaptation_options = get_adaptation_options(context)
     adaptation_type = adaptation_options.adaptation_type
+    m.damage_scale_factor = Param(doc="::economics.damages.scale factor")
 
     if adaptation_type != "noadaptation":
         m.adaptation_effectiveness_scale_factor = Param(
@@ -80,9 +81,6 @@ def get_constraints(
 
     m.damage_costs = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
     m.damage_costs_abs = Var(m.t, m.regions, units=quant.unit("currency_unit"))
-    m.damage_scale_factor = Param(
-        doc="::economics.damages.scale factor"
-    )  # Not implemented yet
     m.global_damage_costs = Var(
         m.t,
         units=quant.unit("fraction_of_GDP"),

@@ -65,7 +65,8 @@ def get_constraints(m, adaptation_options: AdaptationOptions):
                 m.slr_damages_gross_prod[r],
                 m.slr_damages_gross_power[r],
                 x="total_SLR",
-            ),
+            )
+            * m.damage_scale_factor,
         )
     )
 

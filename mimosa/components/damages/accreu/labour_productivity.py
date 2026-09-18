@@ -182,10 +182,10 @@ def get_constraints(m, adaptation_options: AdaptationOptions):
 def gross_dmg_fct_labourprod(m, t, r):
     a = m.labourprod_damages_gross_constant[r]
     b = m.labourprod_damages_gross_linear[r]
-    return dmg_fct_linear(m, t, a, b)
+    return dmg_fct_linear(m, t, a, b) * m.damage_scale_factor
 
 
 def benefits_dmg_fct_labourprod(m, t, r):
     a = m.labourprod_damages_benefits_constant[r]
     b = m.labourprod_damages_benefits_linear[r]
-    return dmg_fct_linear(m, t, a, b)
+    return dmg_fct_linear(m, t, a, b) * m.damage_scale_factor
