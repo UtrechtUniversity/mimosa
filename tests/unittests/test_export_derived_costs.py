@@ -120,7 +120,9 @@ def _cost_model():
     return model
 
 
-def _indirect_cost_model(ignore_damages=False, zero_costs=False):
+def _indirect_cost_model(
+    ignore_damages=False, zero_costs=False, include_adaptation=True
+):
     model = ConcreteModel()
     model.t = Set(initialize=[0, 1, 2], ordered=True)
     model.regions = Set(initialize=["A", "B"], ordered=True)
@@ -190,11 +192,14 @@ def _indirect_cost_model(ignore_damages=False, zero_costs=False):
         mitigation_values = {key: 0 for key in mitigation_values}
         adaptation_values = {key: 0 for key in adaptation_values}
 
-    for name, values in (
+    cost_variables = [
         ("damage_costs_abs", damage_values),
         ("mitigation_costs_abs", mitigation_values),
-        ("adaptation_costs_abs", adaptation_values),
-    ):
+    ]
+    if include_adaptation:
+        cost_variables.append(("adaptation_costs_abs", adaptation_values))
+
+    for name, values in cost_variables:
         setattr(
             model,
             name,
@@ -266,6 +271,25 @@ def test_add_indirect_damage_cost_rows(simulation):
     assert rows_by_name_and_region[
         ("global_indirect_damage_costs", "Global")
     ][3:] == pytest.approx([0, 0.16, 0.106])
+    assert rows_by_name_and_region[
+        ("global_indirect_mitigation_costs", "Global")
+    ][3:] == pytest.approx([0, 0.18, 0.09])
+    assert rows_by_name_and_region[
+        ("global_indirect_adaptation_costs", "Global")
+    ][3:] == pytest.approx([0, 0.01, 0.224])
+
+    for region in model.regions:
+        attributed_total = np.sum(
+            [
+                rows_by_name_and_region[(f"indirect_{cost_type}_costs", region)][
+                    3:
+                ]
+                for cost_type in ("damage", "mitigation", "adaptation")
+            ],
+            axis=0,
+        )
+        expected = [0] + [model.indirect_costs[t, region].value for t in (1, 2)]
+        assert attributed_total == pytest.approx(expected)
 
 
 @pytest.mark.parametrize("simulation", [False, True])
@@ -287,6 +311,57 @@ def test_indirect_damage_costs_are_zero_when_not_attributable(
     rows = []
     add_derived_global_rows(rows, output_model, all_variables)
 
-    indirect_damage_rows = [row for row in rows if "indirect_damage_costs" in row[0]]
-    assert len(indirect_damage_rows) == 3
-    assert all(row[3:] == [0, 0, 0] for row in indirect_damage_rows)
+    rows_by_name_and_region = {(row[0], row[1]): row for row in rows}
+    zero_cost_types = (
+        ("damage", "adaptation")
+        if model_kwargs.get("ignore_damages")
+        else ("damage", "mitigation", "adaptation")
+    )
+    for cost_type in zero_cost_types:
+        attributed_rows = [
+            row
+            for (name, _), row in rows_by_name_and_region.items()
+            if name in (
+                f"indirect_{cost_type}_costs",
+                f"global_indirect_{cost_type}_costs",
+            )
+        ]
+        assert len(attributed_rows) == 3
+        assert all(row[3:] == [0, 0, 0] for row in attributed_rows)
+
+    if model_kwargs.get("ignore_damages"):
+        assert rows_by_name_and_region[("indirect_mitigation_costs", "A")][
+            3:
+        ] == pytest.approx([0, 0.2, 0.3])
+        assert rows_by_name_and_region[("indirect_mitigation_costs", "B")][
+            3:
+        ] == pytest.approx([0, 0.4, 0.5])
+        assert rows_by_name_and_region[
+            ("global_indirect_mitigation_costs", "Global")
+        ][3:] == pytest.approx([0, 0.35, 0.42])
+
+
+@pytest.mark.parametrize("simulation", [False, True])
+def test_missing_adaptation_costs_are_treated_as_zero(simulation):
+    model = _indirect_cost_model(include_adaptation=False)
+
+    if simulation:
+        output_model = SimulationObjectModel(model)
+        all_variables = output_model.all_vars_for_export()
+    else:
+        output_model = model
+        all_variables = get_all_variables(model) + get_all_time_dependent_params(model)
+
+    rows = []
+    add_derived_global_rows(rows, output_model, all_variables)
+    rows_by_name_and_region = {(row[0], row[1]): row for row in rows}
+
+    for region in model.regions:
+        assert rows_by_name_and_region[("indirect_adaptation_costs", region)][3:] == [
+            0,
+            0,
+            0,
+        ]
+    assert rows_by_name_and_region[
+        ("global_indirect_adaptation_costs", "Global")
+    ][3:] == [0, 0, 0]
