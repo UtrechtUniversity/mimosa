@@ -584,12 +584,7 @@ def _get_inertia_and_budget_constraints(
                     >= m.period_length[t]
                     * m.inertia_regional
                     * m.ssp_baseline_emissions[0, r]
-                    if value(m.inertia_regional) is not False
-                    and t > 0
-                    and (
-                        value(m.delay_mitigation_year) is False
-                        or m.year(t) >= m.delay_mitigation_year
-                    )
+                    if value(m.inertia_regional) is not False and t > 0
                     else Constraint.Skip
                 ),
                 name="regional_inertia",
