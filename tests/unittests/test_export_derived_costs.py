@@ -120,6 +120,95 @@ def _cost_model():
     return model
 
 
+def _indirect_cost_model(ignore_damages=False, zero_costs=False):
+    model = ConcreteModel()
+    model.t = Set(initialize=[0, 1, 2], ordered=True)
+    model.regions = Set(initialize=["A", "B"], ordered=True)
+    model.year = lambda t: t
+    model.period_length = Param(
+        model.t, initialize={0: 0, 1: 5, 2: 10}
+    )
+    model.ignore_damages = Param(initialize=ignore_damages)
+    model.baseline_GDP = Param(
+        model.t,
+        model.regions,
+        initialize={
+            (0, "A"): 100,
+            (0, "B"): 300,
+            (1, "A"): 100,
+            (1, "B"): 300,
+            (2, "A"): 200,
+            (2, "B"): 300,
+        },
+        units=quant.unit("currency_unit"),
+    )
+    model.global_baseline_GDP = Param(
+        model.t,
+        initialize={0: 400, 1: 400, 2: 500},
+        units=quant.unit("currency_unit"),
+    )
+    model.indirect_costs = Var(
+        model.t,
+        model.regions,
+        units=quant.unit("fraction_of_baseline_GDP"),
+        initialize={
+            (0, "A"): 0.1,
+            (0, "B"): 0.1,
+            (1, "A"): 0.2,
+            (1, "B"): 0.4,
+            (2, "A"): 0.3,
+            (2, "B"): 0.5,
+        },
+    )
+
+    damage_values = {
+        (0, "A"): 10,
+        (0, "B"): 20,
+        (1, "A"): 30,
+        (1, "B"): 0,
+        (2, "A"): 0,
+        (2, "B"): 0,
+    }
+    mitigation_values = {
+        (0, "A"): 30,
+        (0, "B"): 20,
+        (1, "A"): 10,
+        (1, "B"): 0,
+        (2, "A"): 0,
+        (2, "B"): 0,
+    }
+    adaptation_values = {
+        (0, "A"): 10,
+        (0, "B"): 0,
+        (1, "A"): 10,
+        (1, "B"): 40,
+        (2, "A"): 0,
+        (2, "B"): 0,
+    }
+    if zero_costs:
+        damage_values = {key: 0 for key in damage_values}
+        mitigation_values = {key: 0 for key in mitigation_values}
+        adaptation_values = {key: 0 for key in adaptation_values}
+
+    for name, values in (
+        ("damage_costs_abs", damage_values),
+        ("mitigation_costs_abs", mitigation_values),
+        ("adaptation_costs_abs", adaptation_values),
+    ):
+        setattr(
+            model,
+            name,
+            Var(
+                model.t,
+                model.regions,
+                units=quant.unit("currency_unit"),
+                initialize=values,
+            ),
+        )
+
+    return model
+
+
 @pytest.mark.parametrize("simulation", [False, True])
 def test_add_derived_global_rows(simulation):
     model = _cost_model()
@@ -151,3 +240,53 @@ def test_add_derived_global_rows(simulation):
     assert global_avoided[1] == pytest.approx(0.625)
     assert rows_by_name["global_other_costs"][3:] == pytest.approx([0.175, 0.18])
     assert rows_by_name["global_heat_related_mortality"][3:] == pytest.approx([3, 7])
+
+
+@pytest.mark.parametrize("simulation", [False, True])
+def test_add_indirect_damage_cost_rows(simulation):
+    model = _indirect_cost_model()
+
+    if simulation:
+        output_model = SimulationObjectModel(model)
+        all_variables = output_model.all_vars_for_export()
+    else:
+        output_model = model
+        all_variables = get_all_variables(model) + get_all_time_dependent_params(model)
+
+    rows = []
+    add_derived_global_rows(rows, output_model, all_variables)
+    rows_by_name_and_region = {(row[0], row[1]): row for row in rows}
+
+    assert rows_by_name_and_region[("indirect_damage_costs", "A")][3:] == pytest.approx(
+        [0, 0.04, 0.14]
+    )
+    assert rows_by_name_and_region[("indirect_damage_costs", "B")][3:] == pytest.approx(
+        [0, 0.2, 1 / 12]
+    )
+    assert rows_by_name_and_region[
+        ("global_indirect_damage_costs", "Global")
+    ][3:] == pytest.approx([0, 0.16, 0.106])
+
+
+@pytest.mark.parametrize("simulation", [False, True])
+@pytest.mark.parametrize(
+    "model_kwargs", [{"ignore_damages": True}, {"zero_costs": True}]
+)
+def test_indirect_damage_costs_are_zero_when_not_attributable(
+    simulation, model_kwargs
+):
+    model = _indirect_cost_model(**model_kwargs)
+
+    if simulation:
+        output_model = SimulationObjectModel(model)
+        all_variables = output_model.all_vars_for_export()
+    else:
+        output_model = model
+        all_variables = get_all_variables(model) + get_all_time_dependent_params(model)
+
+    rows = []
+    add_derived_global_rows(rows, output_model, all_variables)
+
+    indirect_damage_rows = [row for row in rows if "indirect_damage_costs" in row[0]]
+    assert len(indirect_damage_rows) == 3
+    assert all(row[3:] == [0, 0, 0] for row in indirect_damage_rows)
