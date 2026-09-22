@@ -84,18 +84,18 @@ for monetise_mortality in [False, True]:
     model_mit.solve()
     model_mit.save(f"{PREFIX}_mit_mortality_{monetise_mortality}")
 
-    #### Run "mit_late": Same as mit, but mitigation is delayed until after 2050
+    #### Run "mit_late": Same as mit, but mitigation is delayed until after 2045
     params_mit_late = init_params(monetise_mortality, adapt_type="noadaptation")
-    params_mit_late["emissions"]["delay_mitigation_until_year"] = 2050
+    params_mit_late["emissions"]["delay_mitigation_until_year"] = 2045
     model_mit_late = MIMOSA(params_mit_late)
     model_mit_late.solve()
     model_mit_late.save(f"{PREFIX}_mit_late_mortality_{monetise_mortality}")
 
     for adapt_calibration in [
         "accreu",
-        "literature",
-        "literature_low",
-        "literature_high",
+        # "literature",
+        # "literature_low",
+        # "literature_high",
     ]:
 
         #### Run "ada": no-policy baseline with optimal adaptation
@@ -181,26 +181,26 @@ for monetise_mortality in [False, True]:
 
         if adapt_calibration == "accreu":
 
-            #### Run "mit_late_ada": Same as mit_ada, but mitigation is delayed until after 2050
+            #### Run "mit_late_ada": Same as mit_ada, but mitigation is delayed until after 2045
             params_mit_late_ada = init_params(monetise_mortality, adapt_calibration)
             params_mit_late_ada["model structure"]["damage module options"][
                 "ACCREU_adaptation_determination"
             ] = "analytical_optimum"
-            params_mit_late_ada["emissions"]["delay_mitigation_until_year"] = 2050
+            params_mit_late_ada["emissions"]["delay_mitigation_until_year"] = 2045
             model_mit_late_ada = MIMOSA(params_mit_late_ada)
             model_mit_late_ada.solve()
             model_mit_late_ada.save(
                 f"{PREFIX}_mit_late_ada_adapt_calib_{adapt_calibration}_mortality_{monetise_mortality}"
             )
 
-            #### Run "ada_late": Same as ada, but adaptation is delayed until after 2050
+            #### Run "ada_late": Same as ada, but adaptation is delayed until after 2045
             params_ada_late = init_params(monetise_mortality, adapt_calibration)
             params_ada_late["model structure"]["damage module options"][
                 "ACCREU_adaptation_determination"
             ] = "analytical_optimum"
             params_ada_late["economics"]["damages"]["accreu"][
                 "delay_adaptation_until_year"
-            ] = 2050
+            ] = 2045
             model_ada_late = MIMOSA(params_ada_late)
             sim_ada_late = model_ada_late.run_simulation()
             model_ada_late.save_simulation(
@@ -222,7 +222,7 @@ for monetise_mortality in [False, True]:
                 f"{PREFIX}_mit_ada_late_adapt_calib_{adapt_calibration}_mortality_{monetise_mortality}"
             )
 
-            #### Run "mit_late_ada_late": Same as mit_ada, but adaptation and mitigation are delayed until after 2050
+            #### Run "mit_late_ada_late": Same as mit_ada, but adaptation and mitigation are delayed until after 2045
             params_mit_late_ada_late = init_params(
                 monetise_mortality, adapt_calibration
             )
@@ -231,8 +231,8 @@ for monetise_mortality in [False, True]:
             ] = "analytical_optimum"
             params_mit_late_ada_late["economics"]["damages"]["accreu"][
                 "delay_adaptation_until_year"
-            ] = 2050
-            params_mit_late_ada_late["emissions"]["delay_mitigation_until_year"] = 2050
+            ] = 2045
+            params_mit_late_ada_late["emissions"]["delay_mitigation_until_year"] = 2045
             model_mit_late_ada_late = MIMOSA(params_mit_late_ada_late)
             model_mit_late_ada_late.solve()
             model_mit_late_ada_late.save(
