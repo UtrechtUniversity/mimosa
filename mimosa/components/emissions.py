@@ -8,6 +8,7 @@ from typing import Sequence
 import numpy as np
 from mimosa.common import (
     AbstractModel,
+    ConcreteModel,
     Param,
     Var,
     GeneralConstraint,
@@ -54,6 +55,12 @@ def get_constraints(
     )
 
     return constraints
+
+
+def fix_initial_abatement(m: ConcreteModel) -> None:
+    """Fix initial abatement after general Pyomo preprocessing is complete."""
+    for region in m.regions:
+        m.relative_abatement[0, region].fix(0)
 
 
 def _set_baseline_emissions(m: AbstractModel) -> None:
@@ -195,10 +202,10 @@ def _get_emissions_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
         m.t,
         m.regions,
         initialize=0,
-        # In first time step, abatement needs to be zero (allowing for a negligeable amount of abatement for numerical stability),
-        # in subsequent time steps, abatement can be between 0 and 250% of baseline emissions.
+        # Initial abatement is fixed to zero after Pyomo preprocessing;
+        # subsequent steps allow up to 250% of baseline emissions.
         # Note that limits on negative emissions can also be set with the parameters `global_min_level` and `regional_min_level`.
-        bounds=lambda m, t, r: (0, 1e-8) if t == 0 else (0, 2.5),
+        bounds=(0, 2.5),
         units=quant.unit("fraction_of_baseline_emissions"),
     )
 
