@@ -8,6 +8,7 @@ from typing import Sequence
 import numpy as np
 from mimosa.common import (
     AbstractModel,
+    ConcreteModel,
     Param,
     Var,
     GeneralConstraint,
@@ -54,6 +55,12 @@ def get_constraints(
     )
 
     return constraints
+
+
+def fix_initial_abatement(m: ConcreteModel) -> None:
+    """Fix initial abatement after general Pyomo preprocessing is complete."""
+    for region in m.regions:
+        m.relative_abatement[0, region].fix(0)
 
 
 def _set_baseline_emissions(m: AbstractModel) -> None:

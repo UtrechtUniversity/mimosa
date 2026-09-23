@@ -11,6 +11,7 @@ from mimosa.common import (
 )
 from mimosa.common.config.parseconfig import check_params, parse_param_values
 from mimosa.abstract_model import ALL_COMPONENTS, create_abstract_model
+from mimosa.components import emissions
 from mimosa.concrete_model.instantiate_params import InstantiatedModel
 from mimosa.concrete_model import custom_constraints
 
@@ -61,7 +62,7 @@ class Preprocessor:
         3. Loads the necessary data and regional parameters.
         4. Instantiates the abstract model with the loaded data and parameters.
         5. Applies custom constraints and Pyomo transformations.
-        6. Fixes initial conditions that must remain outside variable propagation.
+        6. Fixes initial abatement after variable propagation.
 
         Returns:
             ModelBuildResult: Named references to the concrete model, parsed
@@ -74,7 +75,7 @@ class Preprocessor:
         self.concrete_model = self._instantiate_model()
         self._apply_custom_constraints()
         self._apply_pyomo_transformations()
-        self._fix_initial_conditions()
+        emissions.fix_initial_abatement(self.concrete_model)
 
         return ModelBuildResult(
             concrete_model=self.concrete_model,
@@ -170,8 +171,3 @@ class Preprocessor:
             TransformationFactory("contrib.propagate_fixed_vars").apply_to(
                 self.concrete_model
             )
-
-    def _fix_initial_conditions(self) -> None:
-        """Fix model initial conditions after Pyomo variable propagation."""
-        for region in self.concrete_model.regions:
-            self.concrete_model.relative_abatement[0, region].fix(0)

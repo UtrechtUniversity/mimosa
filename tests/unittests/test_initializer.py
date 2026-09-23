@@ -94,9 +94,8 @@ def test_build_model_orchestrates_stages_and_returns_their_artifacts(monkeypatch
         lambda: calls.append("Pyomo transformations"),
     )
     monkeypatch.setattr(
-        preprocessor,
-        "_fix_initial_conditions",
-        lambda: calls.append("initial conditions"),
+        "mimosa.core.initializer.emissions.fix_initial_abatement",
+        lambda model: calls.append(("initial abatement", model)),
     )
 
     result = preprocessor.build_model()
@@ -111,7 +110,7 @@ def test_build_model_orchestrates_stages_and_returns_their_artifacts(monkeypatch
         "instantiate",
         "custom constraints",
         "Pyomo transformations",
-        "initial conditions",
+        ("initial abatement", concrete_model),
     ]
     assert result == ModelBuildResult(
         concrete_model=concrete_model,
