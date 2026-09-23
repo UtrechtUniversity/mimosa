@@ -233,7 +233,7 @@ def get_constraints(
     2025 to the stated 2100 warming level. Values are metres relative to 1900:
 
     <div class="tiny_table table_first_col_header" markdown>
-    {{ read_csv_macro("docs/assets/data/slr_ar6_benchmark.csv") }}
+    {{ read_csv("docs/assets/data/slr_ar6_benchmark.csv") }}
     </div>
 
     The MIMOSA columns in this table and the component table below are generated
@@ -259,7 +259,7 @@ def get_constraints(
     the central 2100 component values at 2, 3, and 4 degrees C respectively are:
 
     <div class="tiny_table table_first_col_header" markdown>
-    {{ read_csv_macro("docs/assets/data/slr_ar6_components.csv") }}
+    {{ read_csv("docs/assets/data/slr_ar6_components.csv") }}
     </div>
 
     References:
