@@ -194,7 +194,7 @@ def get_constraints_slr(m: AbstractModel) -> Sequence[GeneralConstraint]:
     and are equal to:
 
     <div class="tiny_table table_first_col_header table_scrollable" markdown>
-    {{ read_csv_macro("docs/assets/data/coacch_slr_form.csv") }}
+    {{ read_csv("docs/assets/data/coacch_slr_form.csv") }}
     </div>
 
     To calculate the SLR damage costs, two additional transformations have to be taken:

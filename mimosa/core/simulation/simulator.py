@@ -100,6 +100,8 @@ class Simulator:
             * A float value: every region and time step will get this value
             * A numpy array of shape (n_timesteps, n_regions): each region and time step will get the corresponding value
               (or shape (n_timesteps,) for global variables)
+
+        Entries fixed in the Pyomo model retain their fixed values in simulation.
         """
 
         self._require_prepared()
@@ -142,7 +144,11 @@ class Simulator:
             )
 
             # Set the value for the control variable
-            sim_var.values = value
+            sim_var.values = np.array(value, copy=True)
+            pyomo_var = getattr(self.concrete_model, var)
+            for index in pyomo_var:
+                if pyomo_var[index].fixed:
+                    sim_var.set_indexed(index, pyomo_var[index].value)
 
         self._simulate(simulation_model)
 
