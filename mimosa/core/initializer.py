@@ -61,6 +61,7 @@ class Preprocessor:
         3. Loads the necessary data and regional parameters.
         4. Instantiates the abstract model with the loaded data and parameters.
         5. Applies custom constraints and Pyomo transformations.
+        6. Fixes initial conditions that must remain outside variable propagation.
 
         Returns:
             ModelBuildResult: Named references to the concrete model, parsed
@@ -73,6 +74,7 @@ class Preprocessor:
         self.concrete_model = self._instantiate_model()
         self._apply_custom_constraints()
         self._apply_pyomo_transformations()
+        self._fix_initial_conditions()
 
         return ModelBuildResult(
             concrete_model=self.concrete_model,
@@ -148,9 +150,7 @@ class Preprocessor:
     def _apply_custom_constraints(self) -> None:
         """Apply configured constraints to the instantiated concrete model."""
         if self._params.get("custom_constraints") is not None:
-            custom_constraints.set_custom_constraints(
-                self.concrete_model, self._params
-            )
+            custom_constraints.set_custom_constraints(self.concrete_model, self._params)
 
     def _apply_pyomo_transformations(self) -> None:
         """
@@ -170,3 +170,8 @@ class Preprocessor:
             TransformationFactory("contrib.propagate_fixed_vars").apply_to(
                 self.concrete_model
             )
+
+    def _fix_initial_conditions(self) -> None:
+        """Fix model initial conditions after Pyomo variable propagation."""
+        for region in self.concrete_model.regions:
+            self.concrete_model.relative_abatement[0, region].fix(0)
