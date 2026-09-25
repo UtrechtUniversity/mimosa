@@ -386,7 +386,7 @@ def _get_temperature_constraints(m: AbstractModel) -> Sequence[GeneralConstraint
             GlobalEquation(
                 m.temperature,
                 lambda m, t: (
-                    m.T0 + m.TCRE * m.global_cumulative_emissions[t] if t > 0 else m.T0
+                    m.T0 + (m.TCRE * m.global_cumulative_emissions[t]) + m.total_tipping_anomaly[t] if t > 0 else m.T0
                 ),
             ),
             GlobalConstraint(

@@ -21,6 +21,8 @@ for i in range(0, 20):
 
     params["model structure"]["tippingpoints options"]["include ALL"] = True
 
+
+
     params["tippingpoints"]["AMAZ"]["threshold"] = AMAZ_tipping_temp[0]
     params["tippingpoints"]["AMOC"]["threshold"] = AMOC_tipping_temp[0]
     params["tippingpoints"]["AWSI"]["threshold"] = AWSI_tipping_temp[0]
@@ -28,13 +30,18 @@ for i in range(0, 20):
     params["tippingpoints"]["PFAT"]["threshold"] = PFAT_tipping_temp[0]
 
     model1 = MIMOSA(params)
+    model1.simulator.plot_dependency_graph()
+    exit()
+    baseline = model1.run_nopolicy_baseline()
+    model1.save_simulation(baseline, "nopolicy_with_tipping_23_09_2026" + str(i))
     model1.solve()
-    model1.save("run_17_09_2026_" + str(i))
+    #model1.save("nopolicy_run_23_09_2026_" + str(i))
 
 
 
-# for single runs
 """
+# for single runs
+
 AMAZ_tipping_temp = random.lognormal(mean=1.25, sigma=0.33, size=1)
 AMOC_tipping_temp = random.triangular(left=0.36, mode=2.64, right=9.85, size=1)
 AWSI_tipping_temp = random.lognormal(mean=1.84, sigma=0.20, size=1)
@@ -50,6 +57,8 @@ params["tippingpoints"]["LABC"]["threshold"] = LABC_tipping_temp[0]
 params["tippingpoints"]["PFAT"]["threshold"] = PFAT_tipping_temp[0]
 
 model1 = MIMOSA(params)
-model1.solve()
-model1.save("new_PFAT_calculation")
+baseline = model1.run_nopolicy_baseline()
+model1.save_simulation(baseline, "baseline_nopolicy_with_tipping_23_09_2026")
+#model1.solve()
+#model1.save("run_no_tipping_points_23_09_2026")
 """

@@ -137,7 +137,7 @@ def get_AMAZ_constraints(m: AbstractModel):
                 m.tipping_temps_AMAZ,
                 lambda m, t: (
                     calc_global_temp_AMAZ(
-                        m.temperature[t],
+                        m.temperature[t-1],
                         m.AMAZ_severity_quantile,
                         m.AMAZ_threshold,
                         m,
@@ -163,7 +163,7 @@ def get_AMOC_constraints(m: AbstractModel):
                 m.tipping_temps_AMOC,
                 lambda m, t: (
                     calc_global_temp_AMOC(
-                        m.temperature[t],
+                        m.temperature[t-1],
                         m.AMOC_threshold,
                         m,
                     )
@@ -188,7 +188,7 @@ def get_AWSI_constraints(m: AbstractModel):
                 m.tipping_temps_AWSI,
                 lambda m, t: (
                     calc_global_temp_AWSI(
-                        m.temperature[t],
+                        m.temperature[t-1],
                         m.AWSI_threshold,
                         m,
                     )
@@ -213,7 +213,7 @@ def get_LABC_constraints(m: AbstractModel):
                 m.tipping_temps_LABC,
                 lambda m, t: (
                     calc_global_temp_LABC(
-                        m.temperature[t],
+                        m.temperature[t-1],
                         m.LABC_threshold,
                         m,
                     )
@@ -241,7 +241,7 @@ def get_PFAT_constraints(m: AbstractModel):
             m.tipping_temps_PFAT,
             lambda m, t: (
                 calc_global_temp_PFAT(
-                    m.temperature[t],
+                    m.temperature[t-1],
                     m.PFAT_severity_quantile,
                     m.PFAT_threshold,
                     m.year(t),
