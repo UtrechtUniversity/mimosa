@@ -24,6 +24,63 @@ Omit `doc` when using a sourced initializer: supplying both raises `ValueError`.
 The current abstract-model pipeline still loads configured inputs through the `doc` conventions
 described below, including overriding initialization data with configured values.
 
+## Explicit input lookup
+
+`ModelInputs` is available from `mimosa.core.model_inputs` for independent construction code.
+It consumes validated configuration with references resolved, its parser tree, and the existing
+`DataStore` and `RegionalParamStore`. For example:
+
+```python
+from mimosa.common.config.parseconfig import check_params, parse_param_values
+from mimosa.common.data import DataStore
+from mimosa.common.regional_params import RegionalParamStore
+from mimosa.core.model_inputs import ModelInputs
+
+params, parser_tree = check_params({}, return_parser_tree=True)
+params = parse_param_values(params)
+inputs = ModelInputs(
+    params=params,
+    parser_tree=parser_tree,
+    data_store=DataStore(params),
+    regional_store=RegionalParamStore(params, parser_tree),
+)
+```
+
+Once the model's sets are defined, parameters can use a single source reference:
+
+```python
+m.alpha = Param(initialize=inputs.config("economics.GDP.alpha"))
+m.init_capitalstock_factor = Param(
+    m.regions,
+    initialize=inputs.regional("economics", "init_capital_factor"),
+)
+m.population = Param(
+    m.t, m.regions,
+    initialize=inputs.time_regional("population"),
+    units=quant.unit("billion people"),
+)
+```
+
+These methods return `SourcedValue` objects. Scalar quantities are converted using their configured
+units; regional data retains existing mapping and per-region overrides; time-dependent data is
+interpolated using the existing store. Keys are timestep indices and region names, not calendar years.
+`inputs.t`, `inputs.regions`, `inputs.time_grid` and `inputs.year(t)` expose the configured indices
+and calendar grid. A nonzero emissions pulse must fall on that grid; a zero pulse may be off-grid.
+
+For Python decisions, use `inputs.config_value("model structure.damage module")` or retrieve a whole
+section, such as `inputs.config_value("model structure.damage module options")`. Scalar quantity
+lookups return converted magnitudes, while whole sections retain their parsed contents without
+recursive quantity conversion. Lookups do not modify the configuration.
+
+`inputs.mac_ssp_calibration_factor()` returns time-indexed sourced values interpolated from the
+selected SSP's calibration keyframes. Configure inputs before preparing the stores and lookup object.
+
+The current component interface remains `get_constraints(m, context)`. `ModelInputs` is not yet
+provided automatically to components; existing components continue using the loading conventions
+below until the next migration checkpoint.
+
+## Existing component declarations
+
 A new parameter called `new_param` can be added in the `get_constraints` function of any component:
 
 ```python hl_lines="4"

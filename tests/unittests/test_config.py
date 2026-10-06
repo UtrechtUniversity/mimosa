@@ -24,4 +24,5 @@ def test_trajectory_and_deactivation_configuration_remain_supported():
         "constraint_variables": {"relative_abatement": 0.2},
         "disabled_constraints": ["carbon_budget"],
     }
+
     assert check_params({"custom_constraints": custom})["custom_constraints"] == custom
