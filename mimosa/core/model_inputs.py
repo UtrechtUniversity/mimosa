@@ -1,5 +1,6 @@
 """Explicit input lookup for model-component construction."""
 
+from collections.abc import Mapping
 from typing import Any, Callable
 
 import numpy as np
@@ -102,13 +103,28 @@ class ModelInputs:
             raise KeyError(f"Time-and-region input {name!r} was not found.") from exc
         return SourcedValue(values, f"timeandregional::{name}")
 
-    def mac_ssp_calibration_factor(self) -> SourcedValue:
-        """Interpolate MAC calibration keyframes for the selected SSP."""
-        source = self.config(
-            f"economics.MAC.SSP_calibration_factor.{self.config_value('SSP')}"
-        )
-        values = {
-            t: self.data_store.interp_data_from_dict(self.year(t), source.values)
-            for t in self.t
-        }
+    def time_config(self, path: str) -> SourcedValue:
+        """Interpolate numeric config keyframes on the model time grid.
+
+        The setting must map ascending calendar years to numeric values. Values
+        outside the keyframe range retain the nearest endpoint, matching the
+        existing data-store interpolation. Returned keys are timestep indices;
+        source metadata identifies the supplied configuration path.
+        """
+        source = self.config(path)
+        if not isinstance(source.values, Mapping) or not source.values:
+            raise ValueError(
+                f"Time-dependent configuration {path!r} must be a non-empty "
+                "year-to-value mapping."
+            )
+        try:
+            values = {
+                t: self.data_store.interp_data_from_dict(self.year(t), source.values)
+                for t in self.t
+            }
+        except (TypeError, ValueError) as exc:
+            raise ValueError(
+                f"Time-dependent configuration {path!r} must map numeric "
+                "calendar years to numeric values."
+            ) from exc
         return SourcedValue(values, source.documentation_key)

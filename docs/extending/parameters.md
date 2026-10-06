@@ -72,8 +72,21 @@ section, such as `inputs.config_value("model structure.damage module options")`.
 lookups return converted magnitudes, while whole sections retain their parsed contents without
 recursive quantity conversion. Lookups do not modify the configuration.
 
-`inputs.mac_ssp_calibration_factor()` returns time-indexed sourced values interpolated from the
-selected SSP's calibration keyframes. Configure inputs before preparing the stores and lookup object.
+`inputs.time_config(path)` linearly interpolates a non-empty configuration mapping of ascending
+calendar years to numeric values onto the model time grid. Values outside the keyframe range use
+the nearest endpoint. It returns timestep-indexed values with the original config path as metadata.
+The caller chooses the source; for example, mitigation can select its SSP calibration explicitly:
+
+```python
+ssp = inputs.config_value("SSP")
+m.MAC_SSP_calibration_factor = Param(
+    m.t,
+    initialize=inputs.time_config(f"economics.MAC.SSP_calibration_factor.{ssp}"),
+    units=quant.unit("dimensionless"),
+)
+```
+
+Configure inputs before preparing the stores and lookup object.
 
 The current component interface remains `get_constraints(m, context)`. `ModelInputs` is not yet
 provided automatically to components; existing components continue using the loading conventions

@@ -145,12 +145,17 @@ def test_time_regional_data_keeps_full_grid_and_region_dimensions(inputs, name):
         )
 
 
-def test_mac_calibration_interpolates_selected_ssp_keyframes(inputs):
-    source = inputs.mac_ssp_calibration_factor()
+def test_time_config_interpolates_the_explicitly_selected_path(inputs):
+    ssp = inputs.config_value("SSP")
+    source = inputs.time_config(f"economics.MAC.SSP_calibration_factor.{ssp}")
     assert source.documentation_key == "::economics.MAC.SSP_calibration_factor.SSP1"
     assert list(source.values) == list(inputs.t)
     assert source.values[0] == pytest.approx(1 - (2025 - 2020) / 80 * (1 - 0.618))
     assert source.values[6] == pytest.approx(1 - (2060 - 2020) / 80 * (1 - 0.618))
+    # The caller selects the path; lookup does not impose the configured SSP.
+    assert inputs.time_config("economics.MAC.SSP_calibration_factor.SSP2").values == {
+        t: 1.0 for t in inputs.t
+    }
 
 
 def test_lookup_values_construct_native_pyomo_parameters_and_derived_values(inputs):
@@ -169,7 +174,8 @@ def test_lookup_values_construct_native_pyomo_parameters_and_derived_values(inpu
         model.t, initialize=lambda m, t: sum(m.population[t, r] for r in m.regions),
         units=quant.unit("billion people"),
     )
-    model.mac_factor = Param(model.t, initialize=inputs.mac_ssp_calibration_factor())
+    calibration = inputs.time_config("economics.MAC.SSP_calibration_factor.SSP1")
+    model.mac_factor = Param(model.t, initialize=calibration)
     population = inputs.time_regional("population").values
 
     assert value(model.alpha) == 0.3
@@ -181,7 +187,8 @@ def test_lookup_values_construct_native_pyomo_parameters_and_derived_values(inpu
         )
     assert model.population.doc == "timeandregional::population"
     assert model.population.index_set().dimen == 2
-    assert model.mac_factor.extract_values() == inputs.mac_ssp_calibration_factor().values
+    assert model.mac_factor.extract_values() == calibration.values
+    assert model.mac_factor.doc == calibration.documentation_key
 
 
 def test_lookup_matches_current_model_initialization(inputs):
@@ -207,7 +214,7 @@ def test_lookup_matches_current_model_initialization(inputs):
         inputs.regional("economics", "init_capital_factor").values
     )
     assert model.MAC_SSP_calibration_factor.extract_values() == pytest.approx(
-        inputs.mac_ssp_calibration_factor().values
+        inputs.time_config("economics.MAC.SSP_calibration_factor.SSP1").values
     )
 
 
@@ -234,7 +241,7 @@ def test_fractional_grid_and_single_region_have_correct_indices():
     assert list(lookup.time_regional("population").values) == [(t, "CAN") for t in range(5)]
 
 
-def test_mac_calibration_clamps_before_and_after_keyframe_range():
+def test_time_config_clamps_before_and_after_keyframe_range():
     params, tree = prepare(
         {
             "regions": {"CAN": None},
@@ -243,9 +250,46 @@ def test_mac_calibration_clamps_before_and_after_keyframe_range():
         }
     )
     lookup = make_inputs(params, tree)
-    assert lookup.mac_ssp_calibration_factor().values == {
+    assert lookup.time_config("economics.MAC.SSP_calibration_factor.SSP2").values == {
         0: 2, 1: 2, 2: 3, 3: 4, 4: 4, 5: 4
     }
+
+
+def test_time_config_accepts_non_mac_config_with_calendar_keys():
+    params, tree = prepare(
+        {
+            "regions": {"CAN": None},
+            "time": {"end": 2050, "periods": {2030: 5, 2040: 10}},
+        }
+    )
+    lookup = make_inputs(params, tree)
+    source = lookup.time_config("time.periods")
+
+    assert lookup.time_grid.years == (2025, 2030, 2035, 2040, 2050)
+    assert source.values == {0: 5, 1: 5, 2: 7.5, 3: 10, 4: 10}
+    assert source.documentation_key == "::time.periods"
+
+
+@pytest.mark.parametrize(
+    "path", ["economics.GDP.alpha", "model structure.damage module", "time.periods"]
+)
+def test_time_config_requires_nonempty_keyframe_mapping(inputs, path):
+    params, tree = prepare({"time": {"periods": {}}})
+    lookup = ModelInputs(params, tree, inputs.data_store, inputs.regional_store)
+    with pytest.raises(ValueError, match="must be a non-empty year-to-value mapping"):
+        lookup.time_config(path)
+
+
+def test_time_config_rejects_nonnumeric_keyframes_with_path_context(inputs):
+    path = "model structure.damage module options"
+    with pytest.raises(ValueError, match="must map numeric calendar years") as error:
+        inputs.time_config(path)
+    assert path in str(error.value)
+
+
+def test_time_config_reports_missing_configuration_path(inputs):
+    with pytest.raises(KeyError, match="Configuration path 'missing'"):
+        inputs.time_config("missing")
 
 
 def test_invalid_grid_reuses_existing_validation(inputs):
