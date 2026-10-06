@@ -1,7 +1,30 @@
 # Adding parameters and data
 
-Parameters are values used in MIMOSA that can be changed without changing the code. A new parameter called `new_param` can be added in the `get_constraints` function of any component:
+Parameters are values used in MIMOSA that can be changed without changing the code.
 
+`Param` imported from `mimosa.common` is a factory that returns a standard Pyomo parameter.
+Ordinary Pyomo arguments, including `initialize`, `default`, `units` and `mutable`, work as usual.
+For component filtering or type checks, import `PyomoParam` from `mimosa.common` instead.
+
+The factory also accepts already resolved input values with source metadata:
+
+```python
+from mimosa.common import ConcreteModel, Param, SourcedValue
+
+m = ConcreteModel()
+m.alpha = Param(
+    initialize=SourcedValue(0.3, "::economics.GDP.alpha"),
+)
+# m.alpha is a Pyomo parameter; m.alpha.doc is "::economics.GDP.alpha".
+```
+
+`SourcedValue` does not load or convert data. It carries values and a documentation key using the
+existing `::config.path`, `regional::category.name` or `timeandregional::variable` conventions.
+Omit `doc` when using a sourced initializer: supplying both raises `ValueError`.
+The current abstract-model pipeline still loads configured inputs through the `doc` conventions
+described below, including overriding initialization data with configured values.
+
+A new parameter called `new_param` can be added in the `get_constraints` function of any component:
 
 ```python hl_lines="4"
 def get_constraints(m, context):

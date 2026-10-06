@@ -1,6 +1,6 @@
 import numpy as np
 
-from mimosa.common import AbstractModel, quant, Param
+from mimosa.common import AbstractModel, quant, PyomoParam
 from mimosa.common.data import DataStore
 from mimosa.common.regional_params import RegionalParamStore
 from mimosa.common.config.parseconfig import get_nested
@@ -79,7 +79,7 @@ class InstantiatedModel:
         parameter_mapping = {}
 
         # Attempt to set parameter values automatically from their doc value
-        for parameter in self.abstract_model.component_objects(Param):
+        for parameter in self.abstract_model.component_objects(PyomoParam):
             # First check if the parameter is callable: in this case,
             # the parameter doc is a function that returns the parameter doc string.
             # This is used for dynamic parameter values (depending on other parameters).

@@ -1,6 +1,6 @@
 import numpy as np
 
-from mimosa.common import get_indices, Var, Param, Set, UsefulVar
+from mimosa.common import get_indices, Var, PyomoParam, Set, UsefulVar
 
 
 class SimVar:
@@ -116,7 +116,7 @@ class SimulationObjectModel:
         self.params = None
         # Recreate all variables and
         self.all_vars = []
-        for var in concrete_model.component_objects([Var, Param]):
+        for var in concrete_model.component_objects([Var, PyomoParam]):
             if not var.name.startswith("_"):
                 if var.index_set().dimen > 0:
                     setattr(self, var.name, SimVar(var))
