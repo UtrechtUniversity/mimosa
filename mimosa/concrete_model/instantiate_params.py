@@ -138,9 +138,6 @@ class InstantiatedModel:
             for t in range(num_years)
         }
 
-        if "custom_mapping" in params["custom_constraints"]:
-            parameter_mapping.update(params["custom_constraints"]["custom_mapping"])
-
         instance_data[None].update(parameter_mapping)
 
     def _set_instance_data_coacch(self, instance_data) -> None:

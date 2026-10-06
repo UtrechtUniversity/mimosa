@@ -54,7 +54,11 @@ def create_leaf_criterium(parser_tree):
     def leaf_criterium(keys, node):
         try:
             parser_type = get_nested(parser_tree, keys).type
-        except (AttributeError, KeyError):
+        except KeyError:
+            # Unknown options are obsolete as a whole, regardless of their value
+            # shape. Do not traverse raw indexed mappings with non-string keys.
+            return True
+        except AttributeError:
             parser_type = None
         if isinstance(node, dict) and parser_type not in ["dict", "datasource"]:
             return False
