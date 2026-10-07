@@ -87,11 +87,12 @@ def get_constraints(
 
     """
     constraints = []
+    inputs = context.inputs
 
     m.init_capitalstock_factor = Param(
         m.regions,
         units=quant.unit("dimensionless"),
-        doc="regional::economics.init_capital_factor",
+        initialize=inputs.regional("economics", "init_capital_factor"),
     )
     m.capital_stock = Var(
         m.t,
@@ -101,9 +102,9 @@ def get_constraints(
     )
 
     # Parameters
-    m.alpha = Param(doc="::economics.GDP.alpha")
-    m.dk = Param(doc="::economics.GDP.depreciation of capital")
-    m.sr = Param(doc="::economics.GDP.savings rate")
+    m.alpha = Param(initialize=inputs.config("economics.GDP.alpha"))
+    m.dk = Param(initialize=inputs.config("economics.GDP.depreciation of capital"))
+    m.sr = Param(initialize=inputs.config("economics.GDP.savings rate"))
 
     m.GDP_gross = Var(
         m.t,
@@ -130,7 +131,7 @@ def get_constraints(
     m.investments = Var(m.t, m.regions, units=quant.unit("currency_unit"))
     m.consumption = Var(m.t, m.regions, units=quant.unit("currency_unit"))
 
-    m.ignore_damages = Param(doc="::economics.damages.ignore damages")
+    m.ignore_damages = Param(initialize=inputs.config("economics.damages.ignore damages"))
 
     m.TFP = Param(m.t, m.regions, initialize=economics.get_TFP_value)
 

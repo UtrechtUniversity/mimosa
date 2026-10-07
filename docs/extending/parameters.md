@@ -97,7 +97,20 @@ m.elasmu = Param(initialize=context.inputs.config("economics.elasmu"))
 ```
 
 Its `param::elasmu` documentation marker continues to work because the factory preserves the source
-key in `doc`. Other components still use the loading conventions below. Construction remains
+key in `doc`. The Cobb–Douglas component now also uses explicit lookup for its capital-stock
+coefficient, production parameters and damage-ignore flag. For example:
+
+```python
+inputs = context.inputs
+m.alpha = Param(initialize=inputs.config("economics.GDP.alpha"))
+m.init_capitalstock_factor = Param(
+    m.regions,
+    initialize=inputs.regional("economics", "init_capital_factor"),
+    units=quant.unit("dimensionless"),
+)
+```
+
+The remaining components still use the loading conventions below. Construction remains
 abstract until the later concrete-model checkpoint; do not read unconstructed model values here.
 
 ## Existing component declarations
