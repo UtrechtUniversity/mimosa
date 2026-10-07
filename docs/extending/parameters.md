@@ -88,9 +88,17 @@ m.MAC_SSP_calibration_factor = Param(
 
 Configure inputs before preparing the stores and lookup object.
 
-The current component interface remains `get_constraints(m, context)`. `ModelInputs` is not yet
-provided automatically to components; existing components continue using the loading conventions
-below until the next migration checkpoint.
+The current component interface remains `get_constraints(m, context)`. During the migration,
+prepared input lookup is available as `context.inputs`. The default `welfare_loss_minimising`
+component is the first to use explicit initialization:
+
+```python
+m.elasmu = Param(initialize=context.inputs.config("economics.elasmu"))
+```
+
+Its `param::elasmu` documentation marker continues to work because the factory preserves the source
+key in `doc`. Other components still use the loading conventions below. Construction remains
+abstract until the later concrete-model checkpoint; do not read unconstructed model values here.
 
 ## Existing component declarations
 

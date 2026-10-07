@@ -36,6 +36,7 @@ def test_create_model_context_separates_registry_and_fixed_components():
         options={"emissions-option": True}
     )
     assert context.components["mitigation"].module == ""
+    assert context.inputs is None
 
 
 def test_build_model_orchestrates_stages_and_returns_their_artifacts(monkeypatch):
@@ -54,14 +55,22 @@ def test_build_model_orchestrates_stages_and_returns_their_artifacts(monkeypatch
     data_store = object()
     regional_store = object()
     concrete_model = object()
+    inputs = object()
     calls = []
 
     def parse_params():
         calls.append("parse")
         preprocessor._params = {"source": "parsed parameters"}
 
-    def create_context():
+    def create_inputs():
+        calls.append("inputs")
+        assert preprocessor._data_store is data_store
+        assert preprocessor._regional_param_store is regional_store
+        return inputs
+
+    def create_context(model_inputs):
         calls.append("context")
+        assert model_inputs is inputs
         return context
 
     def create_abstract_model():
@@ -80,6 +89,7 @@ def test_build_model_orchestrates_stages_and_returns_their_artifacts(monkeypatch
     # Replace expensive configuration, data, and Pyomo work with stage spies.
     monkeypatch.setattr(preprocessor, "_check_and_parse_params", parse_params)
     monkeypatch.setattr(preprocessor, "_create_model_context", create_context)
+    monkeypatch.setattr(preprocessor, "_create_model_inputs", create_inputs)
     monkeypatch.setattr(preprocessor, "_create_abstract_model", create_abstract_model)
     monkeypatch.setattr(preprocessor, "_load_data", load_data)
     monkeypatch.setattr(preprocessor, "_instantiate_model", instantiate_model)
@@ -104,9 +114,10 @@ def test_build_model_orchestrates_stages_and_returns_their_artifacts(monkeypatch
     # transformations potentially fix or propagate its variables.
     assert calls == [
         "parse",
+        "load data",
+        "inputs",
         "context",
         "abstract model",
-        "load data",
         "instantiate",
         "custom constraints",
         "Pyomo transformations",

@@ -17,6 +17,8 @@ class ComponentConfig:
 @dataclass(frozen=True)
 class ModelContext:
     components: Dict[str, ComponentConfig]
+    # Temporary ModelInputs bridge while components migrate to (m, inputs).
+    inputs: Any = None
 
     def module(self, name: str) -> str:
         return self.components[name].module

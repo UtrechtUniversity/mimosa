@@ -54,7 +54,7 @@ def get_constraints(
     constraints = []
 
     # Parameters
-    m.elasmu = Param(doc="::economics.elasmu")
+    m.elasmu = Param(initialize=context.inputs.config("economics.elasmu"))
 
     m.utility = Var(m.t, m.regions, initialize=0.1)
     m.global_welfare = Var(m.t)
