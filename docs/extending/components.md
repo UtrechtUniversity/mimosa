@@ -74,9 +74,9 @@ the Pyomo `Param` to a configuration value or input file.
 
 ## 2. Add the component to MIMOSA
 
-Import and register the component in the component catalogue in `mimosa/model_builder.py`:
+Import the component and call it in `create_model` in `mimosa/model_builder.py`:
 
-```python title="mimosa/model_builder.py" hl_lines="3 10"
+```python title="mimosa/model_builder.py" hl_lines="3 11"
 from mimosa.components import (
     emissions,
     new_component,
@@ -84,16 +84,18 @@ from mimosa.components import (
 )
 
 
-MODEL_COMPONENTS = (
-    fixed_component("emissions", emissions.get_constraints),
-    fixed_component("new_component", new_component.get_constraints),
-    # ... remaining components ...
-)
+def create_model(inputs: ModelInputs):
+    m = create_base_model(inputs)
+    constraints = []
+    constraints.extend(emissions.get_constraints(m, inputs))
+    constraints.extend(new_component.get_constraints(m, inputs))
+    # ... remaining components and constraint attachment ...
 ```
 
-Place the entry near related model components so the construction sequence remains easy to understand.
+Place the call near related model components so the construction sequence remains easy to understand.
 References inside equation functions are evaluated after the model components have been added, so their
-dependencies do not normally determine the order of these entries.
+dependencies do not normally determine the order of these calls. Direct access to another component's
+parameters or variables during construction does require that component to be constructed first.
 
 That is all that is required for a component that should always be included. There is no need to add
 the component anywhere else. There is also no need to change `config_default.yaml` unless users need

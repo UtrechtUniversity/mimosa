@@ -22,7 +22,8 @@ m = create_base_model(inputs)
 
 The preprocessor prepares configuration and data lookup before construction. Base sets and
 parameters are immediately available; components add initialized parameters and variables in
-catalogue order. Collected constraints and the objective are attached after all declarations.
+the explicit order in `create_model`. Collected constraints and the objective are attached after
+all declarations.
 There is no separate abstract-model instantiation or parameter loading from `doc`.
 
 !!! info "A note about file structure"

@@ -1,4 +1,4 @@
-"""Component catalogue and construction of MIMOSA's concrete model."""
+"""Construction of MIMOSA's concrete model."""
 
 from typing import List, Tuple
 
@@ -21,45 +21,6 @@ from mimosa.components import (
     sealevelrise,
     welfare,
 )
-from mimosa.core.component_definition import (
-    fixed_component,
-    selectable_component,
-    validate_unique_component_names,
-)
-
-#######################
-# Component catalogue
-#######################
-
-# The tuple order is the order in which model components are constructed.
-# The name of each component corresponds to the name in the parameters file.
-MODEL_COMPONENTS = (
-    # Emissions and temperature
-    fixed_component("emissions", emissions.get_constraints),
-    # Sea-level rise
-    fixed_component("sealevelrise", sealevelrise.get_constraints),
-    # Damage costs
-    selectable_component("damage", damages.DAMAGE_MODULES),
-    # Mitigation costs
-    fixed_component("mitigation", mitigation.get_constraints),
-    # Emission trading and financial transfers
-    selectable_component("emissiontrade", emissiontrade.EMISSIONTRADE_MODULES),
-    selectable_component(
-        "financialtransfer", financialtransfer.FINANCIALTRANSFER_MODULES
-    ),
-    # Effort-sharing regime
-    selectable_component("effortsharing", effortsharing.EFFORTSHARING_MODULES),
-    # Production and consumption
-    fixed_component("cobbdouglas", cobbdouglas.get_constraints),
-    # Utility and welfare
-    selectable_component("welfare", welfare.WELFARE_MODULES),
-)
-
-# The objective has a different return value and is therefore built separately.
-OBJECTIVE_COMPONENT = selectable_component("objective", objective.OBJECTIVE_MODULES)
-
-ALL_COMPONENTS = MODEL_COMPONENTS + (OBJECTIVE_COMPONENT,)
-validate_unique_component_names(ALL_COMPONENTS)
 
 
 ########################
@@ -90,12 +51,25 @@ def create_model(
     # then added to the model at the end of this file.
     constraints = []
 
-    # Add all ordinary model components in catalogue order.
-    for component in MODEL_COMPONENTS:
-        constraints.extend(component.build(m, inputs))
+    # Emissions, temperature and sea-level rise
+    constraints.extend(emissions.get_constraints(m, inputs))
+    constraints.extend(sealevelrise.get_constraints(m, inputs))
+
+    # Damage and mitigation costs
+    constraints.extend(damages.get_constraints(m, inputs))
+    constraints.extend(mitigation.get_constraints(m, inputs))
+
+    # Emission trading, financial transfers and effort sharing
+    constraints.extend(emissiontrade.get_constraints(m, inputs))
+    constraints.extend(financialtransfer.get_constraints(m, inputs))
+    constraints.extend(effortsharing.get_constraints(m, inputs))
+
+    # Production, consumption and welfare
+    constraints.extend(cobbdouglas.get_constraints(m, inputs))
+    constraints.extend(welfare.get_constraints(m, inputs))
 
     # Objective of optimisation
-    model_objective, objective_constraints = OBJECTIVE_COMPONENT.build(m, inputs)
+    model_objective, objective_constraints = objective.get_constraints(m, inputs)
     constraints.extend(objective_constraints)
 
     ######################

@@ -87,10 +87,10 @@ params["emissions"]["include feedback"] = True
 
 ## Options for a new component
 
-Register the component in the catalogue as before:
+Call the component in `create_model` as before:
 
 ```python title="mimosa/model_builder.py"
-fixed_component("new_component", new_component.get_constraints),
+constraints.extend(new_component.get_constraints(m, inputs))
 ```
 
 Define the setting in the section for that component and read its full path:
