@@ -20,6 +20,7 @@ from mimosa.common import (
     quant,
     ModelContext,
 )
+from mimosa.core.model_inputs import ModelInputs
 
 
 def get_constraints(
@@ -36,12 +37,15 @@ def get_constraints(
         :::mimosa.components.mitigation._get_learning_constraints
 
     """
-    constraints = _get_mac_constraints(m) + _get_learning_constraints(m)
+    inputs = context.inputs
+    constraints = _get_mac_constraints(m, inputs) + _get_learning_constraints(m, inputs)
 
     return constraints
 
 
-def _get_mac_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
+def _get_mac_constraints(
+    m: AbstractModel, inputs: ModelInputs
+) -> Sequence[GeneralConstraint]:
     """
     In MIMOSA, the baseline emissions can be reduced by implementing a carbon price. This increases the price of
     carbon-intensive technologies relative to cleaner alternatives, which in turn leads to a reduction in emissions.
@@ -194,12 +198,19 @@ def _get_mac_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     constraints = []
 
     # MAC: linking the carbon price to the relative abatement
-    m.MAC_gamma = Param(doc="::economics.MAC.gamma")
-    m.MAC_beta = Param(doc="::economics.MAC.beta")
+    m.MAC_gamma = Param(initialize=inputs.config("economics.MAC.gamma"))
+    m.MAC_beta = Param(initialize=inputs.config("economics.MAC.beta"))
+    calibration = inputs.config_value("economics.MAC.regional calibration factor")
     m.MAC_scaling_factor = Param(
         m.regions,
-        doc=lambda params: f'regional::MAC.{params["economics"]["MAC"]["regional calibration factor"]}',
+        initialize=inputs.regional("MAC", calibration),
     )  # Regional scaling of the MAC
+    ssp = inputs.config_value("SSP")
+    m.MAC_SSP_calibration_factor = Param(
+        m.t,
+        initialize=inputs.time_config(f"economics.MAC.SSP_calibration_factor.{ssp}"),
+        units=quant.unit("dimensionless"),
+    )
     m.carbon_price = Var(
         m.t,
         m.regions,
@@ -234,7 +245,7 @@ def _get_mac_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     )
     m.mitigation_costs = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
     m.mitigation_costs_min_level = Param(
-        doc="::economics.MAC.rel_mitigation_costs_min_level"
+        initialize=inputs.config("economics.MAC.rel_mitigation_costs_min_level")
     )
     constraints.extend(
         [
@@ -316,7 +327,9 @@ def _get_mac_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     return constraints
 
 
-def _get_learning_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
+def _get_learning_constraints(
+    m: AbstractModel, inputs: ModelInputs
+) -> Sequence[GeneralConstraint]:
     """
 
     In MIMOSA, there are two ways in which the price of mitigation policy can be reduced over time:
@@ -370,9 +383,9 @@ def _get_learning_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     ### Technological learning
 
     # Learning by doing
-    m.LBD_rate = Param(doc="::economics.MAC.LBD_rate")
+    m.LBD_rate = Param(initialize=inputs.config("economics.MAC.LBD_rate"))
     m.log_LBD_rate = Param(initialize=log(m.LBD_rate) / log(2))
-    m.LBD_scaling = Param(doc="::economics.MAC.LBD_scaling")
+    m.LBD_scaling = Param(initialize=inputs.config("economics.MAC.LBD_scaling"))
     m.LBD_factor = Var(m.t)  # , bounds=(0,1), initialize=1)
     constraints.append(
         GlobalEquation(
@@ -396,7 +409,7 @@ def _get_learning_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     )
 
     # Learning over time and total learning factor
-    m.LOT_rate = Param(doc="::economics.MAC.LOT_rate")
+    m.LOT_rate = Param(initialize=inputs.config("economics.MAC.LOT_rate"))
     m.LOT_factor = Var(m.t)
     m.learning_factor = Var(m.t)
     constraints.extend(

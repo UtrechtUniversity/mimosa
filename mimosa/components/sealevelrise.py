@@ -274,7 +274,7 @@ def get_constraints(
     - [Wong, Bakker and Keller (2017), Antarctic fast dynamics](https://doi.org/10.1007/s10584-017-2039-4).
     """
 
-    projection = context.option("sealevelrise", "projection", default="central")
+    projection = context.inputs.config_value("model structure.sealevelrise options.projection")
     try:
         slr_params = SLR_PROJECTION_PARAMETER_SETS[projection]
     except KeyError as exc:

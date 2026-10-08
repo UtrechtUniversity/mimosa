@@ -219,10 +219,11 @@ def test_lookup_matches_current_model_initialization(inputs):
 
 
 @pytest.mark.parametrize("amount", ["1000 MtCO2", "-1 GtCO2"])
-def test_nonzero_off_grid_pulse_is_rejected_in_model_units(inputs, amount):
+def test_lookup_does_not_apply_emissions_specific_pulse_validation(inputs, amount):
     params, tree = prepare({"emissions": {"pulse": {"year": 2032, "amount": amount}}})
-    with pytest.raises(ValueError, match="pulse year 2032 is not on the model time grid"):
-        ModelInputs(params, tree, inputs.data_store, inputs.regional_store)
+    lookup = ModelInputs(params, tree, inputs.data_store, inputs.regional_store)
+    assert lookup.config_value("emissions.pulse.year") == 2032
+    assert abs(lookup.config_value("emissions.pulse.amount")) == 1.0
 
 
 def test_zero_off_grid_pulse_is_allowed(inputs):

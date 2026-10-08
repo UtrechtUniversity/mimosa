@@ -24,6 +24,7 @@ from mimosa.common import (
     trapezoid,
     ModelContext,
 )
+from mimosa.core.model_inputs import ModelInputs
 
 
 def get_constraints(
@@ -47,11 +48,12 @@ def get_constraints(
 
     # First set baseline emission functions (cumulative emissions and global cumulative emissions)
     _set_baseline_emissions(m)
+    inputs = context.inputs
 
     constraints = (
-        _get_emissions_constraints(m)
-        + _get_temperature_constraints(m)
-        + _get_inertia_and_budget_constraints(m)
+        _get_emissions_constraints(m, inputs)
+        + _get_temperature_constraints(m, inputs)
+        + _get_inertia_and_budget_constraints(m, inputs)
     )
 
     return constraints
@@ -98,7 +100,9 @@ def _set_baseline_emissions(m: AbstractModel) -> None:
     )
 
 
-def _get_emissions_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
+def _get_emissions_constraints(
+    m: AbstractModel, inputs: ModelInputs
+) -> Sequence[GeneralConstraint]:
     """
     ## Baseline emissions
 
@@ -195,7 +199,7 @@ def _get_emissions_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
         units=quant.unit("emissionsrate_unit"),
     )
     m.use_carbon_intensity_for_baseline = Param(
-        doc="::emissions.baseline carbon intensity"
+        initialize=inputs.config("emissions.baseline carbon intensity")
     )
 
     m.relative_abatement = Var(
@@ -210,7 +214,9 @@ def _get_emissions_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     )
 
     # If set, delay mitigation until after a given year by setting a bound on relative_abatement:
-    m.delay_mitigation_year = Param(doc="::emissions.delay_mitigation_until_year")
+    m.delay_mitigation_year = Param(
+        initialize=inputs.config("emissions.delay_mitigation_until_year")
+    )
     constraints.append(
         RegionalConstraint(
             lambda m, t, r: (
@@ -229,10 +235,13 @@ def _get_emissions_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     m.global_emissions = Var(m.t, units=quant.unit("emissionsrate_unit"))
 
     m.global_cumulative_emissions_trapz = Param(
-        doc="::emissions.cumulative_emissions_trapz"
+        initialize=inputs.config("emissions.cumulative_emissions_trapz")
     )
-    m.emissions_pulse_year = Param(doc="::emissions.pulse.year")
-    m.emissions_pulse_amount = Param(doc="::emissions.pulse.amount")
+    m.emissions_pulse_year = Param(initialize=inputs.config("emissions.pulse.year"))
+    m.emissions_pulse_amount = Param(
+        initialize=inputs.config("emissions.pulse.amount"),
+        validate=_validate_emissions_pulse,
+    )
 
     constraints.extend(
         [
@@ -315,7 +324,19 @@ def _get_emissions_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     return constraints
 
 
-def _get_temperature_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
+def _validate_emissions_pulse(m, pulse_amount):
+    """A nonzero pulse must fall on the initialized model's calendar grid."""
+    pulse_year = value(m.emissions_pulse_year)
+    if pulse_amount != 0 and pulse_year not in {m.year(t) for t in m.t}:
+        raise ValueError(
+            f"Emissions pulse year {pulse_year} is not on the model time grid."
+        )
+    return True
+
+
+def _get_temperature_constraints(
+    m: AbstractModel, inputs: ModelInputs
+) -> Sequence[GeneralConstraint]:
     """
 
     The global temperature change is calculated as a linear function of cumulative emissions, with a slope
@@ -385,12 +406,14 @@ def _get_temperature_constraints(m: AbstractModel) -> Sequence[GeneralConstraint
 
     constraints = []
 
-    m.T0 = Param(units=quant.unit("degC_above_PI"), doc="::temperature.initial")
+    m.T0 = Param(
+        units=quant.unit("degC_above_PI"), initialize=inputs.config("temperature.initial")
+    )
     m.temperature = Var(
         m.t, initialize=lambda m, t: m.T0, units=quant.unit("degC_above_PI")
     )
-    m.TCRE = Param(doc="::temperature.TCRE")
-    m.temperature_target = Param(doc="::temperature.target")
+    m.TCRE = Param(initialize=inputs.config("temperature.TCRE"))
+    m.temperature_target = Param(initialize=inputs.config("temperature.target"))
     constraints.extend(
         [
             GlobalEquation(
@@ -410,7 +433,9 @@ def _get_temperature_constraints(m: AbstractModel) -> Sequence[GeneralConstraint
         ]
     )
 
-    m.perc_reversible_damages = Param(doc="::economics.damages.percentage reversible")
+    m.perc_reversible_damages = Param(
+        initialize=inputs.config("economics.damages.percentage reversible")
+    )
 
     # m.overshoot = Var(m.t, initialize=0)
     # m.overshootdot = DerivativeVar(m.overshoot, wrt=m.t)
@@ -434,7 +459,7 @@ def _get_temperature_constraints(m: AbstractModel) -> Sequence[GeneralConstraint
 
 
 def _get_inertia_and_budget_constraints(
-    m: AbstractModel,
+    m: AbstractModel, inputs: ModelInputs
 ) -> Sequence[GeneralConstraint]:
     """
     MIMOSA allows several types of constraints on emissions: a global carbon budget, inertia constraints,
@@ -543,16 +568,16 @@ def _get_inertia_and_budget_constraints(
 
     constraints = []
 
-    m.budget = Param(doc="::emissions.carbonbudget")
-    m.inertia_global = Param(doc="::emissions.inertia.global")
-    m.inertia_regional = Param(doc="::emissions.inertia.regional")
-    m.global_min_level = Param(doc="::emissions.global min level")
-    m.regional_min_level = Param(doc="::emissions.regional min level")
+    m.budget = Param(initialize=inputs.config("emissions.carbonbudget"))
+    m.inertia_global = Param(initialize=inputs.config("emissions.inertia.global"))
+    m.inertia_regional = Param(initialize=inputs.config("emissions.inertia.regional"))
+    m.global_min_level = Param(initialize=inputs.config("emissions.global min level"))
+    m.regional_min_level = Param(initialize=inputs.config("emissions.regional min level"))
     m.non_increasing_emissions_after_2100 = Param(
-        doc="::emissions.non increasing emissions after 2100"
+        initialize=inputs.config("emissions.non increasing emissions after 2100")
     )
     m.no_pos_emissions_after_budget_year = Param(
-        doc="::emissions.not positive after budget year"
+        initialize=inputs.config("emissions.not positive after budget year")
     )
     constraints.extend(
         [

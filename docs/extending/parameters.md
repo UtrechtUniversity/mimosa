@@ -65,7 +65,7 @@ These methods return `SourcedValue` objects. Scalar quantities are converted usi
 units; regional data retains existing mapping and per-region overrides; time-dependent data is
 interpolated using the existing store. Keys are timestep indices and region names, not calendar years.
 `inputs.t`, `inputs.regions`, `inputs.time_grid` and `inputs.year(t)` expose the configured indices
-and calendar grid. A nonzero emissions pulse must fall on that grid; a zero pulse may be off-grid.
+and calendar grid. Input lookup itself does not apply component-specific consistency checks.
 
 For Python decisions, use `inputs.config_value("model structure.damage module")` or retrieve a whole
 section, such as `inputs.config_value("model structure.damage module options")`. Scalar quantity
@@ -110,8 +110,44 @@ m.init_capitalstock_factor = Param(
 )
 ```
 
+Emissions and mitigation also use explicit lookup; mitigation chooses its regional calibration
+column and SSP keyframe path locally. Sea-level rise reads its projection through `config_value`.
 The remaining components still use the loading conventions below. Construction remains
 abstract until the later concrete-model checkpoint; do not read unconstructed model values here.
+
+For checks that need initialized model values, a standard Pyomo `validate` callback can keep
+validation with the parameter declaration. Emissions uses this for its pulse:
+
+```python
+def _validate_emissions_pulse(m, pulse_amount):
+    pulse_year = value(m.emissions_pulse_year)
+    if pulse_amount != 0 and pulse_year not in {m.year(t) for t in m.t}:
+        raise ValueError(
+            f"Emissions pulse year {pulse_year} is not on the model time grid."
+        )
+    return True
+
+m.emissions_pulse_year = Param(initialize=inputs.config("emissions.pulse.year"))
+m.emissions_pulse_amount = Param(
+    initialize=inputs.config("emissions.pulse.amount"),
+    validate=_validate_emissions_pulse,
+)
+```
+
+Pyomo calls this function when assigning a parameter value: during `create_instance` for an
+abstract model, or when adding the parameter to a concrete model. Dependencies such as the
+pulse year and time grid must be declared first. The callback returns `True` for valid values
+or raises an explanatory error. It adds no solver constraint.
+
+Component helpers can use ordinary imports for type hints and editor completion:
+
+```python
+from mimosa.core.model_inputs import ModelInputs
+
+def _get_emissions_constraints(m: AbstractModel, inputs: ModelInputs):
+    # ...
+    pass
+```
 
 ## Existing component declarations
 

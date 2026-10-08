@@ -53,6 +53,4 @@ def create_base_model() -> AbstractModel:
         doc="timeandregional::emissions",
         units=quant.unit("emissionsrate_unit"),
     )
-    m.MAC_SSP_calibration_factor = Param(m.t, units=quant.unit("dimensionless"))
-
     return m

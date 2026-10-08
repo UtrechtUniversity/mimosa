@@ -48,13 +48,6 @@ class ModelInputs:
         years = np.asarray(self.time_grid.years)
         self.year = lambda t: years[t]
 
-        pulse_year = self.config_value("emissions.pulse.year")
-        pulse_amount = self.config_value("emissions.pulse.amount")
-        if pulse_amount != 0 and pulse_year not in self.time_grid.years:
-            raise ValueError(
-                f"Emissions pulse year {pulse_year} is not on the model time grid."
-            )
-
     def config_value(self, path: str) -> Any:
         """Return a config value, converting scalar quantities to model units.
 
