@@ -21,6 +21,8 @@ from mimosa.common import (
     ModelContext,
 )
 
+from mimosa.core.model_inputs import ModelInputs
+
 
 def get_constraints(
     m: AbstractModel, context: ModelContext
@@ -73,6 +75,8 @@ def get_constraints(
 
 
     """
+    inputs: ModelInputs = context.inputs
+
     ## Per capita convergence:
     # m.regional_per_cap_emissions = Var(
     #     m.t, m.regions, units=quant.unit("emissionsrate_unit/population_unit")
@@ -82,7 +86,7 @@ def get_constraints(
         initialize=lambda m, r: m.ssp_baseline_emissions[0, r]
         / sum(m.ssp_baseline_emissions[0, s] for s in m.regions),
     )
-    m.percapconv_year = Param(initialize=2050, doc="::effort sharing.percapconv_year")
+    m.percapconv_year = Param(initialize=inputs.config("effort sharing.percapconv_year"))
     m.percapconv_share_pop = Param(
         m.t,
         m.regions,

@@ -20,6 +20,8 @@ from mimosa.common import (
 
 from mimosa.components.mitigation import AC
 
+from mimosa.core.model_inputs import ModelInputs
+
 
 def get_constraints(
     m: AbstractModel, context: ModelContext
@@ -38,6 +40,8 @@ def get_constraints(
            - RegionalInitConstraint
         )
     """
+    inputs: ModelInputs = context.inputs
+
     constraints = []
 
     m.domestic_mitigation_costs_abs = Var(
@@ -108,10 +112,10 @@ def get_constraints(
 
     # How are mitigation costs distributed over regions?
     m.min_rel_payment_level = Param(
-        doc="::economics.emission trade.min rel payment level"
+        initialize=inputs.config("economics.emission trade.min rel payment level")
     )
     m.max_rel_payment_level = Param(
-        doc="::economics.emission trade.max rel payment level"
+        initialize=inputs.config("economics.emission trade.max rel payment level")
     )
 
     return constraints

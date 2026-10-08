@@ -19,6 +19,8 @@ from mimosa.common import (
     ModelContext,
 )
 
+from mimosa.core.model_inputs import ModelInputs
+
 
 def get_constraints(
     m: AbstractModel, context: ModelContext
@@ -38,10 +40,12 @@ def get_constraints(
            - RegionalInitConstraint
         )
     """
+    inputs: ModelInputs = context.inputs
+
     constraints = []
 
     m.NPV = Var(m.t)
-    m.PRTP = Param(doc="::economics.PRTP")
+    m.PRTP = Param(initialize=inputs.config("economics.PRTP"))
     constraints.extend(
         [
             GlobalConstraint(

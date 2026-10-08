@@ -26,6 +26,8 @@ from mimosa.common import (
     ModelContext,
 )
 
+from mimosa.core.model_inputs import ModelInputs
+
 
 def get_constraints(
     m: AbstractModel, context: ModelContext
@@ -62,11 +64,15 @@ def get_constraints(
 
     """
 
+    inputs: ModelInputs = context.inputs
+
     historical_emissions, historical_population = _load_data()
     m.effortsharing_ecpc_discount_rate = Param(
-        doc="::effort sharing.ecpc_discount_rate"
+        initialize=inputs.config("effort sharing.ecpc_discount_rate")
     )
-    m.effortsharing_ecpc_start_year = Param(doc="::effort sharing.ecpc_start_year")
+    m.effortsharing_ecpc_start_year = Param(
+        initialize=inputs.config("effort sharing.ecpc_start_year")
+    )
     m.effortsharing_ecpc_historical_debt = Param(
         m.t,  # Constant over time
         m.regions,
@@ -83,7 +89,7 @@ def get_constraints(
     )
 
     m.effortsharing_ecpc_repayment_endyear = Param(
-        doc="::effort sharing.ecpc_repayment_endyear"
+        initialize=inputs.config("effort sharing.ecpc_repayment_endyear")
     )
 
     m.effortsharing_ecpc_annual_debt_repayment = Param(

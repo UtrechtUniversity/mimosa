@@ -16,6 +16,8 @@ from mimosa.common import (
     ModelContext,
 )
 
+from mimosa.core.model_inputs import ModelInputs
+
 
 def get_constraints(
     m: AbstractModel, context: ModelContext
@@ -51,11 +53,13 @@ def get_constraints(
     - param::inequal_aversion
 
     """
+    inputs: ModelInputs = context.inputs
+
     constraints = []
 
     # Parameters
-    m.elasmu = Param(doc="::economics.elasmu")
-    m.inequal_aversion = Param(doc="::economics.inequal_aversion")
+    m.elasmu = Param(initialize=inputs.config("economics.elasmu"))
+    m.inequal_aversion = Param(initialize=inputs.config("economics.inequal_aversion"))
 
     m.utility = Var(m.t, m.regions, initialize=10)
     m.global_welfare = Var(m.t)

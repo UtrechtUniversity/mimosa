@@ -16,6 +16,8 @@ from mimosa.common import (
 )
 from .utility_fct import calc_utility
 
+from mimosa.core.model_inputs import ModelInputs
+
 
 def get_constraints(
     m: AbstractModel, context: ModelContext
@@ -56,10 +58,12 @@ def get_constraints(
     - param::elasmu
 
     """
+    inputs: ModelInputs = context.inputs
+
     constraints = []
 
     # Parameters
-    m.elasmu = Param(doc="::economics.elasmu")
+    m.elasmu = Param(initialize=inputs.config("economics.elasmu"))
 
     m.utility = Var(m.t, m.regions, initialize=10)
     m.global_welfare = Var(m.t)

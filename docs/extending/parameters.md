@@ -132,8 +132,12 @@ once by `get_adaptation_options(inputs)`. Its sector calibration objects and equ
 are retained. Component options use `config_value`, and ACCREU_CGE selects quantile columns
 using its existing two-decimal naming convention.
 
-The remaining components still use the loading conventions below. Construction remains
-abstract until the later concrete-model checkpoint; do not read unconstructed model values here.
+All component configuration/data parameters now use explicit initialization, including the
+remaining welfare variants, objectives, effort-sharing settings and cost-pool payment limits.
+Derived parameters retain their existing rules. The mutable no-policy damage parameter is
+filled later by the baseline hook. Shared base inputs still use the loading conventions below
+until the concrete-builder checkpoint. Construction remains abstract; do not read unconstructed
+model values here.
 
 For checks that need initialized model values, a standard Pyomo `validate` callback can keep
 validation with the parameter declaration. Emissions uses this for its pulse:
