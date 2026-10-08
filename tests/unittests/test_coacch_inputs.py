@@ -6,7 +6,7 @@ import pytest
 from pyomo.environ import value
 
 from mimosa import MIMOSA
-from mimosa.common import AbstractModel, Any, ConcreteModel, Param, Set, Var, quant
+from mimosa.common import Any, ConcreteModel, Param, Set, Var, quant
 from mimosa.common.config.parseconfig import check_params, parse_param_values
 from mimosa.common.data import DataStore
 from mimosa.common.regional_params import RegionalParamStore
@@ -93,12 +93,11 @@ def check_selected_parameters(m, store, combined, adaptation, quantile):
                         assert value(parameter[region]) == expected
 
 
-@pytest.mark.parametrize("model_type", [AbstractModel, ConcreteModel])
 @pytest.mark.parametrize("combined", [False, True])
 @pytest.mark.parametrize("adaptation", [False, True])
 @pytest.mark.parametrize("quantile", [0.025, 0.5, 0.975])
 def test_native_construction_selects_only_needed_sources(
-    monkeypatch, model_type, combined, adaptation, quantile
+    monkeypatch, combined, adaptation, quantile
 ):
     inputs = prepare_inputs(config(combined, adaptation, quantile))
     prefix = "Ad" if adaptation else "NoAd"
@@ -119,15 +118,13 @@ def test_native_construction_selects_only_needed_sources(
         return get(category, name)
 
     monkeypatch.setattr(inputs.regional_store, "get", selected_get)
-    m = model_type()
+    m = ConcreteModel()
     m.t = Set(initialize=inputs.t, ordered=True)
     m.regions = Set(initialize=inputs.regions, ordered=True)
     m.T0 = Param(initialize=1.2, units=quant.unit("degC_above_PI"))
     m.temperature = Var(m.t, initialize={0: 1.2, 1: 2.0, 2: 3.0})
     m.total_SLR = Var(m.t, initialize={0: 0.1, 1: 0.3, 2: 0.6})
     equations = coacch.get_constraints(m, inputs)
-    if model_type is AbstractModel:
-        m = m.create_instance()
 
     assert set(calls) == allowed
     assert len(calls) == len(allowed)

@@ -1,11 +1,11 @@
-"""Migrated climate/mitigation declarations work without the abstract data loader."""
+"""Climate and mitigation input lookup, units, calibration and pulse validation."""
 
 from math import log
 
 import pytest
 from pyomo.environ import value
 
-from mimosa.common import AbstractModel, ConcreteModel, Param, Set, quant
+from mimosa.common import ConcreteModel, Param, Set, quant
 from mimosa.common.config.parseconfig import check_params, parse_param_values
 from mimosa.common.data import DataStore
 from mimosa.common.regional_params import RegionalParamStore
@@ -42,8 +42,8 @@ def inputs():
     return make_inputs()
 
 
-def base_model(inputs, model_type=ConcreteModel):
-    m = model_type()
+def base_model(inputs):
+    m = ConcreteModel()
     m.t = Set(initialize=inputs.t, ordered=True)
     m.regions = Set(initialize=inputs.regions, ordered=True)
     m.beginyear = Param(initialize=inputs.config("time.start"))
@@ -106,22 +106,16 @@ def test_slr_projection_comes_from_prepared_inputs(inputs):
     assert value(m.slr_initial_year) == 2025
 
 
-@pytest.mark.parametrize("model_type", [AbstractModel, ConcreteModel])
 @pytest.mark.parametrize("pulse_amount", ["1000 MtCO2", "-1 GtCO2"])
-def test_pulse_validation_uses_initialized_values_in_both_model_types(model_type, pulse_amount):
+def test_pulse_validation_uses_initialized_model_values(pulse_amount):
     inputs = make_inputs(pulse_year=2032, pulse_amount=pulse_amount)
-    m = base_model(inputs, model_type)
+    m = base_model(inputs)
     with pytest.raises(ValueError, match="Emissions pulse year 2032 is not on the model time grid"):
         emissions.get_constraints(m, inputs)
-        if model_type is AbstractModel:
-            m.create_instance()
 
 
-@pytest.mark.parametrize("model_type", [AbstractModel, ConcreteModel])
-def test_zero_off_grid_pulse_remains_allowed(model_type):
+def test_zero_off_grid_pulse_remains_allowed():
     inputs = make_inputs(pulse_year=2032, pulse_amount="0 GtCO2")
-    m = base_model(inputs, model_type)
+    m = base_model(inputs)
     emissions.get_constraints(m, inputs)
-    if model_type is AbstractModel:
-        m = m.create_instance()
     assert value(m.emissions_pulse_amount) == 0

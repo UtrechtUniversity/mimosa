@@ -406,8 +406,7 @@ The `file` field should point to the IAMC formatted data file. The IAMC format i
     )
     ```
 
-    Pyomo calls this function when assigning a parameter value: during `create_instance` for an
-    abstract model, or when adding the parameter to a concrete model. Dependencies such as the
+    Pyomo calls this function when adding the parameter to the concrete model. Dependencies such as the
     pulse year and time grid must be declared first. The callback returns `True` for valid values
     or raises an explanatory error. It adds no solver constraint.
 

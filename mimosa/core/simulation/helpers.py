@@ -1,16 +1,13 @@
-from typing import Union
-
 import networkx as nx
 from pyomo.core.expr.visitor import identify_variables
 
 from mimosa.common import (
     ConcreteModel,
-    AbstractModel,
     get_indices,
 )
 
 
-def calc_dependencies(equations_dict, m: Union[ConcreteModel, AbstractModel]):
+def calc_dependencies(equations_dict, m: ConcreteModel):
     """
     Determine each equation's variable dependencies from its Pyomo expression tree.
 

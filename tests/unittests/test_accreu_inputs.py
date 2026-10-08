@@ -5,7 +5,7 @@ from math import exp
 import pytest
 from pyomo.environ import value
 
-from mimosa.common import AbstractModel, ConcreteModel, Param, PyomoParam, Set, Var, quant
+from mimosa.common import ConcreteModel, Param, PyomoParam, Set, Var, quant
 from mimosa.common.config.parseconfig import check_params, parse_param_values
 from mimosa.common.data import DataStore
 from mimosa.common.regional_params import RegionalParamStore
@@ -67,8 +67,8 @@ def prepare_inputs(adaptation, determination, mortality, cge_quantile=None):
     return ModelInputs(params, tree, DataStore(params), RegionalParamStore(params, tree))
 
 
-def base_model(inputs, model_type):
-    m = model_type()
+def base_model(inputs):
+    m = ConcreteModel()
     m.t = Set(initialize=inputs.t, ordered=True)
     m.regions = Set(initialize=inputs.regions, ordered=True)
     m.year = inputs.year
@@ -108,18 +108,15 @@ def check_regional_sources(m, inputs):
             )
 
 
-@pytest.mark.parametrize("model_type", [AbstractModel, ConcreteModel])
 @pytest.mark.parametrize("adaptation", ["noadaptation", "separate", "combined"])
 @pytest.mark.parametrize("determination", ["solver_control", "analytical_optimum"])
 @pytest.mark.parametrize("mortality", [False, True])
 def test_native_accreu_parameters_options_bounds_and_equations(
-    model_type, adaptation, determination, mortality
+    adaptation, determination, mortality
 ):
     inputs = prepare_inputs(adaptation, determination, mortality)
-    m = base_model(inputs, model_type)
+    m = base_model(inputs)
     equations = all_damages.get_constraints(m, inputs)
-    if model_type is AbstractModel:
-        m = m.create_instance()
     rhs = {eq.lhs: eq for eq in equations if hasattr(eq, "lhs")}
 
     assert tuple(m.regions) == ("USA", "CAN")
@@ -188,14 +185,11 @@ def test_native_accreu_parameters_options_bounds_and_equations(
         assert value(m.non_market_damage_costs_abs[1, "USA"]) == 0
 
 
-@pytest.mark.parametrize("model_type", [AbstractModel, ConcreteModel])
 @pytest.mark.parametrize("quantile", [0.05, 0.5, 0.95])
-def test_native_cge_preserves_quantile_format_and_regional_overrides(model_type, quantile):
+def test_native_cge_preserves_quantile_format_and_regional_overrides(quantile):
     inputs = prepare_inputs("noadaptation", "solver_control", False, cge_quantile=quantile)
-    m = base_model(inputs, model_type)
+    m = base_model(inputs)
     equations = cge_damages.get_constraints(m, inputs)
-    if model_type is AbstractModel:
-        m = m.create_instance()
     rhs = {eq.lhs: eq for eq in equations if hasattr(eq, "lhs")}
     check_regional_sources(m, inputs)
     assert m.damage_noslr_a.doc == f"regional::ACCREU_CGE.NoSLR_a{quantile:.2f}"

@@ -139,7 +139,8 @@ emissions = quant(5000, "MtCO2/yr", "emissionsrate_unit")
 ```
 
 Most component parameters do not need to call `quant(...)` themselves: values declared as
-`type: quantity` are converted while the model is instantiated.
+`type: quantity` are converted to model units by `inputs.config(...)` or
+`inputs.config_value(...)` when the component reads them.
 
 ## Units in input files
 
