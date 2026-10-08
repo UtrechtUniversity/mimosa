@@ -40,12 +40,12 @@ def test_adaptation_options_are_read_once_and_include_sector_calibrations():
     }
     calls = []
 
-    class Context:
-        def option(self, component, name, default=None):
-            calls.append((component, name))
-            return values.get(name, default)
+    class Inputs:
+        def config_value(self, path):
+            calls.append(path)
+            return values[path.rsplit(".", 1)[-1]]
 
-    options = get_adaptation_options(Context())
+    options = get_adaptation_options(Inputs())
 
     assert options.adaptation_type == "combined"
     assert options.uses_analytical_adaptation is True
@@ -57,9 +57,9 @@ def test_adaptation_options_are_read_once_and_include_sector_calibrations():
         "combined",
     }
     assert calls == [
-        ("damage", "ACCREU_adaptation"),
-        ("damage", "ACCREU_adaptation_calibration"),
-        ("damage", "ACCREU_adaptation_determination"),
+        "model structure.damage module options.ACCREU_adaptation",
+        "model structure.damage module options.ACCREU_adaptation_calibration",
+        "model structure.damage module options.ACCREU_adaptation_determination",
     ]
 
 

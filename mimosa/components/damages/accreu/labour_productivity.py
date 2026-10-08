@@ -16,6 +16,8 @@ from mimosa.common import (
     NonNegativeReals,
 )
 
+from mimosa.core.model_inputs import ModelInputs
+
 from .utils import (
     AdaptationOptions,
     adaptation_effectiveness_fct,
@@ -26,7 +28,9 @@ from .utils import (
 )
 
 
-def get_constraints(m, adaptation_options: AdaptationOptions):
+def get_constraints(
+    m: AbstractModel, inputs: ModelInputs, adaptation_options: AdaptationOptions
+):
     """TODO"""
 
     constraints = []
@@ -49,10 +53,10 @@ def get_constraints(m, adaptation_options: AdaptationOptions):
     )
 
     m.labourprod_damages_gross_constant = Param(
-        m.regions, doc="regional::ACCREU.labourprod_noadapt_ead_constant"
+        m.regions, initialize=inputs.regional("ACCREU", "labourprod_noadapt_ead_constant")
     )
     m.labourprod_damages_gross_linear = Param(
-        m.regions, doc="regional::ACCREU.labourprod_noadapt_ead_linear"
+        m.regions, initialize=inputs.regional("ACCREU", "labourprod_noadapt_ead_linear")
     )
 
     constraints.append(
@@ -68,10 +72,10 @@ def get_constraints(m, adaptation_options: AdaptationOptions):
     )
 
     m.labourprod_damages_benefits_constant = Param(
-        m.regions, doc="regional::ACCREU.labourprod_benefit_cdd_constant"
+        m.regions, initialize=inputs.regional("ACCREU", "labourprod_benefit_cdd_constant")
     )
     m.labourprod_damages_benefits_linear = Param(
-        m.regions, doc="regional::ACCREU.labourprod_benefit_cdd_linear"
+        m.regions, initialize=inputs.regional("ACCREU", "labourprod_benefit_cdd_linear")
     )
 
     constraints.append(
@@ -101,11 +105,11 @@ def get_constraints(m, adaptation_options: AdaptationOptions):
 
         m.labourprod_adaptation_max_effectiveness = Param(
             m.regions,
-            doc="regional::ACCREU.labourprod_adapt_eff_max_effectiveness",
+            initialize=inputs.regional("ACCREU", "labourprod_adapt_eff_max_effectiveness"),
         )
         m.labourprod_adaptation_cost_param = Param(
             m.regions,
-            doc="regional::ACCREU.labourprod_adapt_eff_cost_param",
+            initialize=inputs.regional("ACCREU", "labourprod_adapt_eff_cost_param"),
         )
         constraints.append(
             get_delayed_adaptation_constraint("labourprod_adaptation_costs")

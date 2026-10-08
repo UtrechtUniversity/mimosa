@@ -16,6 +16,8 @@ from mimosa.common import (
     NonNegativeReals,
 )
 
+from mimosa.core.model_inputs import ModelInputs
+
 from .utils import (
     AdaptationOptions,
     adaptation_effectiveness_fct,
@@ -25,7 +27,9 @@ from .utils import (
 )
 
 
-def get_constraints(m, adaptation_options: AdaptationOptions):
+def get_constraints(
+    m: AbstractModel, inputs: ModelInputs, adaptation_options: AdaptationOptions
+):
     """TODO"""
 
     constraints = []
@@ -40,13 +44,13 @@ def get_constraints(m, adaptation_options: AdaptationOptions):
     # )
 
     m.riverine_damages_gross_constant = Param(
-        m.regions, doc="regional::ACCREU.riverine_noadapt_ead_constant"
+        m.regions, initialize=inputs.regional("ACCREU", "riverine_noadapt_ead_constant")
     )
     m.riverine_damages_gross_linear = Param(
-        m.regions, doc="regional::ACCREU.riverine_noadapt_ead_linear"
+        m.regions, initialize=inputs.regional("ACCREU", "riverine_noadapt_ead_linear")
     )
     m.riverine_damages_gross_quadr = Param(
-        m.regions, doc="regional::ACCREU.riverine_noadapt_ead_quadr"
+        m.regions, initialize=inputs.regional("ACCREU", "riverine_noadapt_ead_quadr")
     )
 
     damage_cost_gross_var_name = (
@@ -84,11 +88,11 @@ def get_constraints(m, adaptation_options: AdaptationOptions):
         )
 
         m.riverine_adaptation_max_effectiveness = Param(
-            m.regions, doc="regional::ACCREU.riverine_adapt_eff_max_effectiveness"
+            m.regions, initialize=inputs.regional("ACCREU", "riverine_adapt_eff_max_effectiveness")
         )
         m.riverine_adaptation_cost_param = Param(
             m.regions,
-            doc="regional::ACCREU.riverine_adapt_eff_cost_param",
+            initialize=inputs.regional("ACCREU", "riverine_adapt_eff_cost_param"),
         )
         constraints.append(
             get_delayed_adaptation_constraint("riverine_adaptation_costs")

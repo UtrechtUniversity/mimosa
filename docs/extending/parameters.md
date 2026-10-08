@@ -126,6 +126,12 @@ Only the selected branch performs a lookup. A plain constant initializes every r
 and has no source metadata; sourced regional values carry the selected column name. This replaces
 the former combined-damage backend override while retaining the existing parameter declarations.
 
+ACCREU and ACCREU_CGE also initialize configured and regional parameters explicitly.
+ACCREU passes `inputs` to its existing sector helpers; adaptation options are read and validated
+once by `get_adaptation_options(inputs)`. Its sector calibration objects and equation helpers
+are retained. Component options use `config_value`, and ACCREU_CGE selects quantile columns
+using its existing two-decimal naming convention.
+
 The remaining components still use the loading conventions below. Construction remains
 abstract until the later concrete-model checkpoint; do not read unconstructed model values here.
 

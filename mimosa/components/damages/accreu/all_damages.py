@@ -19,6 +19,7 @@ from mimosa.common import (
     NonNegativeReals,
     ModelContext,
 )
+from mimosa.core.model_inputs import ModelInputs
 
 
 from . import (
@@ -43,38 +44,45 @@ def get_constraints(
     """
 
     constraints = []
+    inputs: ModelInputs = context.inputs
 
     # In the config, the user can choose whether to use the separate adaptation module for ACCREU or not.
     # This is done using the parameter params["model structure"]["damage module options"]["ACCREU_adaptation"] = "separate" or "combined"
-    adaptation_options = get_adaptation_options(context)
+    adaptation_options = get_adaptation_options(inputs)
     adaptation_type = adaptation_options.adaptation_type
-    m.damage_scale_factor = Param(doc="::economics.damages.scale factor")
+    m.damage_scale_factor = Param(
+        initialize=inputs.config("economics.damages.scale factor")
+    )
 
     if adaptation_type != "noadaptation":
         m.adaptation_effectiveness_scale_factor = Param(
-            doc="::economics.damages.accreu.adaptation_effectiveness_scale_factor"
+            initialize=inputs.config(
+                "economics.damages.accreu.adaptation_effectiveness_scale_factor"
+            )
         )
 
     # Get constraints for sea-level rise damages
-    constraints.extend(sealevelrise.get_constraints(m, adaptation_options))
+    constraints.extend(sealevelrise.get_constraints(m, inputs, adaptation_options))
 
     # Get constraints for riverine flooding damages
-    constraints.extend(riverine_flooding.get_constraints(m, adaptation_options))
+    constraints.extend(riverine_flooding.get_constraints(m, inputs, adaptation_options))
 
     # Get constraints for labour productivity damages
-    constraints.extend(labour_productivity.get_constraints(m, adaptation_options))
+    constraints.extend(labour_productivity.get_constraints(m, inputs, adaptation_options))
 
     if adaptation_type == "combined":
         # Get constraints for combined adaptation costs, which combines labour productivity and riverine flooding adaptation costs
         # Only if the user has chosen to use the combined adaptation module for ACCREU
         constraints.extend(
-            combined_nslr_adaptation.get_constraints(m, adaptation_options)
+            combined_nslr_adaptation.get_constraints(m, inputs, adaptation_options)
         )
 
     # Get constraints for mortality
-    monetise_mortality = context.option("damage", "ACCREU_monetise_mortality")
+    monetise_mortality = inputs.config_value(
+        "model structure.damage module options.ACCREU_monetise_mortality"
+    )
     constraints.extend(
-        mortality.get_constraints(m, monetise_mortality=monetise_mortality)
+        mortality.get_constraints(m, inputs, monetise_mortality=monetise_mortality)
     )
 
     # Add all non-SLR sectors together
@@ -125,7 +133,9 @@ def get_constraints(
             units=quant.unit("fraction_of_GDP"),
         )
         m.delay_adaptation_year = Param(
-            doc="::economics.damages.accreu.delay_adaptation_until_year"
+            initialize=inputs.config(
+                "economics.damages.accreu.delay_adaptation_until_year"
+            )
         )
         constraints.extend(
             [

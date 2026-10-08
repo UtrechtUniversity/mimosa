@@ -17,10 +17,12 @@ from mimosa.common import (
     NonNegativeReals,
 )
 
+from mimosa.core.model_inputs import ModelInputs
+
 from .utils import adaptation_effectiveness_fct, dmg_fct_linear, dmg_fct_power
 
 
-def get_constraints(m, monetise_mortality=False):
+def get_constraints(m: AbstractModel, inputs: ModelInputs, monetise_mortality=False):
     """TODO"""
 
     constraints = []
@@ -29,10 +31,10 @@ def get_constraints(m, monetise_mortality=False):
     m.mortality_heat_related = Var(m.t, m.regions, units=quant.unit("billion people"))
 
     m.mortality_heat_related_constant = Param(
-        m.regions, doc="regional::ACCREU.heat_related_mortality_perc_constant"
+        m.regions, initialize=inputs.regional("ACCREU", "heat_related_mortality_perc_constant")
     )
     m.mortality_heat_related_prod = Param(
-        m.regions, doc="regional::ACCREU.heat_related_mortality_perc_prod"
+        m.regions, initialize=inputs.regional("ACCREU", "heat_related_mortality_perc_prod")
     )
 
     constraints.append(
@@ -54,10 +56,10 @@ def get_constraints(m, monetise_mortality=False):
     m.mortality_cold_related = Var(m.t, m.regions, units=quant.unit("billion people"))
 
     m.mortality_cold_related_constant = Param(
-        m.regions, doc="regional::ACCREU.cold_related_mortality_perc_constant"
+        m.regions, initialize=inputs.regional("ACCREU", "cold_related_mortality_perc_constant")
     )
     m.mortality_cold_related_prod = Param(
-        m.regions, doc="regional::ACCREU.cold_related_mortality_perc_prod"
+        m.regions, initialize=inputs.regional("ACCREU", "cold_related_mortality_perc_prod")
     )
 
     constraints.append(
@@ -86,7 +88,7 @@ def get_constraints(m, monetise_mortality=False):
 
     # Calculate the monetary damages from mortality, using the value of a statistical life (VSL)
     m.mortality_svl_rel_gdp_per_cap = Param(
-        doc="::economics.damages.accreu.mortality_svl_rel_gdp_cap"
+        initialize=inputs.config("economics.damages.accreu.mortality_svl_rel_gdp_cap")
     )
 
     if monetise_mortality:

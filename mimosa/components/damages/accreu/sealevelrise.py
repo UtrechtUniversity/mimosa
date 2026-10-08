@@ -16,6 +16,8 @@ from mimosa.common import (
     NonNegativeReals,
 )
 
+from mimosa.core.model_inputs import ModelInputs
+
 from .utils import (
     AdaptationOptions,
     adaptation_effectiveness_fct,
@@ -26,7 +28,9 @@ from .utils import (
 )
 
 
-def get_constraints(m, adaptation_options: AdaptationOptions):
+def get_constraints(
+    m: AbstractModel, inputs: ModelInputs, adaptation_options: AdaptationOptions
+):
     """TODO"""
 
     constraints = []
@@ -36,13 +40,13 @@ def get_constraints(m, adaptation_options: AdaptationOptions):
     ## Gross damages:
 
     m.slr_damages_gross_constant = Param(
-        m.regions, doc="regional::ACCREU.slr_noadapt_ead_constant"
+        m.regions, initialize=inputs.regional("ACCREU", "slr_noadapt_ead_constant")
     )
     m.slr_damages_gross_prod = Param(
-        m.regions, doc="regional::ACCREU.slr_noadapt_ead_prod"
+        m.regions, initialize=inputs.regional("ACCREU", "slr_noadapt_ead_prod")
     )
     m.slr_damages_gross_power = Param(
-        m.regions, doc="regional::ACCREU.slr_noadapt_ead_power"
+        m.regions, initialize=inputs.regional("ACCREU", "slr_noadapt_ead_power")
     )
 
     damage_cost_gross_var_name = (
@@ -88,11 +92,11 @@ def get_constraints(m, adaptation_options: AdaptationOptions):
 
         m.slr_adaptation_max_effectiveness = Param(
             m.regions,
-            doc="regional::ACCREU.slr_adapt_eff_max_effectiveness",
+            initialize=inputs.regional("ACCREU", "slr_adapt_eff_max_effectiveness"),
         )
         m.slr_adaptation_cost_param = Param(
             m.regions,
-            doc="regional::ACCREU.slr_adapt_eff_cost_param",
+            initialize=inputs.regional("ACCREU", "slr_adapt_eff_cost_param"),
         )
         constraints.append(get_delayed_adaptation_constraint("slr_adaptation_costs"))
         constraints.extend(

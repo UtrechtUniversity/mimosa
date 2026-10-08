@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from typing import Mapping
 
 from mimosa.common import exp, log, soft_min, RegionalConstraint, Constraint, value
+from mimosa.core.model_inputs import ModelInputs
 
 
 @dataclass(frozen=True)
@@ -78,12 +79,14 @@ def validate_adaptation_calibration(calibration):
     get_adaptation_calibration(calibration, "slr")
 
 
-def get_adaptation_options(context):
+def get_adaptation_options(inputs: ModelInputs):
     """Read and validate all ACCREU adaptation options once."""
 
-    adaptation_type = context.option("damage", "ACCREU_adaptation")
-    calibration_name = context.option(
-        "damage", "ACCREU_adaptation_calibration", default="accreu"
+    adaptation_type = inputs.config_value(
+        "model structure.damage module options.ACCREU_adaptation"
+    )
+    calibration_name = inputs.config_value(
+        "model structure.damage module options.ACCREU_adaptation_calibration"
     )
     validate_adaptation_calibration(calibration_name)
 
@@ -93,7 +96,9 @@ def get_adaptation_options(context):
 
     return AdaptationOptions(
         adaptation_type=adaptation_type,
-        determination=context.option("damage", "ACCREU_adaptation_determination"),
+        determination=inputs.config_value(
+            "model structure.damage module options.ACCREU_adaptation_determination"
+        ),
         calibrations={
             sector: get_adaptation_calibration(calibration_name, sector)
             for sector in sectors

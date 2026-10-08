@@ -18,6 +18,7 @@ from mimosa.common import (
     quant,
     ModelContext,
 )
+from mimosa.core.model_inputs import ModelInputs
 
 
 def get_constraints(
@@ -25,10 +26,13 @@ def get_constraints(
 ) -> Sequence[GeneralConstraint]:
     """ """
     constraints = []
+    inputs = context.inputs
 
     m.damage_costs = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
     m.damage_costs_abs = Var(m.t, m.regions, units=quant.unit("currency_unit"))
-    m.damage_scale_factor = Param(doc="::economics.damages.scale factor")
+    m.damage_scale_factor = Param(
+        initialize=inputs.config("economics.damages.scale factor")
+    )
     m.non_market_damage_costs_abs = Param(
         m.t, m.regions, initialize=0.0, units=quant.unit("currency_unit")
     )
@@ -58,10 +62,10 @@ def get_constraints(
     )
 
     # Get constraints for temperature dependent damages
-    constraints.extend(get_constraints_temperature_dependent(m))
+    constraints.extend(get_constraints_temperature_dependent(m, inputs))
 
     # Get constraints for sea-level rise damages
-    constraints.extend(get_constraints_slr(m))
+    constraints.extend(get_constraints_slr(m, inputs))
 
     # Adaptation is not modelled yet:
     m.adaptation_costs = Param(
@@ -75,20 +79,25 @@ def get_constraints(
 
 
 def get_constraints_temperature_dependent(
-    m: AbstractModel,
+    m: AbstractModel, inputs: ModelInputs
 ) -> Sequence[GeneralConstraint]:
     """ """
     constraints = []
+    quantile = inputs.config_value("economics.damages.quantile")
 
     # Damages not related to SLR (dependent on temperature)
     m.non_slr_damage_costs = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
 
-    m.damage_noslr_b1 = Param(m.regions, doc="regional::ACCREU_CGE.NoSLR_b1")
-    m.damage_noslr_b2 = Param(m.regions, doc="regional::ACCREU_CGE.NoSLR_b2")
+    m.damage_noslr_b1 = Param(
+        m.regions, initialize=inputs.regional("ACCREU_CGE", "NoSLR_b1")
+    )
+    m.damage_noslr_b2 = Param(
+        m.regions, initialize=inputs.regional("ACCREU_CGE", "NoSLR_b2")
+    )
 
     m.damage_noslr_a = Param(
         m.regions,
-        doc=lambda params: f'regional::ACCREU_CGE.NoSLR_a{params["economics"]["damages"]["quantile"]:.2f}',
+        initialize=inputs.regional("ACCREU_CGE", f"NoSLR_a{quantile:.2f}"),
     )
 
     # Quadratic damage function for non-SLR damages. Factor `a` represents
@@ -113,20 +122,23 @@ def get_constraints_temperature_dependent(
     return constraints
 
 
-def get_constraints_slr(m: AbstractModel) -> Sequence[GeneralConstraint]:
+def get_constraints_slr(
+    m: AbstractModel, inputs: ModelInputs
+) -> Sequence[GeneralConstraint]:
     """ """
     constraints = []
+    quantile = inputs.config_value("economics.damages.quantile")
 
     # SLR damages
     m.slr_damage_costs = Var(
         m.t, m.regions, bounds=(-0.5, 0.7), units=quant.unit("fraction_of_GDP")
     )
-    m.damage_slr_b1 = Param(m.regions, doc="regional::ACCREU_CGE.slr_b1")
-    m.damage_slr_b2 = Param(m.regions, doc="regional::ACCREU_CGE.slr_b2")
+    m.damage_slr_b1 = Param(m.regions, initialize=inputs.regional("ACCREU_CGE", "slr_b1"))
+    m.damage_slr_b2 = Param(m.regions, initialize=inputs.regional("ACCREU_CGE", "slr_b2"))
 
     m.damage_slr_a = Param(
         m.regions,
-        doc=lambda params: f'regional::ACCREU_CGE.slr_a{params["economics"]["damages"]["quantile"]:.2f}',
+        initialize=inputs.regional("ACCREU_CGE", f"slr_a{quantile:.2f}"),
     )
 
     # Linear damage function for SLR damages, including adaptation costs
