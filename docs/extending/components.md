@@ -83,7 +83,6 @@ from mimosa.components import (
     # ...
 )
 
-
 def create_model(inputs: ModelInputs):
     m = create_base_model(inputs)
     constraints = []
