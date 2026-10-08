@@ -18,6 +18,7 @@ from mimosa.common import (
     quant,
     ModelContext,
 )
+from mimosa.core.model_inputs import ModelInputs
 
 
 def get_constraints(
@@ -27,6 +28,9 @@ def get_constraints(
     The COACCH damage functions are split in two parts: temperature-dependent damages (non-SLR, as a function
     of global mean temperature above pre-industrial), and sea-level rise damages (SLR, as function of global mean
     sea-level rise in meters):
+
+    With [combined damages](../parameters.md#economics.damages.coacch_combined_slr_nonslr_damages),
+    the temperature-dependent curve includes SLR impacts and the separate SLR damage term is zero.
 
     $$
     \\text{damages}_{t,r} = \\text{damages}_{\\text{non-SLR},t,r} + \\text{damages}_{\\text{SLR},t,r}
@@ -45,10 +49,13 @@ def get_constraints(
 
     """
     constraints = []
+    inputs = context.inputs
 
     m.damage_costs = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
     m.damage_costs_abs = Var(m.t, m.regions, units=quant.unit("currency_unit"))
-    m.damage_scale_factor = Param(doc="::economics.damages.scale factor")
+    m.damage_scale_factor = Param(
+        initialize=inputs.config("economics.damages.scale factor")
+    )
     m.non_market_damage_costs_abs = Param(
         m.t, m.regions, initialize=0.0, units=quant.unit("currency_unit")
     )
@@ -84,16 +91,16 @@ def get_constraints(
     )
 
     # Get constraints for temperature dependent damages
-    constraints.extend(get_constraints_temperature_dependent(m))
+    constraints.extend(get_constraints_temperature_dependent(m, inputs))
 
     # Get constraints for sea-level rise damages
-    constraints.extend(get_constraints_slr(m))
+    constraints.extend(get_constraints_slr(m, inputs))
 
     return constraints
 
 
 def get_constraints_temperature_dependent(
-    m: AbstractModel,
+    m: AbstractModel, inputs: ModelInputs
 ) -> Sequence[GeneralConstraint]:
     """
     ## Temperature-dependent damages
@@ -129,23 +136,47 @@ def get_constraints_temperature_dependent(
 
     """
     constraints = []
+    combined = inputs.config_value(
+        "economics.damages.coacch_combined_slr_nonslr_damages"
+    )
+    quantile = inputs.config_value("economics.damages.quantile")
+    adapt_prefix = (
+        "Ad" if inputs.config_value("economics.damages.coacch_slr_withadapt") else "NoAd"
+    )
 
     # Damages not related to SLR (dependent on temperature)
     m.non_slr_damage_costs = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
 
+    # Combined curves are quadratic and already incorporate the chosen quantile.
     m.damage_noslr_form = Param(
-        m.regions, within=Any, doc="regional::COACCH.NoSLR_form"
+        m.regions,
+        within=Any,
+        initialize=(
+            "Robust-Quadratic" if combined else inputs.regional("COACCH", "NoSLR_form")
+        ),
     )  # String for functional form
-    m.damage_noslr_b1 = Param(m.regions, doc="regional::COACCH.NoSLR_b1")
-    m.damage_noslr_b2 = Param(m.regions, doc="regional::COACCH.NoSLR_b2")
+    m.damage_noslr_b1 = Param(
+        m.regions,
+        initialize=inputs.regional(
+            "COACCH", f"combined_b1_{adapt_prefix}-q{quantile}" if combined else "NoSLR_b1"
+        ),
+    )
+    m.damage_noslr_b2 = Param(
+        m.regions,
+        initialize=inputs.regional(
+            "COACCH", f"combined_b2_{adapt_prefix}-q{quantile}" if combined else "NoSLR_b2"
+        ),
+    )
     m.damage_noslr_b3 = Param(
-        m.regions, within=Any, doc="regional::COACCH.NoSLR_b3"
+        m.regions,
+        within=Any,
+        initialize=0 if combined else inputs.regional("COACCH", "NoSLR_b3"),
     )  # Can be empty
     # (b2 and b3 are only used for some functional forms)
 
     m.damage_noslr_a = Param(
         m.regions,
-        doc=lambda params: f'regional::COACCH.NoSLR_a (q={params["economics"]["damages"]["quantile"]})',
+        initialize=1 if combined else inputs.regional("COACCH", f"NoSLR_a (q={quantile})"),
     )
 
     # Quadratic damage function for non-SLR damages. Factor `a` represents
@@ -163,7 +194,9 @@ def get_constraints_temperature_dependent(
     return constraints
 
 
-def get_constraints_slr(m: AbstractModel) -> Sequence[GeneralConstraint]:
+def get_constraints_slr(
+    m: AbstractModel, inputs: ModelInputs
+) -> Sequence[GeneralConstraint]:
     """
 
     ## Sea-level rise damages
@@ -213,42 +246,49 @@ def get_constraints_slr(m: AbstractModel) -> Sequence[GeneralConstraint]:
 
     """
     constraints = []
+    combined = inputs.config_value(
+        "economics.damages.coacch_combined_slr_nonslr_damages"
+    )
+    quantile = inputs.config_value("economics.damages.quantile")
+    adapt_prefix = (
+        "Ad" if inputs.config_value("economics.damages.coacch_slr_withadapt") else "NoAd"
+    )
 
     # SLR damages
     m.slr_damage_costs = Var(
         m.t, m.regions, bounds=(-0.5, 0.7), units=quant.unit("fraction_of_GDP")
     )
 
-    def slr_param_name(params, name):
-        """Returns the parameter name regional::COACCH.SLR... depending on if adaptation is included or not."""
-        slr_with_adapt = params["economics"]["damages"]["coacch_slr_withadapt"]
-        return f'regional::COACCH.SLR-{"Ad" if slr_with_adapt else "NoAd"}_{name}'
-
+    # Combined curves already include SLR; keep the separate SLR parameters at zero.
     m.damage_slr_form = Param(
         m.regions,
         within=Any,
-        doc=lambda params: slr_param_name(params, "form"),
+        initialize=(
+            "Robust-Linear" if combined
+            else inputs.regional("COACCH", f"SLR-{adapt_prefix}_form")
+        ),
     )  # String for functional form
     m.damage_slr_b1 = Param(
         m.regions,
-        doc=lambda params: slr_param_name(params, "b1"),
+        initialize=0 if combined else inputs.regional("COACCH", f"SLR-{adapt_prefix}_b1"),
     )
     m.damage_slr_b2 = Param(
         m.regions,
         within=Any,
-        doc=lambda params: slr_param_name(params, "b2"),
+        initialize=0 if combined else inputs.regional("COACCH", f"SLR-{adapt_prefix}_b2"),
     )  # within=Any since it can be empty for some functional forms
     m.damage_slr_b3 = Param(
         m.regions,
         within=Any,
-        doc=lambda params: slr_param_name(params, "b3"),
+        initialize=0 if combined else inputs.regional("COACCH", f"SLR-{adapt_prefix}_b3"),
     )  # within=Any since it can be empty for some functional forms
     # (b2 and b3 are only used for some functional forms)
 
     m.damage_slr_a = Param(
         m.regions,
-        doc=lambda params: slr_param_name(
-            params, f'a (q={params["economics"]["damages"]["quantile"]})'
+        initialize=(
+            0 if combined
+            else inputs.regional("COACCH", f"SLR-{adapt_prefix}_a (q={quantile})")
         ),
     )
 

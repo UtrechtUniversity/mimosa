@@ -112,6 +112,20 @@ m.init_capitalstock_factor = Param(
 
 Emissions and mitigation also use explicit lookup; mitigation chooses its regional calibration
 column and SSP keyframe path locally. Sea-level rise reads its projection through `config_value`.
+COACCH also chooses its combined/separate, adaptation and quantile sources locally. Its
+declarations can select either a sourced value or a constant without a separate `doc` argument:
+
+```python
+m.damage_noslr_a = Param(
+    m.regions,
+    initialize=1 if combined else inputs.regional("COACCH", f"NoSLR_a (q={quantile})"),
+)
+```
+
+Only the selected branch performs a lookup. A plain constant initializes every regional entry
+and has no source metadata; sourced regional values carry the selected column name. This replaces
+the former combined-damage backend override while retaining the existing parameter declarations.
+
 The remaining components still use the loading conventions below. Construction remains
 abstract until the later concrete-model checkpoint; do not read unconstructed model values here.
 

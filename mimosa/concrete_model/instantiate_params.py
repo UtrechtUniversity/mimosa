@@ -36,20 +36,10 @@ class InstantiatedModel:
         return self.abstract_model.create_instance(self.instance_data)
 
     def get_param_values(self):
-        damage_module = self.params["model structure"]["damage module"]
-
         instance_data = {None: {}}
 
         ## Main instance data
         self._set_instance_data_main(instance_data)
-
-        ## Damage module:
-
-        # Instance data for COACCH damages:
-        if damage_module == "COACCH":
-            # Only used if combined damage function is used,
-            # otherwise, the parameter values are set dynamically
-            self._set_instance_data_coacch(instance_data)
 
         return instance_data
 
@@ -128,47 +118,5 @@ class InstantiatedModel:
             )
             for t in range(num_years)
         }
-
-        instance_data[None].update(parameter_mapping)
-
-    def _set_instance_data_coacch(self, instance_data) -> None:
-        try:
-            damage_quantile = self.params["economics"]["damages"]["quantile"]
-        except KeyError:
-            damage_quantile = 0.5
-
-        combined_slr_nonslr_damages = self.params["economics"]["damages"][
-            "coacch_combined_slr_nonslr_damages"
-        ]
-        slr_withadapt = self.params["economics"]["damages"]["coacch_slr_withadapt"]
-        adapt_prfx = "Ad" if slr_withadapt else "NoAd"
-
-        V_region = lambda x: {region: x for region in self.params["regions"]}
-
-        if combined_slr_nonslr_damages:
-            parameter_mapping = {
-                # Combined non-SLR and SLR damages are always quadratic
-                "damage_noslr_form": V_region("Robust-Quadratic"),
-                "damage_noslr_b1": self.regional_param_store.get(
-                    "COACCH", f"combined_b1_{adapt_prfx}-q{damage_quantile}"
-                ),
-                "damage_noslr_b2": self.regional_param_store.get(
-                    "COACCH", f"combined_b2_{adapt_prfx}-q{damage_quantile}"
-                ),
-                "damage_noslr_b3": V_region(0),
-                "damage_noslr_a": V_region(1),
-                # SLR damages (zero but need to be defined)
-                "damage_slr_form": V_region("Robust-Linear"),
-                "damage_slr_b1": V_region(0),
-                "damage_slr_b2": V_region(0),
-                "damage_slr_b3": V_region(0),
-                "damage_slr_a": V_region(0),
-            }
-
-        else:
-
-            parameter_mapping = {
-                # SLR damages:
-            }
 
         instance_data[None].update(parameter_mapping)
