@@ -27,14 +27,14 @@ Create `mimosa/components/damages/newdamage.py`:
 
 ```python title="mimosa/components/damages/newdamage.py"
 from mimosa.common import (
-    AbstractModel,
+    ConcreteModel,
     ModelContext,
     RegionalEquation,
     Var,
 )
 
 
-def get_constraints(m: AbstractModel, context: ModelContext):
+def get_constraints(m: ConcreteModel, context: ModelContext):
     """Example damage specification with cubic damage costs."""
 
     m.damage_costs = Var(m.t, m.regions)
@@ -67,8 +67,8 @@ DAMAGE_MODULES = {
 }
 ```
 
-`create_abstract_model` already reads the selected damage function from `DAMAGE_MODULES`. Do not add a
-separate call to `newdamage.get_constraints` in `abstract_model.py`.
+`create_model` already reads the selected damage function from `DAMAGE_MODULES`. Do not add a
+separate call to `newdamage.get_constraints` in `model_builder.py`.
 
 ### 3. Add the configuration choice
 
@@ -160,9 +160,9 @@ model structure:
 ### 4. Add the selection to the component catalogue
 
 Import the package and add it to `MODEL_COMPONENTS` in
-`mimosa/abstract_model.py`:
+`mimosa/model_builder.py`:
 
-```python title="mimosa/abstract_model.py"
+```python title="mimosa/model_builder.py"
 from mimosa.components import biodiversity
 
 

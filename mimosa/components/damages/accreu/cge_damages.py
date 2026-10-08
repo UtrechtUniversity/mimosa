@@ -5,7 +5,7 @@ Damage and adaptation costs, COACCH specification
 
 from typing import Sequence
 from mimosa.common import (
-    AbstractModel,
+    ConcreteModel,
     Param,
     Var,
     GeneralConstraint,
@@ -22,7 +22,7 @@ from mimosa.core.model_inputs import ModelInputs
 
 
 def get_constraints(
-    m: AbstractModel, context: ModelContext
+    m: ConcreteModel, context: ModelContext
 ) -> Sequence[GeneralConstraint]:
     """ """
     constraints = []
@@ -79,7 +79,7 @@ def get_constraints(
 
 
 def get_constraints_temperature_dependent(
-    m: AbstractModel, inputs: ModelInputs
+    m: ConcreteModel, inputs: ModelInputs
 ) -> Sequence[GeneralConstraint]:
     """ """
     constraints = []
@@ -123,7 +123,7 @@ def get_constraints_temperature_dependent(
 
 
 def get_constraints_slr(
-    m: AbstractModel, inputs: ModelInputs
+    m: ConcreteModel, inputs: ModelInputs
 ) -> Sequence[GeneralConstraint]:
     """ """
     constraints = []

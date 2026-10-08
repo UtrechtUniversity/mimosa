@@ -1,6 +1,6 @@
 import pytest
 
-from mimosa.abstract_model import (
+from mimosa.model_builder import (
     ALL_COMPONENTS,
     MODEL_COMPONENTS,
     OBJECTIVE_COMPONENT,

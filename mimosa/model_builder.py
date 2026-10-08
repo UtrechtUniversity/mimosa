@@ -1,9 +1,9 @@
-"""Component catalogue and construction of MIMOSA's abstract model."""
+"""Component catalogue and construction of MIMOSA's concrete model."""
 
 from typing import List, Tuple
 
 from mimosa.common import (
-    AbstractModel,
+    ConcreteModel,
     add_constraint,
     Equation,
     ModelContext,
@@ -63,17 +63,17 @@ validate_unique_component_names(ALL_COMPONENTS)
 
 
 ########################
-# Build abstract model
+# Build concrete model
 ########################
 
 
-def create_abstract_model(
+def create_model(
     context: ModelContext,
-) -> Tuple[AbstractModel, List[Equation]]:
+) -> Tuple[ConcreteModel, List[Equation]]:
     """
-    ## Building the abstract model
+    ## Building the concrete model
 
-    Builds the abstract model for MIMOSA by combining all components. Some components are optional. In the
+    Builds the concrete model for MIMOSA by combining all components. Some components are optional. In the
     parameters, different variants of some components can be chosen. The components are:
 
     - [`damage module`](../parameters.md#model structure.damage module): The damage module to use
@@ -84,7 +84,7 @@ def create_abstract_model(
     - [`effortsharing module`](../parameters.md#model structure.effortsharing module): The effort-sharing module to use
 
     """
-    m = create_base_model()
+    m = create_base_model(context.inputs)
 
     # Each constraint will be put in this list,
     # then added to the model at the end of this file.
@@ -99,7 +99,7 @@ def create_abstract_model(
     constraints.extend(objective_constraints)
 
     ######################
-    # Add constraints to abstract model
+    # Add constraints to concrete model
     ######################
 
     for constraint in constraints:

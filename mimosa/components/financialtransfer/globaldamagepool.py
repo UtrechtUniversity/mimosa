@@ -6,7 +6,7 @@ Type: global damage cost pool
 
 from typing import Sequence
 from mimosa.common import (
-    AbstractModel,
+    ConcreteModel,
     GeneralConstraint,
     RegionalConstraint,
     GlobalConstraint,
@@ -19,7 +19,7 @@ from mimosa.common import (
 
 
 def get_constraints(
-    m: AbstractModel, context: ModelContext
+    m: ConcreteModel, context: ModelContext
 ) -> Sequence[GeneralConstraint]:
     """
     When allowing financial transfers for a global damage cost pool, a region can

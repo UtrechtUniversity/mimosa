@@ -1,6 +1,6 @@
 from typing import Sequence
 from mimosa.common import (
-    AbstractModel,
+    ConcreteModel,
     Var,
     Param,
     GeneralConstraint,
@@ -18,7 +18,7 @@ from mimosa.common import (
 
 
 def get_constraints(
-    m: AbstractModel, context: ModelContext
+    m: ConcreteModel, context: ModelContext
 ) -> Sequence[GeneralConstraint]:
     """
     In MIMOSA, every region can physically reduce its own emissions. The domestic cost is determined

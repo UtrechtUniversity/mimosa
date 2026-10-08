@@ -7,7 +7,7 @@ from typing import Sequence
 
 import numpy as np
 from mimosa.common import (
-    AbstractModel,
+    ConcreteModel,
     ConcreteModel,
     Param,
     Var,
@@ -28,7 +28,7 @@ from mimosa.core.model_inputs import ModelInputs
 
 
 def get_constraints(
-    m: AbstractModel, context: ModelContext
+    m: ConcreteModel, context: ModelContext
 ) -> Sequence[GeneralConstraint]:
     """
 
@@ -65,7 +65,7 @@ def fix_initial_abatement(m: ConcreteModel) -> None:
         m.relative_abatement[0, region].fix(0)
 
 
-def _set_baseline_emissions(m: AbstractModel) -> None:
+def _set_baseline_emissions(m: ConcreteModel) -> None:
 
     # Create a param for the regional cumulative baseline emissions
     def _calc_cum_baseline_emissions(m, t, r):
@@ -101,7 +101,7 @@ def _set_baseline_emissions(m: AbstractModel) -> None:
 
 
 def _get_emissions_constraints(
-    m: AbstractModel, inputs: ModelInputs
+    m: ConcreteModel, inputs: ModelInputs
 ) -> Sequence[GeneralConstraint]:
     """
     ## Baseline emissions
@@ -335,7 +335,7 @@ def _validate_emissions_pulse(m, pulse_amount):
 
 
 def _get_temperature_constraints(
-    m: AbstractModel, inputs: ModelInputs
+    m: ConcreteModel, inputs: ModelInputs
 ) -> Sequence[GeneralConstraint]:
     """
 
@@ -459,7 +459,7 @@ def _get_temperature_constraints(
 
 
 def _get_inertia_and_budget_constraints(
-    m: AbstractModel, inputs: ModelInputs
+    m: ConcreteModel, inputs: ModelInputs
 ) -> Sequence[GeneralConstraint]:
     """
     MIMOSA allows several types of constraints on emissions: a global carbon budget, inertia constraints,

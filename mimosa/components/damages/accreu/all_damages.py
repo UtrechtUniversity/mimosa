@@ -5,7 +5,7 @@ Damage and adaptation costs, ACCREU specification
 
 from typing import Sequence
 from mimosa.common import (
-    AbstractModel,
+    ConcreteModel,
     Param,
     Var,
     GeneralConstraint,
@@ -33,7 +33,7 @@ from .utils import get_adaptation_options
 
 
 def get_constraints(
-    m: AbstractModel, context: ModelContext
+    m: ConcreteModel, context: ModelContext
 ) -> Sequence[GeneralConstraint]:
     """
     ACCREU damage specification

@@ -5,7 +5,7 @@ Damage and adaptation costs
 
 from typing import Sequence
 from mimosa.common import (
-    AbstractModel,
+    ConcreteModel,
     Var,
     GeneralConstraint,
     RegionalEquation,
@@ -16,7 +16,7 @@ from mimosa.common import (
 
 
 def get_constraints(
-    m: AbstractModel, context: ModelContext
+    m: ConcreteModel, context: ModelContext
 ) -> Sequence[GeneralConstraint]:
     """Damage and adaptation costs equations and constraints
     (no-damage specification)

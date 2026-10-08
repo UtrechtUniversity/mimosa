@@ -1,6 +1,6 @@
 from typing import Sequence
 from mimosa.common import (
-    AbstractModel,
+    ConcreteModel,
     Param,
     Var,
     GeneralConstraint,
@@ -22,7 +22,7 @@ from mimosa.core.model_inputs import ModelInputs
 from .utils import adaptation_effectiveness_fct, dmg_fct_linear, dmg_fct_power
 
 
-def get_constraints(m: AbstractModel, inputs: ModelInputs, monetise_mortality=False):
+def get_constraints(m: ConcreteModel, inputs: ModelInputs, monetise_mortality=False):
     """TODO"""
 
     constraints = []

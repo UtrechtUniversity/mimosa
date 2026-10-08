@@ -1,10 +1,6 @@
 """
-Creates the class MIMOSA:
-This is the main class. It builds a new AbstractModel
-using the chosen damage and objective modules, then reads in the
-parameter values and data (from the DataStore). With these values,
-it creates an `instance` of the AbstractModel. This is then sent to the solver.
-Finally, the export functions are called here.
+Builds a concrete MIMOSA model from prepared configuration and data, runs
+simulation or optimization, and exposes export functions.
 """
 
 import time
@@ -42,7 +38,7 @@ class MIMOSA:
             more important than the initial guess.
 
     Attributes:
-        concrete_model: Instantiated Pyomo model used for optimisation.
+        concrete_model: Initialized Pyomo model used for optimisation.
         equations: Equations available to simulation mode.
         model_context: Selected model components and their model options.
         simulator: Simulator associated with this model.

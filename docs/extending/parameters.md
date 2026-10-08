@@ -21,8 +21,9 @@ m.alpha = Param(
 `SourcedValue` does not load or convert data. It carries values and a documentation key using the
 existing `::config.path`, `regional::category.name` or `timeandregional::variable` conventions.
 Omit `doc` when using a sourced initializer: supplying both raises `ValueError`.
-The current abstract-model pipeline still loads configured inputs through the `doc` conventions
-described below, including overriding initialization data with configured values.
+The concrete builder uses explicit initialization. `doc` is documentation metadata and does not
+load or override values. A doc-only declaration such as `Param(doc="::economics.PRTP")` does
+not initialize the parameter; use `initialize=inputs.config("economics.PRTP")` instead.
 
 ## Explicit input lookup
 
@@ -135,9 +136,10 @@ using its existing two-decimal naming convention.
 All component configuration/data parameters now use explicit initialization, including the
 remaining welfare variants, objectives, effort-sharing settings and cost-pool payment limits.
 Derived parameters retain their existing rules. The mutable no-policy damage parameter is
-filled later by the baseline hook. Shared base inputs still use the loading conventions below
-until the concrete-builder checkpoint. Construction remains abstract; do not read unconstructed
-model values here.
+filled later by the baseline hook. Shared base sets and input parameters are initialized before
+components run, so `m.t`, `m.regions` and previously declared values are immediately available.
+Declare dependencies before any initializer or bound that reads them. Equation lambdas should
+still use the model passed to them, so the same equations work in simulation and optimization.
 
 For checks that need initialized model values, a standard Pyomo `validate` callback can keep
 validation with the parameter declaration. Emissions uses this for its pulse:
@@ -168,12 +170,12 @@ Component helpers can use ordinary imports for type hints and editor completion:
 ```python
 from mimosa.core.model_inputs import ModelInputs
 
-def _get_emissions_constraints(m: AbstractModel, inputs: ModelInputs):
+def _get_emissions_constraints(m: ConcreteModel, inputs: ModelInputs):
     # ...
     pass
 ```
 
-## Existing component declarations
+## Adding a parameter
 
 A new parameter called `new_param` can be added in the `get_constraints` function of any component:
 
@@ -181,15 +183,15 @@ A new parameter called `new_param` can be added in the `get_constraints` functio
 def get_constraints(m, context):
     # ... existing code ...
     
-    m.new_param = Param()
+    m.new_param = Param(initialize=3.0)
     
     # ... existing code ...
 ```
 
-This creates an abstract parameter (without a value). It still needs a value. How to set this depends on the type of parameter. MIMOSA supports three types of parameters:
+This creates an initialized constant. For configurable inputs, MIMOSA supports three types of parameters:
 
 1. [**Scalar parameters**](#config-params): Scalar parameters (that don't depend on region or time) are defined in the `config_default.yaml` file and can be modified at runtime by modifying the `params` dictionary. These parameters are typically used for model settings, such as the pure rate of time preference (PRTP), discount rates, etc.
-2. [**Regional parameters**](#regional-params): Regional parameters (that don't depend on time) are defined in a CSV file and can be linked to the `Param` using the `doc` field. These parameters are typically used for regional coefficients for damage functions, emissions factors, etc.
+2. [**Regional parameters**](#regional-params): Regional parameters (that don't depend on time) are defined in a CSV file and initialized through `inputs.regional`. These parameters are typically used for regional coefficients for damage functions, emissions factors, etc.
 3. [**Time and region dependent data**](#time-and-region-dependent-data): These parameters depend on both time and region, such as baseline population, baseline GDP, etc. Their data comes from CSV files in IAMC format.
 
 ## 1. Parameters from config file: non-regional parameters {id="config-params"}
@@ -215,10 +217,11 @@ Each parameter entry in the configuration file contains the following fields:
 * `default`: The default value of the parameter
 * Optionally some extra fields depending on the type of parameter
 
-The next step is to link this configuration entry to the `Param` in MIMOSA. This is done using the `doc` field when defining the `Param`:
+Initialize the parameter from its configuration entry, using prepared input lookup:
 
 ```python
-m.PRTP = Param(doc="::economics.PRTP")
+inputs = context.inputs
+m.PRTP = Param(initialize=inputs.config("economics.PRTP"))
 ```
 
 Note that the `config_default.yaml` file is structured as a nested dictionary. In this case, the PRTP parameter is located within the `economics` group. This structure can be arbitrary and doesn't need to match the name of the component. It is purely used to structure the configuration file.
@@ -247,7 +250,9 @@ In the example above, the PRTP has a type [`float`](#parser-float). The followin
 The configuration file can be used to set *scalar* parameters. However, some parameters are regional. These are created like:
 
 ```python
-m.new_regional_param = Param(m.regions)
+m.new_regional_param = Param(
+    m.regions, initialize=inputs.regional("newparamgroup", "newparam1")
+)
 ```
 
 Initializing their value is done in three steps:
@@ -334,7 +339,9 @@ Initializing their value is done in three steps:
 3. **Link the `Param`** to the relevant column in the CSV file:
 
     ```python
-    m.new_regional_param = Param(m.regions, doc="regional::newparamgroup.newparam1")
+    m.new_regional_param = Param(
+        m.regions, initialize=inputs.regional("newparamgroup", "newparam1")
+    )
     ```
 
 ## 3. Time and region dependent data {id="time-and-region-dependent-data"}
@@ -347,14 +354,16 @@ They are defined like any other parameter, but with the `time` and `regions` dim
 m.population = Param(
     m.t,
     m.regions,
-    doc="timeandregional::population",
+    initialize=inputs.time_regional("population"),
     units=quant.unit("billion people"), # (1)!
 )
 ```
 
 1.  The `units` field is optional, but it is good practice to include it. This is especially important for numerical values with units (values that are not dimensionless). Import `quant` from `mimosa.common`. See [Units](units.md) for the standard model units and conversion behaviour.
 
-Just like regional parameters, the parameter values are linked to the underlying data using the `doc` field, starting with `timeandregional::`. The input data source should be in IAMC format. For each parameter, the filename, variable, scenario and model should be specified in the configuration file:
+The lookup selects and interpolates the configured IAMC data source and supplies its documentation
+metadata automatically. For each input, specify the filename, variable, scenario and model in the
+configuration file:
 
 ```yaml title="mimosa/inputdata/config/config_default.yaml"
 ...
@@ -372,7 +381,7 @@ input:
     ...
 ```
 
-1. The name defined here (`population`) should match the name used in the `doc` field of the parameter definition: <code>timeandregional::<b>population</b></code>.
+1. The name defined here (`population`) must match the argument to `inputs.time_regional("population")`.
 
 The `file` field should point to the IAMC formatted data file. The IAMC format is a CSV file with the following columns:
 

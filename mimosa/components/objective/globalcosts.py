@@ -6,7 +6,7 @@ Objective function
 from typing import Sequence, Tuple
 
 from mimosa.common import (
-    AbstractModel,
+    ConcreteModel,
     Constraint,
     GeneralConstraint,
     GlobalConstraint,
@@ -23,7 +23,7 @@ from mimosa.core.model_inputs import ModelInputs
 
 
 def get_constraints(
-    m: AbstractModel, context: ModelContext
+    m: ConcreteModel, context: ModelContext
 ) -> Tuple[Objective, Sequence[GeneralConstraint]]:
     """Equations and constraints for the objective of the optimisation
     (global costs specification)

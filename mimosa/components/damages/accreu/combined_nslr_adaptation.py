@@ -1,6 +1,6 @@
 from typing import Sequence
 from mimosa.common import (
-    AbstractModel,
+    ConcreteModel,
     Param,
     Var,
     GeneralConstraint,
@@ -28,7 +28,7 @@ from .utils import (
 
 
 def get_constraints(
-    m: AbstractModel, inputs: ModelInputs, adaptation_options: AdaptationOptions
+    m: ConcreteModel, inputs: ModelInputs, adaptation_options: AdaptationOptions
 ):
     """
     Adaptation for the non-SLR damages combined (labour productivity + riverine flooding).

@@ -5,7 +5,7 @@ Mitigation costs
 
 from typing import Sequence
 from mimosa.common import (
-    AbstractModel,
+    ConcreteModel,
     Param,
     Var,
     GeneralConstraint,
@@ -24,7 +24,7 @@ from mimosa.core.model_inputs import ModelInputs
 
 
 def get_constraints(
-    m: AbstractModel, context: ModelContext
+    m: ConcreteModel, context: ModelContext
 ) -> Sequence[GeneralConstraint]:
     """
 
@@ -44,7 +44,7 @@ def get_constraints(
 
 
 def _get_mac_constraints(
-    m: AbstractModel, inputs: ModelInputs
+    m: ConcreteModel, inputs: ModelInputs
 ) -> Sequence[GeneralConstraint]:
     """
     In MIMOSA, the baseline emissions can be reduced by implementing a carbon price. This increases the price of
@@ -328,7 +328,7 @@ def _get_mac_constraints(
 
 
 def _get_learning_constraints(
-    m: AbstractModel, inputs: ModelInputs
+    m: ConcreteModel, inputs: ModelInputs
 ) -> Sequence[GeneralConstraint]:
     """
 

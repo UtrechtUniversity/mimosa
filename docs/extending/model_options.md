@@ -13,7 +13,7 @@ There are two naming conventions:
 
 The component catalogue determines which naming convention is used:
 
-```python title="mimosa/abstract_model.py"
+```python title="mimosa/model_builder.py"
 MODEL_COMPONENTS = (
     fixed_component("emissions", emissions.get_constraints),
     selectable_component("damage", damages.DAMAGE_MODULES),
@@ -119,7 +119,7 @@ available through `ModelContext`.
 A plain component is already registered with `fixed_component` in the component catalogue. That entry
 also makes its options available through `ModelContext`, so no extra Python registration is needed:
 
-```python title="mimosa/abstract_model.py"
+```python title="mimosa/model_builder.py"
 fixed_component("new_component", new_component.get_constraints),
 ```
 
@@ -149,8 +149,8 @@ Use a model option when the value changes which model objects are created. For e
 enable a sector or choose between a combined and sector-specific set of adaptation equations.
 
 Use a Pyomo `Param` for a numerical or domain assumption within equations, such as an adaptation cost,
-effectiveness coefficient or start year. Pyomo parameters receive their values later, when the
-abstract model is instantiated. See [Adding parameters and data](parameters.md) for these values.
+effectiveness coefficient or start year. Parameters receive values when declared on the concrete
+model through explicit initialization. See [Adding parameters and data](parameters.md).
 
 ## Testing model options
 

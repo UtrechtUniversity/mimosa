@@ -87,4 +87,4 @@ The MIMOSA model consists of several sub-modules, called model components. Each 
 
 ----
 
-:::mimosa.abstract_model.create_abstract_model
+:::mimosa.model_builder.create_model

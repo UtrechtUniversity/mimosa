@@ -13,13 +13,13 @@ A component is a Python file with a function called `get_constraints`:
 
 ```python title="mimosa/components/new_component.py"
 from mimosa.common import (
-    AbstractModel,
+    ConcreteModel,
     GlobalEquation,
     Var,
 )
 
 
-def get_constraints(m: AbstractModel, context):
+def get_constraints(m: ConcreteModel, context):
     """Calculate the square of global temperature for every time step."""
 
     m.temperature_squared = Var(m.t)
@@ -55,7 +55,7 @@ Add a Python file to `mimosa/components`:
 
 ```text hl_lines="7"
 mimosa/
-├── abstract_model.py
+├── model_builder.py
 ├── base_model.py
 └── components/
     ├── emissions.py
@@ -72,9 +72,9 @@ the Pyomo `Param` to a configuration value or input file.
 
 ## 2. Add the component to MIMOSA
 
-Import and register the component in the component catalogue in `mimosa/abstract_model.py`:
+Import and register the component in the component catalogue in `mimosa/model_builder.py`:
 
-```python title="mimosa/abstract_model.py" hl_lines="3 10"
+```python title="mimosa/model_builder.py" hl_lines="3 10"
 from mimosa.components import (
     emissions,
     new_component,
