@@ -5,45 +5,29 @@ separate selectable submodule. Every component receives `inputs` in its `get_con
 function and reads options through `inputs.config_value`. Defaults are defined once in
 `config_default.yaml` and supplied by configuration validation.
 
-There are two naming conventions:
-
-| Component type                    | Configuration group under `model structure` | Example                 |
-| --------------------------------- | ------------------------------------------- | ----------------------- |
-| Selectable component              | `<name> module options`                     | `damage module options` |
-| Component that is always included | `<name> options`                            | `emissions options`     |
-
-The component catalogue determines which naming convention is used:
-
-```python title="mimosa/model_builder.py"
-MODEL_COMPONENTS = (
-    fixed_component("emissions", emissions.get_constraints),
-    selectable_component("damage", damages.DAMAGE_MODULES),
-    # ... remaining components ...
-)
-```
-
-`selectable_component` reads `<name> module` to select a function. The function reads its own
-options from the configuration path shown above; no separate options object is created.
+Keep an option beside the scientific parameters for the component that uses it. For example,
+ACCREU adaptation settings belong in `economics.damages.accreu`, and the sea-level-rise
+projection belongs in `sealevelrise`. The `model structure` section only selects implementations.
+An option's location does not depend on whether a component is fixed or selectable.
 
 ## Options for a selectable component
 
 Suppose the selected damage module can be constructed with no adaptation, combined adaptation, or
-separate adaptation by sector. Define the option under `damage module options` in
+separate adaptation by sector. Define the option under `economics > damages > accreu` in
 `config_default.yaml`:
 
 ```yaml title="mimosa/inputdata/config/config_default.yaml"
-model structure:
-  # ... damage module and other choices ...
-
-  damage module options:
-    adaptation:
-      descr: How adaptation is represented in the selected damage module
-      type: enum
-      values:
-        - none
-        - combined
-        - separate
-      default: combined
+economics:
+  damages:
+    accreu:
+      adaptation:
+        descr: How adaptation is represented in ACCREU
+        type: enum
+        values:
+          - noadaptation
+          - combined
+          - separate
+        default: separate
 ```
 
 Defining each named option as a normal configuration entry gives it type checking, a default value and
@@ -53,7 +37,7 @@ The selected damage submodule can read it while adding its variables and equatio
 
 ```python
 def get_constraints(m, inputs):
-    adaptation = inputs.config_value("model structure.damage module options.adaptation")
+    adaptation = inputs.config_value("economics.damages.accreu.adaptation")
 
     if adaptation == "separate":
         # Add separate adaptation variables and equations for each sector
@@ -64,7 +48,7 @@ Users can change the option before creating the model:
 
 ```python
 params = load_params()
-params["model structure"]["damage module options"]["adaptation"] = "separate"
+params["economics"]["damages"]["accreu"]["adaptation"] = "separate"
 model = MIMOSA(params)
 ```
 
@@ -73,14 +57,11 @@ relevant to its calculations.
 
 ## Options for a component that is always included
 
-For a fixed component, omit the word `module`. The following example adds an illustrative option to
-the emissions component:
+The same approach applies to a component that is always included. The following illustrative
+option belongs in the emissions section:
 
 ```yaml title="mimosa/inputdata/config/config_default.yaml"
-model structure:
-  # ... module choices and other options ...
-
-  emissions options:
+emissions:
     include feedback:
       descr: Include the additional emissions feedback equations
       type: bool
@@ -91,7 +72,7 @@ The emissions component can read it with:
 
 ```python
 def get_constraints(m, inputs):
-    include_feedback = inputs.config_value("model structure.emissions options.include feedback")
+    include_feedback = inputs.config_value("emissions.include feedback")
 
     if include_feedback:
         # Add the additional variables and equations
@@ -101,7 +82,7 @@ def get_constraints(m, inputs):
 Users change it through the corresponding configuration group:
 
 ```python
-params["model structure"]["emissions options"]["include feedback"] = True
+params["emissions"]["include feedback"] = True
 ```
 
 ## Options for a new component
@@ -112,23 +93,23 @@ Register the component in the catalogue as before:
 fixed_component("new_component", new_component.get_constraints),
 ```
 
-Define `new_component options` under `model structure` and read the value at its full path:
+Define the setting in the section for that component and read its full path:
 
 ```python
-include_feedback = inputs.config_value("model structure.new_component options.include feedback")
+include_feedback = inputs.config_value("new_component.include feedback")
 ```
 
-For a selectable component, use `new_component module options` instead. Adding options does
-not require a second registration or a configuration object.
+Use the same approach for selectable components. Adding options does not require a second
+registration or a configuration object.
 
 ## Reading a whole section
 
 When several related settings are needed together, a plain dictionary can keep the code clear:
 
 ```python
-options = inputs.config_value("model structure.damage module options")
-adaptation = options["ACCREU_adaptation"]
-determination = options["ACCREU_adaptation_determination"]
+options = inputs.config_value("economics.damages.accreu")
+adaptation = options["adaptation"]
+determination = options["adaptation_determination"]
 ```
 
 Read a module selection with `inputs.config_value("model structure.damage module")`.

@@ -86,11 +86,11 @@ def accreu_params(adaptation_type, calibration="accreu"):
     params = load_params()
     params["economics"]["damages"]["ignore damages"] = False
     params["model structure"]["damage module"] = "ACCREU"
-    options = params["model structure"]["damage module options"]
-    options["ACCREU_adaptation"] = adaptation_type
-    options["ACCREU_adaptation_calibration"] = calibration
-    options["ACCREU_adaptation_determination"] = "analytical_optimum"
-    options["ACCREU_CBA_strategy"] = "joint"
+    options = params["economics"]["damages"]["accreu"]
+    options["adaptation"] = adaptation_type
+    options["adaptation_calibration"] = calibration
+    options["adaptation_determination"] = "analytical_optimum"
+    options["cba_strategy"] = "joint"
     return params
 
 
@@ -98,9 +98,9 @@ def no_adaptation_reference(params):
     """Run the unadapted pathway used only for Ramsey discount factors."""
 
     reference_params = deepcopy(params)
-    options = reference_params["model structure"]["damage module options"]
-    options["ACCREU_adaptation"] = "noadaptation"
-    options["ACCREU_adaptation_determination"] = "solver_control"
+    options = reference_params["economics"]["damages"]["accreu"]
+    options["adaptation"] = "noadaptation"
+    options["adaptation_determination"] = "solver_control"
     return MIMOSA(reference_params, prerun=False).run_simulation()
 
 

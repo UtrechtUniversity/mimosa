@@ -29,14 +29,14 @@ adaptation_readiness = pd.read_csv("data/adaptation_readiness.csv").set_index(
 def init_params(monetise_mortality, adapt_calibration="accreu", adapt_type="separate"):
     params = load_params()
     params["model structure"]["damage module"] = "ACCREU"
-    params["model structure"]["damage module options"][
-        "ACCREU_adaptation"
+    params["economics"]["damages"]["accreu"][
+        "adaptation"
     ] = adapt_type  # "separate" or "combined"
-    params["model structure"]["damage module options"][
-        "ACCREU_monetise_mortality"
+    params["economics"]["damages"]["accreu"][
+        "monetise_mortality"
     ] = monetise_mortality
-    params["model structure"]["damage module options"][
-        "ACCREU_adaptation_calibration"
+    params["economics"]["damages"]["accreu"][
+        "adaptation_calibration"
     ] = adapt_calibration  # "accreu", "literature", "literature_low", "literature_high"
     return params
 
@@ -100,8 +100,8 @@ for monetise_mortality in [False, True]:
 
         #### Run "ada": no-policy baseline with optimal adaptation
         params_ada = init_params(monetise_mortality, adapt_calibration)
-        params_ada["model structure"]["damage module options"][
-            "ACCREU_adaptation_determination"
+        params_ada["economics"]["damages"]["accreu"][
+            "adaptation_determination"
         ] = "analytical_optimum"
         model_ada = MIMOSA(params_ada)
         sim_ada = model_ada.run_simulation()
@@ -112,11 +112,11 @@ for monetise_mortality in [False, True]:
 
         #### Run "mit_then_ada": optimise mitigation, then calculate adaptation
         params_mit_then_ada = init_params(monetise_mortality, adapt_calibration)
-        params_mit_then_ada["model structure"]["damage module options"][
-            "ACCREU_adaptation_determination"
+        params_mit_then_ada["economics"]["damages"]["accreu"][
+            "adaptation_determination"
         ] = "analytical_optimum"
-        params_mit_then_ada["model structure"]["damage module options"][
-            "ACCREU_CBA_strategy"
+        params_mit_then_ada["economics"]["damages"]["accreu"][
+            "cba_strategy"
         ] = "mitigation_then_adaptation"
         model_mit_then_ada = MIMOSA(params_mit_then_ada)
         model_mit_then_ada.solve()
@@ -129,8 +129,8 @@ for monetise_mortality in [False, True]:
         params_ada_unplanned["economics"]["damages"]["accreu"][
             "adaptation_effectiveness_scale_factor"
         ] = 0.5
-        params_ada_unplanned["model structure"]["damage module options"][
-            "ACCREU_CBA_strategy"
+        params_ada_unplanned["economics"]["damages"]["accreu"][
+            "cba_strategy"
         ] = "joint"
         model_ada_unplanned = MIMOSA(params_ada_unplanned)
 
@@ -152,8 +152,8 @@ for monetise_mortality in [False, True]:
         # measures. The resulting reduced damages are lower, but that's because the adaptation costs are lower.
         # In ada_unplanned the adaptation costs are the same as optimal adaptation, just the effectiveness is reduced.
         params_ada_planned = init_params(monetise_mortality, adapt_calibration)
-        params_ada_planned["model structure"]["damage module options"][
-            "ACCREU_CBA_strategy"
+        params_ada_planned["economics"]["damages"]["accreu"][
+            "cba_strategy"
         ] = "joint"
         model_ada_planned = MIMOSA(params_ada_planned)
 
@@ -170,8 +170,8 @@ for monetise_mortality in [False, True]:
 
         #### Run "mit_ada": CBA with mitigation and adaptation optimised at the same time by MIMOSA
         params_mit_ada = init_params(monetise_mortality, adapt_calibration)
-        params_mit_ada["model structure"]["damage module options"][
-            "ACCREU_CBA_strategy"
+        params_mit_ada["economics"]["damages"]["accreu"][
+            "cba_strategy"
         ] = "joint"
         model_mit_ada = MIMOSA(params_mit_ada)
         model_mit_ada.solve(ipopt_maxiter=10000)
@@ -183,8 +183,8 @@ for monetise_mortality in [False, True]:
 
             #### Run "mit_late_ada": Same as mit_ada, but mitigation is delayed until after 2045
             params_mit_late_ada = init_params(monetise_mortality, adapt_calibration)
-            params_mit_late_ada["model structure"]["damage module options"][
-                "ACCREU_adaptation_determination"
+            params_mit_late_ada["economics"]["damages"]["accreu"][
+                "adaptation_determination"
             ] = "analytical_optimum"
             params_mit_late_ada["emissions"]["delay_mitigation_until_year"] = 2045
             model_mit_late_ada = MIMOSA(params_mit_late_ada)
@@ -195,8 +195,8 @@ for monetise_mortality in [False, True]:
 
             #### Run "ada_late": Same as ada, but adaptation is delayed until after 2045
             params_ada_late = init_params(monetise_mortality, adapt_calibration)
-            params_ada_late["model structure"]["damage module options"][
-                "ACCREU_adaptation_determination"
+            params_ada_late["economics"]["damages"]["accreu"][
+                "adaptation_determination"
             ] = "analytical_optimum"
             params_ada_late["economics"]["damages"]["accreu"][
                 "delay_adaptation_until_year"
@@ -210,8 +210,8 @@ for monetise_mortality in [False, True]:
 
             #### Run "mit_ada_late": Same as mit_ada, but adaptation is delayed until after 2050
             params_mit_ada_late = init_params(monetise_mortality, adapt_calibration)
-            params_mit_ada_late["model structure"]["damage module options"][
-                "ACCREU_adaptation_determination"
+            params_mit_ada_late["economics"]["damages"]["accreu"][
+                "adaptation_determination"
             ] = "analytical_optimum"
             params_mit_ada_late["economics"]["damages"]["accreu"][
                 "delay_adaptation_until_year"
@@ -226,8 +226,8 @@ for monetise_mortality in [False, True]:
             params_mit_late_ada_late = init_params(
                 monetise_mortality, adapt_calibration
             )
-            params_mit_late_ada_late["model structure"]["damage module options"][
-                "ACCREU_adaptation_determination"
+            params_mit_late_ada_late["economics"]["damages"]["accreu"][
+                "adaptation_determination"
             ] = "analytical_optimum"
             params_mit_late_ada_late["economics"]["damages"]["accreu"][
                 "delay_adaptation_until_year"

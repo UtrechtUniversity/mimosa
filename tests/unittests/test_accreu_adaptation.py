@@ -34,9 +34,9 @@ def test_effective_adaptation_curve_applies_all_scale_factors():
 
 def test_adaptation_options_are_read_once_and_include_sector_calibrations():
     values = {
-        "ACCREU_adaptation": "combined",
-        "ACCREU_adaptation_calibration": "accreu",
-        "ACCREU_adaptation_determination": "analytical_optimum",
+        "adaptation": "combined",
+        "adaptation_calibration": "accreu",
+        "adaptation_determination": "analytical_optimum",
     }
     calls = []
 
@@ -57,9 +57,9 @@ def test_adaptation_options_are_read_once_and_include_sector_calibrations():
         "combined",
     }
     assert calls == [
-        "model structure.damage module options.ACCREU_adaptation",
-        "model structure.damage module options.ACCREU_adaptation_calibration",
-        "model structure.damage module options.ACCREU_adaptation_determination",
+        "economics.damages.accreu.adaptation",
+        "economics.damages.accreu.adaptation_calibration",
+        "economics.damages.accreu.adaptation_determination",
     ]
 
 

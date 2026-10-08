@@ -18,11 +18,13 @@ This applies to both separate and combined adaptation:
 ```yaml
 model structure:
   damage module: ACCREU
-  damage module options:
-    ACCREU_adaptation: combined
-    ACCREU_adaptation_calibration: literature
-    ACCREU_adaptation_determination: analytical_optimum
-    ACCREU_CBA_strategy: mitigation_then_adaptation
+economics:
+  damages:
+    accreu:
+      adaptation: combined
+      adaptation_calibration: literature
+      adaptation_determination: analytical_optimum
+      cba_strategy: mitigation_then_adaptation
 ```
 
 The default value is `accreu`, which preserves the original coefficients. The

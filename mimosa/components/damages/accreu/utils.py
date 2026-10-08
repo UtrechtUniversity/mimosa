@@ -83,10 +83,10 @@ def get_adaptation_options(inputs: ModelInputs):
     """Read and validate all ACCREU adaptation options once."""
 
     adaptation_type = inputs.config_value(
-        "model structure.damage module options.ACCREU_adaptation"
+        "economics.damages.accreu.adaptation"
     )
     calibration_name = inputs.config_value(
-        "model structure.damage module options.ACCREU_adaptation_calibration"
+        "economics.damages.accreu.adaptation_calibration"
     )
     validate_adaptation_calibration(calibration_name)
 
@@ -97,7 +97,7 @@ def get_adaptation_options(inputs: ModelInputs):
     return AdaptationOptions(
         adaptation_type=adaptation_type,
         determination=inputs.config_value(
-            "model structure.damage module options.ACCREU_adaptation_determination"
+            "economics.damages.accreu.adaptation_determination"
         ),
         calibrations={
             sector: get_adaptation_calibration(calibration_name, sector)

@@ -66,9 +66,9 @@ def test_config_scalar_quantities_and_false_keep_values_and_metadata(inputs):
 
 def test_sections_dictionary_settings_and_nested_regional_values_are_plain(inputs):
     before = deepcopy(inputs.params)
-    options = inputs.config_value("model structure.damage module options")
-    assert options == inputs.params["model structure"]["damage module options"]
-    assert options["ACCREU_adaptation"] == "separate"
+    options = inputs.config_value("economics.damages.accreu")
+    assert options == inputs.params["economics"]["damages"]["accreu"]
+    assert options["adaptation"] == "separate"
     assert inputs.config_value("model structure.damage module") == "COACCH"
     assert inputs.config_value("economics.MAC")["gamma"] == "2887 USD2010/tCO2"
     frames = inputs.config("economics.MAC.SSP_calibration_factor.SSP1")
@@ -282,7 +282,7 @@ def test_time_config_requires_nonempty_keyframe_mapping(inputs, path):
 
 
 def test_time_config_rejects_nonnumeric_keyframes_with_path_context(inputs):
-    path = "model structure.damage module options"
+    path = "economics.damages.accreu"
     with pytest.raises(ValueError, match="must map numeric calendar years") as error:
         inputs.time_config(path)
     assert path in str(error.value)

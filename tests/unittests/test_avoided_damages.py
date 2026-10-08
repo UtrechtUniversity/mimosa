@@ -30,18 +30,18 @@ def test_analytical_accreu_uses_a_noadaptation_nopolicy_baseline():
     params["time"]["end"] = 2030
     params["time"]["periods"] = {}
     params["model structure"]["damage module"] = "ACCREU"
-    options = params["model structure"]["damage module options"]
-    options["ACCREU_adaptation_determination"] = "analytical_optimum"
+    options = params["economics"]["damages"]["accreu"]
+    options["adaptation_determination"] = "analytical_optimum"
 
     model = MIMOSA(params, prerun=False)
     baseline = model.run_nopolicy_baseline()
     adaptation_only = model.run_simulation()
 
-    baseline_options = baseline.params["model structure"]["damage module options"]
-    assert baseline_options["ACCREU_adaptation"] == "noadaptation"
+    baseline_options = baseline.params["economics"]["damages"]["accreu"]
+    assert baseline_options["adaptation"] == "noadaptation"
     assert np.all(baseline.adaptation_costs.values == 0)
-    assert model.params["model structure"]["damage module options"][
-        "ACCREU_adaptation"
+    assert model.params["economics"]["damages"]["accreu"][
+        "adaptation"
     ] == "separate"
 
     expected_avoided = (

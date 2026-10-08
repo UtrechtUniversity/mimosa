@@ -12,8 +12,8 @@ def test_joint_cba_supports_analytical_adaptation():
     params["time"]["end"] = 2050
     params["time"]["periods"] = {}
     params["model structure"]["damage module"] = "ACCREU"
-    options = params["model structure"]["damage module options"]
-    options["ACCREU_adaptation_determination"] = "analytical_optimum"
+    options = params["economics"]["damages"]["accreu"]
+    options["adaptation_determination"] = "analytical_optimum"
 
     model = MIMOSA(params)
 
@@ -37,18 +37,16 @@ def test_one_call_sequential_cba_matches_manual_two_model_workflow():
     params["time"]["end"] = 2050
     params["time"]["periods"] = {}
     params["model structure"]["damage module"] = "ACCREU"
-    options = params["model structure"]["damage module options"]
-    options["ACCREU_adaptation"] = "separate"
-    options["ACCREU_adaptation_determination"] = "analytical_optimum"
-    options["ACCREU_CBA_strategy"] = "mitigation_then_adaptation"
+    options = params["economics"]["damages"]["accreu"]
+    options["adaptation"] = "separate"
+    options["adaptation_determination"] = "analytical_optimum"
+    options["cba_strategy"] = "mitigation_then_adaptation"
 
     mitigation_params = deepcopy(params)
-    mitigation_options = mitigation_params["model structure"][
-        "damage module options"
-    ]
-    mitigation_options["ACCREU_adaptation"] = "noadaptation"
-    mitigation_options["ACCREU_adaptation_determination"] = "solver_control"
-    mitigation_options["ACCREU_CBA_strategy"] = "joint"
+    mitigation_options = mitigation_params["economics"]["damages"]["accreu"]
+    mitigation_options["adaptation"] = "noadaptation"
+    mitigation_options["adaptation_determination"] = "solver_control"
+    mitigation_options["cba_strategy"] = "joint"
 
     mitigation_model = MIMOSA(mitigation_params)
     mitigation_model.solve(verbose=False)
@@ -127,10 +125,10 @@ def test_literature_adaptation_calibration_matches_bcr_benchmarks(
 ):
     params = load_params()
     params["model structure"]["damage module"] = "ACCREU"
-    options = params["model structure"]["damage module options"]
-    options["ACCREU_adaptation"] = "separate"
-    options["ACCREU_adaptation_calibration"] = calibration
-    options["ACCREU_adaptation_determination"] = "analytical_optimum"
+    options = params["economics"]["damages"]["accreu"]
+    options["adaptation"] = "separate"
+    options["adaptation_calibration"] = calibration
+    options["adaptation_determination"] = "analytical_optimum"
 
     model = MIMOSA(params, prerun=False)
     simulation = model.run_simulation()
@@ -172,10 +170,10 @@ def test_literature_adaptation_calibration_matches_bcr_benchmarks(
 def test_combined_literature_calibration_matches_bcr_benchmarks(calibration, bcr_range):
     params = load_params()
     params["model structure"]["damage module"] = "ACCREU"
-    options = params["model structure"]["damage module options"]
-    options["ACCREU_adaptation"] = "combined"
-    options["ACCREU_adaptation_calibration"] = calibration
-    options["ACCREU_adaptation_determination"] = "analytical_optimum"
+    options = params["economics"]["damages"]["accreu"]
+    options["adaptation"] = "combined"
+    options["adaptation_calibration"] = calibration
+    options["adaptation_determination"] = "analytical_optimum"
 
     simulation = MIMOSA(params, prerun=False).run_simulation()
 

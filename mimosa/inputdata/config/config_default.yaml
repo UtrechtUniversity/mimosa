@@ -298,9 +298,66 @@ economics:
     
     accreu:
 
+      adaptation:
+        descr: >-
+          Whether adaptation should be on combined labour productivity and riverine flooding,
+          or separately
+        type: enum
+        values:
+          - combined
+          - separate
+          - noadaptation
+        default: separate
+
+      cba_strategy:
+        descr: >-
+          How solve() coordinates mitigation and adaptation in an ACCREU
+          cost-benefit analysis. The sequential strategy first optimises mitigation
+          without adaptation and then calculates analytical optimal adaptation for
+          that pathway. The joint strategy uses the ordinary one-model solve path,
+          with adaptation either chosen by the solver or determined analytically.
+        type: enum
+        values:
+          - mitigation_then_adaptation
+          - joint
+        default: joint
+
+      adaptation_determination:
+        descr: >-
+          How ACCREU adaptation expenditure is determined. With solver_control it
+          is a free optimisation or simulation control. With analytical_optimum it
+          is calculated from the analytical optimal-adaptation equation.
+        type: enum
+        values:
+          - solver_control
+          - analytical_optimum
+        default: solver_control
+
+      adaptation_calibration:
+        descr: >-
+          Calibration of the sectoral ACCREU adaptation curves. "accreu" uses the
+          original source-model coefficients. The three "literature" options use
+          realised-effectiveness caps and cost multipliers calibrated to the low,
+          central, and high ends of literature benefit-cost ranges at a 5% discount
+          rate. They apply to both separate and combined adaptation.
+        type: enum
+        values:
+          - accreu
+          - literature_low
+          - literature
+          - literature_high
+        default: accreu
+
+      monetise_mortality:
+        descr: >-
+          Flag for whether the mortality should be monetised using the SVL
+          (Statistical Value of Life)
+        type: bool
+        default: False
+
       mortality_svl_rel_gdp_cap:
         descr: >-
-          If the ACCREU_monetise_mortality option is enabled, use this value for
+          If the monetise_mortality option is enabled, use this value for
           the Statistical Value of Life (SVL), expressed as multiple of GDP per capita.
           Note: while this assumes a global value of the SVL in relative terms,
           the dollar value of the SVL differs per country. This has ethical implications.
@@ -485,21 +542,22 @@ temperature:
 
 ##################
 
-model structure:
-  sealevelrise options:
-    projection:
-      descr: >-
-        Deterministic sea-level-rise parameter set. The central set represents
-        an AR6-calibrated central response; low represents the lower part of
-        the AR6 likely range, and high is a low-likelihood, high-impact
-        sensitivity case. All sets share the same historical initial conditions.
-      type: enum
-      values:
-        - low
-        - central
-        - high
-      default: central
+sealevelrise:
+  projection:
+    descr: >-
+      Deterministic sea-level-rise parameter set. The central set represents
+      an AR6-calibrated central response; low represents the lower part of
+      the AR6 likely range, and high is a low-likelihood, high-impact
+      sensitivity case. All sets share the same historical initial conditions.
+    type: enum
+    values:
+      - low
+      - central
+      - high
+    default: central
 
+
+model structure:
   damage module:
     descr: Damage module to be used
     type: enum
@@ -510,64 +568,6 @@ model structure:
       - nodamage
     default: COACCH
   
-  damage module options:
-    ACCREU_adaptation:
-      descr: >-
-        Whether adaptation should be on combined labour productivity and riverine flooding,
-        or separately
-      type: enum
-      values:
-        - combined
-        - separate
-        - noadaptation
-      default: separate
-    
-    ACCREU_CBA_strategy:
-      descr: >-
-        How solve() coordinates mitigation and adaptation in an ACCREU
-        cost-benefit analysis. The sequential strategy first optimises mitigation
-        without adaptation and then calculates analytical optimal adaptation for
-        that pathway. The joint strategy uses the ordinary one-model solve path,
-        with adaptation either chosen by the solver or determined analytically.
-      type: enum
-      values:
-        - mitigation_then_adaptation
-        - joint
-      default: joint
-
-    ACCREU_adaptation_determination:
-      descr: >-
-        How ACCREU adaptation expenditure is determined. With solver_control it
-        is a free optimisation or simulation control. With analytical_optimum it
-        is calculated from the analytical optimal-adaptation equation.
-      type: enum
-      values:
-        - solver_control
-        - analytical_optimum
-      default: solver_control
-
-    ACCREU_adaptation_calibration:
-      descr: >-
-        Calibration of the sectoral ACCREU adaptation curves. "accreu" uses the
-        original source-model coefficients. The three "literature" options use
-        realised-effectiveness caps and cost multipliers calibrated to the low,
-        central, and high ends of literature benefit-cost ranges at a 5% discount
-        rate. They apply to both separate and combined adaptation.
-      type: enum
-      values:
-        - accreu
-        - literature_low
-        - literature
-        - literature_high
-      default: accreu
-    
-    ACCREU_monetise_mortality:
-        descr: >-
-          Flag for whether the mortality should be monetised using the SVL
-          (Statistical Value of Life)
-        type: bool
-        default: False
-
   emissiontrade module:
     descr: Emission trade module to be used
     type: enum

@@ -18,16 +18,14 @@ def prepare_inputs(adaptation, determination, mortality, cge_quantile=None):
         "time": {"end": 2040, "periods": {2030: 10}},
         "model structure": {
             "damage module": "ACCREU",
-            "damage module options": {
-                "ACCREU_adaptation": adaptation,
-                "ACCREU_adaptation_determination": determination,
-                "ACCREU_adaptation_calibration": "literature_high",
-                "ACCREU_monetise_mortality": mortality,
-            },
         },
         "economics": {"damages": {
             "scale factor": 1.25,
             "accreu": {
+                "adaptation": adaptation,
+                "adaptation_determination": determination,
+                "adaptation_calibration": "literature_high",
+                "monetise_mortality": mortality,
                 "mortality_svl_rel_gdp_cap": 150,
                 "adaptation_effectiveness_scale_factor": 0.5,
                 "delay_adaptation_until_year": 2035,

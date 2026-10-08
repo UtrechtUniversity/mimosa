@@ -196,12 +196,9 @@ class MIMOSA:
             return self.run_simulation()
 
         baseline_params = deepcopy(self._params)
-        baseline_options = baseline_params["model structure"][
-            "damage module options"
-        ]
-        baseline_options["ACCREU_adaptation"] = "noadaptation"
-        baseline_options["ACCREU_adaptation_determination"] = "solver_control"
-        baseline_options["ACCREU_CBA_strategy"] = "joint"
+        # Analytical adaptation occurs even with zero controls, so disable it
+        # explicitly in the no-policy reference used to measure avoided damages.
+        baseline_params["economics"]["damages"]["accreu"]["adaptation"] = "noadaptation"
 
         baseline_model = MIMOSA(baseline_params, prerun=False)
         return baseline_model.run_simulation()
@@ -253,19 +250,19 @@ class MIMOSA:
         if self.inputs.config_value("model structure.damage module") != "ACCREU":
             return False
 
-        options = self.inputs.config_value("model structure.damage module options")
-        if options["ACCREU_adaptation"] == "noadaptation":
+        options = self.inputs.config_value("economics.damages.accreu")
+        if options["adaptation"] == "noadaptation":
             return False
 
-        strategy = options["ACCREU_CBA_strategy"]
-        determination = options["ACCREU_adaptation_determination"]
+        strategy = options["cba_strategy"]
+        determination = options["adaptation_determination"]
         if (
             strategy == "mitigation_then_adaptation"
             and determination != "analytical_optimum"
         ):
             raise ValueError(
-                "ACCREU_CBA_strategy='mitigation_then_adaptation' requires "
-                "ACCREU_adaptation_determination="
+                "cba_strategy='mitigation_then_adaptation' requires "
+                "adaptation_determination="
                 f"'analytical_optimum', not '{determination}'."
             )
 
@@ -277,10 +274,10 @@ class MIMOSA:
         if self.inputs.config_value("model structure.damage module") != "ACCREU":
             return False
 
-        options = self.inputs.config_value("model structure.damage module options")
+        options = self.inputs.config_value("economics.damages.accreu")
         return (
-            options["ACCREU_adaptation"] != "noadaptation"
-            and options["ACCREU_adaptation_determination"] == "analytical_optimum"
+            options["adaptation"] != "noadaptation"
+            and options["adaptation_determination"] == "analytical_optimum"
         )
 
     def _solve_accreu_mitigation_then_adaptation(
@@ -290,18 +287,16 @@ class MIMOSA:
 
         if self._params["emissions"]["carbonbudget"] is not False:
             raise ValueError(
-                "ACCREU_CBA_strategy='mitigation_then_adaptation' is only "
+                "cba_strategy='mitigation_then_adaptation' is only "
                 "available for cost-benefit analysis without a fixed carbon budget. "
-                "Use ACCREU_CBA_strategy='joint' for a carbon-budget run."
+                "Use cba_strategy='joint' for a carbon-budget run."
             )
 
         mitigation_params = deepcopy(self._params)
-        mitigation_options = mitigation_params["model structure"][
-            "damage module options"
-        ]
-        mitigation_options["ACCREU_adaptation"] = "noadaptation"
-        mitigation_options["ACCREU_CBA_strategy"] = "joint"
-        mitigation_options["ACCREU_adaptation_determination"] = "solver_control"
+        mitigation_options = mitigation_params["economics"]["damages"]["accreu"]
+        mitigation_options["adaptation"] = "noadaptation"
+        mitigation_options["cba_strategy"] = "joint"
+        mitigation_options["adaptation_determination"] = "solver_control"
 
         mitigation_model = MIMOSA(mitigation_params)
         mitigation_model.solve(verbose=verbose, use_neos=use_neos, **kwargs)

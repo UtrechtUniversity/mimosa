@@ -16,10 +16,10 @@ def _inputs(
     params = load_params()
     structure = params["model structure"]
     structure["damage module"] = module
-    structure["damage module options"].update({
-        "ACCREU_adaptation": adaptation,
-        "ACCREU_CBA_strategy": strategy,
-        "ACCREU_adaptation_determination": determination,
+    params["economics"]["damages"]["accreu"].update({
+        "adaptation": adaptation,
+        "cba_strategy": strategy,
+        "adaptation_determination": determination,
     })
     return SimpleNamespace(config_value=lambda path: get_nested(params, path.split(".")))
 
@@ -64,37 +64,33 @@ def test_sequential_workflow_selection(
 
 def test_cba_configuration_defaults_and_validation():
     params = load_params()
-    options = params["model structure"]["damage module options"]
+    options = params["economics"]["damages"]["accreu"]
 
-    assert options["ACCREU_CBA_strategy"] == "joint"
-    assert options["ACCREU_adaptation_determination"] == "solver_control"
+    assert options["cba_strategy"] == "joint"
+    assert options["adaptation_determination"] == "solver_control"
 
     for value in ["mitigation_then_adaptation", "joint"]:
         params = load_params()
-        params["model structure"]["damage module options"][
-            "ACCREU_CBA_strategy"
+        params["economics"]["damages"]["accreu"][
+            "cba_strategy"
         ] = value
-        assert check_params(params)["model structure"][
-            "damage module options"
-        ]["ACCREU_CBA_strategy"] == value
+        assert check_params(params)["economics"]["damages"]["accreu"]["cba_strategy"] == value
 
-    params["model structure"]["damage module options"][
-        "ACCREU_CBA_strategy"
+    params["economics"]["damages"]["accreu"][
+        "cba_strategy"
     ] = "unknown"
     with pytest.raises(ValueError):
         check_params(params)
 
     for value in ["solver_control", "analytical_optimum"]:
         params = load_params()
-        params["model structure"]["damage module options"][
-            "ACCREU_adaptation_determination"
+        params["economics"]["damages"]["accreu"][
+            "adaptation_determination"
         ] = value
-        assert check_params(params)["model structure"][
-            "damage module options"
-        ]["ACCREU_adaptation_determination"] == value
+        assert check_params(params)["economics"]["damages"]["accreu"]["adaptation_determination"] == value
 
-    params["model structure"]["damage module options"][
-        "ACCREU_adaptation_determination"
+    params["economics"]["damages"]["accreu"][
+        "adaptation_determination"
     ] = "unknown"
     with pytest.raises(ValueError):
         check_params(params)
@@ -142,10 +138,10 @@ def test_joint_analytical_adaptation_uses_ordinary_solve(monkeypatch):
 def test_sequential_workflow_copies_params_forwards_options_and_replays(monkeypatch):
     params = load_params()
     params["model structure"]["damage module"] = "ACCREU"
-    options = params["model structure"]["damage module options"]
-    options["ACCREU_adaptation"] = "separate"
-    options["ACCREU_adaptation_determination"] = "analytical_optimum"
-    options["ACCREU_CBA_strategy"] = "mitigation_then_adaptation"
+    options = params["economics"]["damages"]["accreu"]
+    options["adaptation"] = "separate"
+    options["adaptation_determination"] = "analytical_optimum"
+    options["cba_strategy"] = "mitigation_then_adaptation"
 
     model = MIMOSA.__new__(MIMOSA)
     model._params = params
@@ -158,12 +154,12 @@ def test_sequential_workflow_copies_params_forwards_options_and_replays(monkeypa
     mitigation_model = SimpleNamespace(status="ok")
 
     def construct_mitigation_model(stage_params):
-        stage_options = stage_params["model structure"]["damage module options"]
+        stage_options = stage_params["economics"]["damages"]["accreu"]
         assert stage_params is not params
-        assert stage_options["ACCREU_adaptation"] == "noadaptation"
-        assert stage_options["ACCREU_CBA_strategy"] == "joint"
+        assert stage_options["adaptation"] == "noadaptation"
+        assert stage_options["cba_strategy"] == "joint"
         assert (
-            stage_options["ACCREU_adaptation_determination"]
+            stage_options["adaptation_determination"]
             == "solver_control"
         )
         mitigation_model.solve = lambda **kwargs: calls.append(("solve", kwargs))
@@ -190,9 +186,9 @@ def test_sequential_workflow_copies_params_forwards_options_and_replays(monkeypa
         verbose=False, use_neos=True, neos_email="user@example.com"
     )
 
-    assert options["ACCREU_adaptation"] == "separate"
-    assert options["ACCREU_adaptation_determination"] == "analytical_optimum"
-    assert options["ACCREU_CBA_strategy"] == "mitigation_then_adaptation"
+    assert options["adaptation"] == "separate"
+    assert options["adaptation_determination"] == "analytical_optimum"
+    assert options["cba_strategy"] == "mitigation_then_adaptation"
     assert calls == [
         (
             "solve",
@@ -279,9 +275,9 @@ def test_determination_option_controls_whether_adaptation_is_a_control(
 ):
     params = load_params()
     params["model structure"]["damage module"] = "ACCREU"
-    options = params["model structure"]["damage module options"]
-    options["ACCREU_adaptation"] = "separate"
-    options["ACCREU_adaptation_determination"] = determination
+    options = params["economics"]["damages"]["accreu"]
+    options["adaptation"] = "separate"
+    options["adaptation_determination"] = determination
 
     model = MIMOSA(params, prerun=False)
     model.prepare_simulation()

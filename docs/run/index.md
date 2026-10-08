@@ -28,10 +28,10 @@ from mimosa import MIMOSA, load_params
 
 params = load_params()
 params["model structure"]["damage module"] = "ACCREU"
-options = params["model structure"]["damage module options"]
-options["ACCREU_adaptation"] = "separate"
-options["ACCREU_adaptation_determination"] = "analytical_optimum"
-options["ACCREU_CBA_strategy"] = "mitigation_then_adaptation"
+options = params["economics"]["damages"]["accreu"]
+options["adaptation"] = "separate"
+options["adaptation_determination"] = "analytical_optimum"
+options["cba_strategy"] = "mitigation_then_adaptation"
 
 model = MIMOSA(params)
 model.solve()

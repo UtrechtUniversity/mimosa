@@ -69,7 +69,7 @@ interpolated using the existing store. Keys are timestep indices and region name
 and calendar grid. Input lookup itself does not apply component-specific consistency checks.
 
 For Python decisions, use `inputs.config_value("model structure.damage module")` or retrieve a whole
-section, such as `inputs.config_value("model structure.damage module options")`. Scalar quantity
+section, such as `inputs.config_value("economics.damages.accreu")`. Scalar quantity
 lookups return converted magnitudes, while whole sections retain their parsed contents without
 recursive quantity conversion. Lookups do not modify the configuration.
 

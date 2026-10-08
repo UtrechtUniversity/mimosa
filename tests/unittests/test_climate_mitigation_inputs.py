@@ -28,7 +28,7 @@ def make_inputs(pulse_year=2030, pulse_amount="1000 MtCO2"):
                 "regional calibration factor": "kappa_rel_abatement_0.4_2030",
                 "LBD_rate": 0.75, "LBD_scaling": "60 GtCO2", "LOT_rate": 0.02,
             }},
-            "model structure": {"sealevelrise options": {"projection": "low"}},
+            "sealevelrise": {"projection": "low"},
         },
         return_parser_tree=True,
     )

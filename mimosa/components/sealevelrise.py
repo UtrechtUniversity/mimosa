@@ -113,7 +113,7 @@ def get_constraints(
     The projection can be selected before model construction with:
 
     ```python
-    params["model structure"]["sealevelrise options"]["projection"] = "high"
+    params["sealevelrise"]["projection"] = "high"
     ```
 
     # Thermal expansion
@@ -275,7 +275,7 @@ def get_constraints(
     - [Wong, Bakker and Keller (2017), Antarctic fast dynamics](https://doi.org/10.1007/s10584-017-2039-4).
     """
 
-    projection = inputs.config_value("model structure.sealevelrise options.projection")
+    projection = inputs.config_value("sealevelrise.projection")
     try:
         slr_params = SLR_PROJECTION_PARAMETER_SETS[projection]
     except KeyError as exc:

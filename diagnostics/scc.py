@@ -270,10 +270,10 @@ def no_adaptation(params):
     """Return a copy of ACCREU parameters with adaptation disabled."""
 
     params = deepcopy(params)
-    options = params["model structure"]["damage module options"]
-    options["ACCREU_adaptation"] = "noadaptation"
-    options["ACCREU_adaptation_determination"] = "solver_control"
-    options["ACCREU_CBA_strategy"] = "joint"
+    options = params["economics"]["damages"]["accreu"]
+    options["adaptation"] = "noadaptation"
+    options["adaptation_determination"] = "solver_control"
+    options["cba_strategy"] = "joint"
     return params
 
 
@@ -281,10 +281,10 @@ def analytical_adaptation(params):
     """Return a copy using ACCREU's analytical optimal adaptation."""
 
     params = deepcopy(params)
-    options = params["model structure"]["damage module options"]
-    options["ACCREU_adaptation"] = "separate"
-    options["ACCREU_adaptation_determination"] = "analytical_optimum"
-    options["ACCREU_CBA_strategy"] = "joint"
+    options = params["economics"]["damages"]["accreu"]
+    options["adaptation"] = "separate"
+    options["adaptation_determination"] = "analytical_optimum"
+    options["cba_strategy"] = "joint"
     return params
 
 
