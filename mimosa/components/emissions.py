@@ -177,7 +177,7 @@ def _get_emissions_constraints(
 
     ## Parameters defined in this module
     - param::use_carbon_intensity_for_baseline
-    - param::cumulative_emissions_trapz
+    - param::global_cumulative_emissions_trapz
     - param::emissions_pulse_year
     - param::emissions_pulse_amount
 
@@ -404,7 +404,8 @@ def _get_temperature_constraints(
     constraints = []
 
     m.T0 = Param(
-        units=quant.unit("degC_above_PI"), initialize=inputs.config("temperature.initial")
+        units=quant.unit("degC_above_PI"),
+        initialize=inputs.config("temperature.initial"),
     )
     m.temperature = Var(
         m.t, initialize=lambda m, t: m.T0, units=quant.unit("degC_above_PI")
@@ -569,7 +570,9 @@ def _get_inertia_and_budget_constraints(
     m.inertia_global = Param(initialize=inputs.config("emissions.inertia.global"))
     m.inertia_regional = Param(initialize=inputs.config("emissions.inertia.regional"))
     m.global_min_level = Param(initialize=inputs.config("emissions.global min level"))
-    m.regional_min_level = Param(initialize=inputs.config("emissions.regional min level"))
+    m.regional_min_level = Param(
+        initialize=inputs.config("emissions.regional min level")
+    )
     m.non_increasing_emissions_after_2100 = Param(
         initialize=inputs.config("emissions.non increasing emissions after 2100")
     )
