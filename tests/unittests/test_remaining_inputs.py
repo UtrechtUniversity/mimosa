@@ -15,11 +15,10 @@ from mimosa.components.effortsharing import equal_cumulative_per_cap, per_cap_co
 from mimosa.components.emissiontrade import globalcostpool
 from mimosa.components.objective import globalcosts, utility
 from mimosa.components.welfare import cost_minimising, inequal_aversion_general
-from mimosa.core.helpers import ModelContext
 from mimosa.core.model_inputs import ModelInputs
 
 
-def context(overrides=None):
+def make_inputs(overrides=None):
     settings = {
         "time": {"end": 2050, "periods": {2030: 10}},
         "regions": {"USA": {}, "CAN": {}},
@@ -37,11 +36,10 @@ def context(overrides=None):
     params, tree = check_params(settings, return_parser_tree=True)
     params = parse_param_values(params)
     inputs = ModelInputs(params, tree, DataStore(params), RegionalParamStore(params, tree))
-    return ModelContext(components={}, inputs=inputs)
+    return inputs
 
 
-def base_model(context, model_type):
-    inputs = context.inputs
+def base_model(inputs, model_type):
     m = model_type()
     m.t = Set(initialize=inputs.t, ordered=True)
     m.regions = Set(initialize=inputs.regions, ordered=True)
@@ -75,9 +73,9 @@ def constructed(m, model_type):
 @pytest.mark.parametrize("model_type", [AbstractModel, ConcreteModel])
 @pytest.mark.parametrize("component", [cost_minimising, inequal_aversion_general])
 def test_remaining_welfare_parameters_and_nondefault_utility(model_type, component):
-    ctx = context()
-    m = base_model(ctx, model_type)
-    equations = component.get_constraints(m, ctx)
+    inputs = make_inputs()
+    m = base_model(inputs, model_type)
+    equations = component.get_constraints(m, inputs)
     m = constructed(m, model_type)
     assert value(m.elasmu) == 1.4
     assert m.elasmu.doc == "::economics.elasmu"
@@ -101,10 +99,10 @@ def test_remaining_welfare_parameters_and_nondefault_utility(model_type, compone
 @pytest.mark.parametrize("model_type", [AbstractModel, ConcreteModel])
 @pytest.mark.parametrize("component", [utility, globalcosts])
 def test_objectives_initialize_prtp_and_preserve_discounting(model_type, component):
-    ctx = context()
-    m = base_model(ctx, model_type)
+    inputs = make_inputs()
+    m = base_model(inputs, model_type)
     m.global_welfare = Param(m.t, initialize=100)
-    objective, constraints = component.get_constraints(m, ctx)
+    objective, constraints = component.get_constraints(m, inputs)
     m.objective = objective
     if component is globalcosts:
         m.cost_recurrence = constraints[0].to_pyomo_constraint(m)
@@ -126,9 +124,9 @@ def test_objectives_initialize_prtp_and_preserve_discounting(model_type, compone
 @pytest.mark.parametrize("model_type", [AbstractModel, ConcreteModel])
 @pytest.mark.parametrize("year", [2025, 2035])
 def test_convergence_uses_configured_year_for_derived_shares(model_type, year):
-    ctx = context({"effort sharing": {"percapconv_year": year}})
-    m = base_model(ctx, model_type)
-    per_cap_convergence.get_constraints(m, ctx)
+    inputs = make_inputs({"effort sharing": {"percapconv_year": year}})
+    m = base_model(inputs, model_type)
+    per_cap_convergence.get_constraints(m, inputs)
     m = constructed(m, model_type)
     assert value(m.percapconv_year) == year
     assert m.percapconv_year.doc == "::effort sharing.percapconv_year"
@@ -149,9 +147,9 @@ def test_ecpc_nondefault_inputs_preserve_debt_and_discrete_repayment(
     emissions = pd.DataFrame({"USA": [8, 12, 15], "CAN": [2, 3, 5]}, index=years)
     population = pd.DataFrame({"USA": [2, 3, 4], "CAN": [1, 1, 1]}, index=years)
     monkeypatch.setattr(equal_cumulative_per_cap, "_load_data", lambda: (emissions, population))
-    ctx = context({"effort sharing": {"ecpc_repayment_endyear": end_year}})
-    m = base_model(ctx, model_type)
-    equal_cumulative_per_cap.get_constraints(m, ctx)
+    inputs = make_inputs({"effort sharing": {"ecpc_repayment_endyear": end_year}})
+    m = base_model(inputs, model_type)
+    equal_cumulative_per_cap.get_constraints(m, inputs)
     m = constructed(m, model_type)
     assert value(m.effortsharing_ecpc_discount_rate) == 0.05
     assert value(m.effortsharing_ecpc_start_year) == 2010
@@ -177,9 +175,9 @@ def test_ecpc_nondefault_inputs_preserve_debt_and_discrete_repayment(
 def test_costpool_initializes_payment_limits_without_full_model_assembly(model_type, enabled):
     limits = {"min rel payment level": 0.2 if enabled else False,
               "max rel payment level": 1.5 if enabled else False}
-    ctx = context({"economics": {"emission trade": limits}})
-    m = base_model(ctx, model_type)
-    globalcostpool.get_constraints(m, ctx)
+    inputs = make_inputs({"economics": {"emission trade": limits}})
+    m = base_model(inputs, model_type)
+    globalcostpool.get_constraints(m, inputs)
     m = constructed(m, model_type)
     assert value(m.min_rel_payment_level) == limits["min rel payment level"]
     assert value(m.max_rel_payment_level) == limits["max rel payment level"]

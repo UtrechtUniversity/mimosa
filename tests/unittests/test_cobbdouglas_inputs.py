@@ -22,8 +22,7 @@ def economic_model():
     return MIMOSA(params, prerun=False)
 
 
-def build_component(context):
-    inputs = context.inputs
+def build_component(inputs):
     model = ConcreteModel()
     model.t = Set(initialize=inputs.t, ordered=True)
     model.regions = Set(initialize=inputs.regions, ordered=True)
@@ -43,7 +42,7 @@ def build_component(context):
         model.t, initialize=lambda m, t: sum(m.baseline_GDP[t, r] for r in m.regions),
         units=quant.unit("currency_unit"),
     )
-    cobbdouglas.get_constraints(model, context)
+    cobbdouglas.get_constraints(model, inputs)
     return model
 
 
@@ -74,7 +73,7 @@ def check_capital_and_tfp(model):
 
 
 def test_economic_component_initializes_inputs_without_abstract_loader(economic_model):
-    model = build_component(economic_model.model_context)
+    model = build_component(economic_model.inputs)
     check_capital_and_tfp(model)
     assert model.init_capitalstock_factor.doc == "regional::economics.init_capital_factor"
     assert model.alpha.doc == "::economics.GDP.alpha"

@@ -10,11 +10,10 @@ from mimosa.common.config.parseconfig import check_params, parse_param_values
 from mimosa.common.data import DataStore
 from mimosa.common.regional_params import RegionalParamStore
 from mimosa.components import emissions, mitigation, sealevelrise
-from mimosa.core.helpers import ModelContext
 from mimosa.core.model_inputs import ModelInputs
 
 
-def make_context(pulse_year=2030, pulse_amount="1000 MtCO2"):
+def make_inputs(pulse_year=2030, pulse_amount="1000 MtCO2"):
     params, tree = check_params(
         {
             "SSP": "SSP1",
@@ -35,16 +34,15 @@ def make_context(pulse_year=2030, pulse_amount="1000 MtCO2"):
     )
     params = parse_param_values(params)
     inputs = ModelInputs(params, tree, DataStore(params), RegionalParamStore(params, tree))
-    return ModelContext(components={}, inputs=inputs)
+    return inputs
 
 
 @pytest.fixture(scope="module")
-def context():
-    return make_context()
+def inputs():
+    return make_inputs()
 
 
-def base_model(context, model_type=ConcreteModel):
-    inputs = context.inputs
+def base_model(inputs, model_type=ConcreteModel):
     m = model_type()
     m.t = Set(initialize=inputs.t, ordered=True)
     m.regions = Set(initialize=inputs.regions, ordered=True)
@@ -63,9 +61,9 @@ def base_model(context, model_type=ConcreteModel):
     return m
 
 
-def test_emissions_initializes_quantities_flags_and_temperature_directly(context):
-    m = base_model(context)
-    emissions.get_constraints(m, context)
+def test_emissions_initializes_quantities_flags_and_temperature_directly(inputs):
+    m = base_model(inputs)
+    emissions.get_constraints(m, inputs)
 
     assert value(m.emissions_pulse_year) == 2030
     assert value(m.emissions_pulse_amount) == pytest.approx(1.0)
@@ -78,17 +76,17 @@ def test_emissions_initializes_quantities_flags_and_temperature_directly(context
     assert all(value(m.temperature[t]) == 2.0 for t in m.t)
 
 
-def test_mitigation_owns_calibration_and_learning_inputs(context):
-    m = base_model(context)
-    emissions.get_constraints(m, context)
+def test_mitigation_owns_calibration_and_learning_inputs(inputs):
+    m = base_model(inputs)
+    emissions.get_constraints(m, inputs)
     assert not hasattr(m, "MAC_SSP_calibration_factor")
-    mitigation.get_constraints(m, context)
+    mitigation.get_constraints(m, inputs)
 
     assert m.MAC_scaling_factor["CAN"] == 0.7
     assert m.MAC_scaling_factor.doc == "regional::MAC.kappa_rel_abatement_0.4_2030"
     assert m.MAC_SSP_calibration_factor.doc == "::economics.MAC.SSP_calibration_factor.SSP1"
     assert m.MAC_SSP_calibration_factor.extract_values() == pytest.approx(
-        context.inputs.time_config("economics.MAC.SSP_calibration_factor.SSP1").values
+        inputs.time_config("economics.MAC.SSP_calibration_factor.SSP1").values
     )
     assert value(m.LBD_rate) == 0.75
     assert value(m.LBD_scaling) == 60.0
@@ -97,10 +95,10 @@ def test_mitigation_owns_calibration_and_learning_inputs(context):
     assert m.carbon_price[1, "CAN"].ub == pytest.approx(2 * value(m.MAC_gamma))
 
 
-def test_slr_projection_comes_from_prepared_inputs(context):
-    m = base_model(context)
-    emissions.get_constraints(m, context)
-    sealevelrise.get_constraints(m, context)
+def test_slr_projection_comes_from_prepared_inputs(inputs):
+    m = base_model(inputs)
+    emissions.get_constraints(m, inputs)
+    sealevelrise.get_constraints(m, inputs)
 
     assert value(m.slr_thermal_fast_sensitivity) == sealevelrise.SLR_PROJECTION_PARAMETER_SETS["low"]["thermal_fast_sensitivity"]
     assert value(m.slr_gsic_timescale) == sealevelrise.SLR_PROJECTION_PARAMETER_SETS["low"]["gsic_timescale"]
@@ -111,19 +109,19 @@ def test_slr_projection_comes_from_prepared_inputs(context):
 @pytest.mark.parametrize("model_type", [AbstractModel, ConcreteModel])
 @pytest.mark.parametrize("pulse_amount", ["1000 MtCO2", "-1 GtCO2"])
 def test_pulse_validation_uses_initialized_values_in_both_model_types(model_type, pulse_amount):
-    context = make_context(pulse_year=2032, pulse_amount=pulse_amount)
-    m = base_model(context, model_type)
+    inputs = make_inputs(pulse_year=2032, pulse_amount=pulse_amount)
+    m = base_model(inputs, model_type)
     with pytest.raises(ValueError, match="Emissions pulse year 2032 is not on the model time grid"):
-        emissions.get_constraints(m, context)
+        emissions.get_constraints(m, inputs)
         if model_type is AbstractModel:
             m.create_instance()
 
 
 @pytest.mark.parametrize("model_type", [AbstractModel, ConcreteModel])
 def test_zero_off_grid_pulse_remains_allowed(model_type):
-    context = make_context(pulse_year=2032, pulse_amount="0 GtCO2")
-    m = base_model(context, model_type)
-    emissions.get_constraints(m, context)
+    inputs = make_inputs(pulse_year=2032, pulse_amount="0 GtCO2")
+    m = base_model(inputs, model_type)
+    emissions.get_constraints(m, inputs)
     if model_type is AbstractModel:
         m = m.create_instance()
     assert value(m.emissions_pulse_amount) == 0

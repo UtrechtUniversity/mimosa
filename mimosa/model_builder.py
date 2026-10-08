@@ -6,9 +6,9 @@ from mimosa.common import (
     ConcreteModel,
     add_constraint,
     Equation,
-    ModelContext,
 )
 from mimosa.base_model import create_base_model
+from mimosa.core.model_inputs import ModelInputs
 from mimosa.components import (
     cobbdouglas,
     damages,
@@ -68,7 +68,7 @@ validate_unique_component_names(ALL_COMPONENTS)
 
 
 def create_model(
-    context: ModelContext,
+    inputs: ModelInputs,
 ) -> Tuple[ConcreteModel, List[Equation]]:
     """
     ## Building the concrete model
@@ -84,7 +84,7 @@ def create_model(
     - [`effortsharing module`](../parameters.md#model structure.effortsharing module): The effort-sharing module to use
 
     """
-    m = create_base_model(context.inputs)
+    m = create_base_model(inputs)
 
     # Each constraint will be put in this list,
     # then added to the model at the end of this file.
@@ -92,10 +92,10 @@ def create_model(
 
     # Add all ordinary model components in catalogue order.
     for component in MODEL_COMPONENTS:
-        constraints.extend(component.build(m, context))
+        constraints.extend(component.build(m, inputs))
 
     # Objective of optimisation
-    model_objective, objective_constraints = OBJECTIVE_COMPONENT.build(m, context)
+    model_objective, objective_constraints = OBJECTIVE_COMPONENT.build(m, inputs)
     constraints.extend(objective_constraints)
 
     ######################

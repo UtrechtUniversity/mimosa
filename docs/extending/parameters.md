@@ -89,12 +89,12 @@ m.MAC_SSP_calibration_factor = Param(
 
 Configure inputs before preparing the stores and lookup object.
 
-The current component interface remains `get_constraints(m, context)`. During the migration,
-prepared input lookup is available as `context.inputs`. The default `welfare_loss_minimising`
-component is the first to use explicit initialization:
+The component interface is `get_constraints(m: ConcreteModel, inputs: ModelInputs)`.
+Every component receives prepared input lookup directly. For example, the default
+`welfare_loss_minimising` component initializes:
 
 ```python
-m.elasmu = Param(initialize=context.inputs.config("economics.elasmu"))
+m.elasmu = Param(initialize=inputs.config("economics.elasmu"))
 ```
 
 Its `param::elasmu` documentation marker continues to work because the factory preserves the source
@@ -102,7 +102,6 @@ key in `doc`. The Cobb–Douglas component now also uses explicit lookup for its
 coefficient, production parameters and damage-ignore flag. For example:
 
 ```python
-inputs = context.inputs
 m.alpha = Param(initialize=inputs.config("economics.GDP.alpha"))
 m.init_capitalstock_factor = Param(
     m.regions,
@@ -180,7 +179,7 @@ def _get_emissions_constraints(m: ConcreteModel, inputs: ModelInputs):
 A new parameter called `new_param` can be added in the `get_constraints` function of any component:
 
 ```python hl_lines="4"
-def get_constraints(m, context):
+def get_constraints(m, inputs):
     # ... existing code ...
     
     m.new_param = Param(initialize=3.0)
@@ -220,7 +219,6 @@ Each parameter entry in the configuration file contains the following fields:
 Initialize the parameter from its configuration entry, using prepared input lookup:
 
 ```python
-inputs = context.inputs
 m.PRTP = Param(initialize=inputs.config("economics.PRTP"))
 ```
 

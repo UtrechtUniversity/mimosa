@@ -17,7 +17,6 @@ from mimosa.common import (
     exp,
     quant,
     NonNegativeReals,
-    ModelContext,
 )
 from mimosa.core.model_inputs import ModelInputs
 
@@ -33,7 +32,7 @@ from .utils import get_adaptation_options
 
 
 def get_constraints(
-    m: ConcreteModel, context: ModelContext
+    m: ConcreteModel, inputs: ModelInputs
 ) -> Sequence[GeneralConstraint]:
     """
     ACCREU damage specification
@@ -44,8 +43,6 @@ def get_constraints(
     """
 
     constraints = []
-    inputs: ModelInputs = context.inputs
-
     # In the config, the user can choose whether to use the separate adaptation module for ACCREU or not.
     # This is done using the parameter params["model structure"]["damage module options"]["ACCREU_adaptation"] = "separate" or "combined"
     adaptation_options = get_adaptation_options(inputs)

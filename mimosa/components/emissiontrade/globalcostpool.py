@@ -15,7 +15,6 @@ from mimosa.common import (
     Constraint,
     NonNegativeReals,
     quant,
-    ModelContext,
 )
 
 from mimosa.components.mitigation import AC
@@ -24,7 +23,7 @@ from mimosa.core.model_inputs import ModelInputs
 
 
 def get_constraints(
-    m: ConcreteModel, context: ModelContext
+    m: ConcreteModel, inputs: ModelInputs
 ) -> Sequence[GeneralConstraint]:
     """Emission trading equations and constraints
     (global cost pool specification)
@@ -40,8 +39,6 @@ def get_constraints(
            - RegionalInitConstraint
         )
     """
-    inputs: ModelInputs = context.inputs
-
     constraints = []
 
     m.domestic_mitigation_costs_abs = Var(

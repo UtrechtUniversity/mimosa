@@ -28,13 +28,14 @@ Create `mimosa/components/damages/newdamage.py`:
 ```python title="mimosa/components/damages/newdamage.py"
 from mimosa.common import (
     ConcreteModel,
-    ModelContext,
     RegionalEquation,
     Var,
 )
 
+from mimosa.core.model_inputs import ModelInputs
 
-def get_constraints(m: ConcreteModel, context: ModelContext):
+
+def get_constraints(m: ConcreteModel, inputs: ModelInputs):
     """Example damage specification with cubic damage costs."""
 
     m.damage_costs = Var(m.t, m.regions)
@@ -47,7 +48,7 @@ def get_constraints(m: ConcreteModel, context: ModelContext):
     ]
 ```
 
-This example does not use `context` itself, but the argument is present because every component is
+This example does not use `inputs` itself, but the argument is present because every component is
 called in the same way.
 
 ### 2. Add it to the selection dictionary
@@ -120,7 +121,7 @@ mimosa/components/biodiversity/
 └── ecosystems.py
 ```
 
-Each file contains a `get_constraints(m, context)` function. All three should create the same main
+Each file contains a `get_constraints(m, inputs)` function. All three should create the same main
 output variables, so other components can use them without knowing which representation was selected.
 For example, they could all define `m.biodiversity_loss`, while calculating it in different ways.
 
@@ -173,7 +174,7 @@ MODEL_COMPONENTS = (
 ```
 
 The name `biodiversity` must match the first part of `biodiversity module` in the configuration.
-MIMOSA then reads the selection into `ModelContext` and calls the chosen function automatically.
+MIMOSA reads the selection from `ModelInputs` and calls the chosen function automatically.
 Place the entry near the model components that use or produce related quantities.
 
 Users can now select a representation in the same way as existing modules:

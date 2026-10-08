@@ -16,18 +16,15 @@ from mimosa.common import (
     Any,
     exp,
     quant,
-    ModelContext,
 )
 from mimosa.core.model_inputs import ModelInputs
 
 
 def get_constraints(
-    m: ConcreteModel, context: ModelContext
+    m: ConcreteModel, inputs: ModelInputs
 ) -> Sequence[GeneralConstraint]:
     """ """
     constraints = []
-    inputs = context.inputs
-
     m.damage_costs = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
     m.damage_costs_abs = Var(m.t, m.regions, units=quant.unit("currency_unit"))
     m.damage_scale_factor = Param(

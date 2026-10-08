@@ -14,12 +14,13 @@ from mimosa.common import (
     Constraint,
     Var,
     quant,
-    ModelContext,
 )
+
+from mimosa.core.model_inputs import ModelInputs
 
 
 def get_constraints(
-    m: ConcreteModel, context: ModelContext
+    m: ConcreteModel, inputs: ModelInputs
 ) -> Sequence[GeneralConstraint]:
     """
     When allowing financial transfers for a global damage cost pool, a region can

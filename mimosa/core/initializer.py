@@ -1,15 +1,14 @@
 from dataclasses import dataclass
-from typing import Iterator, List, Optional, Tuple
+from typing import Iterator, List, Tuple
 
 from mimosa.common import (
     ConcreteModel,
     data,
     regional_params,
     TransformationFactory,
-    ModelContext,
 )
 from mimosa.common.config.parseconfig import check_params, parse_param_values
-from mimosa.model_builder import ALL_COMPONENTS, create_model
+from mimosa.model_builder import create_model
 from mimosa.components import emissions
 from mimosa.concrete_model import custom_constraints
 from mimosa.core.model_inputs import ModelInputs
@@ -22,7 +21,7 @@ class ModelBuildResult:
     concrete_model: ConcreteModel
     params: dict
     equations: list
-    context: ModelContext
+    inputs: ModelInputs
 
     def __iter__(self) -> Iterator:
         """Preserve the former three-value tuple-unpacking interface."""
@@ -43,7 +42,6 @@ class Preprocessor:
     concrete_model: ConcreteModel
     equations: list
     parser_tree: dict
-    model_context: ModelContext
     inputs: ModelInputs
     _data_store: data.DataStore
     _regional_param_store: regional_params.RegionalParamStore
@@ -63,12 +61,11 @@ class Preprocessor:
 
         Returns:
             ModelBuildResult: Named references to the concrete model, parsed
-                parameters, simulation equations, and model context.
+                parameters, simulation equations, and input lookup.
         """
         self._check_and_parse_params()
         self._data_store, self._regional_param_store = self._load_data()
         self.inputs = self._create_model_inputs()
-        self.model_context = self._create_model_context(self.inputs)
         self.concrete_model, self.equations = self._create_model()
         self._apply_custom_constraints()
         self._apply_pyomo_transformations()
@@ -78,7 +75,7 @@ class Preprocessor:
             concrete_model=self.concrete_model,
             params=self.parsed_params,
             equations=self.equations,
-            context=self.model_context,
+            inputs=self.inputs,
         )
 
     @property
@@ -110,22 +107,9 @@ class Preprocessor:
             regional_store=self._regional_param_store,
         )
 
-    def _create_model_context(
-        self, inputs: Optional[ModelInputs] = None
-    ) -> ModelContext:
-        model_params = self._params["model structure"]
-
-        return ModelContext(
-            components={
-                component.name: component.read_config(model_params)
-                for component in ALL_COMPONENTS
-            },
-            inputs=inputs,
-        )
-
     def _create_model(self) -> Tuple[ConcreteModel, List]:
         """Build the selected components directly on a concrete model."""
-        return create_model(self.model_context)
+        return create_model(self.inputs)
 
     def _load_data(self):
         """

@@ -5,7 +5,7 @@ parameters and equations. If the change only adds one or two equations to an exi
 it is usually clearer to add them to the existing component instead.
 
 This page describes the most common case: adding a component that is always part of MIMOSA. This does
-not require changes to the configuration of the model or the use of `ModelContext` options.
+not require changes to the configuration of the model or model options.
 
 ## Basic structure of a component
 
@@ -18,8 +18,10 @@ from mimosa.common import (
     Var,
 )
 
+from mimosa.core.model_inputs import ModelInputs
 
-def get_constraints(m: ConcreteModel, context):
+
+def get_constraints(m: ConcreteModel, inputs: ModelInputs):
     """Calculate the square of global temperature for every time step."""
 
     m.temperature_squared = Var(m.t)
@@ -39,8 +41,8 @@ The function does three things:
 3. It returns those equations and constraints, so MIMOSA can add them to the Pyomo model and use the
    equations in simulation mode.
 
-Every component function receives both `m` and `context`. A basic component does not need to use
-`context`; it only needs to include it in the function definition because MIMOSA supplies it when the
+Every component function receives both `m` and `inputs`. A basic component does not need to use
+`inputs`; it only needs to include it in the function definition because MIMOSA supplies it when the
 component is added. More advanced uses are described under [Selectable modules](selectable_modules.md)
 and [Model options](model_options.md).
 

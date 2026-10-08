@@ -12,12 +12,13 @@ from mimosa.common import (
     quant,
     RegionalEquation,
     Var,
-    ModelContext,
 )
+
+from mimosa.core.model_inputs import ModelInputs
 
 
 def get_constraints(
-    m: ConcreteModel, context: ModelContext
+    m: ConcreteModel, inputs: ModelInputs
 ) -> Sequence[GeneralConstraint]:
     """
     Without emission trading, both trading balances are always zero:

@@ -46,9 +46,10 @@ Import `quant` from `mimosa.common` and use `quant.unit(...)` in the Pyomo defin
 
 ```python
 from mimosa.common import ConcreteModel, Param, Var, quant
+from mimosa.core.model_inputs import ModelInputs
 
 
-def get_constraints(m: ConcreteModel, context):
+def get_constraints(m: ConcreteModel, inputs: ModelInputs):
     m.adaptation_costs = Var(
         m.t,
         m.regions,
@@ -56,7 +57,7 @@ def get_constraints(m: ConcreteModel, context):
     )
     m.maximum_adaptation = Param(
         units=quant.unit("dimensionless"),
-        initialize=context.inputs.config("economics.adaptation.maximum"),
+        initialize=inputs.config("economics.adaptation.maximum"),
     )
 
     # ... equations and constraints ...

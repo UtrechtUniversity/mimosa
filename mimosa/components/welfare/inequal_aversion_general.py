@@ -13,14 +13,13 @@ from mimosa.common import (
     RegionalEquation,
     GlobalEquation,
     soft_min,
-    ModelContext,
 )
 
 from mimosa.core.model_inputs import ModelInputs
 
 
 def get_constraints(
-    m: ConcreteModel, context: ModelContext
+    m: ConcreteModel, inputs: ModelInputs
 ) -> Sequence[GeneralConstraint]:
     """
     <h3>General inequality aversion</h3>
@@ -53,8 +52,6 @@ def get_constraints(
     - param::inequal_aversion
 
     """
-    inputs: ModelInputs = context.inputs
-
     constraints = []
 
     # Parameters

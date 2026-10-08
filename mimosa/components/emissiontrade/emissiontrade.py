@@ -13,12 +13,13 @@ from mimosa.common import (
     RegionalSoftEqualityConstraint,
     value,
     soft_min,
-    ModelContext,
 )
+
+from mimosa.core.model_inputs import ModelInputs
 
 
 def get_constraints(
-    m: ConcreteModel, context: ModelContext
+    m: ConcreteModel, inputs: ModelInputs
 ) -> Sequence[GeneralConstraint]:
     """
     In MIMOSA, every region can physically reduce its own emissions. The domestic cost is determined

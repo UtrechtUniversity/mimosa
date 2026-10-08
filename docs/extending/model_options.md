@@ -1,8 +1,9 @@
 # Model options
 
 Model options let a component change which variables or equations it creates without introducing a
-separate selectable submodule. Every component receives `context` in its `get_constraints(m, context)`
-function and can use it to read these options.
+separate selectable submodule. Every component receives `inputs` in its `get_constraints(m, inputs)`
+function and reads options through `inputs.config_value`. Defaults are defined once in
+`config_default.yaml` and supplied by configuration validation.
 
 There are two naming conventions:
 
@@ -21,8 +22,8 @@ MODEL_COMPONENTS = (
 )
 ```
 
-`fixed_component` reads `<name> options`. `selectable_component` reads both `<name> module` and
-`<name> module options`.
+`selectable_component` reads `<name> module` to select a function. The function reads its own
+options from the configuration path shown above; no separate options object is created.
 
 ## Options for a selectable component
 
@@ -51,12 +52,8 @@ an entry in the generated parameter reference.
 The selected damage submodule can read it while adding its variables and equations:
 
 ```python
-def get_constraints(m, context):
-    adaptation = context.option(
-        "damage",
-        "adaptation",
-        default="combined",
-    )
+def get_constraints(m, inputs):
+    adaptation = inputs.config_value("model structure.damage module options.adaptation")
 
     if adaptation == "separate":
         # Add separate adaptation variables and equations for each sector
@@ -71,8 +68,8 @@ params["model structure"]["damage module options"]["adaptation"] = "separate"
 model = MIMOSA(params)
 ```
 
-All submodules in a selectable package receive the same options dictionary. Each submodule may use the
-options that are relevant to its calculations.
+All submodules receive the same prepared input lookup. Each reads the configuration values
+relevant to its calculations.
 
 ## Options for a component that is always included
 
@@ -93,12 +90,8 @@ model structure:
 The emissions component can read it with:
 
 ```python
-def get_constraints(m, context):
-    include_feedback = context.option(
-        "emissions",
-        "include feedback",
-        default=False,
-    )
+def get_constraints(m, inputs):
+    include_feedback = inputs.config_value("model structure.emissions options.include feedback")
 
     if include_feedback:
         # Add the additional variables and equations
@@ -111,37 +104,37 @@ Users change it through the corresponding configuration group:
 params["model structure"]["emissions options"]["include feedback"] = True
 ```
 
-The existing fixed components—`emissions`, `sealevelrise`, `mitigation` and `cobbdouglas`—are already
-available through `ModelContext`.
+## Options for a new component
 
-## Options for a new fixed component
-
-A plain component is already registered with `fixed_component` in the component catalogue. That entry
-also makes its options available through `ModelContext`, so no extra Python registration is needed:
+Register the component in the catalogue as before:
 
 ```python title="mimosa/model_builder.py"
 fixed_component("new_component", new_component.get_constraints),
 ```
 
-Define `new_component options` under `model structure` and read individual values with
-`context.option("new_component", "option name", default=...)`.
-
-## Other ways to read options
-
-`ModelContext` provides three related methods:
+Define `new_component options` under `model structure` and read the value at its full path:
 
 ```python
-context.module("damage")
-context.options("damage")
-context.option("damage", "adaptation", default="combined")
+include_feedback = inputs.config_value("model structure.new_component options.include feedback")
 ```
 
-- `module(component)` returns the selected submodule name for a selectable component.
-- `options(component)` returns the complete options dictionary.
-- `option(component, option, default)` returns one option, or the supplied default if it was not set.
+For a selectable component, use `new_component module options` instead. Adding options does
+not require a second registration or a configuration object.
 
-Prefer `context.option(...)` when a component only needs one setting. It keeps the fallback value next
-to the variables or equations affected by that option.
+## Reading a whole section
+
+When several related settings are needed together, a plain dictionary can keep the code clear:
+
+```python
+options = inputs.config_value("model structure.damage module options")
+adaptation = options["ACCREU_adaptation"]
+determination = options["ACCREU_adaptation_determination"]
+```
+
+Read a module selection with `inputs.config_value("model structure.damage module")`.
+The configuration parser supplies defaults and validates supported values before construction.
+`config_value` returns Python values for decisions; use `inputs.config(...)` when creating a
+Pyomo parameter with source metadata. See [Adding parameters and data](parameters.md).
 
 ## Model option or Pyomo parameter?
 

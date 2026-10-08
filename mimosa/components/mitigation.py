@@ -18,13 +18,12 @@ from mimosa.common import (
     log,
     soft_min,
     quant,
-    ModelContext,
 )
 from mimosa.core.model_inputs import ModelInputs
 
 
 def get_constraints(
-    m: ConcreteModel, context: ModelContext
+    m: ConcreteModel, inputs: ModelInputs
 ) -> Sequence[GeneralConstraint]:
     """
 
@@ -37,7 +36,6 @@ def get_constraints(
         :::mimosa.components.mitigation._get_learning_constraints
 
     """
-    inputs = context.inputs
     constraints = _get_mac_constraints(m, inputs) + _get_learning_constraints(m, inputs)
 
     return constraints

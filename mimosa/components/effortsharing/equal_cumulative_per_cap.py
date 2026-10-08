@@ -23,14 +23,13 @@ from mimosa.common import (
     quant,
     value,
     soft_min,
-    ModelContext,
 )
 
 from mimosa.core.model_inputs import ModelInputs
 
 
 def get_constraints(
-    m: ConcreteModel, context: ModelContext
+    m: ConcreteModel, inputs: ModelInputs
 ) -> Sequence[GeneralConstraint]:
     """
     Usage:
@@ -63,8 +62,6 @@ def get_constraints(
 
 
     """
-
-    inputs: ModelInputs = context.inputs
 
     historical_emissions, historical_population = _load_data()
     m.effortsharing_ecpc_discount_rate = Param(

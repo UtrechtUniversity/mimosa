@@ -10,7 +10,6 @@ from mimosa.common.config.parseconfig import check_params, parse_param_values
 from mimosa.common.data import DataStore
 from mimosa.common.regional_params import RegionalParamStore
 from mimosa.components.damages.accreu import all_damages, cge_damages
-from mimosa.core.helpers import ModelContext
 from mimosa.core.model_inputs import ModelInputs
 
 
@@ -120,7 +119,7 @@ def test_native_accreu_parameters_options_bounds_and_equations(
 ):
     inputs = prepare_inputs(adaptation, determination, mortality)
     m = base_model(inputs, model_type)
-    equations = all_damages.get_constraints(m, ModelContext(components={}, inputs=inputs))
+    equations = all_damages.get_constraints(m, inputs)
     if model_type is AbstractModel:
         m = m.create_instance()
     rhs = {eq.lhs: eq for eq in equations if hasattr(eq, "lhs")}
@@ -196,7 +195,7 @@ def test_native_accreu_parameters_options_bounds_and_equations(
 def test_native_cge_preserves_quantile_format_and_regional_overrides(model_type, quantile):
     inputs = prepare_inputs("noadaptation", "solver_control", False, cge_quantile=quantile)
     m = base_model(inputs, model_type)
-    equations = cge_damages.get_constraints(m, ModelContext(components={}, inputs=inputs))
+    equations = cge_damages.get_constraints(m, inputs)
     if model_type is AbstractModel:
         m = m.create_instance()
     rhs = {eq.lhs: eq for eq in equations if hasattr(eq, "lhs")}

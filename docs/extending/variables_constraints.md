@@ -13,7 +13,7 @@ all GDP-related variables and equations. Each component has a function `get_cons
 Inside the function `get_constraints()`, create the new variable `m.carbon_intensity`:
 
 ```python title="mimosa/components/cobbdouglas.py" hl_lines="5"
-def get_constraints(m, context):
+def get_constraints(m, inputs):
     # ... existing code ...
 
     # New variable
@@ -156,7 +156,7 @@ Next, MIMOSA needs to receive the equation from the component. Every component u
 returns MIMOSA equations. Add the new equation to the returned list:
 
 ```python hl_lines="5 6 7 8 9 10 11"
-def get_constraints(m, context):
+def get_constraints(m, inputs):
     equations = []
     # ... existing code ...
 

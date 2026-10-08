@@ -20,9 +20,9 @@ def pilot():
 
 def test_pipeline_supplies_inputs_using_existing_config_and_stores(pilot):
     preprocessor = pilot.preprocessor
-    inputs = pilot.model_context.inputs
+    inputs = pilot.inputs
 
-    assert pilot.model_context.module("welfare") == "welfare_loss_minimising"
+    assert pilot.inputs.config_value("model structure.welfare module") == "welfare_loss_minimising"
     assert inputs is preprocessor.inputs
     assert inputs.params is preprocessor.parsed_params
     assert inputs.parser_tree is preprocessor.parser_tree
@@ -36,11 +36,11 @@ def test_component_initializes_elasmu_without_the_abstract_data_loader(pilot):
     model = ConcreteModel()
     model.t = Set(initialize=[0, 1], ordered=True)
     model.regions = Set(initialize=["CAN", "USA"], ordered=True)
-    model.year = pilot.model_context.inputs.year
+    model.year = pilot.inputs.year
     model.population = Param(model.t, model.regions, initialize=2.0)
     model.consumption = Var(model.t, model.regions, initialize=6.0)
 
-    equations = welfare_loss_minimising.get_constraints(model, pilot.model_context)
+    equations = welfare_loss_minimising.get_constraints(model, pilot.inputs)
 
     assert value(model.elasmu) == 1.4
     assert model.elasmu.doc == "::economics.elasmu"

@@ -4,27 +4,25 @@ import pytest
 
 from mimosa import MIMOSA, load_params
 from mimosa.common.config.parseconfig import check_params
-from mimosa.core.helpers import ComponentConfig, ModelContext
+from mimosa.common.config.utils import get_nested
 
 
-def _context(
+def _inputs(
     module="ACCREU",
     adaptation="separate",
     strategy="mitigation_then_adaptation",
     determination="analytical_optimum",
 ):
-    return ModelContext(
-        components={
-            "damage": ComponentConfig(
-                module=module,
-                options={
-                    "ACCREU_adaptation": adaptation,
-                    "ACCREU_CBA_strategy": strategy,
-                    "ACCREU_adaptation_determination": determination,
-                },
-            )
-        }
-    )
+    params = load_params()
+    structure = params["model structure"]
+    structure["damage module"] = module
+    structure["damage module options"].update({
+        "ACCREU_adaptation": adaptation,
+        "ACCREU_CBA_strategy": strategy,
+        "ACCREU_adaptation_determination": determination,
+    })
+    return SimpleNamespace(config_value=lambda path: get_nested(params, path.split(".")))
+
 
 
 @pytest.mark.parametrize(
@@ -59,7 +57,7 @@ def test_sequential_workflow_selection(
     module, adaptation, strategy, determination, expected
 ):
     model = MIMOSA.__new__(MIMOSA)
-    model.model_context = _context(module, adaptation, strategy, determination)
+    model.inputs = _inputs(module, adaptation, strategy, determination)
 
     assert model._uses_sequential_accreu_cba() is expected
 
@@ -104,7 +102,7 @@ def test_cba_configuration_defaults_and_validation():
 
 def test_sequential_solve_rejects_solver_control_adaptation():
     model = MIMOSA.__new__(MIMOSA)
-    model.model_context = _context(
+    model.inputs = _inputs(
         strategy="mitigation_then_adaptation", determination="solver_control"
     )
     model.status = "old status"
@@ -122,7 +120,7 @@ def test_sequential_solve_rejects_solver_control_adaptation():
 def test_joint_analytical_adaptation_uses_ordinary_solve(monkeypatch):
     calls = []
     model = MIMOSA.__new__(MIMOSA)
-    model.model_context = _context(
+    model.inputs = _inputs(
         strategy="joint", determination="analytical_optimum"
     )
     model.status = None

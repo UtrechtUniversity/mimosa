@@ -11,7 +11,6 @@ from mimosa.common.config.parseconfig import check_params, parse_param_values
 from mimosa.common.data import DataStore
 from mimosa.common.regional_params import RegionalParamStore
 from mimosa.components.damages import coacch
-from mimosa.core.helpers import ModelContext
 from mimosa.core.model_inputs import ModelInputs
 
 
@@ -126,7 +125,7 @@ def test_native_construction_selects_only_needed_sources(
     m.T0 = Param(initialize=1.2, units=quant.unit("degC_above_PI"))
     m.temperature = Var(m.t, initialize={0: 1.2, 1: 2.0, 2: 3.0})
     m.total_SLR = Var(m.t, initialize={0: 0.1, 1: 0.3, 2: 0.6})
-    equations = coacch.get_constraints(m, ModelContext(components={}, inputs=inputs))
+    equations = coacch.get_constraints(m, inputs)
     if model_type is AbstractModel:
         m = m.create_instance()
 
@@ -161,6 +160,6 @@ def test_production_pipeline_preserves_selected_overrides(
     monkeypatch.setattr(RegionalParamStore, "get", selected_get)
     model = MIMOSA(config(combined, adaptation, 0.84), prerun=False)
     check_selected_parameters(
-        model.concrete_model, model.model_context.inputs.regional_store,
+        model.concrete_model, model.inputs.regional_store,
         combined, adaptation, 0.84
     )

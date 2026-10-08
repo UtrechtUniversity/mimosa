@@ -6,7 +6,7 @@ from typing import Callable, Dict, Iterable, Optional
 
 from mimosa.common.utils import load_from_registry
 
-from .helpers import ComponentConfig, ModelContext
+from .model_inputs import ModelInputs
 
 
 @dataclass(frozen=True)
@@ -23,25 +23,14 @@ class ComponentDefinition:
                 "A component must define either get_constraints or selectable modules"
             )
 
-    def read_config(self, model_structure: dict) -> ComponentConfig:
-        """Read this component's module choice and options from model structure."""
-        if self.modules is not None:
-            return ComponentConfig(
-                module=model_structure[f"{self.name} module"],
-                options=model_structure.get(f"{self.name} module options", {}),
-            )
-
-        return ComponentConfig(
-            options=model_structure.get(f"{self.name} options", {}),
-        )
-
-    def build(self, model, context: ModelContext):
+    def build(self, model, inputs: ModelInputs):
         """Add this component's model objects and return its constraints."""
         get_constraints = self.get_constraints
         if self.modules is not None:
-            get_constraints = load_from_registry(context.module(self.name), self.modules)
+            module = inputs.config_value(f"model structure.{self.name} module")
+            get_constraints = load_from_registry(module, self.modules)
 
-        return get_constraints(model, context)
+        return get_constraints(model, inputs)
 
 
 def fixed_component(name: str, get_constraints: Callable) -> ComponentDefinition:

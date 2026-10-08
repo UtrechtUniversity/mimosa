@@ -20,7 +20,6 @@ from mimosa.common import (
     exp,
     tanh,
     quant,
-    ModelContext,
 )
 
 
@@ -87,9 +86,11 @@ SLR_PROJECTION_PARAMETER_SETS = {
     },
 }
 
+from mimosa.core.model_inputs import ModelInputs
+
 
 def get_constraints(
-    m: ConcreteModel, context: ModelContext
+    m: ConcreteModel, inputs: ModelInputs
 ) -> Sequence[GeneralConstraint]:
     r"""
     The sea-level-rise (SLR) component represents thermal expansion, glaciers,
@@ -274,7 +275,7 @@ def get_constraints(
     - [Wong, Bakker and Keller (2017), Antarctic fast dynamics](https://doi.org/10.1007/s10584-017-2039-4).
     """
 
-    projection = context.inputs.config_value("model structure.sealevelrise options.projection")
+    projection = inputs.config_value("model structure.sealevelrise options.projection")
     try:
         slr_params = SLR_PROJECTION_PARAMETER_SETS[projection]
     except KeyError as exc:

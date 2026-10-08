@@ -11,13 +11,14 @@ from mimosa.common import (
     GeneralConstraint,
     GlobalEquation,
     RegionalEquation,
-    ModelContext,
 )
 from .utility_fct import calc_utility
 
+from mimosa.core.model_inputs import ModelInputs
+
 
 def get_constraints(
-    m: ConcreteModel, context: ModelContext
+    m: ConcreteModel, inputs: ModelInputs
 ) -> Sequence[GeneralConstraint]:
     """
 
@@ -54,7 +55,7 @@ def get_constraints(
     constraints = []
 
     # Parameters
-    m.elasmu = Param(initialize=context.inputs.config("economics.elasmu"))
+    m.elasmu = Param(initialize=inputs.config("economics.elasmu"))
 
     m.utility = Var(m.t, m.regions, initialize=0.1)
     m.global_welfare = Var(m.t)

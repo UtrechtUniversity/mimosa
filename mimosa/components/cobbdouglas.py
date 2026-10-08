@@ -15,12 +15,13 @@ from mimosa.common import (
     soft_min,
     economics,
     quant,
-    ModelContext,
 )
+
+from mimosa.core.model_inputs import ModelInputs
 
 
 def get_constraints(
-    m: ConcreteModel, context: ModelContext
+    m: ConcreteModel, inputs: ModelInputs
 ) -> Sequence[GeneralConstraint]:
     """
     # Economic module and production function
@@ -87,8 +88,6 @@ def get_constraints(
 
     """
     constraints = []
-    inputs = context.inputs
-
     m.init_capitalstock_factor = Param(
         m.regions,
         units=quant.unit("dimensionless"),

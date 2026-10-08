@@ -13,14 +13,13 @@ from mimosa.common import (
     Objective,
     exp,
     maximize,
-    ModelContext,
 )
 
 from mimosa.core.model_inputs import ModelInputs
 
 
 def get_constraints(
-    m: ConcreteModel, context: ModelContext
+    m: ConcreteModel, inputs: ModelInputs
 ) -> Tuple[Objective, Sequence[GeneralConstraint]]:
     """Equations and constraints for the objective of the optimisation
     (utility specification)
@@ -37,8 +36,6 @@ def get_constraints(
            - RegionalInitConstraint
         )
     """
-    inputs: ModelInputs = context.inputs
-
     constraints = []
 
     m.NPV = Var(m.t)

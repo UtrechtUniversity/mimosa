@@ -18,6 +18,7 @@ from mimosa.components.after_initialisation import avoided_damages
 from mimosa.core import simulation
 
 from mimosa.core.initializer import Preprocessor
+from mimosa.core.model_inputs import ModelInputs
 from mimosa.core.solver import Solver
 from mimosa.core.simulation import Simulator, SimulationObjectModel
 
@@ -40,7 +41,7 @@ class MIMOSA:
     Attributes:
         concrete_model: Initialized Pyomo model used for optimisation.
         equations: Equations available to simulation mode.
-        model_context: Selected model components and their model options.
+        inputs: Prepared configuration and data lookup used to build the model.
         simulator: Simulator associated with this model.
         status: Solver status after `solve()`; `None` before a solve starts.
         solve_runtime: Wall-clock duration of the most recently completed
@@ -52,6 +53,7 @@ class MIMOSA:
 
     concrete_model: ConcreteModel
     equations: list
+    inputs: ModelInputs
     _params: dict
 
     def __init__(self, params: dict, prerun: bool = True) -> None:
@@ -91,7 +93,7 @@ class MIMOSA:
         self.concrete_model = result.concrete_model
         self._params = result.params
         self.equations = result.equations
-        self.model_context = result.context
+        self.inputs = result.inputs
 
     def prepare_simulation(self):
         """
@@ -248,17 +250,15 @@ class MIMOSA:
     def _uses_sequential_accreu_cba(self) -> bool:
         """Return whether this model selects the ordered ACCREU CBA workflow."""
 
-        if (
-            self.model_context.module("damage") != "ACCREU"
-            or self.model_context.option("damage", "ACCREU_adaptation")
-            == "noadaptation"
-        ):
+        if self.inputs.config_value("model structure.damage module") != "ACCREU":
             return False
 
-        strategy = self.model_context.option("damage", "ACCREU_CBA_strategy")
-        determination = self.model_context.option(
-            "damage", "ACCREU_adaptation_determination"
-        )
+        options = self.inputs.config_value("model structure.damage module options")
+        if options["ACCREU_adaptation"] == "noadaptation":
+            return False
+
+        strategy = options["ACCREU_CBA_strategy"]
+        determination = options["ACCREU_adaptation_determination"]
         if (
             strategy == "mitigation_then_adaptation"
             and determination != "analytical_optimum"
@@ -274,14 +274,13 @@ class MIMOSA:
     def _uses_analytical_accreu_adaptation(self) -> bool:
         """Return whether ACCREU adaptation is defined analytically."""
 
+        if self.inputs.config_value("model structure.damage module") != "ACCREU":
+            return False
+
+        options = self.inputs.config_value("model structure.damage module options")
         return (
-            self.model_context.module("damage") == "ACCREU"
-            and self.model_context.option("damage", "ACCREU_adaptation")
-            != "noadaptation"
-            and self.model_context.option(
-                "damage", "ACCREU_adaptation_determination"
-            )
-            == "analytical_optimum"
+            options["ACCREU_adaptation"] != "noadaptation"
+            and options["ACCREU_adaptation_determination"] == "analytical_optimum"
         )
 
     def _solve_accreu_mitigation_then_adaptation(

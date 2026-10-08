@@ -9,7 +9,7 @@ from mimosa.core.component_definition import (
     ComponentDefinition,
     validate_unique_component_names,
 )
-from mimosa.core.helpers import ComponentConfig, ModelContext
+from types import SimpleNamespace
 
 
 def test_catalogue_contains_components_in_construction_order():
@@ -29,36 +29,15 @@ def test_catalogue_contains_components_in_construction_order():
     assert OBJECTIVE_COMPONENT.name == "objective"
 
 
-def test_component_definition_uses_the_matching_config_naming_convention():
-    fixed = ComponentDefinition(name="fixed", get_constraints=lambda *_args: [])
-    selectable = ComponentDefinition(
-        name="selectable",
-        modules={"chosen": lambda *_args: []},
-    )
-    model_structure = {
-        "fixed options": {"fixed option": True},
-        "selectable module": "chosen",
-        "selectable module options": {"selectable option": True},
-    }
-
-    assert fixed.read_config(model_structure) == ComponentConfig(
-        options={"fixed option": True}
-    )
-    assert selectable.read_config(model_structure) == ComponentConfig(
-        module="chosen",
-        options={"selectable option": True},
-    )
-
-
 def test_component_definition_builds_fixed_and_selected_components():
     calls = []
 
-    def record_fixed(model, context):
-        calls.append(("fixed", model, context))
+    def record_fixed(model, inputs):
+        calls.append(("fixed", model, inputs))
         return ["fixed constraint"]
 
-    def record_selected(model, context):
-        calls.append(("selected", model, context))
+    def record_selected(model, inputs):
+        calls.append(("selected", model, inputs))
         return ["selected constraint"]
 
     fixed = ComponentDefinition(name="fixed", get_constraints=record_fixed)
@@ -66,20 +45,31 @@ def test_component_definition_builds_fixed_and_selected_components():
         name="selectable",
         modules={"chosen": record_selected},
     )
-    context = ModelContext(
-        components={
-            "fixed": ComponentConfig(),
-            "selectable": ComponentConfig(module="chosen"),
-        }
-    )
+    config_calls = []
+
+    def config_value(path):
+        config_calls.append(path)
+        return "chosen"
+
+    inputs = SimpleNamespace(config_value=config_value)
     model = object()
 
-    assert fixed.build(model, context) == ["fixed constraint"]
-    assert selectable.build(model, context) == ["selected constraint"]
+    assert fixed.build(model, inputs) == ["fixed constraint"]
+    assert selectable.build(model, inputs) == ["selected constraint"]
     assert calls == [
-        ("fixed", model, context),
-        ("selected", model, context),
+        ("fixed", model, inputs),
+        ("selected", model, inputs),
     ]
+    assert config_calls == ["model structure.selectable module"]
+
+
+def test_selectable_component_reports_unknown_module_from_config():
+    component = ComponentDefinition(
+        name="damage", modules={"known": lambda *_args: []}
+    )
+    inputs = SimpleNamespace(config_value=lambda _path: "unknown")
+    with pytest.raises(NotImplementedError, match="Module `unknown` not implemented.*known"):
+        component.build(object(), inputs)
 
 
 def test_component_definition_requires_one_construction_method():

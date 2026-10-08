@@ -22,13 +22,12 @@ from mimosa.common import (
     value,
     quant,
     trapezoid,
-    ModelContext,
 )
 from mimosa.core.model_inputs import ModelInputs
 
 
 def get_constraints(
-    m: ConcreteModel, context: ModelContext
+    m: ConcreteModel, inputs: ModelInputs
 ) -> Sequence[GeneralConstraint]:
     """
 
@@ -48,8 +47,6 @@ def get_constraints(
 
     # First set baseline emission functions (cumulative emissions and global cumulative emissions)
     _set_baseline_emissions(m)
-    inputs = context.inputs
-
     constraints = (
         _get_emissions_constraints(m, inputs)
         + _get_temperature_constraints(m, inputs)
