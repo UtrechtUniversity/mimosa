@@ -10,34 +10,33 @@
 
 === "No policy"
 
-    - Configuration and minimal example.
-    - Use of `run_nopolicy_baseline()`.
-    - Results to inspect and save.
+    ```python
+    --8<-- "tests/runs/run_accreu_nopolicy.py"
+    ```
 
-=== "Mitigation only"
+=== "Mitigation only CBA"
 
-    - Configuration and minimal example.
-    - Optimisation without adaptation.
-    - Results to inspect and save.
+    ```python
+    --8<-- "tests/runs/run_accreu_mit.py"
+    ```
 
 === "Adaptation only"
 
-    - Configuration and minimal example.
-    - Analytical adaptation with no mitigation.
-    - Difference between `run_simulation()` and `run_nopolicy_baseline()`.
-    - Results to inspect and save.
+    ```python
+    --8<-- "tests/runs/run_accreu_ada.py"
+    ```
 
-=== "Joint CBA"
+=== "Mitigation and adaptation CBA (sequential)"
 
-    - Configuration and minimal example.
-    - Joint mitigation and adaptation workflow.
-    - Results to inspect and save.
+    ```python
+    --8<-- "tests/runs/run_accreu_mit_then_ada.py"
+    ```
 
-=== "Sequential CBA"
+=== "Mitigation and adaptation CBA (joint)"
 
-    - Configuration and minimal example.
-    - Mitigation-then-adaptation workflow and required settings.
-    - Results to inspect and save.
+    ```python
+    --8<-- "tests/runs/run_accreu_mit_ada_joint.py"
+    ```
 
 ## Changing assumptions
 

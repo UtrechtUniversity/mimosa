@@ -7,4 +7,5 @@ params["economics"]["damages"]["accreu"]["adaptation"] = "sectoral"
 
 model = MIMOSA(params)
 sim = model.run_simulation()
+
 model.save_simulation(sim, "run_accreu_ada")

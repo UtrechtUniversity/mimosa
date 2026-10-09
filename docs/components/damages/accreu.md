@@ -157,16 +157,16 @@ icon: material/gamepad-circle
 
 ## Optimisation strategy
 
-=== "Joint CBA"
-
-    - Mitigation and adaptation choices in the joint workflow.
-    - Solver-controlled and analytical adaptation variants.
-
 === "Mitigation then adaptation"
 
     - Order of the mitigation optimisation and adaptation calculation.
     - Required settings and restrictions.
     - Reasons for differences from the joint workflow.
+
+=== "Joint CBA"
+
+    - Mitigation and adaptation choices in the joint workflow.
+    - Solver-controlled and analytical adaptation variants.
 
 ## Configuration options
 
