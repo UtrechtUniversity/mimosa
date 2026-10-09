@@ -19,18 +19,20 @@ def prepare_inputs(adaptation, determination, mortality, cge_quantile=None):
         "model structure": {
             "damage module": "ACCREU",
         },
-        "economics": {"damages": {
-            "scale factor": 1.25,
-            "accreu": {
-                "adaptation": adaptation,
-                "adaptation_determination": determination,
-                "adaptation_calibration": "literature_high",
-                "monetise_mortality": mortality,
-                "mortality_svl_rel_gdp_cap": 150,
-                "adaptation_effectiveness_scale_factor": 0.5,
-                "delay_adaptation_until_year": 2035,
-            },
-        }},
+        "economics": {
+            "damages": {
+                "scale factor": 1.25,
+                "accreu": {
+                    "adaptation": adaptation,
+                    "adaptation_determination": determination,
+                    "adaptation_calibration": "literature_high",
+                    "monetise_mortality": mortality,
+                    "mortality_svl_rel_gdp_cap": 150,
+                    "adaptation_effectiveness_scale_factor": 0.5,
+                    "delay_adaptation_until_year": 2035,
+                },
+            }
+        },
         "regions": {
             "USA": {
                 "economics": {"gdp_ppp_2010_div_gdp_mer_2010": 2.5},
@@ -59,12 +61,18 @@ def prepare_inputs(adaptation, determination, mortality, cge_quantile=None):
         settings["model structure"]["damage module"] = "ACCREU_CGE"
         settings["economics"]["damages"]["quantile"] = cge_quantile
         settings["regions"]["USA"]["ACCREU_CGE"] = {
-            "NoSLR_b1": 1.0, "NoSLR_b2": 2.0, f"NoSLR_a{cge_quantile:.2f}": 3.0,
-            "slr_b1": 4.0, "slr_b2": 5.0, f"slr_a{cge_quantile:.2f}": 6.0,
+            "NoSLR_b1": 1.0,
+            "NoSLR_b2": 2.0,
+            f"NoSLR_a{cge_quantile:.2f}": 3.0,
+            "slr_b1": 4.0,
+            "slr_b2": 5.0,
+            f"slr_a{cge_quantile:.2f}": 6.0,
         }
     params, tree = check_params(settings, return_parser_tree=True)
     params = parse_param_values(params)
-    return ModelInputs(params, tree, DataStore(params), RegionalParamStore(params, tree))
+    return ModelInputs(
+        params, tree, DataStore(params), RegionalParamStore(params, tree)
+    )
 
 
 def base_model(inputs):
@@ -73,15 +81,20 @@ def base_model(inputs):
     m.regions = Set(initialize=inputs.regions, ordered=True)
     m.year = inputs.year
     m.baseline_GDP = Param(
-        m.t, m.regions, initialize=inputs.time_regional("GDP"),
+        m.t,
+        m.regions,
+        initialize=inputs.time_regional("GDP"),
         units=quant.unit("currency_unit"),
     )
     m.population = Param(
-        m.t, m.regions, initialize=inputs.time_regional("population"),
+        m.t,
+        m.regions,
+        initialize=inputs.time_regional("population"),
         units=quant.unit("billion people"),
     )
     m.gdp_ppp_2010_div_gdp_mer_2010 = Param(
-        m.regions, initialize=inputs.regional("economics", "gdp_ppp_2010_div_gdp_mer_2010")
+        m.regions,
+        initialize=inputs.regional("economics", "gdp_ppp_2010_div_gdp_mer_2010"),
     )
     m.dollar_2017_MER_to_2010_PPP = Param(
         m.regions, initialize=lambda m, r: 0.89632 * m.gdp_ppp_2010_div_gdp_mer_2010[r]
@@ -108,7 +121,7 @@ def check_regional_sources(m, inputs):
             )
 
 
-@pytest.mark.parametrize("adaptation", ["noadaptation", "separate", "combined"])
+@pytest.mark.parametrize("adaptation", ["noadaptation", "sectoral", "combined"])
 @pytest.mark.parametrize("determination", ["solver_control", "analytical_optimum"])
 @pytest.mark.parametrize("mortality", [False, True])
 def test_native_accreu_parameters_options_bounds_and_equations(
@@ -123,7 +136,10 @@ def test_native_accreu_parameters_options_bounds_and_equations(
     assert [m.year(t) for t in m.t] == [2025, 2030, 2040]
     assert value(m.damage_scale_factor) == 1.25
     assert value(m.mortality_svl_rel_gdp_per_cap) == 150
-    assert m.mortality_svl_rel_gdp_per_cap.doc == "::economics.damages.accreu.mortality_svl_rel_gdp_cap"
+    assert (
+        m.mortality_svl_rel_gdp_per_cap.doc
+        == "::economics.damages.accreu.mortality_svl_rel_gdp_cap"
+    )
     check_regional_sources(m, inputs)
 
     suffix = "" if adaptation == "noadaptation" else "_gross"
@@ -139,9 +155,13 @@ def test_native_accreu_parameters_options_bounds_and_equations(
         getattr(m, name)[1, "USA"].set_value(actual)
         assert value(rhs[name](m, 0, "USA")) == pytest.approx(0)
 
-    assert hasattr(m, "adaptation_effectiveness_scale_factor") == (adaptation != "noadaptation")
-    assert hasattr(m, "combined_labprod_riv_adaptation_costs_abs") == (adaptation == "combined")
-    assert hasattr(m, "labourprod_adaptation_costs_abs") == (adaptation == "separate")
+    assert hasattr(m, "adaptation_effectiveness_scale_factor") == (
+        adaptation != "noadaptation"
+    )
+    assert hasattr(m, "combined_labprod_riv_adaptation_costs_abs") == (
+        adaptation == "combined"
+    )
+    assert hasattr(m, "labourprod_adaptation_costs_abs") == (adaptation == "sectoral")
     if adaptation == "noadaptation":
         assert value(m.adaptation_costs_abs[1, "USA"]) == 0
         assert not hasattr(m, "delay_adaptation_year")
@@ -150,24 +170,35 @@ def test_native_accreu_parameters_options_bounds_and_equations(
         assert value(m.delay_adaptation_year) == 2035
         # Independent literature_high factors and currency conversion.
         curves = {"slr": (0.9, 2, 0.933, 2)}
-        if adaptation == "separate":
-            curves.update({"labourprod": (0.8, 4, 1.977, 0.5), "riverine": (0.7, 3, 0.721, 0.5)})
+        if adaptation == "sectoral":
+            curves.update(
+                {"labourprod": (0.8, 4, 1.977, 0.5), "riverine": (0.7, 3, 0.721, 0.5)}
+            )
         else:
             curves["combined_labprod_riv"] = (0.65, 5, 1.25, 0.25)
         for sector, (source_max, source_cost, max_scale, multiplier) in curves.items():
             cost_name = sector + "_adaptation_costs_abs"
             costs = getattr(m, cost_name)
-            assert costs[1, "USA"].bounds == pytest.approx((0, 0.1 * value(m.baseline_GDP[1, "USA"])))
+            assert costs[1, "USA"].bounds == pytest.approx(
+                (0, 0.1 * value(m.baseline_GDP[1, "USA"]))
+            )
             costs[1, "USA"].set_value(0.01)
-            expected = source_max * max_scale * 0.5 * (1 - exp(-source_cost / multiplier / (0.89632 * 2.5) * 0.01))
-            assert value(rhs[sector + "_avoided_damages_adapt"](m, 1, "USA")) == pytest.approx(expected)
+            expected = (
+                source_max
+                * max_scale
+                * 0.5
+                * (1 - exp(-source_cost / multiplier / (0.89632 * 2.5) * 0.01))
+            )
+            assert value(
+                rhs[sector + "_avoided_damages_adapt"](m, 1, "USA")
+            ) == pytest.approx(expected)
             assert (cost_name in rhs) == (determination == "analytical_optimum")
             if determination == "analytical_optimum":
                 # Within the delay, the rule needs no gross-damage value.
                 assert value(rhs[cost_name](m, 1, "USA")) == 0
 
     population = value(m.population[1, "USA"])
-    heat = population * 0.001 * ((2.0 - 1.1)**2 - (1.2 - 1.1)**2)
+    heat = population * 0.001 * ((2.0 - 1.1) ** 2 - (1.2 - 1.1) ** 2)
     cold = population * -0.0005 * (2.0 - 1.2)
     assert value(rhs["mortality_heat_related"](m, 1, "USA")) == pytest.approx(heat)
     assert value(rhs["mortality_cold_related"](m, 1, "USA")) == pytest.approx(cold)
@@ -178,16 +209,22 @@ def test_native_accreu_parameters_options_bounds_and_equations(
         vsl = 150 * value(m.GDP_gross[1, "USA"]) / population
         assert value(rhs["mortality_svl"](m, 1, "USA")) == pytest.approx(vsl)
         m.mortality_svl[1, "USA"].set_value(vsl)
-        assert value(rhs["mortality_damage_costs_abs"](m, 1, "USA")) == pytest.approx(vsl * (heat + cold))
+        assert value(rhs["mortality_damage_costs_abs"](m, 1, "USA")) == pytest.approx(
+            vsl * (heat + cold)
+        )
         gdp = value(m.baseline_GDP[1, "USA"])
-        assert m.mortality_damage_costs_abs[1, "USA"].bounds == pytest.approx((-0.1 * gdp, 0.5 * gdp))
+        assert m.mortality_damage_costs_abs[1, "USA"].bounds == pytest.approx(
+            (-0.1 * gdp, 0.5 * gdp)
+        )
     else:
         assert value(m.non_market_damage_costs_abs[1, "USA"]) == 0
 
 
 @pytest.mark.parametrize("quantile", [0.05, 0.5, 0.95])
 def test_native_cge_preserves_quantile_format_and_regional_overrides(quantile):
-    inputs = prepare_inputs("noadaptation", "solver_control", False, cge_quantile=quantile)
+    inputs = prepare_inputs(
+        "noadaptation", "solver_control", False, cge_quantile=quantile
+    )
     m = base_model(inputs)
     equations = cge_damages.get_constraints(m, inputs)
     rhs = {eq.lhs: eq for eq in equations if hasattr(eq, "lhs")}

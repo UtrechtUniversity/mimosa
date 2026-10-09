@@ -44,7 +44,7 @@ def get_constraints(
 
     constraints = []
     # In the config, the user can choose whether to use the separate adaptation module for ACCREU or not.
-    # This is done using the parameter params["economics"]["damages"]["accreu"]["adaptation"] = "separate" or "combined"
+    # This is done using the parameter params["economics"]["damages"]["accreu"]["adaptation"] = "sectoral" or "combined"
     adaptation_options = get_adaptation_options(inputs)
     adaptation_type = adaptation_options.adaptation_type
     m.damage_scale_factor = Param(
@@ -65,7 +65,9 @@ def get_constraints(
     constraints.extend(riverine_flooding.get_constraints(m, inputs, adaptation_options))
 
     # Get constraints for labour productivity damages
-    constraints.extend(labour_productivity.get_constraints(m, inputs, adaptation_options))
+    constraints.extend(
+        labour_productivity.get_constraints(m, inputs, adaptation_options)
+    )
 
     if adaptation_type == "combined":
         # Get constraints for combined adaptation costs, which combines labour productivity and riverine flooding adaptation costs

@@ -1,18 +1,19 @@
 # Running MIMOSA
 
 ### Base run
+
 A basic run of MIMOSA requires 4 steps: loading the parameters, building the model instance, solving the model and finally saving the output.
 With this code, the default parameter values are used (see [Parameter reference](../parameters.md)).
 
-``` python
+```python
 --8<-- "tests/runs/run_base.py"
 ```
 
-1.   Read the default parameters
-2.   Build the model using the parameters
-3.   Once the model is built, send the model to the solver.<br>
-     Note that if you use the NEOS solver, use the syntax `model1.solve(use_neos=True, neos_email="your.email@email.com")`
-4.   Export the output to the file output/run1.csv
+1.  Read the default parameters
+2.  Build the model using the parameters
+3.  Once the model is built, send the model to the solver.<br>
+    Note that if you use the NEOS solver, use the syntax `model1.solve(use_neos=True, neos_email="your.email@email.com")`
+4.  Export the output to the file output/run1.csv
 
 ### ACCREU cost-benefit analysis
 
@@ -31,7 +32,7 @@ from mimosa import MIMOSA, load_params
 params = load_params()
 params["model structure"]["damage module"] = "ACCREU"
 options = params["economics"]["damages"]["accreu"]
-options["adaptation"] = "separate"
+options["adaptation"] = "sectoral"
 options["adaptation_determination"] = "analytical_optimum"
 options["cba_strategy"] = "mitigation_then_adaptation"
 

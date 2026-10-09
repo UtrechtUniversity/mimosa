@@ -9,20 +9,23 @@ from mimosa.common.config.utils import get_nested
 
 def _inputs(
     module="ACCREU",
-    adaptation="separate",
+    adaptation="sectoral",
     strategy="mitigation_then_adaptation",
     determination="analytical_optimum",
 ):
     params = load_params()
     structure = params["model structure"]
     structure["damage module"] = module
-    params["economics"]["damages"]["accreu"].update({
-        "adaptation": adaptation,
-        "cba_strategy": strategy,
-        "adaptation_determination": determination,
-    })
-    return SimpleNamespace(config_value=lambda path: get_nested(params, path.split(".")))
-
+    params["economics"]["damages"]["accreu"].update(
+        {
+            "adaptation": adaptation,
+            "cba_strategy": strategy,
+            "adaptation_determination": determination,
+        }
+    )
+    return SimpleNamespace(
+        config_value=lambda path: get_nested(params, path.split("."))
+    )
 
 
 @pytest.mark.parametrize(
@@ -30,13 +33,13 @@ def _inputs(
     [
         (
             "ACCREU",
-            "separate",
+            "sectoral",
             "mitigation_then_adaptation",
             "analytical_optimum",
             True,
         ),
         ("ACCREU", "combined", "joint", "solver_control", False),
-        ("ACCREU", "separate", "joint", "analytical_optimum", False),
+        ("ACCREU", "sectoral", "joint", "analytical_optimum", False),
         (
             "ACCREU",
             "noadaptation",
@@ -46,7 +49,7 @@ def _inputs(
         ),
         (
             "COACCH",
-            "separate",
+            "sectoral",
             "mitigation_then_adaptation",
             "solver_control",
             False,
@@ -66,32 +69,32 @@ def test_cba_configuration_defaults_and_validation():
     params = load_params()
     options = params["economics"]["damages"]["accreu"]
 
-    assert options["cba_strategy"] == "joint"
-    assert options["adaptation_determination"] == "solver_control"
+    assert options["cba_strategy"] == "mitigation_then_adaptation"
+    assert options["adaptation_determination"] == "analytical_optimum"
 
     for value in ["mitigation_then_adaptation", "joint"]:
         params = load_params()
-        params["economics"]["damages"]["accreu"][
-            "cba_strategy"
-        ] = value
-        assert check_params(params)["economics"]["damages"]["accreu"]["cba_strategy"] == value
+        params["economics"]["damages"]["accreu"]["cba_strategy"] = value
+        assert (
+            check_params(params)["economics"]["damages"]["accreu"]["cba_strategy"]
+            == value
+        )
 
-    params["economics"]["damages"]["accreu"][
-        "cba_strategy"
-    ] = "unknown"
+    params["economics"]["damages"]["accreu"]["cba_strategy"] = "unknown"
     with pytest.raises(ValueError):
         check_params(params)
 
     for value in ["solver_control", "analytical_optimum"]:
         params = load_params()
-        params["economics"]["damages"]["accreu"][
-            "adaptation_determination"
-        ] = value
-        assert check_params(params)["economics"]["damages"]["accreu"]["adaptation_determination"] == value
+        params["economics"]["damages"]["accreu"]["adaptation_determination"] = value
+        assert (
+            check_params(params)["economics"]["damages"]["accreu"][
+                "adaptation_determination"
+            ]
+            == value
+        )
 
-    params["economics"]["damages"]["accreu"][
-        "adaptation_determination"
-    ] = "unknown"
+    params["economics"]["damages"]["accreu"]["adaptation_determination"] = "unknown"
     with pytest.raises(ValueError):
         check_params(params)
 
@@ -116,9 +119,7 @@ def test_sequential_solve_rejects_solver_control_adaptation():
 def test_joint_analytical_adaptation_uses_ordinary_solve(monkeypatch):
     calls = []
     model = MIMOSA.__new__(MIMOSA)
-    model.inputs = _inputs(
-        strategy="joint", determination="analytical_optimum"
-    )
+    model.inputs = _inputs(strategy="joint", determination="analytical_optimum")
     model.status = None
     model.solve_runtime = None
     model.workflow_control_values = None
@@ -130,16 +131,14 @@ def test_joint_analytical_adaptation_uses_ordinary_solve(monkeypatch):
 
     model.solve(verbose=False, ipopt_maxiter=123)
 
-    assert calls == [
-        {"verbose": False, "use_neos": False, "ipopt_maxiter": 123}
-    ]
+    assert calls == [{"verbose": False, "use_neos": False, "ipopt_maxiter": 123}]
 
 
 def test_sequential_workflow_copies_params_forwards_options_and_replays(monkeypatch):
     params = load_params()
     params["model structure"]["damage module"] = "ACCREU"
     options = params["economics"]["damages"]["accreu"]
-    options["adaptation"] = "separate"
+    options["adaptation"] = "sectoral"
     options["adaptation_determination"] = "analytical_optimum"
     options["cba_strategy"] = "mitigation_then_adaptation"
 
@@ -158,10 +157,7 @@ def test_sequential_workflow_copies_params_forwards_options_and_replays(monkeypa
         assert stage_params is not params
         assert stage_options["adaptation"] == "noadaptation"
         assert stage_options["cba_strategy"] == "joint"
-        assert (
-            stage_options["adaptation_determination"]
-            == "solver_control"
-        )
+        assert stage_options["adaptation_determination"] == "solver_control"
         mitigation_model.solve = lambda **kwargs: calls.append(("solve", kwargs))
         return mitigation_model
 
@@ -186,7 +182,7 @@ def test_sequential_workflow_copies_params_forwards_options_and_replays(monkeypa
         verbose=False, use_neos=True, neos_email="user@example.com"
     )
 
-    assert options["adaptation"] == "separate"
+    assert options["adaptation"] == "sectoral"
     assert options["adaptation_determination"] == "analytical_optimum"
     assert options["cba_strategy"] == "mitigation_then_adaptation"
     assert calls == [
@@ -276,7 +272,7 @@ def test_determination_option_controls_whether_adaptation_is_a_control(
     params = load_params()
     params["model structure"]["damage module"] = "ACCREU"
     options = params["economics"]["damages"]["accreu"]
-    options["adaptation"] = "separate"
+    options["adaptation"] = "sectoral"
     options["adaptation_determination"] = determination
 
     model = MIMOSA(params, prerun=False)

@@ -300,14 +300,15 @@ economics:
 
       adaptation:
         descr: >-
-          Whether adaptation should be on combined labour productivity and riverine flooding,
-          or separately
+          Enable sector-specific adaptation with "sectoral", disable it with
+          "noadaptation", or use "combined" labour productivity and riverine flooding
+          adaptation for diagnostics and model comparisons.
         type: enum
         values:
+          - sectoral
           - combined
-          - separate
           - noadaptation
-        default: separate
+        default: sectoral
 
       cba_strategy:
         descr: >-

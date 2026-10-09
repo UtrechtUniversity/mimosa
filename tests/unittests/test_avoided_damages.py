@@ -16,9 +16,10 @@ def test_policy_simulation_calculates_avoided_damages_after_baseline():
     np.testing.assert_allclose(policy.avoided_damage_costs.values, expected_regional)
     assert np.isfinite(policy.avoided_damage_costs.values).all()
 
-    expected_global = np.sum(
-        expected_regional * policy.GDP_gross.values, axis=1
-    ) / policy.global_GDP_gross.values
+    expected_global = (
+        np.sum(expected_regional * policy.GDP_gross.values, axis=1)
+        / policy.global_GDP_gross.values
+    )
     np.testing.assert_allclose(
         policy.global_avoided_damage_costs.values, expected_global
     )
@@ -40,9 +41,7 @@ def test_analytical_accreu_uses_a_noadaptation_nopolicy_baseline():
     baseline_options = baseline.params["economics"]["damages"]["accreu"]
     assert baseline_options["adaptation"] == "noadaptation"
     assert np.all(baseline.adaptation_costs.values == 0)
-    assert model.params["economics"]["damages"]["accreu"][
-        "adaptation"
-    ] == "separate"
+    assert model.params["economics"]["damages"]["accreu"]["adaptation"] == "sectoral"
 
     expected_avoided = (
         baseline.damage_costs.values - adaptation_only.damage_costs.values

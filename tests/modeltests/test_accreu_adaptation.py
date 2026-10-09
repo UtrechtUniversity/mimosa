@@ -14,13 +14,12 @@ def test_joint_cba_supports_analytical_adaptation():
     params["model structure"]["damage module"] = "ACCREU"
     options = params["economics"]["damages"]["accreu"]
     options["adaptation_determination"] = "analytical_optimum"
+    options["cba_strategy"] = "joint"
 
     model = MIMOSA(params)
 
     assert model._uses_sequential_accreu_cba() is False
-    assert not any(
-        "adaptation" in name for name in model.simulator.control_variables
-    )
+    assert not any("adaptation" in name for name in model.simulator.control_variables)
 
     model.solve(verbose=False)
 
@@ -38,7 +37,7 @@ def test_one_call_sequential_cba_matches_manual_two_model_workflow():
     params["time"]["periods"] = {}
     params["model structure"]["damage module"] = "ACCREU"
     options = params["economics"]["damages"]["accreu"]
-    options["adaptation"] = "separate"
+    options["adaptation"] = "sectoral"
     options["adaptation_determination"] = "analytical_optimum"
     options["cba_strategy"] = "mitigation_then_adaptation"
 
@@ -68,15 +67,11 @@ def test_one_call_sequential_cba_matches_manual_two_model_workflow():
         "total_direct_costs_abs",
     ]:
         workflow_variable = getattr(workflow_model.concrete_model, variable)
-        workflow_values = np.asarray(
-            list(workflow_variable.extract_values().values())
-        )
+        workflow_values = np.asarray(list(workflow_variable.extract_values().values()))
         manual_values = np.asarray(
             list(getattr(manual_result, variable).extract_values().values())
         )
-        np.testing.assert_allclose(
-            workflow_values, manual_values, rtol=1e-7, atol=1e-9
-        )
+        np.testing.assert_allclose(workflow_values, manual_values, rtol=1e-7, atol=1e-9)
 
     assert workflow_model.status == mitigation_model.status
 
@@ -126,7 +121,7 @@ def test_literature_adaptation_calibration_matches_bcr_benchmarks(
     params = load_params()
     params["model structure"]["damage module"] = "ACCREU"
     options = params["economics"]["damages"]["accreu"]
-    options["adaptation"] = "separate"
+    options["adaptation"] = "sectoral"
     options["adaptation_calibration"] = calibration
     options["adaptation_determination"] = "analytical_optimum"
 

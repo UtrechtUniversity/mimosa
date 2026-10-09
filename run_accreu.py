@@ -26,15 +26,13 @@ adaptation_readiness = pd.read_csv("data/adaptation_readiness.csv").set_index(
 )
 
 
-def init_params(monetise_mortality, adapt_calibration="accreu", adapt_type="separate"):
+def init_params(monetise_mortality, adapt_calibration="accreu", adapt_type="sectoral"):
     params = load_params()
     params["model structure"]["damage module"] = "ACCREU"
     params["economics"]["damages"]["accreu"][
         "adaptation"
-    ] = adapt_type  # "separate" or "combined"
-    params["economics"]["damages"]["accreu"][
-        "monetise_mortality"
-    ] = monetise_mortality
+    ] = adapt_type  # "sectoral" or "combined"
+    params["economics"]["damages"]["accreu"]["monetise_mortality"] = monetise_mortality
     params["economics"]["damages"]["accreu"][
         "adaptation_calibration"
     ] = adapt_calibration  # "accreu", "literature", "literature_low", "literature_high"
@@ -129,9 +127,7 @@ for monetise_mortality in [False, True]:
         params_ada_unplanned["economics"]["damages"]["accreu"][
             "adaptation_effectiveness_scale_factor"
         ] = 0.5
-        params_ada_unplanned["economics"]["damages"]["accreu"][
-            "cba_strategy"
-        ] = "joint"
+        params_ada_unplanned["economics"]["damages"]["accreu"]["cba_strategy"] = "joint"
         model_ada_unplanned = MIMOSA(params_ada_unplanned)
 
         control_variables = model_ada_unplanned.simulator.control_variables
@@ -152,9 +148,7 @@ for monetise_mortality in [False, True]:
         # measures. The resulting reduced damages are lower, but that's because the adaptation costs are lower.
         # In ada_unplanned the adaptation costs are the same as optimal adaptation, just the effectiveness is reduced.
         params_ada_planned = init_params(monetise_mortality, adapt_calibration)
-        params_ada_planned["economics"]["damages"]["accreu"][
-            "cba_strategy"
-        ] = "joint"
+        params_ada_planned["economics"]["damages"]["accreu"]["cba_strategy"] = "joint"
         model_ada_planned = MIMOSA(params_ada_planned)
 
         reduced_control_variables_values = reduce_adaptation_costs(
@@ -170,9 +164,7 @@ for monetise_mortality in [False, True]:
 
         #### Run "mit_ada": CBA with mitigation and adaptation optimised at the same time by MIMOSA
         params_mit_ada = init_params(monetise_mortality, adapt_calibration)
-        params_mit_ada["economics"]["damages"]["accreu"][
-            "cba_strategy"
-        ] = "joint"
+        params_mit_ada["economics"]["damages"]["accreu"]["cba_strategy"] = "joint"
         model_mit_ada = MIMOSA(params_mit_ada)
         model_mit_ada.solve(ipopt_maxiter=10000)
         model_mit_ada.save(

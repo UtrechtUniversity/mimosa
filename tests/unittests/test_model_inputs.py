@@ -68,7 +68,7 @@ def test_sections_dictionary_settings_and_nested_regional_values_are_plain(input
     before = deepcopy(inputs.params)
     options = inputs.config_value("economics.damages.accreu")
     assert options == inputs.params["economics"]["damages"]["accreu"]
-    assert options["adaptation"] == "separate"
+    assert options["adaptation"] == "sectoral"
     assert inputs.config_value("model structure.damage module") == "COACCH"
     assert inputs.config_value("economics.MAC")["gamma"] == "2887 USD2010/tCO2"
     frames = inputs.config("economics.MAC.SSP_calibration_factor.SSP1")
@@ -110,7 +110,9 @@ def test_regional_lookup_preserves_override_and_dynamic_source_key(inputs):
     assert all(np.isfinite(number) for number in source.values.values())
 
 
-@pytest.mark.parametrize("category,name", [("missing", "factor"), ("economics", "missing")])
+@pytest.mark.parametrize(
+    "category,name", [("missing", "factor"), ("economics", "missing")]
+)
 def test_missing_regional_inputs_have_context(inputs, category, name):
     with pytest.raises(KeyError, match="Regional input") as error:
         inputs.regional(category, name)
@@ -167,11 +169,14 @@ def test_lookup_values_construct_native_pyomo_parameters_and_derived_values(inpu
         model.regions, initialize=inputs.regional("economics", "init_capital_factor")
     )
     model.population = Param(
-        model.t, model.regions,
-        initialize=inputs.time_regional("population"), units=quant.unit("billion people"),
+        model.t,
+        model.regions,
+        initialize=inputs.time_regional("population"),
+        units=quant.unit("billion people"),
     )
     model.global_population = Param(
-        model.t, initialize=lambda m, t: sum(m.population[t, r] for r in m.regions),
+        model.t,
+        initialize=lambda m, t: sum(m.population[t, r] for r in m.regions),
         units=quant.unit("billion people"),
     )
     calibration = inputs.time_config("economics.MAC.SSP_calibration_factor.SSP1")
@@ -204,7 +209,8 @@ def test_lookup_matches_current_model_initialization(inputs):
         assert value(getattr(model, name)) == pytest.approx(inputs.config_value(path))
     assert value(model.budget) is inputs.config_value("emissions.carbonbudget")
     for source_name, parameter_name in (
-        ("population", "population"), ("GDP", "baseline_GDP"),
+        ("population", "population"),
+        ("GDP", "baseline_GDP"),
         ("emissions", "ssp_baseline_emissions"),
     ):
         assert getattr(model, parameter_name).extract_values() == pytest.approx(
@@ -227,7 +233,9 @@ def test_lookup_does_not_apply_emissions_specific_pulse_validation(inputs, amoun
 
 
 def test_zero_off_grid_pulse_is_allowed(inputs):
-    params, tree = prepare({"emissions": {"pulse": {"year": 2032, "amount": "0 GtCO2"}}})
+    params, tree = prepare(
+        {"emissions": {"pulse": {"year": 2032, "amount": "0 GtCO2"}}}
+    )
     lookup = make_inputs(params, tree)
     assert lookup.config_value("emissions.pulse.amount") == 0
 
@@ -239,7 +247,9 @@ def test_fractional_grid_and_single_region_have_correct_indices():
     lookup = make_inputs(params, tree)
     assert lookup.time_grid.years == (2025, 2027.5, 2030, 2032.5, 2035)
     assert lookup.time_grid.period_lengths == (0, 2.5, 2.5, 2.5, 2.5)
-    assert list(lookup.time_regional("population").values) == [(t, "CAN") for t in range(5)]
+    assert list(lookup.time_regional("population").values) == [
+        (t, "CAN") for t in range(5)
+    ]
 
 
 def test_time_config_clamps_before_and_after_keyframe_range():
@@ -247,12 +257,19 @@ def test_time_config_clamps_before_and_after_keyframe_range():
         {
             "regions": {"CAN": None},
             "time": {"end": 2050, "periods": {}},
-            "economics": {"MAC": {"SSP_calibration_factor": {"SSP2": {2030: 2, 2040: 4}}}},
+            "economics": {
+                "MAC": {"SSP_calibration_factor": {"SSP2": {2030: 2, 2040: 4}}}
+            },
         }
     )
     lookup = make_inputs(params, tree)
     assert lookup.time_config("economics.MAC.SSP_calibration_factor.SSP2").values == {
-        0: 2, 1: 2, 2: 3, 3: 4, 4: 4, 5: 4
+        0: 2,
+        1: 2,
+        2: 3,
+        3: 4,
+        4: 4,
+        5: 4,
     }
 
 

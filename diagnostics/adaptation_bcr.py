@@ -36,7 +36,7 @@ CALIBRATIONS = (
 )
 
 SECTORS = {
-    "separate": {
+    "sectoral": {
         "Labour productivity": (
             "labourprod_damage_costs_gross",
             "labourprod_avoided_damages_adapt",
@@ -147,19 +147,14 @@ def sector_bcr(simulation, weights, variable_names, regions=None):
     avoided_damages = np.asarray(
         [
             sum(
-                gross_damages[t, r]
-                * simulation.GDP_gross[t, r]
-                * effectiveness[t, r]
+                gross_damages[t, r] * simulation.GDP_gross[t, r] * effectiveness[t, r]
                 for r in regions
             )
             for t in simulation.t
         ]
     )
     costs = np.asarray(
-        [
-            sum(adaptation_costs[t, r] for r in regions)
-            for t in simulation.t
-        ]
+        [sum(adaptation_costs[t, r] for r in regions) for t in simulation.t]
     )
     benefits_pv = np.sum(avoided_damages * weights)
     costs_pv = np.sum(costs * weights)
@@ -176,7 +171,7 @@ def calculate_bcrs():
 
     global_rows = []
     regional_rows = []
-    ramsey_reference = no_adaptation_reference(accreu_params("separate"))
+    ramsey_reference = no_adaptation_reference(accreu_params("sectoral"))
     for adaptation_type, sectors in SECTORS.items():
         for calibration in CALIBRATIONS:
             params = accreu_params(adaptation_type, calibration)
@@ -205,9 +200,7 @@ def calculate_bcrs():
                 )
 
                 sector_results = []
-                regional_sector_results = {
-                    region: [] for region in simulation.regions
-                }
+                regional_sector_results = {region: [] for region in simulation.regions}
                 for sector, variable_names in sectors.items():
                     result = sector_bcr(simulation, weights, variable_names)
                     sector_results.append(result)
@@ -242,9 +235,7 @@ def calculate_bcrs():
                 total_benefits = sum(
                     result[BENEFITS_COLUMN] for result in sector_results
                 )
-                total_costs = sum(
-                    result[COSTS_COLUMN] for result in sector_results
-                )
+                total_costs = sum(result[COSTS_COLUMN] for result in sector_results)
                 global_rows.append(
                     {
                         "discounting": discounting_label,
@@ -261,9 +252,7 @@ def calculate_bcrs():
                     regional_benefits = sum(
                         result[BENEFITS_COLUMN] for result in results
                     )
-                    regional_costs = sum(
-                        result[COSTS_COLUMN] for result in results
-                    )
+                    regional_costs = sum(result[COSTS_COLUMN] for result in results)
                     regional_rows.append(
                         {
                             "discounting": discounting_label,
@@ -291,17 +280,13 @@ def create_figure(results):
     colors = ("#636EFA", "#EF553B", "#00CC96", "#AB63FA")
     trace_discounting = []
     for discounting_label in DISCOUNTING_OPTIONS:
-        discounting_results = results[
-            results["discounting"] == discounting_label
-        ]
+        discounting_results = results[results["discounting"] == discounting_label]
         for column, adaptation_type in enumerate(SECTORS, start=1):
             subset = discounting_results[
                 discounting_results["adaptation type"] == adaptation_type
             ]
             for calibration, color in zip(CALIBRATIONS, colors):
-                calibration_results = subset[
-                    subset["calibration"] == calibration
-                ]
+                calibration_results = subset[subset["calibration"] == calibration]
                 figure.add_trace(
                     go.Bar(
                         x=calibration_results["sector"],
@@ -311,8 +296,7 @@ def create_figure(results):
                         showlegend=column == 1,
                         marker_color=color,
                         hovertemplate=(
-                            "%{x}<br>BCR=%{y:.2f}"
-                            "<extra>%{fullData.name}</extra>"
+                            "%{x}<br>BCR=%{y:.2f}" "<extra>%{fullData.name}</extra>"
                         ),
                         visible=discounting_label == DEFAULT_DISCOUNTING,
                     ),
@@ -411,9 +395,7 @@ def create_regional_figure(results):
     trace_discounting = []
 
     for discounting_label in DISCOUNTING_OPTIONS:
-        discounting_results = results[
-            results["discounting"] == discounting_label
-        ]
+        discounting_results = results[results["discounting"] == discounting_label]
         for row, adaptation_type in enumerate(SECTORS, start=1):
             sectors = [*SECTORS[adaptation_type], "Total"]
             for column, calibration in enumerate(CALIBRATIONS, start=1):
@@ -421,9 +403,7 @@ def create_regional_figure(results):
                     (discounting_results["adaptation type"] == adaptation_type)
                     & (discounting_results["calibration"] == calibration)
                 ]
-                bcrs = subset.pivot(
-                    index="region", columns="sector", values="BCR"
-                )
+                bcrs = subset.pivot(index="region", columns="sector", values="BCR")
                 bcrs = bcrs.reindex(index=regions, columns=sectors)
                 category_values = np.where(
                     bcrs.isna(),
@@ -432,9 +412,7 @@ def create_regional_figure(results):
                 )
                 labels = np.full(bcrs.shape, "", dtype=object)
                 valid = ~bcrs.isna().values
-                labels[valid] = [
-                    f"{value:.1f}" for value in bcrs.values[valid]
-                ]
+                labels[valid] = [f"{value:.1f}" for value in bcrs.values[valid]]
                 figure.add_trace(
                     go.Heatmap(
                         x=sectors,
@@ -523,9 +501,7 @@ def write_default_png(figure, output_path):
 
 if __name__ == "__main__":
     global_bcrs, regional_bcrs = calculate_bcrs()
-    print(
-        global_bcrs.to_string(index=False, float_format=lambda value: f"{value:.3f}")
-    )
+    print(global_bcrs.to_string(index=False, float_format=lambda value: f"{value:.3f}"))
 
     OUTPUT_DIRECTORY.mkdir(parents=True, exist_ok=True)
     global_bcrs.to_csv(TABLE_OUTPUT, index=False)

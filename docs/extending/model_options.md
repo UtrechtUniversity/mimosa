@@ -38,7 +38,7 @@ The component reads the option while adding its variables and equations:
 def get_constraints(m, inputs):
     adaptation = inputs.config_value("economics.damages.accreu.adaptation")
 
-    if adaptation == "separate":
+    if adaptation == "sectoral":
         # Add separate adaptation variables and equations for each sector
         ...
 ```
@@ -47,7 +47,7 @@ Users can change the option before creating the model:
 
 ```python
 params = load_params()
-params["economics"]["damages"]["accreu"]["adaptation"] = "separate"
+params["economics"]["damages"]["accreu"]["adaptation"] = "sectoral"
 model = MIMOSA(params)
 ```
 

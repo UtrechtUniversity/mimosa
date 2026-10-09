@@ -123,9 +123,9 @@ icon: material/gamepad-circle
     - Meaning of `noadaptation`.
     - Damage and expenditure outputs.
 
-=== "Separate adaptation"
+=== "With adaptation"
 
-    - Sector-specific adaptation choices and expenditure.
+    - Meaning of `sectoral` and sector-specific adaptation choices and expenditure.
     - Sectors protected by each adaptation curve.
     - Aggregation of costs and residual damages.
 

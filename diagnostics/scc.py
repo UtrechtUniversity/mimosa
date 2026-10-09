@@ -282,7 +282,7 @@ def analytical_adaptation(params):
 
     params = deepcopy(params)
     options = params["economics"]["damages"]["accreu"]
-    options["adaptation"] = "separate"
+    options["adaptation"] = "sectoral"
     options["adaptation_determination"] = "analytical_optimum"
     options["cba_strategy"] = "joint"
     return params

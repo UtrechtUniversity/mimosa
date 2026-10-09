@@ -53,7 +53,8 @@ def get_constraints(
     )
 
     m.labourprod_damages_gross_constant = Param(
-        m.regions, initialize=inputs.regional("ACCREU", "labourprod_noadapt_ead_constant")
+        m.regions,
+        initialize=inputs.regional("ACCREU", "labourprod_noadapt_ead_constant"),
     )
     m.labourprod_damages_gross_linear = Param(
         m.regions, initialize=inputs.regional("ACCREU", "labourprod_noadapt_ead_linear")
@@ -72,7 +73,8 @@ def get_constraints(
     )
 
     m.labourprod_damages_benefits_constant = Param(
-        m.regions, initialize=inputs.regional("ACCREU", "labourprod_benefit_cdd_constant")
+        m.regions,
+        initialize=inputs.regional("ACCREU", "labourprod_benefit_cdd_constant"),
     )
     m.labourprod_damages_benefits_linear = Param(
         m.regions, initialize=inputs.regional("ACCREU", "labourprod_benefit_cdd_linear")
@@ -86,7 +88,7 @@ def get_constraints(
 
     ## Adaptation (only for costs, doesn't apply to benefits):
 
-    if adaptation_type == "separate":
+    if adaptation_type == "sectoral":
         m.labourprod_adaptation_costs_abs = Var(
             m.t,
             m.regions,
@@ -105,7 +107,9 @@ def get_constraints(
 
         m.labourprod_adaptation_max_effectiveness = Param(
             m.regions,
-            initialize=inputs.regional("ACCREU", "labourprod_adapt_eff_max_effectiveness"),
+            initialize=inputs.regional(
+                "ACCREU", "labourprod_adapt_eff_max_effectiveness"
+            ),
         )
         m.labourprod_adaptation_cost_param = Param(
             m.regions,

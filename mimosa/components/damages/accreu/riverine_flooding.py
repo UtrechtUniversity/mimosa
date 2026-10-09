@@ -70,7 +70,7 @@ def get_constraints(
 
     ## Adaptation:
 
-    if adaptation_type == "separate":
+    if adaptation_type == "sectoral":
         m.riverine_adaptation_costs_abs = Var(
             m.t,
             m.regions,
@@ -88,7 +88,10 @@ def get_constraints(
         )
 
         m.riverine_adaptation_max_effectiveness = Param(
-            m.regions, initialize=inputs.regional("ACCREU", "riverine_adapt_eff_max_effectiveness")
+            m.regions,
+            initialize=inputs.regional(
+                "ACCREU", "riverine_adapt_eff_max_effectiveness"
+            ),
         )
         m.riverine_adaptation_cost_param = Param(
             m.regions,
