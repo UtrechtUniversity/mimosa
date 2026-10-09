@@ -1,8 +1,7 @@
 import logging
 import logging.handlers
-import pandas as pd
 
-from mimosa import MIMOSA, load_params
+from mimosa import MIMOSA, load_params, load_adaptation_readiness
 
 log_file = "accreu.log"
 
@@ -21,9 +20,7 @@ root.addHandler(handler)
 
 PREFIX = "accreu"
 
-adaptation_readiness = pd.read_csv("data/adaptation_readiness.csv").set_index(
-    ["SSP", "Region"]
-)
+adaptation_readiness = load_adaptation_readiness()
 
 
 def init_params(monetise_mortality, adapt_calibration="accreu", adapt_type="sectoral"):
