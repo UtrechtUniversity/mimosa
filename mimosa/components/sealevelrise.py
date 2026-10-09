@@ -11,7 +11,7 @@ reference year.
 from typing import Sequence
 
 from mimosa.common import (
-    AbstractModel,
+    ConcreteModel,
     Param,
     Var,
     GeneralConstraint,
@@ -20,7 +20,6 @@ from mimosa.common import (
     exp,
     tanh,
     quant,
-    ModelContext,
 )
 
 
@@ -87,9 +86,11 @@ SLR_PROJECTION_PARAMETER_SETS = {
     },
 }
 
+from mimosa.core.model_inputs import ModelInputs
+
 
 def get_constraints(
-    m: AbstractModel, context: ModelContext
+    m: ConcreteModel, inputs: ModelInputs
 ) -> Sequence[GeneralConstraint]:
     r"""
     The sea-level-rise (SLR) component represents thermal expansion, glaciers,
@@ -112,7 +113,7 @@ def get_constraints(
     The projection can be selected before model construction with:
 
     ```python
-    params["model structure"]["sealevelrise options"]["projection"] = "high"
+    params["sealevelrise"]["projection"] = "high"
     ```
 
     # Thermal expansion
@@ -274,7 +275,7 @@ def get_constraints(
     - [Wong, Bakker and Keller (2017), Antarctic fast dynamics](https://doi.org/10.1007/s10584-017-2039-4).
     """
 
-    projection = context.option("sealevelrise", "projection", default="central")
+    projection = inputs.config_value("sealevelrise.projection")
     try:
         slr_params = SLR_PROJECTION_PARAMETER_SETS[projection]
     except KeyError as exc:
@@ -483,7 +484,7 @@ def get_constraints(
     return constraints
 
 
-def slr_initial_value(value_at_initial_year, m: AbstractModel):
+def slr_initial_value(value_at_initial_year, m: ConcreteModel):
     """Interpolate a component value from the common reference year.
 
     The central initial values are specified for 2025. Linear interpolation is
@@ -508,7 +509,7 @@ def slr_thermal_expansion(
     temperature,
     sensitivity,
     timescale,
-    m: AbstractModel,
+    m: ConcreteModel,
     period_length,
 ):
     """Update one thermal-expansion response box."""
@@ -517,7 +518,7 @@ def slr_thermal_expansion(
     return relax_to_equilibrium(slr_thermal, equilibrium, timescale, period_length)
 
 
-def slr_gsic_equilibrium(temperature, m: AbstractModel):
+def slr_gsic_equilibrium(temperature, m: ConcreteModel):
     """Temperature-dependent equilibrium glacier contribution."""
 
     return m.slr_gsic_total_ice * tanh(
@@ -525,7 +526,7 @@ def slr_gsic_equilibrium(temperature, m: AbstractModel):
     )
 
 
-def slr_gsic(cumgsic, temperature, m: AbstractModel, period_length):
+def slr_gsic(cumgsic, temperature, m: ConcreteModel, period_length):
     """Relax the glacier contribution towards its finite equilibrium."""
 
     equilibrium = slr_gsic_equilibrium(temperature, m)
@@ -540,7 +541,7 @@ def logistic(x):
     return 1 / (1 + exp(-x))
 
 
-def slr_gis_equilibrium(temperature, m: AbstractModel):
+def slr_gis_equilibrium(temperature, m: ConcreteModel):
     """Bounded Greenland equilibrium contribution, normalised at 0 degree C."""
 
     threshold = m.slr_gis_threshold
@@ -551,7 +552,7 @@ def slr_gis_equilibrium(temperature, m: AbstractModel):
     return m.slr_gis_total_ice * fraction_melted
 
 
-def slr_gis_timescale(temperature, m: AbstractModel):
+def slr_gis_timescale(temperature, m: ConcreteModel):
     """Greenland response time, decreasing smoothly as warming increases."""
 
     return m.slr_gis_base_timescale * exp(
@@ -559,7 +560,7 @@ def slr_gis_timescale(temperature, m: AbstractModel):
     )
 
 
-def slr_gis(cumgis, temperature, m: AbstractModel, period_length):
+def slr_gis(cumgis, temperature, m: ConcreteModel, period_length):
     """Update the Greenland contribution using delayed equilibrium response."""
 
     equilibrium = slr_gis_equilibrium(temperature, m)
@@ -581,7 +582,7 @@ def slr_antarctic_ocean_temperature(
     )
 
 
-def slr_ais_rate(ocean_temperature, m: AbstractModel):
+def slr_ais_rate(ocean_temperature, m: ConcreteModel):
     """Antarctic contribution rate in metres of sea level per year."""
 
     fast_fraction = logistic(
@@ -595,7 +596,7 @@ def slr_ais_rate(ocean_temperature, m: AbstractModel):
     )
 
 
-def slr_ais(cumais, ocean_temperature, m: AbstractModel, period_length):
+def slr_ais(cumais, ocean_temperature, m: ConcreteModel, period_length):
     """Update the Antarctic contribution, subject to its finite ice stock."""
 
     remaining_fraction = 1 - cumais / m.slr_ais_total_ice

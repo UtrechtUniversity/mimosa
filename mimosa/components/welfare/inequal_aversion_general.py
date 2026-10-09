@@ -6,19 +6,20 @@ Utility and global welfare
 from typing import Sequence
 
 from mimosa.common import (
-    AbstractModel,
+    ConcreteModel,
     Param,
     Var,
     GeneralConstraint,
     RegionalEquation,
     GlobalEquation,
     soft_min,
-    ModelContext,
 )
+
+from mimosa.core.model_inputs import ModelInputs
 
 
 def get_constraints(
-    m: AbstractModel, context: ModelContext
+    m: ConcreteModel, inputs: ModelInputs
 ) -> Sequence[GeneralConstraint]:
     """
     <h3>General inequality aversion</h3>
@@ -54,8 +55,8 @@ def get_constraints(
     constraints = []
 
     # Parameters
-    m.elasmu = Param(doc="::economics.elasmu")
-    m.inequal_aversion = Param(doc="::economics.inequal_aversion")
+    m.elasmu = Param(initialize=inputs.config("economics.elasmu"))
+    m.inequal_aversion = Param(initialize=inputs.config("economics.inequal_aversion"))
 
     m.utility = Var(m.t, m.regions, initialize=10)
     m.global_welfare = Var(m.t)

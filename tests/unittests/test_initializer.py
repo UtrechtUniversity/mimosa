@@ -1,41 +1,6 @@
-from types import SimpleNamespace
-
 import pytest
 
-from mimosa.core.helpers import ComponentConfig, ModelContext
 from mimosa.core.initializer import ModelBuildResult, Preprocessor
-
-
-def _model_structure():
-    return {
-        "damage module": "damage-choice",
-        "damage module options": {"adaptation": "combined"},
-        "emissiontrade module": "trade-choice",
-        "financialtransfer module": "transfer-choice",
-        "effortsharing module": "effort-choice",
-        "welfare module": "welfare-choice",
-        "objective module": "objective-choice",
-        "emissions options": {"emissions-option": True},
-        "sealevelrise options": {},
-        "mitigation options": {"learning": False},
-        "cobbdouglas options": {},
-    }
-
-
-def test_create_model_context_separates_registry_and_fixed_components():
-    preprocessor = Preprocessor({"model structure": _model_structure()})
-
-    context = preprocessor._create_model_context()
-
-    assert context.components["damage"] == ComponentConfig(
-        module="damage-choice",
-        options={"adaptation": "combined"},
-    )
-    assert context.components["objective"].module == "objective-choice"
-    assert context.components["emissions"] == ComponentConfig(
-        options={"emissions-option": True}
-    )
-    assert context.components["mitigation"].module == ""
 
 
 def test_build_model_orchestrates_stages_and_returns_their_artifacts(monkeypatch):
@@ -47,42 +12,38 @@ def test_build_model_orchestrates_stages_and_returns_their_artifacts(monkeypatch
     contain the exact artifacts produced by those stages.
     """
     preprocessor = Preprocessor({"source": "user parameters"})
-    context = ModelContext(components={})
     # Unique objects make accidental substitution or re-creation visible.
-    abstract_model = object()
     equations = [object()]
     data_store = object()
     regional_store = object()
     concrete_model = object()
+    inputs = object()
     calls = []
 
     def parse_params():
         calls.append("parse")
         preprocessor._params = {"source": "parsed parameters"}
 
-    def create_context():
-        calls.append("context")
-        return context
+    def create_inputs():
+        calls.append("inputs")
+        assert preprocessor._data_store is data_store
+        assert preprocessor._regional_param_store is regional_store
+        return inputs
 
-    def create_abstract_model():
-        calls.append("abstract model")
-        assert preprocessor.model_context is context
-        return abstract_model, equations
+    def create_model():
+        calls.append("concrete model")
+        assert preprocessor.inputs is inputs
+        return concrete_model, equations
 
     def load_data():
         calls.append("load data")
         return data_store, regional_store
 
-    def instantiate_model():
-        calls.append("instantiate")
-        return concrete_model
-
     # Replace expensive configuration, data, and Pyomo work with stage spies.
     monkeypatch.setattr(preprocessor, "_check_and_parse_params", parse_params)
-    monkeypatch.setattr(preprocessor, "_create_model_context", create_context)
-    monkeypatch.setattr(preprocessor, "_create_abstract_model", create_abstract_model)
+    monkeypatch.setattr(preprocessor, "_create_model_inputs", create_inputs)
+    monkeypatch.setattr(preprocessor, "_create_model", create_model)
     monkeypatch.setattr(preprocessor, "_load_data", load_data)
-    monkeypatch.setattr(preprocessor, "_instantiate_model", instantiate_model)
     monkeypatch.setattr(
         preprocessor,
         "_apply_custom_constraints",
@@ -100,14 +61,13 @@ def test_build_model_orchestrates_stages_and_returns_their_artifacts(monkeypatch
 
     result = preprocessor.build_model()
 
-    # Custom constraints must be applied to the instantiated model before
+    # Custom constraints must be applied to the constructed model before
     # transformations potentially fix or propagate its variables.
     assert calls == [
         "parse",
-        "context",
-        "abstract model",
         "load data",
-        "instantiate",
+        "inputs",
+        "concrete model",
         "custom constraints",
         "Pyomo transformations",
         ("initial abatement", concrete_model),
@@ -116,7 +76,7 @@ def test_build_model_orchestrates_stages_and_returns_their_artifacts(monkeypatch
         concrete_model=concrete_model,
         params={"source": "parsed parameters"},
         equations=equations,
-        context=context,
+        inputs=inputs,
     )
     # Existing callers may continue to unpack the former three-value result.
     assert tuple(result) == (
@@ -126,23 +86,22 @@ def test_build_model_orchestrates_stages_and_returns_their_artifacts(monkeypatch
     )
 
 
-def test_instantiation_artifacts_are_retained(monkeypatch):
-    concrete_model = object()
-    instantiation = SimpleNamespace(concrete_model=concrete_model)
-    preprocessor = Preprocessor({})
-    preprocessor._abstract_model = object()
-    preprocessor._regional_param_store = object()
-    preprocessor._data_store = object()
+def test_production_build_never_instantiates_an_abstract_model(monkeypatch):
+    from mimosa import MIMOSA
+    from mimosa.common import AbstractModel, ConcreteModel
 
-    monkeypatch.setattr(
-        "mimosa.core.initializer.InstantiatedModel",
-        lambda *_args: instantiation,
-    )
+    def forbidden(*_args, **_kwargs):
+        raise AssertionError("Production must build directly without create_instance")
 
-    result = preprocessor._instantiate_model()
-
-    assert result is concrete_model
-    assert preprocessor.instantiated_model is instantiation
+    monkeypatch.setattr(AbstractModel, "create_instance", forbidden)
+    model = MIMOSA({"time": {"end": 2030, "periods": {}}, "regions": {"CAN": {}}})
+    assert isinstance(model.concrete_model, ConcreteModel)
+    assert not hasattr(model.preprocessor, "_abstract_model")
+    assert not hasattr(model.preprocessor, "instantiated_model")
+    assert not hasattr(model, "model_context")
+    assert model.inputs is model.preprocessor.inputs
+    assert model.concrete_model.nopolicy_damage_costs.extract_values()
+    assert model.run_simulation(relative_abatement=0.2).damage_costs.values.shape == (2, 1)
 
 
 def test_custom_constraints_are_applied_only_when_configured(monkeypatch):

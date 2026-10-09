@@ -45,10 +45,11 @@ example, is expressed using `m`.
 Import `quant` from `mimosa.common` and use `quant.unit(...)` in the Pyomo definition:
 
 ```python
-from mimosa.common import AbstractModel, Param, Var, quant
+from mimosa.common import ConcreteModel, Param, Var, quant
+from mimosa.core.model_inputs import ModelInputs
 
 
-def get_constraints(m: AbstractModel, context):
+def get_constraints(m: ConcreteModel, inputs: ModelInputs):
     m.adaptation_costs = Var(
         m.t,
         m.regions,
@@ -56,7 +57,7 @@ def get_constraints(m: AbstractModel, context):
     )
     m.maximum_adaptation = Param(
         units=quant.unit("dimensionless"),
-        doc="::economics.adaptation.maximum",
+        initialize=inputs.config("economics.adaptation.maximum"),
     )
 
     # ... equations and constraints ...
@@ -100,7 +101,7 @@ Link this configuration value to a Pyomo parameter in the usual way:
 
 ```python
 m.maximum_annual_adaptation_cost = Param(
-    doc="::economics.adaptation.maximum_annual_cost",
+    initialize=inputs.config("economics.adaptation.maximum_annual_cost"),
     units=quant.unit("currency_unit"),
 )
 ```
@@ -138,7 +139,8 @@ emissions = quant(5000, "MtCO2/yr", "emissionsrate_unit")
 ```
 
 Most component parameters do not need to call `quant(...)` themselves: values declared as
-`type: quantity` are converted while the model is instantiated.
+`type: quantity` are converted to model units by `inputs.config(...)` or
+`inputs.config_value(...)` when the component reads them.
 
 ## Units in input files
 

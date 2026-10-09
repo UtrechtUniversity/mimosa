@@ -5,19 +5,20 @@ Utility and global welfare
 
 from typing import Sequence
 from mimosa.common import (
-    AbstractModel,
+    ConcreteModel,
     Param,
     Var,
     GeneralConstraint,
     GlobalEquation,
     RegionalEquation,
-    ModelContext,
 )
 from .utility_fct import calc_utility
 
+from mimosa.core.model_inputs import ModelInputs
+
 
 def get_constraints(
-    m: AbstractModel, context: ModelContext
+    m: ConcreteModel, inputs: ModelInputs
 ) -> Sequence[GeneralConstraint]:
     """
 
@@ -54,7 +55,7 @@ def get_constraints(
     constraints = []
 
     # Parameters
-    m.elasmu = Param(doc="::economics.elasmu")
+    m.elasmu = Param(initialize=inputs.config("economics.elasmu"))
 
     m.utility = Var(m.t, m.regions, initialize=0.1)
     m.global_welfare = Var(m.t)

@@ -20,6 +20,13 @@ Simulation is especially useful for:
 
 Simulation does not determine whether a pathway is optimal. It also does not enforce ordinary Pyomo constraints (like a carbon budget), so supplied controls may produce a result that would be infeasible in an optimisation.
 
+The ACCREU `mitigation_then_adaptation` strategy uses simulation internally after
+its mitigation optimisation. `MIMOSA.solve()` transfers the optimised controls
+into the analytical-adaptation model, evaluates the final pathway, and loads
+those values back into the public Pyomo model. This internal replay is why the
+ordered strategy is not available with a fixed carbon budget: simulation does
+not enforce that constraint.
+
 ## Control variables
 
 The available controls depend on the selected model components. You can inspect them after creating the model:
@@ -40,7 +47,8 @@ With the default components, this prints a list containing `relative_abatement`.
 
 ## Use case 1: create a no-policy reference run
 
-Use `run_nopolicy_baseline()` when all control variables should be zero and the result represents the no-policy reference:
+Use `run_nopolicy_baseline()` when mitigation and adaptation should both be
+disabled and the result represents the no-policy reference:
 
 ```python
 from mimosa import MIMOSA, load_params
@@ -52,7 +60,13 @@ baseline = model.run_nopolicy_baseline()
 model.save_simulation(baseline, "baseline_nopolicy")
 ```
 
-Calling `run_simulation()` without arguments also evaluates the model with all controls set to zero. The difference is that `run_nopolicy_baseline()` additionally stores the resulting damage costs in `nopolicy_damage_costs`. MIMOSA uses this reference to calculate avoided damages in policy runs. Therefore, use `run_nopolicy_baseline()` when the result is intended to be the no-policy reference, and use `run_simulation()` for other prescribed scenarios.
+Calling `run_simulation()` without arguments evaluates the configured model with
+all controls set to zero. Usually this matches the no-policy run. With analytical
+ACCREU adaptation, however, its adaptation equations remain active, producing an
+adaptation-only scenario. In that case `run_nopolicy_baseline()` internally uses
+a temporary `noadaptation` model. It stores that model's damage costs in
+`nopolicy_damage_costs`, giving all subsequent policy simulations the same
+no-mitigation, no-adaptation reference.
 
 When MIMOSA is created with the default `prerun=True`, it already calculates this reference internally to prepare the optimisation model. Calling `run_nopolicy_baseline()` explicitly gives you the simulation result so that you can inspect or save it.
 
@@ -96,6 +110,22 @@ optimised_model.save_simulation(replay, "optimisation_replayed")
 ```
 
 The simulation recalculates variables from the copied controls; it does not continue or rerun the optimisation.
+
+Simulation variables provide the same `extract_values()` interface as Pyomo
+variables. This makes it possible to transfer controls from a simulation in the
+same way:
+
+```python
+control_values = {
+    name: getattr(previous_simulation, name).extract_values()
+    for name in original_model.simulator.control_variables
+}
+
+replay = sensitivity_model.run_simulation(**control_values)
+```
+
+The returned dictionary uses the model's index values as keys. For NumPy-based
+workflows, the underlying array remains available as `variable.values`.
 
 ## Use case 4: keep a policy fixed while changing assumptions
 

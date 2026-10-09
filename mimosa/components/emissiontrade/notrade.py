@@ -6,18 +6,19 @@ Type: no trade
 
 from typing import Sequence
 from mimosa.common import (
-    AbstractModel,
+    ConcreteModel,
     GeneralConstraint,
     Param,
     quant,
     RegionalEquation,
     Var,
-    ModelContext,
 )
+
+from mimosa.core.model_inputs import ModelInputs
 
 
 def get_constraints(
-    m: AbstractModel, context: ModelContext
+    m: ConcreteModel, inputs: ModelInputs
 ) -> Sequence[GeneralConstraint]:
     """
     Without emission trading, both trading balances are always zero:

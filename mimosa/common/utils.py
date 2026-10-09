@@ -64,7 +64,7 @@ class MimosaSolverWarning(Warning):
 
 def load_from_registry(name: str, registry: dict):
     """
-    Load a component for the abstract model from the registry by name.
+    Load a model component from the registry by name.
     Raises NotImplementedError if the name is not found.
     """
     try:

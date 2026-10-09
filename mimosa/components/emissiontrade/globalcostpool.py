@@ -6,7 +6,7 @@ Type: global cost pool
 
 from typing import Sequence
 from mimosa.common import (
-    AbstractModel,
+    ConcreteModel,
     Var,
     Param,
     GeneralConstraint,
@@ -15,14 +15,15 @@ from mimosa.common import (
     Constraint,
     NonNegativeReals,
     quant,
-    ModelContext,
 )
 
 from mimosa.components.mitigation import AC
 
+from mimosa.core.model_inputs import ModelInputs
+
 
 def get_constraints(
-    m: AbstractModel, context: ModelContext
+    m: ConcreteModel, inputs: ModelInputs
 ) -> Sequence[GeneralConstraint]:
     """Emission trading equations and constraints
     (global cost pool specification)
@@ -108,10 +109,10 @@ def get_constraints(
 
     # How are mitigation costs distributed over regions?
     m.min_rel_payment_level = Param(
-        doc="::economics.emission trade.min rel payment level"
+        initialize=inputs.config("economics.emission trade.min rel payment level")
     )
     m.max_rel_payment_level = Param(
-        doc="::economics.emission trade.max rel payment level"
+        initialize=inputs.config("economics.emission trade.max rel payment level")
     )
 
     return constraints

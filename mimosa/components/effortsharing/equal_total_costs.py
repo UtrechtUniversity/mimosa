@@ -5,7 +5,7 @@ Effort sharing
 
 from typing import Sequence
 from mimosa.common import (
-    AbstractModel,
+    ConcreteModel,
     Var,
     Param,
     GeneralConstraint,
@@ -18,12 +18,13 @@ from mimosa.common import (
     quant,
     value,
     soft_min,
-    ModelContext,
 )
+
+from mimosa.core.model_inputs import ModelInputs
 
 
 def get_constraints(
-    m: AbstractModel, context: ModelContext
+    m: ConcreteModel, inputs: ModelInputs
 ) -> Sequence[GeneralConstraint]:
     """
     Usage:
@@ -40,7 +41,7 @@ def get_constraints(
     $$
 
     where the variable $\\text{common level}_t$ can have arbitrary values and is purely used as a common
-    value accross all the regions[^1]. Note that the variable $\\text{damages}_{t,r}$ is already expressed as percentage of GDP (see [Damages](damages.md)).
+    value accross all the regions[^1]. Note that the variable $\\text{damages}_{t,r}$ is already expressed as percentage of GDP (see [Damages](damages/index.md)).
 
     For feasibility reasons, this constraint is only enforced until 2100.
 
@@ -68,6 +69,7 @@ def get_constraints(
         RegionalSoftEqualityConstraint(
             lambda m, t, r: m.mitigation_costs[t, r]
             + m.damage_costs[t, r]
+            + m.adaptation_costs[t, r]
             + m.financial_transfer[t, r],
             lambda m, t, r: m.effort_sharing_common_level[t],
             "effort_sharing_regime_total_costs",

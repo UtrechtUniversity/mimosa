@@ -285,7 +285,7 @@ class QuantityParser(GeneralParser):
             UndefinedUnitError,
         ):
             self.error(f"Cannot parse quantity `{value}` to unit `{self.unit}`")
-        return value  # Returns the string, unit will be really converted when instantiating the model
+        return value  # Keep the quantity string; input lookup converts it to model units.
 
     def to_string(self):
         return f"{super().to_string()} Unit: {self.unit}."

@@ -5,7 +5,7 @@ Economics and Cobb-Douglas
 
 from typing import Sequence
 from mimosa.common import (
-    AbstractModel,
+    ConcreteModel,
     Param,
     Var,
     GeneralConstraint,
@@ -15,12 +15,13 @@ from mimosa.common import (
     soft_min,
     economics,
     quant,
-    ModelContext,
 )
+
+from mimosa.core.model_inputs import ModelInputs
 
 
 def get_constraints(
-    m: AbstractModel, context: ModelContext
+    m: ConcreteModel, inputs: ModelInputs
 ) -> Sequence[GeneralConstraint]:
     """
     # Economic module and production function
@@ -87,11 +88,10 @@ def get_constraints(
 
     """
     constraints = []
-
     m.init_capitalstock_factor = Param(
         m.regions,
         units=quant.unit("dimensionless"),
-        doc="regional::economics.init_capital_factor",
+        initialize=inputs.regional("economics", "init_capital_factor"),
     )
     m.capital_stock = Var(
         m.t,
@@ -101,9 +101,9 @@ def get_constraints(
     )
 
     # Parameters
-    m.alpha = Param(doc="::economics.GDP.alpha")
-    m.dk = Param(doc="::economics.GDP.depreciation of capital")
-    m.sr = Param(doc="::economics.GDP.savings rate")
+    m.alpha = Param(initialize=inputs.config("economics.GDP.alpha"))
+    m.dk = Param(initialize=inputs.config("economics.GDP.depreciation of capital"))
+    m.sr = Param(initialize=inputs.config("economics.GDP.savings rate"))
 
     m.GDP_gross = Var(
         m.t,
@@ -130,7 +130,7 @@ def get_constraints(
     m.investments = Var(m.t, m.regions, units=quant.unit("currency_unit"))
     m.consumption = Var(m.t, m.regions, units=quant.unit("currency_unit"))
 
-    m.ignore_damages = Param(doc="::economics.damages.ignore damages")
+    m.ignore_damages = Param(initialize=inputs.config("economics.damages.ignore damages"))
 
     m.TFP = Param(m.t, m.regions, initialize=economics.get_TFP_value)
 
@@ -173,7 +173,14 @@ def get_constraints(
                 m.GDP_net,
                 lambda m, t, r: (
                     m.GDP_gross[t, r]
-                    * (1 - (m.damage_costs[t, r] if not value(m.ignore_damages) else 0))
+                    * (
+                        1
+                        - (
+                            (m.damage_costs[t, r] + m.adaptation_costs[t, r])
+                            if not value(m.ignore_damages)
+                            else 0
+                        )
+                    )
                     - m.mitigation_costs_abs[t, r]
                     - m.financial_transfer_abs[t, r]
                 ),
@@ -184,23 +191,31 @@ def get_constraints(
             ),
             RegionalEquation(
                 m.investments,
-                lambda m, t, r: (m.sr * m.GDP_net[t, r]),
+                lambda m, t, r: m.sr * m.GDP_net[t, r],
             ),
             RegionalEquation(
                 m.consumption,
-                lambda m, t, r: ((1 - m.sr) * m.GDP_net[t, r]),
+                lambda m, t, r: (1 - m.sr) * m.GDP_net[t, r]
+                - m.non_market_damage_costs_abs[t, r],
             ),
         ]
     )
 
     # GDP loss: takes into account indirect effects of reduced GDP growth due to damages and mitigation costs
     m.GDP_loss = Var(
-        m.t,
-        m.regions,
-        units=quant.unit("fraction_of_baseline_GDP"),
-        initialize=0,
+        m.t, m.regions, units=quant.unit("fraction_of_baseline_GDP"), initialize=0
     )
     m.global_GDP_loss = Var(
+        m.t, units=quant.unit("fraction_of_baseline_GDP"), initialize=0
+    )
+
+    m.total_direct_costs_abs = Var(
+        m.t, m.regions, units=quant.unit("currency_unit"), initialize=0
+    )
+    m.indirect_costs = Var(
+        m.t, m.regions, units=quant.unit("fraction_of_baseline_GDP"), initialize=0
+    )
+    m.global_indirect_costs = Var(
         m.t, units=quant.unit("fraction_of_baseline_GDP"), initialize=0
     )
 
@@ -217,6 +232,31 @@ def get_constraints(
                 lambda m, t: (
                     (m.global_baseline_GDP[t] - m.global_GDP_net[t])
                     / m.global_baseline_GDP[t]
+                ),
+            ),
+            RegionalEquation(
+                m.total_direct_costs_abs,
+                lambda m, t, r: (
+                    m.mitigation_costs_abs[t, r]
+                    + m.damage_costs_abs[t, r]
+                    + m.adaptation_costs_abs[t, r]
+                ),
+            ),
+            RegionalEquation(
+                m.indirect_costs,
+                lambda m, t, r: (
+                    m.GDP_loss[t, r]
+                    - (m.total_direct_costs_abs[t, r] / m.baseline_GDP[t, r])
+                ),
+            ),
+            GlobalEquation(
+                m.global_indirect_costs,
+                lambda m, t: (
+                    m.global_GDP_loss[t]
+                    - (
+                        sum(m.total_direct_costs_abs[t, r] for r in m.regions)
+                        / m.global_baseline_GDP[t]
+                    )
                 ),
             ),
         ]

@@ -6,7 +6,7 @@ Objective function
 from typing import Sequence, Tuple
 
 from mimosa.common import (
-    AbstractModel,
+    ConcreteModel,
     Constraint,
     GeneralConstraint,
     GlobalConstraint,
@@ -16,12 +16,13 @@ from mimosa.common import (
     Var,
     exp,
     minimize,
-    ModelContext,
 )
+
+from mimosa.core.model_inputs import ModelInputs
 
 
 def get_constraints(
-    m: AbstractModel, context: ModelContext
+    m: ConcreteModel, inputs: ModelInputs
 ) -> Tuple[Objective, Sequence[GeneralConstraint]]:
     """Equations and constraints for the objective of the optimisation
     (global costs specification)
@@ -41,7 +42,7 @@ def get_constraints(
     constraints = []
 
     m.NPV = Var(m.t)
-    m.PRTP = Param(doc="::economics.PRTP")
+    m.PRTP = Param(initialize=inputs.config("economics.PRTP"))
     constraints.extend(
         [
             GlobalConstraint(
@@ -53,7 +54,9 @@ def get_constraints(
                     * (
                         sum(m.mitigation_costs_abs[t, r] for r in m.regions)
                         + sum(
-                            m.damage_costs[t, r] * m.GDP_gross[t, r] for r in m.regions
+                            (m.damage_costs[t, r] + m.adaptation_costs[t, r])
+                            * m.GDP_gross[t, r]
+                            for r in m.regions
                         )
                     )
                     if t > 0

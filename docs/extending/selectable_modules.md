@@ -27,14 +27,15 @@ Create `mimosa/components/damages/newdamage.py`:
 
 ```python title="mimosa/components/damages/newdamage.py"
 from mimosa.common import (
-    AbstractModel,
-    ModelContext,
+    ConcreteModel,
     RegionalEquation,
     Var,
 )
 
+from mimosa.core.model_inputs import ModelInputs
 
-def get_constraints(m: AbstractModel, context: ModelContext):
+
+def get_constraints(m: ConcreteModel, inputs: ModelInputs):
     """Example damage specification with cubic damage costs."""
 
     m.damage_costs = Var(m.t, m.regions)
@@ -47,7 +48,7 @@ def get_constraints(m: AbstractModel, context: ModelContext):
     ]
 ```
 
-This example does not use `context` itself, but the argument is present because every component is
+This example does not use `inputs` itself, but the argument is present because every component is
 called in the same way.
 
 ### 2. Add it to the selection dictionary
@@ -67,8 +68,9 @@ DAMAGE_MODULES = {
 }
 ```
 
-`create_abstract_model` already reads the selected damage function from `DAMAGE_MODULES`. Do not add a
-separate call to `newdamage.get_constraints` in `abstract_model.py`.
+The package's `get_constraints(m, inputs)` reads the selected damage function from `DAMAGE_MODULES`.
+The model builder calls that package function. Do not add a
+separate call to `newdamage.get_constraints` in `model_builder.py`.
 
 ### 3. Add the configuration choice
 
@@ -106,7 +108,7 @@ want MIMOSA to support several biodiversity representations: no biodiversity imp
 temperature-dependent representation, and a more detailed representation based on ecosystems.
 
 This requires a new component package, a new selection dictionary, a configuration choice, and one
-entry in MIMOSA's component catalogue.
+call in MIMOSA's model builder.
 
 ### 1. Create the package and submodules
 
@@ -120,15 +122,19 @@ mimosa/components/biodiversity/
 └── ecosystems.py
 ```
 
-Each file contains a `get_constraints(m, context)` function. All three should create the same main
+Each file contains a `get_constraints(m, inputs)` function. All three should create the same main
 output variables, so other components can use them without knowing which representation was selected.
 For example, they could all define `m.biodiversity_loss`, while calculating it in different ways.
 
-### 2. Create the selection dictionary
+### 2. Create the selection dictionary and package entry point
 
 Connect the user-facing names to those functions in `mimosa/components/biodiversity/__init__.py`:
 
 ```python title="mimosa/components/biodiversity/__init__.py"
+from mimosa.common import ConcreteModel
+from mimosa.common.utils import load_from_registry
+from mimosa.core.model_inputs import ModelInputs
+
 from . import ecosystems, no_biodiversity, temperature_dependent
 
 
@@ -137,7 +143,16 @@ BIODIVERSITY_MODULES = {
     "temperature_dependent": temperature_dependent.get_constraints,
     "ecosystems": ecosystems.get_constraints,
 }
+
+
+def get_constraints(m: ConcreteModel, inputs: ModelInputs):
+    module = inputs.config_value("model structure.biodiversity module")
+    get_module_constraints = load_from_registry(module, BIODIVERSITY_MODULES)
+    return get_module_constraints(m, inputs)
 ```
+
+The package owns its selection. `load_from_registry` reports an unsupported name together with
+the available choices. The chosen submodule still receives the same model and inputs.
 
 ### 3. Define the configuration choice
 
@@ -157,24 +172,25 @@ model structure:
     default: none
 ```
 
-### 4. Add the selection to the component catalogue
+### 4. Call the package in the model builder
 
-Import the package and add it to `MODEL_COMPONENTS` in
-`mimosa/abstract_model.py`:
+Import the package and call its `get_constraints` function in `create_model` in
+`mimosa/model_builder.py`:
 
-```python title="mimosa/abstract_model.py"
+```python title="mimosa/model_builder.py"
 from mimosa.components import biodiversity
 
 
-MODEL_COMPONENTS = (
-    # ... existing components ...
-    selectable_component("biodiversity", biodiversity.BIODIVERSITY_MODULES),
-)
+def create_model(inputs: ModelInputs):
+    m = create_base_model(inputs)
+    constraints = []
+    # ... existing component calls ...
+    constraints.extend(biodiversity.get_constraints(m, inputs))
+    # ... remaining components and constraint attachment ...
 ```
 
-The name `biodiversity` must match the first part of `biodiversity module` in the configuration.
-MIMOSA then reads the selection into `ModelContext` and calls the chosen function automatically.
-Place the entry near the model components that use or produce related quantities.
+The package reads `model structure.biodiversity module` from `ModelInputs` and calls the chosen
+function. Place the construction call near the model components that use or produce related quantities.
 
 Users can now select a representation in the same way as existing modules:
 

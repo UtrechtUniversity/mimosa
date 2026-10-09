@@ -10,7 +10,13 @@ import numpy as np
 import pandas as pd
 
 import mimosa
-from mimosa.common import Var, get_all_variables, get_all_time_dependent_params, value
+from mimosa.common import (
+    Var,
+    get_all_variables,
+    get_all_time_dependent_params,
+    quant,
+    value,
+)
 
 
 def save_output_pyomo(
@@ -54,7 +60,7 @@ def save_output(
     rows = []
     for useful_var in all_variables:
         var_to_row(rows, m, useful_var.var, useful_var.is_regional, useful_var.unit)
-    add_derived_global_cost_rows(rows, m, all_variables)
+    add_derived_global_rows(rows, m, all_variables)
     dataframe = rows_to_dataframe(rows, m)
 
     # add_param_columns(df, params, id, experiment)
@@ -97,21 +103,40 @@ def var_to_row(rows, m, var, is_regional, unit):
         rows.append([name, "Global", unit] + [value(var[t]) for t in m.t])
 
 
-def add_derived_global_cost_rows(rows, m, all_variables):
+def add_derived_global_rows(rows, m, all_variables):
     """
-    Add missing global cost series to the exported results.
+    Add derived regional and missing global series to the exported results.
 
-    Some cost variables are defined only by time and region because their global
-    counterparts are not needed while solving the model. To keep these variables
-    available at the global level without adding equations to the optimisation
-    problem, MIMOSA derives the corresponding series while exporting the results.
+    Indirect costs are attributed to damage, mitigation, and adaptation using
+    their shares of cumulative direct costs. Only costs before the current time
+    step are included, and annual cost flows are weighted by the length of the
+    interval over which they affect capital accumulation. Global series are the
+    baseline-GDP-weighted aggregations of the regional attributed costs. All
+    attributed series are zero in the initial period or when cumulative direct
+    costs are zero. Damage and adaptation shares are zero when damages are
+    ignored; a missing adaptation-cost series is also treated as zero.
 
-    A variable is aggregated when it:
+    Some variables are defined only by time and region because their global
+    counterparts are not needed while solving the model. To keep selected
+    variables available at the global level without adding equations to the
+    optimisation problem, MIMOSA derives the corresponding series while exporting
+    the results.
+
+    A variable can be aggregated when it:
 
     - is a Pyomo variable indexed by time and region;
-    - has `fraction_of_GDP` as its unit;
-    - contains `costs` in its name; and
     - does not already have a `global_<variable name>` counterpart.
+
+    Regional population quantities, such as variables measured in `billion
+    people`, are summed directly:
+
+    $$
+    \\text{global population quantity}_t =
+    \\sum_r \\text{population quantity}_{t,r}.
+    $$
+
+    Regional cost variables are aggregated when they have `fraction_of_GDP` as
+    their unit and contain `costs` in their name.
 
     If an exported `<variable name>_abs` quantity exists, its regional values are
     used as the numerator:
@@ -132,15 +157,24 @@ def add_derived_global_cost_rows(rows, m, all_variables):
     {\\text{global GDP gross}_t}.
     $$
 
+    Regional adaptation effectiveness variables measured as
+    `fraction_of_gross_damages` are weighted by the corresponding sector's
+    absolute gross damages. The corresponding gross-damage variable is inferred
+    from the name: `<sector>_avoided_damages_adapt` uses
+    `<sector>_damage_costs_gross`. If global gross damages are zero, the exported
+    avoided fraction is `NaN`.
+
     The resulting `global_*` rows are added only to the exported CSV file. They
     are not added as Pyomo components and therefore cannot be accessed as
     attributes of the model. Global variables that already exist in the model are
     exported normally and are not replaced by this calculation.
     """
-    variables_by_name = {
-        useful_var.name: useful_var for useful_var in all_variables
-    }
+    variables_by_name = {useful_var.name: useful_var for useful_var in all_variables}
     existing_names = set(variables_by_name)
+
+    add_indirect_cost_rows(rows, m, variables_by_name)
+
+    people_dimensionality = quant.unit("people", pyomo=False).dimensionality
 
     for useful_var in all_variables:
         source_var = getattr(useful_var.var, "_var", useful_var.var)
@@ -149,28 +183,152 @@ def add_derived_global_cost_rows(rows, m, all_variables):
         if (
             getattr(source_var, "ctype", None) is not Var
             or useful_var.indices != ["t", "regions"]
-            or str(useful_var.unit) != "fraction_of_GDP"
-            or "costs" not in useful_var.name
             or global_name in existing_names
         ):
             continue
 
-        absolute_costs = variables_by_name.get(f"{useful_var.name}_abs")
-        global_values = []
-        for t in m.t:
-            if absolute_costs is not None:
+        unit_str = str(useful_var.unit) if useful_var.unit is not None else ""
+        unit_dimensionality = (
+            quant.unit(unit_str, pyomo=False).dimensionality if unit_str else None
+        )
+
+        if unit_dimensionality == people_dimensionality:
+            global_values = [
+                sum(value(useful_var.var[t, r]) for r in m.regions) for t in m.t
+            ]
+        elif unit_str == "fraction_of_GDP" and "costs" in useful_var.name:
+            absolute_costs = variables_by_name.get(f"{useful_var.name}_abs")
+            global_values = []
+            for t in m.t:
+                if absolute_costs is not None:
+                    numerator = sum(value(absolute_costs.var[t, r]) for r in m.regions)
+                else:
+                    numerator = sum(
+                        value(useful_var.var[t, r]) * value(m.GDP_gross[t, r])
+                        for r in m.regions
+                    )
+                global_values.append(numerator / value(m.global_GDP_gross[t]))
+        elif unit_str == "fraction_of_gross_damages":
+            avoided_damages_suffix = "_avoided_damages_adapt"
+            if not useful_var.name.endswith(avoided_damages_suffix):
+                continue
+
+            sector_name = useful_var.name[: -len(avoided_damages_suffix)]
+            gross_damages = variables_by_name.get(
+                f"{sector_name}_damage_costs_gross"
+            )
+            if gross_damages is None:
+                continue
+
+            global_values = []
+            for t in m.t:
+                gross_damages_abs = {
+                    r: value(gross_damages.var[t, r])
+                    * value(m.GDP_gross[t, r])
+                    for r in m.regions
+                }
+                denominator = sum(gross_damages_abs.values())
                 numerator = sum(
-                    value(absolute_costs.var[t, r]) for r in m.regions
-                )
-            else:
-                numerator = sum(
-                    value(useful_var.var[t, r]) * value(m.GDP_gross[t, r])
+                    value(useful_var.var[t, r]) * gross_damages_abs[r]
                     for r in m.regions
                 )
-            global_values.append(numerator / value(m.global_GDP_gross[t]))
+                global_values.append(
+                    np.nan
+                    if np.isclose(denominator, 0.0)
+                    else numerator / denominator
+                )
+        else:
+            continue
+
+        rows.append([global_name, "Global", useful_var.unit, *global_values])
+
+
+def add_indirect_cost_rows(rows, m, variables_by_name):
+    """Attribute indirect costs to direct cost categories in exported rows."""
+    required_names = (
+        "indirect_costs",
+        "damage_costs_abs",
+        "mitigation_costs_abs",
+        "baseline_GDP",
+    )
+    if any(name not in variables_by_name for name in required_names):
+        return
+
+    indirect_costs = variables_by_name["indirect_costs"]
+    cost_variables = {
+        "damage": variables_by_name["damage_costs_abs"].var,
+        "mitigation": variables_by_name["mitigation_costs_abs"].var,
+        "adaptation": (
+            variables_by_name["adaptation_costs_abs"].var
+            if "adaptation_costs_abs" in variables_by_name
+            else None
+        ),
+    }
+    baseline_gdp = variables_by_name["baseline_GDP"].var
+    time_steps = list(m.t)
+    ignore_damages = bool(value(getattr(m, "ignore_damages", False)))
+
+    regional_values = {cost_type: {} for cost_type in cost_variables}
+    for region in m.regions:
+        cumulative_costs = {cost_type: 0.0 for cost_type in cost_variables}
+        values = {cost_type: [] for cost_type in cost_variables}
+
+        for position, t in enumerate(time_steps):
+            cumulative_total_costs = sum(cumulative_costs.values())
+            for cost_type in cost_variables:
+                if np.isclose(cumulative_total_costs, 0.0):
+                    attributed_costs = 0.0
+                else:
+                    cost_share = (
+                        cumulative_costs[cost_type] / cumulative_total_costs
+                    )
+                    attributed_costs = (
+                        value(indirect_costs.var[t, region]) * cost_share
+                    )
+                values[cost_type].append(attributed_costs)
+
+            if position + 1 < len(time_steps):
+                next_t = time_steps[position + 1]
+                interval_length = value(m.period_length[next_t])
+                for cost_type, cost_var in cost_variables.items():
+                    excluded_by_configuration = (
+                        ignore_damages and cost_type in ("damage", "adaptation")
+                    )
+                    direct_costs = (
+                        0.0
+                        if cost_var is None or excluded_by_configuration
+                        else value(cost_var[t, region])
+                    )
+                    cumulative_costs[cost_type] += interval_length * direct_costs
+
+        for cost_type in cost_variables:
+            regional_values[cost_type][region] = values[cost_type]
+            rows.append(
+                [
+                    f"indirect_{cost_type}_costs",
+                    region,
+                    indirect_costs.unit,
+                    *values[cost_type],
+                ]
+            )
+
+    for cost_type in cost_variables:
+        global_values = []
+        for position, t in enumerate(time_steps):
+            numerator = sum(
+                regional_values[cost_type][region][position]
+                * value(baseline_gdp[t, region])
+                for region in m.regions
+            )
+            global_values.append(numerator / value(m.global_baseline_GDP[t]))
 
         rows.append(
-            [global_name, "Global", useful_var.unit, *global_values]
+            [
+                f"global_indirect_{cost_type}_costs",
+                "Global",
+                indirect_costs.unit,
+                *global_values,
+            ]
         )
 
 
