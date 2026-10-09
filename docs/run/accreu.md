@@ -60,6 +60,18 @@
 - Separate versus combined adaptation.
 - **Graph:** selected sensitivity comparisons with clearly labelled assumptions.
 
+=== "Reduced adaptation effectiveness"
+
+    ```python
+    --8<-- "tests/runs/run_accreu_ada_red_eff.py"
+    ```
+
+=== "Implementation gap"
+
+    ```python
+    --8<-- "tests/runs/run_accreu_ada_impl_gap.py"
+    ```
+
 ??? info "Advanced: replaying controls"
 
     - Example retaining chosen controls while changing realised effectiveness.
