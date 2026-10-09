@@ -145,7 +145,9 @@ for monetise_mortality in [False, True]:
         # measures. The resulting reduced damages are lower, but that's because the adaptation costs are lower.
         # In ada_unplanned the adaptation costs are the same as optimal adaptation, just the effectiveness is reduced.
         params_ada_planned = init_params(monetise_mortality, adapt_calibration)
-        params_ada_planned["economics"]["damages"]["accreu"]["cba_strategy"] = "joint"
+        params_ada_planned["economics"]["damages"]["accreu"][
+            "adaptation_determination"
+        ] = "solver_control"
         model_ada_planned = MIMOSA(params_ada_planned)
 
         reduced_control_variables_values = reduce_adaptation_costs(
