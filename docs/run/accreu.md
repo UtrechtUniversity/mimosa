@@ -26,13 +26,13 @@
     --8<-- "tests/runs/run_accreu_ada.py"
     ```
 
-=== "Mitigation and adaptation CBA (sequential)"
+=== "Mitig. and adapt. CBA (sequential)"
 
     ```python
     --8<-- "tests/runs/run_accreu_mit_then_ada.py"
     ```
 
-=== "Mitigation and adaptation CBA (joint)"
+=== "Mitig. and adapt. CBA (joint)"
 
     ```python
     --8<-- "tests/runs/run_accreu_mit_ada_joint.py"
