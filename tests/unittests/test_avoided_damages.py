@@ -32,6 +32,7 @@ def test_analytical_accreu_uses_a_noadaptation_nopolicy_baseline():
     params["time"]["periods"] = {}
     params["model structure"]["damage module"] = "ACCREU"
     options = params["economics"]["damages"]["accreu"]
+    options["adaptation"] = "sectoral"
     options["adaptation_determination"] = "analytical_optimum"
 
     model = MIMOSA(params, prerun=False)

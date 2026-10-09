@@ -9,7 +9,7 @@ from mimosa.common.config.parseconfig import check_params
 def test_option_defaults_and_module_selectors_are_preserved():
     params = load_params()
     accreu = params["economics"]["damages"]["accreu"]
-    assert accreu["adaptation"] == "sectoral"
+    assert accreu["adaptation"] == "noadaptation"
     assert accreu["cba_strategy"] == "mitigation_then_adaptation"
     assert accreu["adaptation_determination"] == "analytical_optimum"
     assert accreu["adaptation_calibration"] == "accreu"

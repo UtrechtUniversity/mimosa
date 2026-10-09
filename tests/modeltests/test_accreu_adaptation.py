@@ -13,6 +13,7 @@ def test_joint_cba_supports_analytical_adaptation():
     params["time"]["periods"] = {}
     params["model structure"]["damage module"] = "ACCREU"
     options = params["economics"]["damages"]["accreu"]
+    options["adaptation"] = "sectoral"
     options["adaptation_determination"] = "analytical_optimum"
     options["cba_strategy"] = "joint"
 

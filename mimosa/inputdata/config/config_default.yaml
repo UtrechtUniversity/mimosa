@@ -308,7 +308,7 @@ economics:
           - sectoral
           - combined
           - noadaptation
-        default: sectoral
+        default: noadaptation
 
       cba_strategy:
         descr: >-

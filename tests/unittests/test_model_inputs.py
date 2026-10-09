@@ -68,7 +68,7 @@ def test_sections_dictionary_settings_and_nested_regional_values_are_plain(input
     before = deepcopy(inputs.params)
     options = inputs.config_value("economics.damages.accreu")
     assert options == inputs.params["economics"]["damages"]["accreu"]
-    assert options["adaptation"] == "sectoral"
+    assert options["adaptation"] == "noadaptation"
     assert inputs.config_value("model structure.damage module") == "COACCH"
     assert inputs.config_value("economics.MAC")["gamma"] == "2887 USD2010/tCO2"
     frames = inputs.config("economics.MAC.SSP_calibration_factor.SSP1")
