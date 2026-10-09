@@ -41,7 +41,7 @@ def get_constraints(
     $$
 
     where the variable $\\text{common level}_t$ can have arbitrary values and is purely used as a common
-    value accross all the regions[^1]. Note that the variable $\\text{damages}_{t,r}$ is already expressed as percentage of GDP (see [Damages](damages.md)).
+    value accross all the regions[^1]. Note that the variable $\\text{damages}_{t,r}$ is already expressed as percentage of GDP (see [Damages](damages/index.md)).
 
     For feasibility reasons, this constraint is only enforced until 2100.
 

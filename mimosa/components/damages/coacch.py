@@ -28,7 +28,7 @@ def get_constraints(
     of global mean temperature above pre-industrial), and sea-level rise damages (SLR, as function of global mean
     sea-level rise in meters):
 
-    With [combined damages](../parameters.md#economics.damages.coacch_combined_slr_nonslr_damages),
+    With [combined damages](../../parameters.md#economics.damages.coacch_combined_slr_nonslr_damages),
     the temperature-dependent curve includes SLR impacts and the separate SLR damage term is zero.
 
     $$
@@ -113,7 +113,7 @@ def get_constraints_temperature_dependent(
     * The COACCH damage functions were created as function of temperature relative to 1986-2005, which is 0.6°C above pre-industrial.
         For this reason, the temperature is shifted by 0.6°C.
     * The damages are scaled by a factor $a_{q,r}$, which depends on the quantile $q$ of the damage function. This represents the uncertainty
-        in the damage function. For median damages, this factor is $a_{0.5,r} = 1$. The quantile can be set using the [damage quantile parameter](../parameters.md#economics.damages.quantile).
+        in the damage function. For median damages, this factor is $a_{0.5,r} = 1$. The quantile can be set using the [damage quantile parameter](../../parameters.md#economics.damages.quantile).
     * Since we assume that until 2020 the climate damages are already incorporated in the baseline GDP,
         we subtract the damages of the initial time period $t=0$.
 
@@ -123,7 +123,7 @@ def get_constraints_temperature_dependent(
     \\text{damages}_{\\text{non-SLR},t,r} = a_{q,r} \\cdot \\big( D(\\text{temperature}_t - 0.6; b_{1,r}, b_{2,r}) -  D(T_0 - 0.6; b_{1,r}, b_{2,r}) \\big).
     $$
 
-    All the damage coefficients are region-dependent (see [Damage functions and coefficients](damages.md#damage-functions-and-coefficients)).
+    All the damage coefficients are region-dependent (see [Damage functions and coefficients](coacch.md#damage-functions-and-coefficients)).
 
     ### Temperature-dependent damages aggregated to the world, and comparison with the literature:
 
@@ -138,7 +138,9 @@ def get_constraints_temperature_dependent(
     )
     quantile = inputs.config_value("economics.damages.quantile")
     adapt_prefix = (
-        "Ad" if inputs.config_value("economics.damages.coacch_slr_withadapt") else "NoAd"
+        "Ad"
+        if inputs.config_value("economics.damages.coacch_slr_withadapt")
+        else "NoAd"
     )
 
     # Damages not related to SLR (dependent on temperature)
@@ -155,13 +157,15 @@ def get_constraints_temperature_dependent(
     m.damage_noslr_b1 = Param(
         m.regions,
         initialize=inputs.regional(
-            "COACCH", f"combined_b1_{adapt_prefix}-q{quantile}" if combined else "NoSLR_b1"
+            "COACCH",
+            f"combined_b1_{adapt_prefix}-q{quantile}" if combined else "NoSLR_b1",
         ),
     )
     m.damage_noslr_b2 = Param(
         m.regions,
         initialize=inputs.regional(
-            "COACCH", f"combined_b2_{adapt_prefix}-q{quantile}" if combined else "NoSLR_b2"
+            "COACCH",
+            f"combined_b2_{adapt_prefix}-q{quantile}" if combined else "NoSLR_b2",
         ),
     )
     m.damage_noslr_b3 = Param(
@@ -173,7 +177,9 @@ def get_constraints_temperature_dependent(
 
     m.damage_noslr_a = Param(
         m.regions,
-        initialize=1 if combined else inputs.regional("COACCH", f"NoSLR_a (q={quantile})"),
+        initialize=(
+            1 if combined else inputs.regional("COACCH", f"NoSLR_a (q={quantile})")
+        ),
     )
 
     # Quadratic damage function for non-SLR damages. Factor `a` represents
@@ -200,11 +206,11 @@ def get_constraints_slr(
 
     In MIMOSA, sea-level rise damages are modelled separately from temperature dependent damages, as they occur
     on a different time scale: sea-level rise is a slow process with high inertia. Therefore, these damages are
-    calculated as a function of global mean sea-level rise (SLR) in meters (calculated in the [Sea-level rise](sealevelrise.md) component).
+    calculated as a function of global mean sea-level rise (SLR) in meters (calculated in the [Sea-level rise](../sealevelrise.md) component).
 
-    The SLR damages are calculated with the DIVA impact model (see [Impact sectors used in the damage functions](damages.md#impact-sectors-used-in-the-damage-functions)).
+    The SLR damages are calculated with the DIVA impact model (see [Impact sectors used in the damage functions](coacch.md#impact-sectors-used-in-the-damage-functions)).
     These damages are available either with optimal adaptation (and include adaptation costs), or without adaptation. This can be
-    chosen with the parameter [coacch_slr_withadapt](../parameters.md#economics.damages.coacch_slr_withadapt). By default, the optimal
+    chosen with the parameter [coacch_slr_withadapt](../../parameters.md#economics.damages.coacch_slr_withadapt). By default, the optimal
     adaptation case is used.
 
     Depending on the region, the SLR damages are modelled with different functional forms following from a best-fit regression. The
@@ -220,7 +226,7 @@ def get_constraints_slr(
 
     The values of $b_1$, $b_2$, and $b_3$ are region-dependent and depend on whether adaptation is included or not. These are different
     values than the coefficients in the temperature-dependent damages. The functional form
-    depends on the regression of the underlying impact data (see [Damage functions and coefficients](damages.md#damage-functions-and-coefficients)),
+    depends on the regression of the underlying impact data (see [Damage functions and coefficients](coacch.md#damage-functions-and-coefficients)),
     and are equal to:
 
     <div class="tiny_table table_first_col_header table_scrollable" markdown>
@@ -231,7 +237,7 @@ def get_constraints_slr(
 
     * Similar to temperature-dependent damages, the SLR damages are scaled by a factor $a_{q,r}$, which depends on the quantile $q$ of the damage function.
         This represents the uncertainty in the damage function. For median damages, this factor is $a_{0.5,r} = 1$. The quantile can be set using the
-        [damage quantile parameter](../parameters.md#economics.damages.quantile).
+        [damage quantile parameter](../../parameters.md#economics.damages.quantile).
     * Since we assume that until 2020 the climate damages are already incorporated in the baseline GDP,
         we subtract the damages of the initial time period $t=0$.
 
@@ -248,7 +254,9 @@ def get_constraints_slr(
     )
     quantile = inputs.config_value("economics.damages.quantile")
     adapt_prefix = (
-        "Ad" if inputs.config_value("economics.damages.coacch_slr_withadapt") else "NoAd"
+        "Ad"
+        if inputs.config_value("economics.damages.coacch_slr_withadapt")
+        else "NoAd"
     )
 
     # SLR damages
@@ -261,30 +269,38 @@ def get_constraints_slr(
         m.regions,
         within=Any,
         initialize=(
-            "Robust-Linear" if combined
+            "Robust-Linear"
+            if combined
             else inputs.regional("COACCH", f"SLR-{adapt_prefix}_form")
         ),
     )  # String for functional form
     m.damage_slr_b1 = Param(
         m.regions,
-        initialize=0 if combined else inputs.regional("COACCH", f"SLR-{adapt_prefix}_b1"),
+        initialize=(
+            0 if combined else inputs.regional("COACCH", f"SLR-{adapt_prefix}_b1")
+        ),
     )
     m.damage_slr_b2 = Param(
         m.regions,
         within=Any,
-        initialize=0 if combined else inputs.regional("COACCH", f"SLR-{adapt_prefix}_b2"),
+        initialize=(
+            0 if combined else inputs.regional("COACCH", f"SLR-{adapt_prefix}_b2")
+        ),
     )  # within=Any since it can be empty for some functional forms
     m.damage_slr_b3 = Param(
         m.regions,
         within=Any,
-        initialize=0 if combined else inputs.regional("COACCH", f"SLR-{adapt_prefix}_b3"),
+        initialize=(
+            0 if combined else inputs.regional("COACCH", f"SLR-{adapt_prefix}_b3")
+        ),
     )  # within=Any since it can be empty for some functional forms
     # (b2 and b3 are only used for some functional forms)
 
     m.damage_slr_a = Param(
         m.regions,
         initialize=(
-            0 if combined
+            0
+            if combined
             else inputs.regional("COACCH", f"SLR-{adapt_prefix}_a (q={quantile})")
         ),
     )

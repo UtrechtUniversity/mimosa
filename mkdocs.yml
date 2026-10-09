@@ -9,7 +9,10 @@ nav:
       - Emissions and temperature: components/emissions.md
       - Mitigation: components/mitigation.md
       - Sea-level rise: components/sealevelrise.md
-      - Damages: components/damages.md
+      - Damages:
+          - components/damages/index.md
+          - COACCH damages: components/damages/coacch.md
+          - ACCREU damages and adaptation: components/damages/accreu.md
       - Effort-sharing: components/effortsharing.md
       - Emission trading: components/emissiontrading.md
       - Financial transfers: components/financialtransfers.md
@@ -22,6 +25,7 @@ nav:
       - Simulation vs optimisation: run/simulation.md
       - Doing a baseline run: run/baseline.md
       - Doing multiple runs: run/multipleruns.md
+      - Doing an ACCREU run: run/accreu.md
       - Doing an effort-sharing run: run/effortsharing.md
       - "Advanced: logging": run/logging.md
       - Python reference: run/python_reference.md

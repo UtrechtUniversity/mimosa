@@ -320,7 +320,7 @@ economics:
         values:
           - mitigation_then_adaptation
           - joint
-        default: joint
+        default: mitigation_then_adaptation
 
       adaptation_determination:
         descr: >-
@@ -331,7 +331,7 @@ economics:
         values:
           - solver_control
           - analytical_optimum
-        default: solver_control
+        default: analytical_optimum
 
       adaptation_calibration:
         descr: >-
@@ -353,7 +353,7 @@ economics:
           Flag for whether the mortality should be monetised using the SVL
           (Statistical Value of Life)
         type: bool
-        default: False
+        default: True
 
       mortality_svl_rel_gdp_cap:
         descr: >-

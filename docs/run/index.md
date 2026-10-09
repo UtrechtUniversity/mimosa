@@ -16,6 +16,8 @@ With this code, the default parameter values are used (see [Parameter reference]
 
 ### ACCREU cost-benefit analysis
 
+[Doing an ACCREU run](accreu.md).
+
 ACCREU adaptation expenditure is a solver control by default, and `solve()`
 therefore optimises mitigation and adaptation jointly. To use the ordered
 cost-benefit workflow, select analytical adaptation and the sequential strategy.
