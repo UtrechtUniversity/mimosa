@@ -47,6 +47,34 @@ def test_transferred_controls_reproduce_saved_pathway(script_output):
     )
 
 
+def test_workflow_matches_manual_replay(script_output, accreu_mit_output):
+    model = script_output["model"]
+    mitigation_model = accreu_mit_output["model"]
+    controls = model._extract_compatible_controls(mitigation_model)
+    manual_result = model.run_simulation(**controls)
+
+    for variable in (
+        "relative_abatement", "temperature", "adaptation_costs_abs",
+        "damage_costs_abs", "avoided_damage_costs",
+        "global_avoided_damage_costs", "total_direct_costs_abs",
+    ):
+        actual = list(getattr(model.concrete_model, variable).extract_values().values())
+        expected = list(getattr(manual_result, variable).extract_values().values())
+        np.testing.assert_allclose(actual, expected, rtol=1e-7, atol=1e-9)
+    assert model.status == mitigation_model.status
+
+
+def test_avoided_damages_use_nopolicy_reference(script_output, accreu_mit_output):
+    model = script_output["model"].concrete_model
+    reference = accreu_mit_output["model"].concrete_model
+    baseline = np.asarray(list(reference.nopolicy_damage_costs.extract_values().values()))
+    damages = np.asarray(list(model.damage_costs.extract_values().values()))
+    avoided = np.asarray(list(model.avoided_damage_costs.extract_values().values()))
+
+    np.testing.assert_allclose(avoided, baseline - damages, rtol=1e-7, atol=1e-9)
+    assert np.isfinite(avoided).all()
+
+
 def test_saved_results_match_model(script_output):
     assert_saved_regional_output(
         script_output["model"],

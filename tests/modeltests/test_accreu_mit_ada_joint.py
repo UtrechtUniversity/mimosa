@@ -26,6 +26,15 @@ def test_positive_mitigation_and_adaptation(script_output):
     assert output.loc["adaptation_costs_abs", "2025":].max().max() > 0
 
 
+def test_analytical_adaptation_is_not_a_simulation_control(script_output):
+    model = script_output["model"]
+    assert model.params["economics"]["damages"]["accreu"][
+        "adaptation_determination"
+    ] == "analytical_optimum"
+    assert model._uses_sequential_accreu_cba() is False
+    assert not any("adaptation" in name for name in model.simulator.control_variables)
+
+
 def test_final_temperature_above_mitigation_only_run(script_output, accreu_mit_output):
     model = script_output["model"]
     output = read_output(model)
