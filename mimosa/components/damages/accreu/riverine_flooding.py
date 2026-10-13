@@ -57,19 +57,11 @@ def get_constraints(
 
         === "Damages (without adaptation)"
 
-            <div style="overflow: scroll;" markdown>
-            ``` plotly
-            {"file_path": "./assets/plots/coacch_all_curves_noslr.json"}
-            ```
-            </div>
+            ![Regional damage costs (without adaptation)](../../assets/fig/accreu/riverine_noadapt_ead.png)
 
         === "Adaptation costs"
 
-            <div style="overflow: scroll;" markdown>
-            ``` plotly
-            {"file_path": "./assets/plots/coacch_all_curves_noslr.json"}
-            ```
-            </div>
+            ![Regional damage costs (without adaptation)](../../assets/fig/accreu/riverine_adapt_eff.png)
 
 
     """

@@ -39,11 +39,39 @@ def get_constraints(
     (especially relevant for currently cold regions).
 
 
-    ### Damages
-    ...
+    <div class="grid cards" markdown>
 
-    ### Adaptation
-    ...
+    -   #### Global damages (heat- and cold-related, without adapt.)
+
+        ---
+
+        ``` plotly
+        {"file_path": "./assets/plots/labourprod_damages_global.json"}
+        ```
+
+    -   #### Global adaptation costs (only for heat-related damages)
+
+        ---
+
+        ``` plotly
+        {"file_path": "./assets/plots/labourprod_adaptation_global.json"}
+        ```
+    </div>
+
+    ??? regional-fct "Regional damage and adaptation functions"
+
+        === "Damages (without adaptation, heat-related)"
+
+            ![Regional damage costs (without adaptation)](../../assets/fig/accreu/labourprod_noadapt_ead.png)
+
+        === "Benefits (from reduced cold)"
+
+            ![Regional benefits from reduced cold](../../assets/fig/accreu/labourprod_benefit_cdd.png)
+
+        === "Adaptation costs"
+
+            ![Regional damage costs (without adaptation)](../../assets/fig/accreu/labourprod_adapt_eff.png)
+
 
     """
 

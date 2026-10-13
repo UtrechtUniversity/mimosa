@@ -41,11 +41,36 @@ def get_constraints(
     in the IAMs.
 
 
-    ### Damages
-    ...
 
-    ### Adaptation
-    ...
+
+    <div class="grid cards" markdown>
+
+    -   #### Global damages (without adaptation)
+
+        ---
+
+        ``` plotly
+        {"file_path": "./assets/plots/slr_damages_global.json"}
+        ```
+
+    -   #### Global adaptation costs
+
+        ---
+
+        ``` plotly
+        {"file_path": "./assets/plots/slr_adaptation_global.json"}
+        ```
+    </div>
+
+    ??? regional-fct "Regional damage and adaptation functions"
+
+        === "Damages (without adaptation)"
+
+            ![Regional damage costs (without adaptation)](../../assets/fig/accreu/slr_noadapt_ead.png)
+
+        === "Adaptation costs"
+
+            ![Regional damage costs (without adaptation)](../../assets/fig/accreu/slr_adapt_eff.png)
 
     """
 
