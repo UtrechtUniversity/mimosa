@@ -13,7 +13,7 @@ Climate impacts in MIMOSA are calculated using the [COACCH](https://www.coacch.e
 
 ## Damage functions and coefficients
 
-??? info "Visualisation of damage functions and damage coefficients"
+??? regional-fct "Visualisation of damage functions and damage coefficients"
 
     [:material-download: Download COACCH damage function coefficients](../../assets/data/COACCH_damage_function_coefficients_IMAGE_regions.xlsx){.md-button}
 
