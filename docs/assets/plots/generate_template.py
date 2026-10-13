@@ -69,7 +69,11 @@ template_slate = {
         "#F18872",
         "#bd7161",
     ],
-    "font": {"color": "#f2f5fa"},
+    "font": {
+        "color": "#f2f5fa",
+        "family": 'Roboto, Arial, "Frutiger LT Pro Condensed", "FrutigerLTPro-Condensed", "Open Sans", verdana, arial, sans-serif',
+        "size": 13,
+    },
     "hovermode": "closest",
     "hoverlabel": {"align": "left"},
     "paper_bgcolor": "rgba(17,17,17,0)",

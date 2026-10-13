@@ -6,19 +6,21 @@ icon: material/gamepad-circle
 
 :::mimosa.components.damages.accreu.all_damages.get_constraints
 
-## :material-home-flood: Riverine flooding
+## Impact sectors
+
+### :material-home-flood: Riverine flooding
 
 :::mimosa.components.damages.accreu.riverine_flooding.get_constraints
 
-## :material-human-male-male: Labour productivity
+### :material-human-male-male: Labour productivity
 
 :::mimosa.components.damages.accreu.labour_productivity.get_constraints
 
-## :material-waves-arrow-up: Sea level rise
+### :material-waves-arrow-up: Sea level rise
 
 :::mimosa.components.damages.accreu.sealevelrise.get_constraints
 
-## :material-heart-pulse: Mortality
+### :material-heart-pulse: Mortality
 
 :::mimosa.components.damages.accreu.mortality.get_constraints
 
