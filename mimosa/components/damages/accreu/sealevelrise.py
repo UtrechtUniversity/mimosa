@@ -31,7 +31,23 @@ from .utils import (
 def get_constraints(
     m: ConcreteModel, inputs: ModelInputs, adaptation_options: AdaptationOptions
 ):
-    """TODO"""
+    """
+
+    The sea-level rise impacts are calculated using the DIVA model. Specifically,
+    for this purpose, we compare the Constant Dike Height scenario (“no adaptation / CDH”)
+    with three adaptation scenarios: Constant flood protection standards, Doubling
+    flood protection standards, and Quadrupling flood protection standards. Importantly,
+    we do not use the “optimal adaptation” scenario from DIVA, to avoid double optimisation
+    in the IAMs.
+
+
+    ### Damages
+    ...
+
+    ### Adaptation
+    ...
+
+    """
 
     constraints = []
     adaptation_type = adaptation_options.adaptation_type

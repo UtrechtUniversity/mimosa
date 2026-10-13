@@ -30,7 +30,49 @@ from .utils import (
 def get_constraints(
     m: ConcreteModel, inputs: ModelInputs, adaptation_options: AdaptationOptions
 ):
-    """TODO"""
+    """
+
+    The impacts of riverine flooding are estimated using the GLOFRIS model.
+
+    <div class="grid cards" markdown>
+
+    -   #### Global damages (without adaptation)
+
+        ---
+
+        ``` plotly
+        {"file_path": "./assets/plots/riverine_damages_global.json"}
+        ```
+
+    -   #### Global adaptation costs
+
+        ---
+
+        ``` plotly
+        {"file_path": "./assets/plots/riverine_adaptation_global.json"}
+        ```
+    </div>
+
+    ??? regional-fct "Regional damage and adaptation functions"
+
+        === "Damages (without adaptation)"
+
+            <div style="overflow: scroll;" markdown>
+            ``` plotly
+            {"file_path": "./assets/plots/coacch_all_curves_noslr.json"}
+            ```
+            </div>
+
+        === "Adaptation costs"
+
+            <div style="overflow: scroll;" markdown>
+            ``` plotly
+            {"file_path": "./assets/plots/coacch_all_curves_noslr.json"}
+            ```
+            </div>
+
+
+    """
 
     constraints = []
 

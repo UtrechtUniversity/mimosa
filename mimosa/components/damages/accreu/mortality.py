@@ -23,7 +23,26 @@ from .utils import adaptation_effectiveness_fct, dmg_fct_linear, dmg_fct_power
 
 
 def get_constraints(m: ConcreteModel, inputs: ModelInputs, monetise_mortality=False):
-    """TODO"""
+    """
+
+    ### Physical impacts
+
+    The ACCREU damage representation includes temperature-related mortality impacts, though
+    without accounting for explicit adaptation. Like labour productivity, there is a heat-related
+    and cold-related component, varying strongly between regions. As global mean temperature increases,
+    the heat-related mortality increases, while the cold-related mortality decreases.
+
+    The mortality forecasts are sourced from Bressler et al. (2021). The paper forecasts the change in
+    future heat-related and cold-related mortality rates under RCP 2.6, RCP 4.5, RCP 6.0 and RCP 8.5 scenarios.
+    It does so for the 2040-59 and 2080-99 periods. For this analysis, the estimates for these ranges are assigned
+    to the years 2050 and 2090 respectively. In order to convert the forecasted change in the mortality rate
+    into an estimate of excess mortality, the Bressler forecasts were combined with mortality rate forecasts
+    from the World Bank (2025).
+
+    ### Monetisation of mortality
+    ...
+
+    """
 
     constraints = []
 
@@ -31,10 +50,12 @@ def get_constraints(m: ConcreteModel, inputs: ModelInputs, monetise_mortality=Fa
     m.mortality_heat_related = Var(m.t, m.regions, units=quant.unit("billion people"))
 
     m.mortality_heat_related_constant = Param(
-        m.regions, initialize=inputs.regional("ACCREU", "heat_related_mortality_perc_constant")
+        m.regions,
+        initialize=inputs.regional("ACCREU", "heat_related_mortality_perc_constant"),
     )
     m.mortality_heat_related_prod = Param(
-        m.regions, initialize=inputs.regional("ACCREU", "heat_related_mortality_perc_prod")
+        m.regions,
+        initialize=inputs.regional("ACCREU", "heat_related_mortality_perc_prod"),
     )
 
     constraints.append(
@@ -56,10 +77,12 @@ def get_constraints(m: ConcreteModel, inputs: ModelInputs, monetise_mortality=Fa
     m.mortality_cold_related = Var(m.t, m.regions, units=quant.unit("billion people"))
 
     m.mortality_cold_related_constant = Param(
-        m.regions, initialize=inputs.regional("ACCREU", "cold_related_mortality_perc_constant")
+        m.regions,
+        initialize=inputs.regional("ACCREU", "cold_related_mortality_perc_constant"),
     )
     m.mortality_cold_related_prod = Param(
-        m.regions, initialize=inputs.regional("ACCREU", "cold_related_mortality_perc_prod")
+        m.regions,
+        initialize=inputs.regional("ACCREU", "cold_related_mortality_perc_prod"),
     )
 
     constraints.append(

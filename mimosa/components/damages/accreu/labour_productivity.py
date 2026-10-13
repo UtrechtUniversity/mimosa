@@ -31,7 +31,21 @@ from .utils import (
 def get_constraints(
     m: ConcreteModel, inputs: ModelInputs, adaptation_options: AdaptationOptions
 ):
-    """TODO"""
+    """
+
+    The impact of climate change on labour productivity can be decomposed in two types:
+    heat-related expected annual costs due to warming (e.g. hot regions get hotter, leading
+    to reduced labour productivity), and cold-related expected annual benefits due to less cold days
+    (especially relevant for currently cold regions).
+
+
+    ### Damages
+    ...
+
+    ### Adaptation
+    ...
+
+    """
 
     constraints = []
 

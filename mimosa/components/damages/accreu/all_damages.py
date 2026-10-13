@@ -35,10 +35,33 @@ def get_constraints(
     m: ConcreteModel, inputs: ModelInputs
 ) -> Sequence[GeneralConstraint]:
     """
-    ACCREU damage specification
+    During the ACCREU project, new damage estimates were developed for [:material-home-flood: riverine flooding](accreu.md#riverine-flooding), [:material-human-male-male: labour productivity](accreu.md#labour-productivity),
+    [:material-waves-arrow-up: sea-level rise](accreu.md#sea-level-rise) and [:material-heart-pulse: mortality](accreu.md#mortality). Moreover, adaptation costs and effectiveness were estimated for all sectors
+    (except mortality).
 
-    Currently, the temperature-dependent damages are taken directly from the COACCH
-    specification.
+    The total damage costs are the sum of the sectoral damages:
+
+    $$
+    \\text{damages}_{t,r} = \\text{damages}_{\\text{riverine},t,r} + \\text{damages}_{\\text{labour prod. (net)},t,r} + \\text{damages}_{\\text{SLR},t,r}.
+    $$
+
+    Similarly, the total adaptation costs are the sum of the sectoral adaptation costs:
+
+    $$
+    \\text{adapt. costs}_{t,r} = \\text{adapt. costs}_{\\text{riverine},t,r} + \\text{adapt. costs}_{\\text{labour prod.},t,r} + \\text{adapt. costs}_{\\text{SLR},t,r}.
+    $$
+
+    As mentioned above, mortality is also included in this damage representation. However, since (the monetisation of) mortality
+    is not represented as a direct cost to the economy, but rather a non-market impact, it is not included in the total damage costs.
+    Instead, the monetised mortality costs are reported separately. If a user is interested in the sum of market and non-market damages,
+    this is given by the variable `market_and_non_market_damage_costs`, calculated as:
+
+    $$
+    \\text{market and non-market damages}_{t,r} = \\text{damages}_{t,r} + \\frac{\\text{abs. damages}_{\\text{mortality},t,r}}{\\text{GDP}_{\\text{gross},t,r}},
+    $$
+
+    where $\\text{abs. damages}_{\\text{mortality}}$ is the mortality damages in absolute terms (i.e. in currency units),
+    and $\\text{GDP}_{\\text{gross}}$ is the gross GDP, also in absolute terms (i.e. in currency units).
 
     """
 
@@ -83,8 +106,6 @@ def get_constraints(
     constraints.extend(
         mortality.get_constraints(m, inputs, monetise_mortality=monetise_mortality)
     )
-
-    # Add all non-SLR sectors together
 
     m.damage_costs = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
     m.damage_costs_abs = Var(m.t, m.regions, units=quant.unit("currency_unit"))

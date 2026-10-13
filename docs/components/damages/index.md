@@ -2,10 +2,28 @@
 icon: material/home-flood
 ---
 
+# Damages
+
 [:octicons-arrow-left-24: Back to general structure](../index.md)
 
-## Damage-model choices
+There are two damage representations available in MIMOSA:
 
-- Overview of the available damage models and when to use them.
-- [**COACCH:** damage functions](coacch.md).
-- [**ACCREU:** damages and adaptation by impact sector](accreu.md).
+<div class="grid cards" markdown>
+
+-   #### :material-google-circles-extended: COACCH
+
+    ---
+
+    Economic damages for temperature and sea-level rise driven impacts
+
+    [:octicons-arrow-right-24: Read more](coacch.md){.md-button}
+
+-   #### :material-gamepad-circle: ACCREU
+
+    ---
+
+    Economic damages and adaptation by impact sector
+
+    [:octicons-arrow-right-24: Read more](accreu.md){.md-button}
+
+
