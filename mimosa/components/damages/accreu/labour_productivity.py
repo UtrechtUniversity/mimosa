@@ -41,7 +41,7 @@ def get_constraints(
 
     <div class="grid cards" markdown>
 
-    -   #### Global damages (heat- and cold-related, without adapt.)
+    -   <h5 class="no-nav">Global damages (heat- and cold-related, without adapt.)</h5>
 
         ---
 
@@ -49,7 +49,7 @@ def get_constraints(
         {"file_path": "./assets/plots/labourprod_damages_global.json"}
         ```
 
-    -   #### Global adaptation costs (only for heat-related damages)
+    -   <h5 class="no-nav">Global adaptation costs (only for heat-related damages)</h5>
 
         ---
 

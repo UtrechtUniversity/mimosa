@@ -37,6 +37,9 @@ def create_all_figs():
         raw["slr_adaptation"], "slr", maxval=30
     )
 
+    ## Global mortality plot
+    figs["mortality_global"] = fig_mortality_global(raw)
+
     return figs
 
 
@@ -67,6 +70,43 @@ def fig_slr_damages_global(raw):
         xvar="global_slr_rel_to_2020",
     )
     fig.update_xaxes(ticksuffix=" m", title="SLR (relative to 2020)")
+    return fig
+
+
+def fig_mortality_global(raw):
+    fig_heat = fig_damages_global(
+        raw["mortality"],
+        "heat_related_mortality",
+        form="quadr_shifted_1.1",
+        yvar="Heat-related additional deaths (% population)",
+        yvar_param="perc",
+    )
+    fig_cold = fig_damages_global(
+        raw["mortality"],
+        "cold_related_mortality",
+        form="linear_shifted_1.1",
+        yvar="Cold-related additional deaths (% population)",
+        yvar_param="perc",
+    )
+    fig = fig_heat
+    for trace in fig_cold.data:
+        fig.add_trace(trace)
+
+    fig.update_yaxes(title="Mortality<br>(% population)")
+    fig.add_annotation(
+        x=4.5,
+        y=0.00065,
+        text="Extra heat-related deaths",
+        showarrow=False,
+        xanchor="right",
+    )
+    fig.add_annotation(
+        x=4.5,
+        y=-0.00015,
+        text="Reduced cold-related deaths",
+        showarrow=False,
+        xanchor="right",
+    )
     return fig
 
 
@@ -115,6 +155,13 @@ def fig_damages_global(
             p(f"{sector}_{yvar_param}_power"),
         )
         y = a + b * x**c
+    elif form in ["linear_shifted_1.1", "quadr_shifted_1.1"]:
+        a, b = (
+            p(f"{sector}_{yvar_param}_constant"),
+            p(f"{sector}_{yvar_param}_prod"),
+        )
+        power = 1 if form == "linear_shifted_1.1" else 2
+        y = a + b * (x - 1.1) ** power
     else:
         raise ValueError(f"Unknown form {form}")
     fig.add_scatter(

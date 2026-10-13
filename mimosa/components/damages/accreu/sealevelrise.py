@@ -45,7 +45,7 @@ def get_constraints(
 
     <div class="grid cards" markdown>
 
-    -   #### Global damages (without adaptation)
+    -   <h5 class="no-nav">Global damages (without adaptation)</h5>
 
         ---
 
@@ -53,7 +53,7 @@ def get_constraints(
         {"file_path": "./assets/plots/slr_damages_global.json"}
         ```
 
-    -   #### Global adaptation costs
+    -   <h5 class="no-nav">Global adaptation costs</h5>
 
         ---
 

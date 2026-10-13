@@ -39,6 +39,17 @@ def get_constraints(m: ConcreteModel, inputs: ModelInputs, monetise_mortality=Fa
     into an estimate of excess mortality, the Bressler forecasts were combined with mortality rate forecasts
     from the World Bank (2025).
 
+    <div class="grid cards" markdown>
+
+    -   <h5 class="no-nav">Global mortality (heat- and cold-related, without adaptation)</h5>
+
+        ---
+
+        ``` plotly
+        {"file_path": "./assets/plots/mortality_global.json"}
+        ```
+    </div>
+
     ### Monetisation of mortality
     ...
 
