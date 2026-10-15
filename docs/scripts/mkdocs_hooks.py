@@ -5,7 +5,11 @@ import pandas as pd
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../../"))
 
-from docs.scripts.variable_docs import get_documentation_context
+from docs.scripts.variable_docs import (
+    clear_documentation_cache,
+    get_documentation_context,
+    get_variable_catalogue,
+)
 from mimosa.common.config.parseconfig import (
     get_nested,
     flatten,
@@ -227,8 +231,13 @@ def on_page_content(html, **kwargs):
 
 def on_post_build(**kwargs):
     # Release models and refresh metadata on the next build, including mkdocs serve.
-    get_documentation_context.cache_clear()
+    clear_documentation_cache()
 
 
 def on_build_error(**kwargs):
-    get_documentation_context.cache_clear()
+    clear_documentation_cache()
+
+
+def on_pre_build(**kwargs):
+    # Collect available named configurations once before rendering any pages.
+    get_variable_catalogue()
