@@ -25,12 +25,35 @@ are performed. Avoided-damage variables are declared separately and marked as
 requiring a baseline, without attaching or evaluating their equations. Parameters
 and series created only during export are excluded from the catalogue.
 
+## Variable reference resolution
+
+[`docs/scripts/variable_references.py`](docs/scripts/variable_references.py) resolves
+`var::name` and `varref::name`. Both accept an explicit context, for example
+`var::accreu_combined::combined_labprod_riv_damage_costs`.
+
+The resolver accepts the page's `variable_context` frontmatter value as its default
+context. An explicit context in a marker overrides it. With no context, a name is
+accepted only when it has one metadata variant across the catalogue. Unknown
+variables, unknown contexts, unavailable variables and ambiguous names raise
+errors that include the source page when supplied.
+
+Entries are merged only when their name, description, units, dimensions, declared
+unit status and baseline requirement match. A merged entry retains all of its
+contexts and their anchors, such as `variable-accreu_sectoral--damage_costs`.
+Editing descriptions or regrouping entries therefore preserves existing links.
+The URL helper calculates links from the current page's output URL, supporting
+both directory URLs and `.html` pages.
+
+This step provides resolution and link helpers. Connecting them to page
+frontmatter and rendering markers into pages and component docstrings is the
+next step; authoring markers in public pages is not enabled yet.
+
 ## Validation
 
 Activate the `accreu` Conda environment, then run:
 
 ```sh
-python -m pytest tests/unittests/test_variable_docs.py
+python -m pytest tests/unittests/test_variable_docs.py tests/unittests/test_variable_references.py
 python -m mkdocs build --strict
 ```
 
