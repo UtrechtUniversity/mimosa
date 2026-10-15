@@ -5,20 +5,13 @@ import pandas as pd
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../../"))
 
-from mimosa import MIMOSA
+from docs.scripts.variable_docs import get_documentation_context
 from mimosa.common.config.parseconfig import (
     get_nested,
-    check_params,
     flatten,
     load_default_yaml,
 )
 from mimosa.common.config.utils.parsers import PARSER_FACTORY
-
-# Get the default parameters and the parser tree
-params, parser_tree = check_params({}, return_parser_tree=True)
-
-# Create the model only to inspect its parameters; no baseline simulation is needed.
-model = MIMOSA(params, prerun=False).concrete_model
 
 
 def markdown_parse_param_reference(markdown):
@@ -30,6 +23,7 @@ def markdown_parse_param_reference(markdown):
         return markdown
 
     # Build the parameter reference
+    parser_tree = get_documentation_context().parser_tree
     reference_markdown = recursive_param_print(parser_tree, "", [], "")
 
     # Replace the reference in the markdown
@@ -49,7 +43,7 @@ def markdown_parse_parser_types(markdown):
 
 """
 
-    flattened_parser_tree = flatten(parser_tree)
+    flattened_parser_tree = flatten(get_documentation_context().parser_tree)
     default_yaml = load_default_yaml()
 
     for parser_type, parser in PARSER_FACTORY.parsers.items():
@@ -196,6 +190,8 @@ def _print_param(tree, mainkey, breadcrumbs, indent=""):
 
 
 def on_page_content(html, **kwargs):
+    context = get_documentation_context()
+    model, parser_tree = context.model, context.parser_tree
     pattern = re.compile(r"(param::([a-zA-Z0-9_]+))")
     for match, param_name in re.findall(pattern, html):
         try:
@@ -227,3 +223,12 @@ def on_page_content(html, **kwargs):
         except AttributeError:
             pass
     return html
+
+
+def on_post_build(**kwargs):
+    # Release models and refresh metadata on the next build, including mkdocs serve.
+    get_documentation_context.cache_clear()
+
+
+def on_build_error(**kwargs):
+    get_documentation_context.cache_clear()
