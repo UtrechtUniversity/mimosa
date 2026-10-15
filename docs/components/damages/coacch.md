@@ -4,10 +4,16 @@ icon: material/google-circles-extended
 
 [:octicons-arrow-left-24: Back to damage models](index.md)
 
-## COACCH
-
 Climate impacts in MIMOSA are calculated using the [COACCH](https://www.coacch.eu/) damage functions, developed in 2023
 (see [van der Wijst et al., 2023](https://doi.org/10.1038/s41558-023-01636-1)).
+
+Usage:
+
+```python hl_lines="2"
+params = load_params()
+params["model structure"]["damage module"] = "COACCH" # This is the default damage module, so this line is optional.
+model = MIMOSA(params)
+```
 
 :::mimosa.components.damages.coacch.get_constraints
 

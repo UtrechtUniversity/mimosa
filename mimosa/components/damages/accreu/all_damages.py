@@ -35,17 +35,13 @@ def get_constraints(
     m: ConcreteModel, inputs: ModelInputs
 ) -> Sequence[GeneralConstraint]:
     """
-    During the ACCREU project, new damage estimates were developed for [:material-home-flood: riverine flooding](accreu.md#riverine-flooding), [:material-human-male-male: labour productivity](accreu.md#labour-productivity),
-    [:material-waves-arrow-up: sea-level rise](accreu.md#sea-level-rise) and [:material-heart-pulse: mortality](accreu.md#mortality). Moreover, adaptation costs and effectiveness were estimated for all sectors
-    (except mortality).
-
     The total damage costs are the sum of the sectoral damages:
 
     $$
     \\text{damages}_{t,r} = \\text{damages}_{\\text{riverine},t,r} + \\text{damages}_{\\text{labour prod. (net)},t,r} + \\text{damages}_{\\text{SLR},t,r}.
     $$
 
-    Similarly, the total adaptation costs are the sum of the sectoral adaptation costs:
+    Similarly, if adaptation is enabled, the total adaptation costs are the sum of the sectoral adaptation costs:
 
     $$
     \\text{adapt. costs}_{t,r} = \\text{adapt. costs}_{\\text{riverine},t,r} + \\text{adapt. costs}_{\\text{labour prod.},t,r} + \\text{adapt. costs}_{\\text{SLR},t,r}.
