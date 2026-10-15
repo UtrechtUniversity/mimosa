@@ -73,15 +73,24 @@ markers are expanded after mkdocstrings rendering, so pages and docstrings use
 the same context and error handling.
 
 The reference shows availability only for variable names absent from at least one
-documented configuration. Variables present everywhere omit the context list,
-even when their descriptions differ between configurations. All anchors are retained.
+documented configuration. It shows public configuration requirements, such as
+`model structure.emissiontrade module = emissiontrade`, rather than internal
+context names. Variables present everywhere omit availability details, even when
+their descriptions differ between configurations. All anchors are retained.
+
+`variable_availability.py` finds the shortest combination of module choices and
+relevant damage options that distinguishes contexts containing a variable from
+those without it. Damage options are always paired with their parent module.
+This summarises the documented configurations; maintaining representative branch
+coverage remains important. Unrelated choices, such as mortality monetisation
+for a variable present with either setting, are omitted.
 
 ## Validation
 
 Activate the `accreu` Conda environment, then run:
 
 ```sh
-python -m pytest tests/unittests/test_variable_docs.py tests/unittests/test_variable_references.py tests/unittests/test_variable_rendering.py
+python -m pytest tests/unittests/test_variable_docs.py tests/unittests/test_variable_references.py tests/unittests/test_variable_rendering.py tests/unittests/test_variable_availability.py
 python -m mkdocs build --strict
 ```
 

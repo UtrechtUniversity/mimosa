@@ -4,6 +4,8 @@ import re
 from html import escape
 from html.parser import HTMLParser
 
+from docs.scripts.variable_availability import availability_requirements
+from docs.scripts.variable_docs import get_documentation_context
 from docs.scripts.variable_references import (
     group_variables,
     resolve_variable_reference,
@@ -31,20 +33,34 @@ def _details(variable):
     return f'<span class="variable-metadata">{details}</span>'
 
 
-def render_variable_reference(catalogue):
+def render_variable_reference(catalogue, context_params=None):
     """Render each metadata variant once, retaining all context-specific anchors."""
     all_contexts = {variable.context for variable in catalogue}
     available_contexts = {}
     for variable in catalogue:
         available_contexts.setdefault(variable.name, set()).add(variable.context)
 
+    if context_params is None and any(contexts != all_contexts for contexts in available_contexts.values()):
+        context_params = {
+            context: get_documentation_context(context).params for context in sorted(all_contexts)
+        }
+
     entries = []
     for entry in group_variables(catalogue):
         anchors = "".join(f'<span id="{escape(anchor, quote=True)}"></span>' for anchor in entry.anchors)
         availability = ""
         if available_contexts[entry.metadata.name] != all_contexts:
-            contexts = ", ".join(f"<code>{escape(context)}</code>" for context in entry.contexts)
-            availability = f" Available in: {contexts}."
+            alternatives = availability_requirements(
+                available_contexts[entry.metadata.name], context_params
+            )
+            clauses = []
+            for requirements in alternatives:
+                conditions = []
+                for path, values in requirements:
+                    choices = " or ".join(f"<code>{escape(str(value))}</code>" for value in values)
+                    conditions.append(f"<code>{escape(path)}</code> = {choices}")
+                clauses.append(" and ".join(conditions))
+            availability = " Available when: " + "; or ".join(clauses) + "."
         entries.append(
             f'<dt>{anchors}<code>{escape(entry.metadata.name)}</code></dt>'
             f'<dd>{_description(entry.metadata)} {_details(entry.metadata)}{availability}</dd>'

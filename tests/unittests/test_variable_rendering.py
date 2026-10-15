@@ -10,6 +10,7 @@ from pyomo.environ import ConcreteModel, Constraint, Var
 import yaml
 
 from docs.scripts import variable_docs
+from mimosa.common.config.parseconfig import check_params
 from docs.scripts.variable_docs import VariableMetadata
 from docs.scripts.variable_rendering import (
     expand_variable_reference,
@@ -102,19 +103,24 @@ def test_reference_keeps_variants_and_all_merged_anchors(catalogue):
     assert html.count("Damage &amp; adaptation &lt;costs&gt;") == 1
     assert html.count("Residual damages") == 1
     # This variable exists everywhere, despite its different descriptions.
-    assert "Available in:" not in html
+    assert "Available when:" not in html
     for variable in catalogue:
         assert html.count(f'id="variable-{variable.context}--damage_costs"') == 1
 
 
 def test_reference_shows_availability_only_for_conditional_variables(catalogue):
-    conditional = replace(catalogue[0], name="adaptation_costs")
-    html = render_variable_reference(catalogue + (conditional,))
+    conditional = replace(catalogue[0], name="attributed_emission_reductions")
+    context_params = {
+        variable.context: check_params({"model structure": {"emissiontrade module": "notrade"}})
+        for variable in catalogue
+    }
+    context_params["coacch"]["model structure"]["emissiontrade module"] = "emissiontrade"
+    html = render_variable_reference(catalogue + (conditional,), context_params)
 
-    assert html.count("Available in:") == 1
-    assert "Available in: <code>coacch</code>." in html
+    assert html.count("Available when:") == 1
+    assert "<code>model structure.emissiontrade module</code> = <code>emissiontrade</code>" in html
     assert "<code>coacch_noadaptation</code>" not in html
-    assert 'id="variable-coacch--adaptation_costs"' in html
+    assert 'id="variable-coacch--attributed_emission_reductions"' in html
 
 
 def test_reference_placeholder_expands_only_outside_code_examples(catalogue):
