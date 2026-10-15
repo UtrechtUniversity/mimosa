@@ -3,6 +3,7 @@
 import re
 from html import escape
 from html.parser import HTMLParser
+from itertools import product
 from textwrap import indent
 
 from docs.scripts.variable_availability import availability_requirements
@@ -34,7 +35,7 @@ def _details(variable):
 
 
 def render_variable_reference(catalogue, context_params=None):
-    """Render collapsible Markdown entries, retaining context-specific anchors."""
+    """Render Markdown admonitions, retaining context-specific anchors."""
     all_contexts = {variable.context for variable in catalogue}
     available_contexts = {}
     for variable in catalogue:
@@ -71,34 +72,28 @@ def render_variable_reference(catalogue, context_params=None):
             alternatives = availability_requirements(
                 available_contexts[variable.name], context_params
             )
-            clauses = []
+            blocks = []
             for requirements in alternatives:
-                conditions = []
-                for path, values in requirements:
-                    choices = " or ".join(
-                        f"<code>{escape(str(value))}</code>" for value in values
+                paths, value_choices = zip(*requirements)
+                for values in product(*value_choices):
+                    assignments = []
+                    for path, value in zip(paths, values):
+                        keys = "".join(f"[{key!r}]" for key in path.split("."))
+                        assignments.append(f"params{keys} = {value!r}")
+                    highlight_lines = " ".join(
+                        str(line) for line in range(2, len(assignments) + 2)
                     )
-                    conditions.append(f"<code>{escape(path)}</code> = {choices}")
-                clauses.append(" and ".join(conditions))
-            content.append("\nAvailable when: " + "; or ".join(clauses) + ".")
-            # One valid example is enough; the text above lists all alternatives.
-            assignments = []
-            for path, values in alternatives[0]:
-                keys = "".join(f"[{key!r}]" for key in path.split("."))
-                assignments.append(f"params{keys} = {values[0]!r}")
-            highlight_lines = " ".join(
-                str(line) for line in range(2, len(assignments) + 2)
-            )
-            content.extend(
-                [
-                    "\nExample usage:\n",
-                    f'```python hl_lines="{highlight_lines}"',
-                    "params = load_params()",
-                    *assignments,
-                    "model = MIMOSA(params)",
-                    "```",
-                ]
-            )
+                    blocks.append(
+                        "\n".join([
+                            f'```python hl_lines="{highlight_lines}"',
+                            "params = load_params()",
+                            *assignments,
+                            "model = MIMOSA(params)",
+                            "```",
+                        ])
+                    )
+            content.append("\nAvailable when:\n")
+            content.append("\n\nor\n\n".join(blocks))
         title = f'!!! variable "{escape(variable.name)}"\n\n'
         entries.append(title + indent("\n".join(content), "    "))
     return "\n\n".join(entries) + "\n"

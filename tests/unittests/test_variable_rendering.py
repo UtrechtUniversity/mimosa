@@ -99,8 +99,8 @@ def test_missing_metadata_scalar_and_baseline_requirement_are_visible(catalogue)
 def test_reference_keeps_variants_and_all_merged_anchors(catalogue):
     html = render_variable_reference(catalogue)
 
-    assert html.count('??? variable "damage_costs"') == 2
-    assert "    ??? variable" not in html
+    assert html.count('!!! variable "damage_costs"') == 2
+    assert "    !!! variable" not in html
     assert html.count("Damage &amp; adaptation &lt;costs&gt;") == 1
     assert html.count("Residual damages") == 1
     # This variable exists everywhere, despite its different descriptions.
@@ -122,17 +122,41 @@ def test_reference_shows_availability_only_for_conditional_variables(catalogue):
     html = render_variable_reference(catalogue + (conditional,), context_params)
 
     assert html.count("Available when:") == 1
-    assert "<code>model structure.emissiontrade module</code> = <code>emissiontrade</code>" in html
+    assert "<code>model structure.emissiontrade module</code>" not in html
     assert "<code>coacch_noadaptation</code>" not in html
     assert 'id="variable-coacch--attributed_emission_reductions"' in html
     assert "params['model structure']['emissiontrade module'] = 'emissiontrade'" in html
     assert '```python hl_lines="2"' in html
-    assert html.count("Example usage:") == 1
-    rendered = markdown(html, extensions=["pymdownx.details", "pymdownx.superfences"])
-    assert rendered.count('<details class="variable">') == 3
-    assert '<summary>attributed_emission_reductions</summary>' in rendered
+    assert "Example usage:" not in html
+    rendered = markdown(html, extensions=["admonition", "pymdownx.superfences"])
+    assert rendered.count('<div class="admonition variable">') == 3
+    assert '<p class="admonition-title">attributed_emission_reductions</p>' in rendered
     assert 'class="highlight"' in rendered
-    assert "??? variable" not in rendered
+    assert "!!! variable" not in rendered
+
+
+def test_reference_lists_each_allowed_configuration_in_its_own_block(catalogue):
+    from markdown import markdown
+
+    conditional = replace(catalogue[0], name="effort_sharing_common_level")
+    second = replace(conditional, context="coacch_noadaptation")
+    context_params = {
+        "coacch": check_params({"model structure": {"effortsharing module": "equal_mitigation_costs"}}),
+        "coacch_noadaptation": check_params({"model structure": {"effortsharing module": "equal_total_costs"}}),
+        "accreu_sectoral": check_params({}),
+    }
+
+    reference = render_variable_reference(catalogue + (conditional, second), context_params)
+
+    assert "params['model structure']['effortsharing module'] = 'equal_mitigation_costs'" in reference
+    assert "params['model structure']['effortsharing module'] = 'equal_total_costs'" in reference
+    assert reference.count("params = load_params()") == 2
+    assert reference.count("model = MIMOSA(params)") == 2
+    assert "    or\n" in reference
+    assert "Example usage:" not in reference
+    rendered = markdown(reference, extensions=["admonition", "pymdownx.superfences"])
+    assert rendered.count('class="highlight"') == 2
+    assert "<p>or</p>" in rendered
 
 
 def test_reference_example_sets_all_required_options(catalogue):
@@ -163,7 +187,7 @@ def test_reference_placeholder_expands_only_outside_code_examples(catalogue):
     )
     rendered = expand_variable_reference(markdown, catalogue)
 
-    assert rendered.count('??? variable "damage_costs"') == 2
+    assert rendered.count('!!! variable "damage_costs"') == 2
     assert rendered.count("{variables::reference}") == 4
 
 
@@ -269,11 +293,11 @@ def test_strict_site_build_renders_pages_docstrings_and_reference(documentation_
     assert "var::missing_literal" in html
     assert "varref::missing_literal" in html
     assert 'id="variable-coacch_noadaptation--damage_costs"' in reference
-    assert reference.count('<details class="variable">') == 2
-    assert '<summary>damage_costs</summary>' in reference
+    assert reference.count('<div class="admonition variable">') == 2
+    assert '<p class="admonition-title">damage_costs</p>' in reference
     assert "<li>Units: <code>fraction_of_GDP</code></li>" in reference
     assert "<li>Dimensions: <code>t, regions</code></li>" in reference
-    assert "??? variable" not in reference
+    assert "!!! variable" not in reference
     assert "{variables::reference}" not in reference
 
 

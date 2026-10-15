@@ -71,8 +71,9 @@ component docstrings rendered on that page. Markers in inline code, code blocks,
 existing links, HTML attributes, comments, scripts and styles remain literal.
 
 The standalone `{variables::reference}` marker generates the complete reference
-in `docs/variables.md` as flat, collapsible `variable` admonitions, matching the
-parameter reference style. Conditional variables include a configuration example.
+in `docs/variables.md` as flat `variable` admonitions, matching the
+parameter reference style. Conditional variables show configuration code blocks
+under "Available when:", with "or" between the alternatives.
 Missing descriptions and units are shown explicitly for
 now; completeness checks can be introduced once declarations have been documented.
 The reference is expanded before Markdown conversion. Individual variable
@@ -80,10 +81,10 @@ markers are expanded after mkdocstrings rendering, so pages and docstrings use
 the same context and error handling.
 
 The reference shows availability only for variable names absent from at least one
-documented configuration. It shows public configuration requirements, such as
-`model structure.emissiontrade module = emissiontrade`, rather than internal
-context names. Variables present everywhere omit availability details, even when
-their descriptions differ between configurations. All anchors are retained.
+documented configuration. It shows public configuration requirements as assignments
+to `params`, rather than internal context names. Variables present everywhere omit
+availability details, even when their descriptions differ between configurations.
+All anchors are retained.
 
 `variable_availability.py` finds the shortest combination of module choices and
 relevant damage options that distinguishes contexts containing a variable from
