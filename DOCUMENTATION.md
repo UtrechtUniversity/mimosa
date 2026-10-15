@@ -72,6 +72,10 @@ The reference is expanded before Markdown conversion. Individual variable
 markers are expanded after mkdocstrings rendering, so pages and docstrings use
 the same context and error handling.
 
+The reference shows availability only for variable names absent from at least one
+documented configuration. Variables present everywhere omit the context list,
+even when their descriptions differ between configurations. All anchors are retained.
+
 ## Validation
 
 Activate the `accreu` Conda environment, then run:

@@ -33,14 +33,21 @@ def _details(variable):
 
 def render_variable_reference(catalogue):
     """Render each metadata variant once, retaining all context-specific anchors."""
+    all_contexts = {variable.context for variable in catalogue}
+    available_contexts = {}
+    for variable in catalogue:
+        available_contexts.setdefault(variable.name, set()).add(variable.context)
+
     entries = []
     for entry in group_variables(catalogue):
         anchors = "".join(f'<span id="{escape(anchor, quote=True)}"></span>' for anchor in entry.anchors)
-        contexts = ", ".join(f"<code>{escape(context)}</code>" for context in entry.contexts)
+        availability = ""
+        if available_contexts[entry.metadata.name] != all_contexts:
+            contexts = ", ".join(f"<code>{escape(context)}</code>" for context in entry.contexts)
+            availability = f" Available in: {contexts}."
         entries.append(
             f'<dt>{anchors}<code>{escape(entry.metadata.name)}</code></dt>'
-            f'<dd>{_description(entry.metadata)} {_details(entry.metadata)} '
-            f'Available in: {contexts}.</dd>'
+            f'<dd>{_description(entry.metadata)} {_details(entry.metadata)}{availability}</dd>'
         )
     return '<dl class="variable-reference">' + "\n".join(entries) + "</dl>"
 

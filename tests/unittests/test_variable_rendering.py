@@ -101,9 +101,20 @@ def test_reference_keeps_variants_and_all_merged_anchors(catalogue):
     assert html.count("<dt>") == 2
     assert html.count("Damage &amp; adaptation &lt;costs&gt;") == 1
     assert html.count("Residual damages") == 1
+    # This variable exists everywhere, despite its different descriptions.
+    assert "Available in:" not in html
     for variable in catalogue:
         assert html.count(f'id="variable-{variable.context}--damage_costs"') == 1
-        assert f"<code>{variable.context}</code>" in html
+
+
+def test_reference_shows_availability_only_for_conditional_variables(catalogue):
+    conditional = replace(catalogue[0], name="adaptation_costs")
+    html = render_variable_reference(catalogue + (conditional,))
+
+    assert html.count("Available in:") == 1
+    assert "Available in: <code>coacch</code>." in html
+    assert "<code>coacch_noadaptation</code>" not in html
+    assert 'id="variable-coacch--adaptation_costs"' in html
 
 
 def test_reference_placeholder_expands_only_outside_code_examples(catalogue):
