@@ -153,8 +153,8 @@ def test_hooks_and_macros_share_lazy_provider(documentation_model):
     assert documentation_model.calls == [(documentation_model.params, False)]
 
 
-@pytest.mark.parametrize("event", ["on_post_build", "on_build_error"])
-def test_build_completion_or_error_clears_shared_model(documentation_model, monkeypatch, event):
+@pytest.mark.parametrize("event", ["on_startup", "on_shutdown"])
+def test_command_lifecycle_clears_shared_model(documentation_model, monkeypatch, event):
     monkeypatch.setattr(
         variable_docs, "DOCUMENTATION_CONFIGS",
         {"coacch": variable_docs.DOCUMENTATION_CONFIGS["coacch"]},

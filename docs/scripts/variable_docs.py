@@ -122,7 +122,8 @@ def get_documentation_context(context: str = "default") -> DocumentationContext:
     """Construct each named documentation model once, without a prerun.
 
     Both MkDocs entry points import this provider through docs.scripts so they
-    share the cache. The former default context is an alias for coacch.
+    share the cache for the command's lifetime, including live serve rebuilds.
+    The former default context is an alias for coacch.
     Baseline-dependent declarations are added without attaching or evaluating
     their equations; no baseline simulation or solve is performed here.
     """
@@ -156,6 +157,6 @@ def get_variable_catalogue() -> Tuple[VariableMetadata, ...]:
 
 
 def clear_documentation_cache():
-    """Release all contexts and their combined metadata between builds."""
+    """Release contexts and metadata at command startup and shutdown."""
     get_variable_catalogue.cache_clear()
     get_documentation_context.cache_clear()

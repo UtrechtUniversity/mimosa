@@ -245,15 +245,15 @@ def on_page_content(html, **kwargs):
     return html
 
 
-def on_post_build(**kwargs):
-    # Release models and refresh metadata on the next build, including mkdocs serve.
+def on_startup(**kwargs):
+    # Start each build command or serve session with fresh model metadata.
     clear_documentation_cache()
 
 
-def on_build_error(**kwargs):
+def on_shutdown(**kwargs):
     clear_documentation_cache()
 
 
 def on_pre_build(**kwargs):
-    # Collect available named configurations once before rendering any pages.
+    # Reuse the catalogue across live rebuilds within the same serve session.
     get_variable_catalogue()

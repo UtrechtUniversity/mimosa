@@ -143,18 +143,27 @@ def documentation_site(tmp_path, monkeypatch, catalogue):
     pytest.importorskip("mkdocs")
     pytest.importorskip("mkdocstrings")
     pytest.importorskip("mkdocs_macros")
+    from mkdocs.config.config_options import Hooks
+
+    # MkDocs retains hook modules between configurations; each test supplies
+    # fresh fake providers, which must be bound when its hook module is loaded.
+    Hooks._load_hook.cache_clear()
     model = ConcreteModel()
     model.variable = Var()
     model.sample_constraint = Constraint(
         expr=model.variable >= 0, doc="Constraint macros still render."
     )
+    context_constructions = []
+    catalogue_collections = []
 
     @lru_cache(maxsize=None)
     def get_context(context="default"):
+        context_constructions.append(context)
         return SimpleNamespace(model=model, parser_tree={}, variables=catalogue)
 
     @lru_cache(maxsize=1)
     def get_catalogue():
+        catalogue_collections.append(True)
         return catalogue
 
     monkeypatch.setattr(variable_docs, "get_documentation_context", get_context)
@@ -194,7 +203,12 @@ def documentation_site(tmp_path, monkeypatch, catalogue):
         ],
         "markdown_extensions": ["fenced_code"],
     }
-    return SimpleNamespace(root=tmp_path, page=page, config=config)
+    return SimpleNamespace(
+        root=tmp_path, page=page, config=config,
+        context_constructions=context_constructions,
+        catalogue_collections=catalogue_collections,
+        get_context=get_context, get_catalogue=get_catalogue,
+    )
 
 
 def build_site(site):
@@ -226,6 +240,58 @@ def test_strict_site_build_renders_pages_docstrings_and_reference(documentation_
     assert "varref::missing_literal" in html
     assert 'id="variable-coacch_noadaptation--damage_costs"' in reference
     assert "{variables::reference}" not in reference
+
+
+def test_serve_reuses_models_after_successful_failed_and_recovered_rebuilds(documentation_site, monkeypatch):
+    from importlib import import_module
+
+    serve_module = import_module("mkdocs.commands.serve")
+    site = documentation_site
+
+    class LiveReloadServer:
+        """Drive the real serve lifecycle without opening a network server."""
+
+        def __init__(self, builder, root, **kwargs):
+            self.builder = builder
+            self.root = Path(root)
+
+        def watch(self, *args, **kwargs):
+            pass
+
+        def shutdown(self):
+            pass
+
+        def serve(self, **kwargs):
+            original_context = site.get_context()
+            assert len(site.context_constructions) == 1
+            assert len(site.catalogue_collections) == 1
+
+            site.page.write_text("# Updated page\n\nUpdated prose.\n", encoding="utf-8")
+            self.builder()
+            html = (self.root / "components/example/index.html").read_text(encoding="utf-8")
+            assert "Updated prose." in html
+
+            site.page.write_text("# Invalid page\n\nvar::missing\n", encoding="utf-8")
+            with pytest.raises(ValueError, match="Unknown variable 'missing'"):
+                self.builder()
+
+            site.page.write_text(
+                "# Recovered page\n\nvar::coacch::damage_costs\n", encoding="utf-8"
+            )
+            self.builder()
+            html = (self.root / "components/example/index.html").read_text(encoding="utf-8")
+            assert "Damage &amp; adaptation &lt;costs&gt;" in html
+            assert site.get_context() is original_context
+            assert len(site.context_constructions) == 1
+            assert len(site.catalogue_collections) == 1
+
+    monkeypatch.setattr(serve_module, "LiveReloadServer", LiveReloadServer)
+    config_path = site.root / "mkdocs.yml"
+    config_path.write_text(yaml.safe_dump(site.config), encoding="utf-8")
+    serve_module.serve(config_file=str(config_path))
+
+    assert site.get_context.cache_info().currsize == 0
+    assert site.get_catalogue.cache_info().currsize == 0
 
 
 @pytest.mark.parametrize(

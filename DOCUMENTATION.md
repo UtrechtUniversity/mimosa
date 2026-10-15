@@ -20,7 +20,12 @@ existing variable name has a different meaning. Settings that only change
 coefficients or equations usually do not need additional contexts.
 
 The documentation scripts share each model and its metadata for the duration of
-a build. Models are constructed with `prerun=False`; no simulations or solves
+the command. During `mkdocs serve`, successful rebuilds and rebuild errors reuse
+the cached models. Restart `mkdocs serve` after changing variable `doc=...`
+descriptions, declarations, units, or the documentation configurations. Markdown
+and component-docstring edits can use the normal live rebuilds.
+
+Models are constructed with `prerun=False`; no simulations or solves
 are performed. Avoided-damage variables are declared separately and marked as
 requiring a baseline, without attaching or evaluating their equations. Parameters
 and series created only during export are excluded from the catalogue.
