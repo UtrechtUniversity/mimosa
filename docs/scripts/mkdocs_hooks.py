@@ -10,6 +10,11 @@ from docs.scripts.variable_docs import (
     get_documentation_context,
     get_variable_catalogue,
 )
+from docs.scripts.variable_rendering import (
+    REFERENCE_MARKER,
+    expand_variable_reference,
+    render_variable_markers,
+)
 from mimosa.common.config.parseconfig import (
     get_nested,
     flatten,
@@ -136,6 +141,8 @@ def on_page_markdown(markdown, **kwargs):
     markdown = markdown_parse_param_reference(markdown)
     markdown = markdown_parse_parser_types(markdown)
     markdown = markdown_parse_region_defs(markdown)
+    if REFERENCE_MARKER in markdown:
+        markdown = expand_variable_reference(markdown, get_variable_catalogue())
 
     return markdown
 
@@ -226,6 +233,15 @@ def on_page_content(html, **kwargs):
 
         except AttributeError:
             pass
+    if "var::" in html or "varref::" in html:
+        page = kwargs["page"]
+        reference = kwargs["files"].get_file_from_path("variables.md")
+        if reference is None:
+            raise ValueError(f"{page.file.src_uri}: Variable reference page variables.md is missing")
+        html = render_variable_markers(
+            html, get_variable_catalogue(), page.meta.get("variable_context"),
+            page.file.src_uri, page.url, reference.url,
+        )
     return html
 
 

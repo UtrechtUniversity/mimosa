@@ -41,34 +41,19 @@ DOCUMENTATION_CONFIGS = {
     "coacch": _damage_config(
         "COACCH", coacch_slr_withadapt=True, coacch_combined_slr_nonslr_damages=False
     ),
-    "coacch_noadaptation": _damage_config(
-        "COACCH", coacch_slr_withadapt=False, coacch_combined_slr_nonslr_damages=False
-    ),
-    "coacch_combined": _damage_config(
-        "COACCH", coacch_slr_withadapt=True, coacch_combined_slr_nonslr_damages=True
-    ),
-    "coacch_combined_noadaptation": _damage_config(
-        "COACCH", coacch_slr_withadapt=False, coacch_combined_slr_nonslr_damages=True
-    ),
     "accreu_noadaptation": _damage_config(
         "ACCREU", accreu={"adaptation": "noadaptation", "monetise_mortality": True}
     ),
     "accreu_sectoral": _damage_config(
         "ACCREU", accreu={"adaptation": "sectoral", "monetise_mortality": True}
     ),
-    "accreu_combined": _damage_config(
-        "ACCREU", accreu={"adaptation": "combined", "monetise_mortality": True}
-    ),
     "accreu_sectoral_no_mortality_monetisation": _damage_config(
         "ACCREU", accreu={"adaptation": "sectoral", "monetise_mortality": False}
     ),
-    "accreu_cge": _damage_config("ACCREU_CGE"),
-    "nodamage": _damage_config("nodamage"),
     "emissiontrade": {"model structure": {"emissiontrade module": "emissiontrade"}},
-    "globaldamagepool": {
-        "model structure": {"financialtransfer module": "globaldamagepool"}
-    },
-    "effortsharing_equal_mitigation_costs": _effortsharing_config("equal_mitigation_costs"),
+    "effortsharing_equal_mitigation_costs": _effortsharing_config(
+        "equal_mitigation_costs"
+    ),
     "effortsharing_equal_total_costs": _effortsharing_config("equal_total_costs"),
     "effortsharing_per_cap_convergence": _effortsharing_config("per_cap_convergence"),
     "effortsharing_ability_to_pay": _effortsharing_config("ability_to_pay"),

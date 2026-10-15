@@ -44,16 +44,40 @@ Editing descriptions or regrouping entries therefore preserves existing links.
 The URL helper calculates links from the current page's output URL, supporting
 both directory URLs and `.html` pages.
 
-This step provides resolution and link helpers. Connecting them to page
-frontmatter and rendering markers into pages and component docstrings is the
-next step; authoring markers in public pages is not enabled yet.
+## Rendering variable documentation
+
+[`docs/scripts/variable_rendering.py`](docs/scripts/variable_rendering.py) expands
+markers through the existing MkDocs hooks. Add descriptions directly to ordinary
+`Var(..., doc="...")` declarations. Descriptions are escaped plain text; Markdown
+and HTML inside them are not interpreted.
+
+Set a page's default context in its existing YAML frontmatter:
+
+```yaml
+---
+variable_context: accreu_sectoral
+---
+```
+
+Use `var::damage_costs` for a linked name, description, units and dimensions, or
+`varref::damage_costs` for just the linked name. An explicit context such as
+`var::coacch::damage_costs` overrides the page default. These markers also work in
+component docstrings rendered on that page. Markers in inline code, code blocks,
+existing links, HTML attributes, comments, scripts and styles remain literal.
+
+The standalone `{variables::reference}` marker generates the complete reference
+in `docs/variables.md`. Missing descriptions and units are shown explicitly for
+now; completeness checks can be introduced once declarations have been documented.
+The reference is expanded before Markdown conversion. Individual variable
+markers are expanded after mkdocstrings rendering, so pages and docstrings use
+the same context and error handling.
 
 ## Validation
 
 Activate the `accreu` Conda environment, then run:
 
 ```sh
-python -m pytest tests/unittests/test_variable_docs.py tests/unittests/test_variable_references.py
+python -m pytest tests/unittests/test_variable_docs.py tests/unittests/test_variable_references.py tests/unittests/test_variable_rendering.py
 python -m mkdocs build --strict
 ```
 

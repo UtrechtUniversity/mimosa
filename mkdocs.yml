@@ -18,6 +18,7 @@ nav:
       - Financial transfers: components/financialtransfers.md
       - Region definitions: components/regions.md
   - Parameter reference: parameters.md
+  - Variable reference: variables.md
   - Installing MIMOSA: installation.md
   - Running MIMOSA:
       - run/index.md
