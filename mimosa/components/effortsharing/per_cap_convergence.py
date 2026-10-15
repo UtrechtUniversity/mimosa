@@ -28,16 +28,23 @@ def get_constraints(
 ) -> Sequence[GeneralConstraint]:
     """
     Usage:
-    ```python hl_lines="2-9"
+    ```python hl_lines="2-3"
     params = load_params()
     params["model structure"]["effortsharing module"] = "per_cap_convergence"
     params["effort sharing"]["percapconv_year"] = 2050
 
-    # Per-capita convergence needs emission trading to avoid infeasibility
+    # Effort-sharing regimes require emission trading to be feasible:
     params["model structure"]["emissiontrade module"] = "emissiontrade"
-    # And financial transfers higher than just emission trading need to be enabled
-    # (therefore allowing for negative mitigation costs)
+
+    # Cost-minimisation is typically used, to allocate real mitigation effort to regions with the lowest costs:
+    params["model structure"]["welfare module"] = "cost_minimising"
+
+    # Often, the effort sharing regimes require financial transfers larger than the mitigation costs:
     params["economics"]["MAC"]["rel_mitigation_costs_min_level"] = -0.5
+
+    # Optionally set a carbon budget:
+    params["emissions"]["carbonbudget"] = "700 GtCO2"
+
     model = MIMOSA(params)
     ```
 
@@ -83,7 +90,9 @@ def get_constraints(
         initialize=lambda m, r: m.ssp_baseline_emissions[0, r]
         / sum(m.ssp_baseline_emissions[0, s] for s in m.regions),
     )
-    m.percapconv_year = Param(initialize=inputs.config("effort sharing.percapconv_year"))
+    m.percapconv_year = Param(
+        initialize=inputs.config("effort sharing.percapconv_year")
+    )
     m.percapconv_share_pop = Param(
         m.t,
         m.regions,

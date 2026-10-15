@@ -31,6 +31,19 @@ def get_constraints(
     ```python hl_lines="2"
     params = load_params()
     params["model structure"]["effortsharing module"] = "equal_total_costs"
+
+    # Effort-sharing regimes require emission trading to be feasible:
+    params["model structure"]["emissiontrade module"] = "emissiontrade"
+
+    # Cost-minimisation is typically used, to allocate real mitigation effort to regions with the lowest costs:
+    params["model structure"]["welfare module"] = "cost_minimising"
+
+    # Often, the effort sharing regimes require financial transfers larger than the mitigation costs:
+    params["economics"]["MAC"]["rel_mitigation_costs_min_level"] = -0.5
+
+    # Optionally set a carbon budget:
+    params["emissions"]["carbonbudget"] = "700 GtCO2"
+
     model = MIMOSA(params)
     ```
 
