@@ -60,7 +60,7 @@ def get_constraints(
     m.combined_labprod_riv_adaptation_costs = Var(
         m.t, m.regions, units=quant.unit("fraction_of_GDP")
     )
-    m.combined_labprod_riv_avoided_damages_adapt = Var(
+    m.combined_labprod_riv_adaptation_level = Var(
         m.t, m.regions, units=quant.unit("fraction_of_gross_damages"), bounds=(0, 1)
     )
     m.combined_labprod_riv_damage_costs_residual = Var(
@@ -85,7 +85,7 @@ def get_constraints(
         [
             # Adaptation effectiveness function
             RegionalEquation(
-                m.combined_labprod_riv_avoided_damages_adapt,
+                m.combined_labprod_riv_adaptation_level,
                 lambda m, t, r: adaptation_effectiveness_fct(
                     m.combined_labprod_riv_adaptation_costs_abs[t, r],
                     *effective_adaptation_curve(
@@ -107,7 +107,7 @@ def get_constraints(
             RegionalEquation(
                 m.combined_labprod_riv_damage_costs_residual,
                 lambda m, t, r: m.combined_labprod_riv_damage_costs_gross[t, r]
-                * (1 - m.combined_labprod_riv_avoided_damages_adapt[t, r]),
+                * (1 - m.combined_labprod_riv_adaptation_level[t, r]),
             ),
             # Total damages after adaptation
             RegionalEquation(

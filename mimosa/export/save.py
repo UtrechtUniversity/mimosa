@@ -160,7 +160,7 @@ def add_derived_global_rows(rows, m, all_variables):
     Regional adaptation effectiveness variables measured as
     `fraction_of_gross_damages` are weighted by the corresponding sector's
     absolute gross damages. The corresponding gross-damage variable is inferred
-    from the name: `<sector>_avoided_damages_adapt` uses
+    from the name: `<sector>_adaptation_level` uses
     `<sector>_damage_costs_gross`. If global gross damages are zero, the exported
     avoided fraction is `NaN`.
 
@@ -209,22 +209,19 @@ def add_derived_global_rows(rows, m, all_variables):
                     )
                 global_values.append(numerator / value(m.global_GDP_gross[t]))
         elif unit_str == "fraction_of_gross_damages":
-            avoided_damages_suffix = "_avoided_damages_adapt"
-            if not useful_var.name.endswith(avoided_damages_suffix):
+            adapt_level_suffix = "_adaptation_level"
+            if not useful_var.name.endswith(adapt_level_suffix):
                 continue
 
-            sector_name = useful_var.name[: -len(avoided_damages_suffix)]
-            gross_damages = variables_by_name.get(
-                f"{sector_name}_damage_costs_gross"
-            )
+            sector_name = useful_var.name[: -len(adapt_level_suffix)]
+            gross_damages = variables_by_name.get(f"{sector_name}_damage_costs_gross")
             if gross_damages is None:
                 continue
 
             global_values = []
             for t in m.t:
                 gross_damages_abs = {
-                    r: value(gross_damages.var[t, r])
-                    * value(m.GDP_gross[t, r])
+                    r: value(gross_damages.var[t, r]) * value(m.GDP_gross[t, r])
                     for r in m.regions
                 }
                 denominator = sum(gross_damages_abs.values())
@@ -233,9 +230,7 @@ def add_derived_global_rows(rows, m, all_variables):
                     for r in m.regions
                 )
                 global_values.append(
-                    np.nan
-                    if np.isclose(denominator, 0.0)
-                    else numerator / denominator
+                    np.nan if np.isclose(denominator, 0.0) else numerator / denominator
                 )
         else:
             continue
@@ -279,20 +274,17 @@ def add_indirect_cost_rows(rows, m, variables_by_name):
                 if np.isclose(cumulative_total_costs, 0.0):
                     attributed_costs = 0.0
                 else:
-                    cost_share = (
-                        cumulative_costs[cost_type] / cumulative_total_costs
-                    )
-                    attributed_costs = (
-                        value(indirect_costs.var[t, region]) * cost_share
-                    )
+                    cost_share = cumulative_costs[cost_type] / cumulative_total_costs
+                    attributed_costs = value(indirect_costs.var[t, region]) * cost_share
                 values[cost_type].append(attributed_costs)
 
             if position + 1 < len(time_steps):
                 next_t = time_steps[position + 1]
                 interval_length = value(m.period_length[next_t])
                 for cost_type, cost_var in cost_variables.items():
-                    excluded_by_configuration = (
-                        ignore_damages and cost_type in ("damage", "adaptation")
+                    excluded_by_configuration = ignore_damages and cost_type in (
+                        "damage",
+                        "adaptation",
                     )
                     direct_costs = (
                         0.0

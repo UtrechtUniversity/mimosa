@@ -126,7 +126,7 @@ def get_constraints(
         m.slr_adaptation_costs = Var(
             m.t, m.regions, units=quant.unit("fraction_of_GDP")
         )
-        m.slr_avoided_damages_adapt = Var(
+        m.slr_adaptation_level = Var(
             m.t, m.regions, units=quant.unit("fraction_of_gross_damages"), bounds=(0, 1)
         )
         m.slr_damage_costs = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
@@ -144,7 +144,7 @@ def get_constraints(
             [
                 # Adaptation effectiveness function
                 RegionalEquation(
-                    m.slr_avoided_damages_adapt,
+                    m.slr_adaptation_level,
                     lambda m, t, r: adaptation_effectiveness_fct(
                         m.slr_adaptation_costs_abs[t, r],
                         *effective_adaptation_curve(
@@ -166,7 +166,7 @@ def get_constraints(
                 RegionalEquation(
                     m.slr_damage_costs,
                     lambda m, t, r: m.slr_damage_costs_gross[t, r]
-                    * (1 - m.slr_avoided_damages_adapt[t, r]),
+                    * (1 - m.slr_adaptation_level[t, r]),
                 ),
             ]
         )

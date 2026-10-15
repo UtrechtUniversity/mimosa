@@ -190,7 +190,7 @@ def test_native_accreu_parameters_options_bounds_and_equations(
                 * (1 - exp(-source_cost / multiplier / (0.89632 * 2.5) * 0.01))
             )
             assert value(
-                rhs[sector + "_avoided_damages_adapt"](m, 1, "USA")
+                rhs[sector + "_adaptation_level"](m, 1, "USA")
             ) == pytest.approx(expected)
             assert (cost_name in rhs) == (determination == "analytical_optimum")
             if determination == "analytical_optimum":

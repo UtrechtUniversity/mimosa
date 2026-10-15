@@ -39,29 +39,29 @@ SECTORS = {
     "sectoral": {
         "Labour productivity": (
             "labourprod_damage_costs_gross",
-            "labourprod_avoided_damages_adapt",
+            "labourprod_adaptation_level",
             "labourprod_adaptation_costs_abs",
         ),
         "Riverine flooding": (
             "riverine_damage_costs_gross",
-            "riverine_avoided_damages_adapt",
+            "riverine_adaptation_level",
             "riverine_adaptation_costs_abs",
         ),
         "SLR": (
             "slr_damage_costs_gross",
-            "slr_avoided_damages_adapt",
+            "slr_adaptation_level",
             "slr_adaptation_costs_abs",
         ),
     },
     "combined": {
         "Combined labour and riverine": (
             "combined_labprod_riv_damage_costs_gross",
-            "combined_labprod_riv_avoided_damages_adapt",
+            "combined_labprod_riv_adaptation_level",
             "combined_labprod_riv_adaptation_costs_abs",
         ),
         "SLR": (
             "slr_damage_costs_gross",
-            "slr_avoided_damages_adapt",
+            "slr_adaptation_level",
             "slr_adaptation_costs_abs",
         ),
     },

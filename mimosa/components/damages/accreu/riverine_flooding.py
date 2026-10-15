@@ -114,7 +114,7 @@ def get_constraints(
         m.riverine_adaptation_costs = Var(
             m.t, m.regions, units=quant.unit("fraction_of_GDP")
         )
-        m.riverine_avoided_damages_adapt = Var(
+        m.riverine_adaptation_level = Var(
             m.t, m.regions, units=quant.unit("fraction_of_gross_damages"), bounds=(0, 1)
         )
         m.riverine_damage_costs = Var(
@@ -138,7 +138,7 @@ def get_constraints(
             [
                 # Adaptation effectiveness function
                 RegionalEquation(
-                    m.riverine_avoided_damages_adapt,
+                    m.riverine_adaptation_level,
                     lambda m, t, r: adaptation_effectiveness_fct(
                         m.riverine_adaptation_costs_abs[t, r],
                         *effective_adaptation_curve(
@@ -160,7 +160,7 @@ def get_constraints(
                 RegionalEquation(
                     m.riverine_damage_costs,
                     lambda m, t, r: m.riverine_damage_costs_gross[t, r]
-                    * (1 - m.riverine_avoided_damages_adapt[t, r]),
+                    * (1 - m.riverine_adaptation_level[t, r]),
                 ),
             ]
         )

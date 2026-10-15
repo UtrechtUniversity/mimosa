@@ -24,12 +24,16 @@ def test_mitigation_and_adaptation_expenditure_are_unchanged(script_output):
     sim = script_output["sim"]
     reference = script_output["sim_ada"]
     for variable in (
-        "relative_abatement", "labourprod_adaptation_costs_abs",
-        "riverine_adaptation_costs_abs", "slr_adaptation_costs_abs",
+        "relative_abatement",
+        "labourprod_adaptation_costs_abs",
+        "riverine_adaptation_costs_abs",
+        "slr_adaptation_costs_abs",
     ):
         np.testing.assert_allclose(
-            getattr(sim, variable).values, getattr(reference, variable).values,
-            rtol=1e-9, atol=1e-9,
+            getattr(sim, variable).values,
+            getattr(reference, variable).values,
+            rtol=1e-9,
+            atol=1e-9,
         )
 
 
@@ -37,9 +41,11 @@ def test_effectiveness_is_halved(script_output):
     sim = script_output["sim"]
     reference = script_output["sim_ada"]
     for sector in ("labourprod", "riverine", "slr"):
-        variable = sector + "_avoided_damages_adapt"
+        variable = sector + "_adaptation_level"
         expected = 0.5 * getattr(reference, variable).values
-        np.testing.assert_allclose(getattr(sim, variable).values, expected, rtol=1e-9, atol=1e-9)
+        np.testing.assert_allclose(
+            getattr(sim, variable).values, expected, rtol=1e-9, atol=1e-9
+        )
 
 
 def test_larger_unavoided_share_of_gross_damages(script_output):
@@ -65,6 +71,11 @@ def test_larger_unavoided_share_of_gross_damages(script_output):
 def test_saved_results_match_simulation(script_output):
     assert_saved_regional_output(
         script_output["model"],
-        ["regional_emissions", "damage_costs_abs", "adaptation_costs_abs", "mortality_net"],
+        [
+            "regional_emissions",
+            "damage_costs_abs",
+            "adaptation_costs_abs",
+            "mortality_net",
+        ],
         simulation=script_output["sim"],
     )

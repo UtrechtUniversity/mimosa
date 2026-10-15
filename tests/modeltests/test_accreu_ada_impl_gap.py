@@ -31,7 +31,8 @@ def test_mitigation_is_unchanged(script_output):
     np.testing.assert_allclose(
         script_output["sim"].relative_abatement.values,
         script_output["sim_ada"].relative_abatement.values,
-        rtol=1e-9, atol=1e-9,
+        rtol=1e-9,
+        atol=1e-9,
     )
 
 
@@ -46,7 +47,9 @@ def test_expenditure_is_scaled_by_readiness(script_output):
         for t in sim.t:
             year = str(int(sim.year(t)))
             for region in sim.regions:
-                expected = readiness.loc[(ssp, region), year] * reference_costs[t, region]
+                expected = (
+                    readiness.loc[(ssp, region), year] * reference_costs[t, region]
+                )
                 assert costs[t, region] == pytest.approx(expected, rel=1e-9, abs=1e-9)
                 assert costs[t, region] <= reference_costs[t, region] + 1e-9
 
@@ -54,25 +57,36 @@ def test_expenditure_is_scaled_by_readiness(script_output):
 def test_effectiveness_uses_reduced_expenditure(script_output):
     sim = script_output["sim"]
     model = script_output["model"].concrete_model
-    calibration_name = script_output["params"]["economics"]["damages"]["accreu"]["adaptation_calibration"]
+    calibration_name = script_output["params"]["economics"]["damages"]["accreu"][
+        "adaptation_calibration"
+    ]
     for sector in ("labourprod", "riverine", "slr"):
         calibration = get_adaptation_calibration(calibration_name, sector)
         for region in sim.regions:
             maximum, cost_parameter = effective_adaptation_curve(
-                model, region,
+                model,
+                region,
                 getattr(model, sector + "_adaptation_max_effectiveness")[region],
-                getattr(model, sector + "_adaptation_cost_param")[region], calibration,
+                getattr(model, sector + "_adaptation_cost_param")[region],
+                calibration,
             )
             for t in sim.t:
                 costs = getattr(sim, sector + "_adaptation_costs_abs")[t, region]
-                expected = value(adaptation_effectiveness_fct(costs, maximum, cost_parameter))
-                effectiveness = getattr(sim, sector + "_avoided_damages_adapt")[t, region]
+                expected = value(
+                    adaptation_effectiveness_fct(costs, maximum, cost_parameter)
+                )
+                effectiveness = getattr(sim, sector + "_adaptation_level")[t, region]
                 assert effectiveness == pytest.approx(expected, rel=1e-9, abs=1e-9)
 
 
 def test_saved_results_match_simulation(script_output):
     assert_saved_regional_output(
         script_output["model"],
-        ["regional_emissions", "damage_costs_abs", "adaptation_costs_abs", "mortality_net"],
+        [
+            "regional_emissions",
+            "damage_costs_abs",
+            "adaptation_costs_abs",
+            "mortality_net",
+        ],
         simulation=script_output["sim"],
     )

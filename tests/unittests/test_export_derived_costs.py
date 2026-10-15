@@ -37,7 +37,7 @@ def _cost_model():
         units=quant.unit("fraction_of_GDP"),
         initialize={(0, "A"): 0, (0, "B"): 0, (1, "A"): 0.1, (1, "B"): 0.2},
     )
-    model.sector_avoided_damages_adapt = Var(
+    model.sector_adaptation_level = Var(
         model.t,
         model.regions,
         units=quant.unit("fraction_of_gross_damages"),
@@ -48,7 +48,7 @@ def _cost_model():
             (1, "B"): 0.75,
         },
     )
-    model.orphan_avoided_damages_adapt = Var(
+    model.orphan_adaptation_level = Var(
         model.t,
         model.regions,
         units=quant.unit("fraction_of_gross_damages"),
@@ -127,9 +127,7 @@ def _indirect_cost_model(
     model.t = Set(initialize=[0, 1, 2], ordered=True)
     model.regions = Set(initialize=["A", "B"], ordered=True)
     model.year = lambda t: t
-    model.period_length = Param(
-        model.t, initialize={0: 0, 1: 5, 2: 10}
-    )
+    model.period_length = Param(model.t, initialize={0: 0, 1: 5, 2: 10})
     model.ignore_damages = Param(initialize=ignore_damages)
     model.baseline_GDP = Param(
         model.t,
@@ -232,7 +230,7 @@ def test_add_derived_global_rows(simulation):
     assert set(rows_by_name) == {
         "global_sector_damage_costs",
         "global_sector_damage_costs_gross",
-        "global_sector_avoided_damages_adapt",
+        "global_sector_adaptation_level",
         "global_other_costs",
         "global_heat_related_mortality",
     }
@@ -240,7 +238,7 @@ def test_add_derived_global_rows(simulation):
     assert rows_by_name["global_sector_damage_costs_gross"][3:] == pytest.approx(
         [0, 0.16]
     )
-    global_avoided = rows_by_name["global_sector_avoided_damages_adapt"][3:]
+    global_avoided = rows_by_name["global_sector_adaptation_level"][3:]
     assert np.isnan(global_avoided[0])
     assert global_avoided[1] == pytest.approx(0.625)
     assert rows_by_name["global_other_costs"][3:] == pytest.approx([0.175, 0.18])
@@ -268,22 +266,20 @@ def test_add_indirect_damage_cost_rows(simulation):
     assert rows_by_name_and_region[("indirect_damage_costs", "B")][3:] == pytest.approx(
         [0, 0.2, 1 / 12]
     )
-    assert rows_by_name_and_region[
-        ("global_indirect_damage_costs", "Global")
-    ][3:] == pytest.approx([0, 0.16, 0.106])
-    assert rows_by_name_and_region[
-        ("global_indirect_mitigation_costs", "Global")
-    ][3:] == pytest.approx([0, 0.18, 0.09])
-    assert rows_by_name_and_region[
-        ("global_indirect_adaptation_costs", "Global")
-    ][3:] == pytest.approx([0, 0.01, 0.224])
+    assert rows_by_name_and_region[("global_indirect_damage_costs", "Global")][
+        3:
+    ] == pytest.approx([0, 0.16, 0.106])
+    assert rows_by_name_and_region[("global_indirect_mitigation_costs", "Global")][
+        3:
+    ] == pytest.approx([0, 0.18, 0.09])
+    assert rows_by_name_and_region[("global_indirect_adaptation_costs", "Global")][
+        3:
+    ] == pytest.approx([0, 0.01, 0.224])
 
     for region in model.regions:
         attributed_total = np.sum(
             [
-                rows_by_name_and_region[(f"indirect_{cost_type}_costs", region)][
-                    3:
-                ]
+                rows_by_name_and_region[(f"indirect_{cost_type}_costs", region)][3:]
                 for cost_type in ("damage", "mitigation", "adaptation")
             ],
             axis=0,
@@ -296,9 +292,7 @@ def test_add_indirect_damage_cost_rows(simulation):
 @pytest.mark.parametrize(
     "model_kwargs", [{"ignore_damages": True}, {"zero_costs": True}]
 )
-def test_indirect_damage_costs_are_zero_when_not_attributable(
-    simulation, model_kwargs
-):
+def test_indirect_damage_costs_are_zero_when_not_attributable(simulation, model_kwargs):
     model = _indirect_cost_model(**model_kwargs)
 
     if simulation:
@@ -321,7 +315,8 @@ def test_indirect_damage_costs_are_zero_when_not_attributable(
         attributed_rows = [
             row
             for (name, _), row in rows_by_name_and_region.items()
-            if name in (
+            if name
+            in (
                 f"indirect_{cost_type}_costs",
                 f"global_indirect_{cost_type}_costs",
             )
@@ -336,9 +331,9 @@ def test_indirect_damage_costs_are_zero_when_not_attributable(
         assert rows_by_name_and_region[("indirect_mitigation_costs", "B")][
             3:
         ] == pytest.approx([0, 0.4, 0.5])
-        assert rows_by_name_and_region[
-            ("global_indirect_mitigation_costs", "Global")
-        ][3:] == pytest.approx([0, 0.35, 0.42])
+        assert rows_by_name_and_region[("global_indirect_mitigation_costs", "Global")][
+            3:
+        ] == pytest.approx([0, 0.35, 0.42])
 
 
 @pytest.mark.parametrize("simulation", [False, True])
@@ -362,6 +357,6 @@ def test_missing_adaptation_costs_are_treated_as_zero(simulation):
             0,
             0,
         ]
-    assert rows_by_name_and_region[
-        ("global_indirect_adaptation_costs", "Global")
-    ][3:] == [0, 0, 0]
+    assert rows_by_name_and_region[("global_indirect_adaptation_costs", "Global")][
+        3:
+    ] == [0, 0, 0]

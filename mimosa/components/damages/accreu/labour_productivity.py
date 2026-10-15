@@ -140,7 +140,7 @@ def get_constraints(
         m.labourprod_adaptation_costs = Var(
             m.t, m.regions, units=quant.unit("fraction_of_GDP")
         )
-        m.labourprod_avoided_damages_adapt = Var(
+        m.labourprod_adaptation_level = Var(
             m.t, m.regions, units=quant.unit("fraction_of_gross_damages"), bounds=(0, 1)
         )
         m.labourprod_damage_costs = Var(
@@ -164,7 +164,7 @@ def get_constraints(
             [
                 # Adaptation effectiveness function
                 RegionalEquation(
-                    m.labourprod_avoided_damages_adapt,
+                    m.labourprod_adaptation_level,
                     lambda m, t, r: adaptation_effectiveness_fct(
                         m.labourprod_adaptation_costs_abs[t, r],
                         *effective_adaptation_curve(
@@ -186,7 +186,7 @@ def get_constraints(
                 RegionalEquation(
                     m.labourprod_damage_costs,
                     lambda m, t, r: m.labourprod_damage_costs_gross[t, r]
-                    * (1 - m.labourprod_avoided_damages_adapt[t, r]),
+                    * (1 - m.labourprod_adaptation_level[t, r]),
                 ),
             ]
         )

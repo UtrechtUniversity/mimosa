@@ -52,7 +52,7 @@ def test_literature_adaptation_calibration_matches_bcr_benchmarks(
             getattr(simulation, f"{sector}_damage_costs_gross").values
             * simulation.GDP_gross.values
         )[through_2100]
-        effectiveness = getattr(simulation, f"{sector}_avoided_damages_adapt").values[
+        effectiveness = getattr(simulation, f"{sector}_adaptation_level").values[
             through_2100
         ]
         weights = period_length[:, None] * discount_factor[:, None]
@@ -93,7 +93,7 @@ def test_combined_literature_calibration_matches_bcr_benchmarks(calibration, bcr
         simulation.combined_labprod_riv_damage_costs_gross.values
         * simulation.GDP_gross.values
     )[through_2100]
-    effectiveness = simulation.combined_labprod_riv_avoided_damages_adapt.values[
+    effectiveness = simulation.combined_labprod_riv_adaptation_level.values[
         through_2100
     ]
     bcr = np.sum(gross_damages * effectiveness * weights) / np.sum(costs * weights)
