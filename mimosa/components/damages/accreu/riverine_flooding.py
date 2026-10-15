@@ -63,6 +63,13 @@ def get_constraints(
 
             ![Regional damage costs (without adaptation)](../../assets/fig/accreu/riverine_adapt_eff.png)
 
+    Variables created in this module:
+
+    - var::riverine_damage_costs_gross
+    - var::riverine_adaptation_costs_abs
+    - var::riverine_adaptation_costs
+    - var::riverine_adaptation_level
+    - var::riverine_damage_costs
 
     """
 
@@ -95,7 +102,12 @@ def get_constraints(
     setattr(
         m,
         damage_cost_gross_var_name,
-        Var(m.t, m.regions, units=quant.unit("fraction_of_GDP")),
+        Var(
+            m.t,
+            m.regions,
+            units=quant.unit("fraction_of_GDP"),
+            doc="Gross damages from riverine flooding, without adaptation.",
+        ),
     )
 
     constraints.append(
@@ -110,15 +122,26 @@ def get_constraints(
             m.regions,
             units=quant.unit("currency_unit"),
             bounds=lambda m, t, r: (0, 0.1 * m.baseline_GDP[t, r]),
+            doc="Absolute adaptation costs for riverine flooding, in currency units. Used to calculate the adaptation level.",
         )
         m.riverine_adaptation_costs = Var(
-            m.t, m.regions, units=quant.unit("fraction_of_GDP")
+            m.t,
+            m.regions,
+            units=quant.unit("fraction_of_GDP"),
+            doc="Adaptation costs for riverine flooding, as a fraction of GDP.",
         )
         m.riverine_adaptation_level = Var(
-            m.t, m.regions, units=quant.unit("fraction_of_gross_damages"), bounds=(0, 1)
+            m.t,
+            m.regions,
+            units=quant.unit("fraction_of_gross_damages"),
+            bounds=(0, 1),
+            doc="Adaptation level for riverine flooding, as a fraction of gross damages. 0 means that no damages are avoided, while 1 means that all damages are avoided.",
         )
         m.riverine_damage_costs = Var(
-            m.t, m.regions, units=quant.unit("fraction_of_GDP")
+            m.t,
+            m.regions,
+            units=quant.unit("fraction_of_GDP"),
+            doc="Residual damages from riverine flooding, after adaptation. If `noadaptation` is chosen, this variable represents the gross damages.",
         )
 
         m.riverine_adaptation_max_effectiveness = Param(

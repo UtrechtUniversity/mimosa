@@ -1,5 +1,6 @@
 ---
 icon: material/gamepad-circle
+variable_context: accreu_sectoral
 ---
 
 [:octicons-arrow-left-24: Back to damage models](index.md)
