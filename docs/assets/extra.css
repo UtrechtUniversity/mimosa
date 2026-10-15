@@ -80,7 +80,9 @@ nav.md-nav a[target=_blank]::after {
 
 /* Parameter admonition */
 .md-typeset .admonition.parameter,
-.md-typeset details.parameter {
+.md-typeset details.parameter,
+.md-typeset .admonition.variable,
+.md-typeset details.variable {
     border-color: rgba(120, 155, 43, 0.1);
 }
 

@@ -3,6 +3,7 @@
 import re
 from html import escape
 from html.parser import HTMLParser
+from textwrap import indent
 
 from docs.scripts.variable_availability import availability_requirements
 from docs.scripts.variable_docs import get_documentation_context
@@ -11,7 +12,6 @@ from docs.scripts.variable_references import (
     resolve_variable_reference,
     variable_reference_url,
 )
-
 
 REFERENCE_MARKER = "{variables::reference}"
 VARIABLE_MARKER = re.compile(r"(?<![\w:])(?:varref|var)::[\w.]*(?:::[\w.]*)*")
@@ -25,8 +25,8 @@ def _details(variable):
     unit = variable.unit if variable.has_declared_units else "not declared"
     dimensions = ", ".join(variable.dimensions) or "scalar"
     details = (
-        f'Units: <code>{escape(unit)}</code>; '
-        f'dimensions: <code>{escape(dimensions)}</code>.'
+        f"Units: <code>{escape(unit)}</code>; "
+        f"dimensions: <code>{escape(dimensions)}</code>."
     )
     if variable.requires_baseline:
         details += " Requires a no-policy baseline."
@@ -34,38 +34,74 @@ def _details(variable):
 
 
 def render_variable_reference(catalogue, context_params=None):
-    """Render each metadata variant once, retaining all context-specific anchors."""
+    """Render collapsible Markdown entries, retaining context-specific anchors."""
     all_contexts = {variable.context for variable in catalogue}
     available_contexts = {}
     for variable in catalogue:
         available_contexts.setdefault(variable.name, set()).add(variable.context)
 
-    if context_params is None and any(contexts != all_contexts for contexts in available_contexts.values()):
+    if context_params is None and any(
+        contexts != all_contexts for contexts in available_contexts.values()
+    ):
         context_params = {
-            context: get_documentation_context(context).params for context in sorted(all_contexts)
+            context: get_documentation_context(context).params
+            for context in sorted(all_contexts)
         }
 
     entries = []
     for entry in group_variables(catalogue):
-        anchors = "".join(f'<span id="{escape(anchor, quote=True)}"></span>' for anchor in entry.anchors)
-        availability = ""
-        if available_contexts[entry.metadata.name] != all_contexts:
+        variable = entry.metadata
+        anchors = "".join(
+            f'<span id="{escape(anchor, quote=True)}"></span>'
+            for anchor in entry.anchors
+        )
+        unit = variable.unit if variable.has_declared_units else "not declared"
+        dimensions = ", ".join(variable.dimensions) or "scalar"
+        content = [
+            anchors,
+            "",
+            f"<p>{_description(variable)}</p>",
+            "",
+            f"- Units: <code>{escape(unit)}</code>",
+            f"- Dimensions: <code>{escape(dimensions)}</code>",
+        ]
+        if variable.requires_baseline:
+            content.append("- Requires a no-policy baseline.")
+        if available_contexts[variable.name] != all_contexts:
             alternatives = availability_requirements(
-                available_contexts[entry.metadata.name], context_params
+                available_contexts[variable.name], context_params
             )
             clauses = []
             for requirements in alternatives:
                 conditions = []
                 for path, values in requirements:
-                    choices = " or ".join(f"<code>{escape(str(value))}</code>" for value in values)
+                    choices = " or ".join(
+                        f"<code>{escape(str(value))}</code>" for value in values
+                    )
                     conditions.append(f"<code>{escape(path)}</code> = {choices}")
                 clauses.append(" and ".join(conditions))
-            availability = " Available when: " + "; or ".join(clauses) + "."
-        entries.append(
-            f'<dt>{anchors}<code>{escape(entry.metadata.name)}</code></dt>'
-            f'<dd>{_description(entry.metadata)} {_details(entry.metadata)}{availability}</dd>'
-        )
-    return '<dl class="variable-reference">' + "\n".join(entries) + "</dl>"
+            content.append("\nAvailable when: " + "; or ".join(clauses) + ".")
+            # One valid example is enough; the text above lists all alternatives.
+            assignments = []
+            for path, values in alternatives[0]:
+                keys = "".join(f"[{key!r}]" for key in path.split("."))
+                assignments.append(f"params{keys} = {values[0]!r}")
+            highlight_lines = " ".join(
+                str(line) for line in range(2, len(assignments) + 2)
+            )
+            content.extend(
+                [
+                    "\nExample usage:\n",
+                    f'```python hl_lines="{highlight_lines}"',
+                    "params = load_params()",
+                    *assignments,
+                    "model = MIMOSA(params)",
+                    "```",
+                ]
+            )
+        title = f'!!! variable "{escape(variable.name)}"\n\n'
+        entries.append(title + indent("\n".join(content), "    "))
+    return "\n\n".join(entries) + "\n"
 
 
 def expand_variable_reference(markdown, catalogue):
@@ -78,7 +114,11 @@ def expand_variable_reference(markdown, catalogue):
             marker, suffix = match.groups()
             if fence is None:
                 fence = marker
-            elif marker[0] == fence[0] and len(marker) >= len(fence) and not suffix.strip():
+            elif (
+                marker[0] == fence[0]
+                and len(marker) >= len(fence)
+                and not suffix.strip()
+            ):
                 fence = None
         if fence is None and line.rstrip("\r\n") == REFERENCE_MARKER:
             lines.append(render_variable_reference(catalogue) + "\n")
@@ -114,12 +154,14 @@ class _VariableHTMLRenderer(HTMLParser):
             self.ignored.pop()
 
     def handle_data(self, data):
-        self.output.append(data if self.ignored else VARIABLE_MARKER.sub(self._replace, data))
+        self.output.append(
+            data if self.ignored else VARIABLE_MARKER.sub(self._replace, data)
+        )
 
     def _replace(self, match):
         # A sentence-ending period is punctuation, not part of a variable name.
         marker = match.group().rstrip(".")
-        punctuation = match.group()[len(marker):]
+        punctuation = match.group()[len(marker) :]
         variable = resolve_variable_reference(
             marker, self.page_context, self.page_path, self.catalogue
         )
@@ -129,7 +171,7 @@ class _VariableHTMLRenderer(HTMLParser):
             return link + punctuation
         return (
             f'<span class="variable-description">{link}: '
-            f'{_description(variable)} {_details(variable)}</span>{punctuation}'
+            f"{_description(variable)} {_details(variable)}</span>{punctuation}"
         )
 
     def handle_entityref(self, name):
@@ -148,9 +190,13 @@ class _VariableHTMLRenderer(HTMLParser):
         self.output.append(f"<?{data}>")
 
 
-def render_variable_markers(html, catalogue, page_context, page_path, page_url, reference_url):
+def render_variable_markers(
+    html, catalogue, page_context, page_path, page_url, reference_url
+):
     """Process both page prose and mkdocstrings output with the same renderer."""
-    renderer = _VariableHTMLRenderer(catalogue, page_context, page_path, page_url, reference_url)
+    renderer = _VariableHTMLRenderer(
+        catalogue, page_context, page_path, page_url, reference_url
+    )
     renderer.feed(html)
     renderer.close()
     return "".join(renderer.output)

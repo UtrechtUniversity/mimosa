@@ -71,7 +71,9 @@ component docstrings rendered on that page. Markers in inline code, code blocks,
 existing links, HTML attributes, comments, scripts and styles remain literal.
 
 The standalone `{variables::reference}` marker generates the complete reference
-in `docs/variables.md`. Missing descriptions and units are shown explicitly for
+in `docs/variables.md` as flat, collapsible `variable` admonitions, matching the
+parameter reference style. Conditional variables include a configuration example.
+Missing descriptions and units are shown explicitly for
 now; completeness checks can be introduced once declarations have been documented.
 The reference is expanded before Markdown conversion. Individual variable
 markers are expanded after mkdocstrings rendering, so pages and docstrings use

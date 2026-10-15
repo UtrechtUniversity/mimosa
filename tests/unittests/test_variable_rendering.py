@@ -99,16 +99,20 @@ def test_missing_metadata_scalar_and_baseline_requirement_are_visible(catalogue)
 def test_reference_keeps_variants_and_all_merged_anchors(catalogue):
     html = render_variable_reference(catalogue)
 
-    assert html.count("<dt>") == 2
+    assert html.count('??? variable "damage_costs"') == 2
+    assert "    ??? variable" not in html
     assert html.count("Damage &amp; adaptation &lt;costs&gt;") == 1
     assert html.count("Residual damages") == 1
     # This variable exists everywhere, despite its different descriptions.
     assert "Available when:" not in html
+    assert "Example usage:" not in html
     for variable in catalogue:
         assert html.count(f'id="variable-{variable.context}--damage_costs"') == 1
 
 
 def test_reference_shows_availability_only_for_conditional_variables(catalogue):
+    from markdown import markdown
+
     conditional = replace(catalogue[0], name="attributed_emission_reductions")
     context_params = {
         variable.context: check_params({"model structure": {"emissiontrade module": "notrade"}})
@@ -121,6 +125,32 @@ def test_reference_shows_availability_only_for_conditional_variables(catalogue):
     assert "<code>model structure.emissiontrade module</code> = <code>emissiontrade</code>" in html
     assert "<code>coacch_noadaptation</code>" not in html
     assert 'id="variable-coacch--attributed_emission_reductions"' in html
+    assert "params['model structure']['emissiontrade module'] = 'emissiontrade'" in html
+    assert '```python hl_lines="2"' in html
+    assert html.count("Example usage:") == 1
+    rendered = markdown(html, extensions=["pymdownx.details", "pymdownx.superfences"])
+    assert rendered.count('<details class="variable">') == 3
+    assert '<summary>attributed_emission_reductions</summary>' in rendered
+    assert 'class="highlight"' in rendered
+    assert "??? variable" not in rendered
+
+
+def test_reference_example_sets_all_required_options(catalogue):
+    conditional = replace(catalogue[0], name="monetary_mortality", context="accreu_sectoral")
+    context_params = {
+        "coacch": check_params({}),
+        "coacch_noadaptation": check_params({
+            "model structure": {"damage module": "ACCREU"},
+            "economics": {"damages": {"accreu": {"monetise_mortality": False}}},
+        }),
+        "accreu_sectoral": check_params({"model structure": {"damage module": "ACCREU"}}),
+    }
+
+    rendered = render_variable_reference(catalogue + (conditional,), context_params)
+
+    assert "params['model structure']['damage module'] = 'ACCREU'" in rendered
+    assert "params['economics']['damages']['accreu']['monetise_mortality'] = True" in rendered
+    assert '```python hl_lines="2 3"' in rendered
 
 
 def test_reference_placeholder_expands_only_outside_code_examples(catalogue):
@@ -133,7 +163,7 @@ def test_reference_placeholder_expands_only_outside_code_examples(catalogue):
     )
     rendered = expand_variable_reference(markdown, catalogue)
 
-    assert rendered.count('<dl class="variable-reference">') == 1
+    assert rendered.count('??? variable "damage_costs"') == 2
     assert rendered.count("{variables::reference}") == 4
 
 
@@ -201,7 +231,7 @@ def documentation_site(tmp_path, monkeypatch, catalogue):
             {"mkdocstrings": {"handlers": {"python": {"paths": [str(tmp_path)]}}}},
             {"macros": {"module_name": str(root / "docs/scripts/mkdocs_macros")}},
         ],
-        "markdown_extensions": ["fenced_code"],
+        "markdown_extensions": ["admonition", "pymdownx.details", "pymdownx.superfences"],
     }
     return SimpleNamespace(
         root=tmp_path, page=page, config=config,
@@ -239,6 +269,11 @@ def test_strict_site_build_renders_pages_docstrings_and_reference(documentation_
     assert "var::missing_literal" in html
     assert "varref::missing_literal" in html
     assert 'id="variable-coacch_noadaptation--damage_costs"' in reference
+    assert reference.count('<details class="variable">') == 2
+    assert '<summary>damage_costs</summary>' in reference
+    assert "<li>Units: <code>fraction_of_GDP</code></li>" in reference
+    assert "<li>Dimensions: <code>t, regions</code></li>" in reference
+    assert "??? variable" not in reference
     assert "{variables::reference}" not in reference
 
 
