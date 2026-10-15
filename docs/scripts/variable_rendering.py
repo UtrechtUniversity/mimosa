@@ -53,7 +53,7 @@ def render_variable_reference(catalogue, context_params=None):
     for entry in group_variables(catalogue):
         variable = entry.metadata
         anchors = "".join(
-            f'<span id="{escape(anchor, quote=True)}"></span>'
+            f'<span id="{escape(anchor, quote=True)}" class="variable_anchor"></span>'
             for anchor in entry.anchors
         )
         unit = variable.unit if variable.has_declared_units else "not declared"

@@ -108,6 +108,7 @@ def test_reference_keeps_variants_and_all_merged_anchors(catalogue):
     assert "Example usage:" not in html
     for variable in catalogue:
         assert html.count(f'id="variable-{variable.context}--damage_costs"') == 1
+        assert f'id="variable-{variable.context}--damage_costs" class="variable_anchor"' in html
 
 
 def test_reference_shows_availability_only_for_conditional_variables(catalogue):
