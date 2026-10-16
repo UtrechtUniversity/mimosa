@@ -86,8 +86,13 @@ def test_explicit_context_in_rendered_marker_overrides_page(catalogue):
     html = render("<p>var::accreu_sectoral::damage_costs</p>", catalogue)
 
     assert "Residual damages" in html
-    assert 'href="#var__damage_costs"' in html
+    assert 'href="#var__accreu_sectoral::damage_costs"' in html
     assert "Damage &amp; adaptation" not in html
+
+
+@pytest.mark.parametrize("marker", ["var::coacch::damage_costs", "varref::coacch::damage_costs", "varref::default::damage_costs"])
+def test_explicit_graph_context_and_default_alias_are_preserved(catalogue, marker):
+    assert 'href="#var__coacch::damage_costs"' in render(marker, catalogue)
 
 
 def test_missing_metadata_scalar_and_baseline_requirement_are_visible(catalogue):
@@ -274,7 +279,9 @@ def test_strict_site_build_renders_pages_docstrings_and_reference(
     assert html.count("Damage &amp; adaptation &lt;costs&gt;") == 1
     assert "Residual damages" in html
     assert "Constraint macros still render." in html
-    assert html.count('href="#var__damage_costs"') == 4
+    assert html.count('href="#var__damage_costs"') == 3
+    assert 'href="#var__accreu_sectoral::damage_costs"' in html
+    assert 'data-documentation-context="coacch"' in html
     assert "var::missing_literal" in html
     assert "varref::missing_literal" in html
     assert 'id="variable-coacch_noadaptation--damage_costs"' in reference

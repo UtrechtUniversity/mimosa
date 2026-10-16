@@ -1,7 +1,26 @@
 // Resolve the reference page from this asset, independently of the current page.
 const dependencyGraphPage = new URL("../variables/", document.currentScript.src);
+const dependencyGraphAssets = new URL("dependency-graphs/", document.currentScript.src);
+const dependencyGraphRequests = new Map();
 
-function initializeDependencyTooltips(panel, nodes, reference) {
+function loadDependencyAsset(url, format = "text") {
+    const key = String(url);
+    if (!dependencyGraphRequests.has(key)) {
+        dependencyGraphRequests.set(key, fetch(url).then(response => {
+            if (!response.ok) throw new Error(`Graph request failed: ${response.status}`);
+            return response[format]();
+        }));
+    }
+    return dependencyGraphRequests.get(key);
+}
+
+function parseDependencyLink(hash, pageContext = "coacch") {
+    const parts = decodeURIComponent(hash.slice("#var__".length)).split("::");
+    const context = parts.length === 2 ? parts[0] : pageContext;
+    return { context: context === "default" ? "coacch" : context, variable: parts.at(-1) };
+}
+
+function initializeDependencyTooltips(panel, nodes, reference, signal) {
     const tooltip = document.createElement("div");
     tooltip.className = "dependency-graph-tooltip md-typeset";
     tooltip.id = panel.closest("dialog") ? "dependency-graph-modal-tooltip" : "dependency-graph-tooltip";
@@ -77,8 +96,8 @@ function initializeDependencyTooltips(panel, nodes, reference) {
     tooltip.addEventListener("focusin", () => clearTimeout(hideTimer));
     tooltip.addEventListener("focusout", scheduleHide);
     panel.querySelector(".dependency-graph-viewport").addEventListener("scroll", hide);
-    panel.closest("dialog")?.addEventListener("close", hide);
-    return hide;
+    panel.closest("dialog")?.addEventListener("close", hide, { signal });
+    return { hide, show };
 }
 
 async function initializeDependencyGraph(panel, source, dialog = null, reference = document) {
@@ -86,13 +105,12 @@ async function initializeDependencyGraph(panel, source, dialog = null, reference
     const select = panel.querySelector("select");
     const focusButton = panel.querySelector('[data-action="focus"]');
 
+    const events = new AbortController();
     try {
-        const response = await fetch(source);
-        if (!response.ok) throw new Error(`Graph request failed: ${response.status}`);
-        const graphDocument = new DOMParser().parseFromString(await response.text(), "image/svg+xml");
+        const graphDocument = new DOMParser().parseFromString(await loadDependencyAsset(source), "image/svg+xml");
         const svg = graphDocument.documentElement;
         svg.setAttribute("role", "group");
-        svg.setAttribute("aria-label", "ACCREU sectoral variable dependencies");
+        svg.setAttribute("aria-label", "Model variable dependencies");
         viewport.replaceChildren(svg);
 
         const nodes = Array.from(svg.querySelectorAll("g.node"));
@@ -107,15 +125,21 @@ async function initializeDependencyGraph(panel, source, dialog = null, reference
             node.dataset.variable = name;
             node.classList.add("dependency-node");
             const link = node.querySelector("a");
-            link.setAttribute("href", `?graph_variable=${encodeURIComponent(name)}#dependency-graph`);
+            const url = new URL(dependencyGraphPage);
+            url.searchParams.set("graph_context", panel.dataset.variableContext);
+            url.searchParams.set("graph_variable", name);
+            url.hash = "dependency-graph";
+            link.setAttribute("href", url.href);
             link.setAttribute("aria-label", `Highlight ${name}`);
             link.addEventListener("click", event => {
                 event.preventDefault();
                 choose(name);
                 if (scale < focusZoom) focusSelected();
+                showSelectedInformation();
             });
         });
-        const hideTooltip = initializeDependencyTooltips(panel, nodes, reference);
+        const tooltips = initializeDependencyTooltips(panel, nodes, reference, events.signal);
+        const hideTooltip = tooltips.hide;
         select.add(new Option("No selection", ""));
         nodes.map(node => node.dataset.variable).sort().forEach(name => {
             select.add(new Option(name, name));
@@ -156,6 +180,7 @@ async function initializeDependencyGraph(panel, source, dialog = null, reference
                 const url = new URL(location.href);
                 if (name) url.searchParams.set("graph_variable", name);
                 else url.searchParams.delete("graph_variable");
+                url.searchParams.set("graph_context", panel.dataset.variableContext);
                 url.hash = "dependency-graph";
                 history.replaceState(history.state, "", url);
             }
@@ -193,15 +218,29 @@ async function initializeDependencyGraph(panel, source, dialog = null, reference
             viewport.scrollTop += node.top - frame.top + node.height / 2 - viewport.clientHeight / 2;
         }
 
-        function focusVariable(requested) {
+        function showSelectedInformation() {
+            const name = selected;
+            requestAnimationFrame(() => {
+                if (name && selected === name && panel.isConnected) {
+                    tooltips.show(nodes.find(node => node.dataset.variable === name));
+                }
+            });
+        }
+
+        function focusVariable(requested, showInformation = false) {
+            hideTooltip();
             const exists = nodes.some(node => node.dataset.variable === requested);
             highlight(exists ? requested : null);
-            if (exists) focusSelected();
+            if (exists) {
+                focusSelected();
+                if (showInformation) showSelectedInformation();
+            }
         }
 
         select.addEventListener("change", () => {
             choose(select.value || null);
             focusSelected();
+            showSelectedInformation();
         });
 
         let pan = null;
@@ -260,46 +299,113 @@ async function initializeDependencyGraph(panel, source, dialog = null, reference
                     event.preventDefault();
                     choose(null);
                 }
-            });
+            }, { signal: events.signal });
         } else {
             window.addEventListener("keydown", event => {
                 if (panel.isConnected && event.key === "Escape" && !document.querySelector(".dependency-graph-modal[open]")) {
                     choose(null);
                 }
-            });
-            window.addEventListener("popstate", () => {
-                if (panel.isConnected) focusVariable(new URLSearchParams(location.search).get("graph_variable"));
-            });
+            }, { signal: events.signal });
         }
         panel.querySelector('[data-action="zoom-in"]').addEventListener("click", () => setZoom(scale * 1.4));
         panel.querySelector('[data-action="zoom-out"]').addEventListener("click", () => setZoom(scale / 1.4));
         panel.querySelector('[data-action="fit"]').addEventListener("click", fitGraph);
         focusButton.addEventListener("click", focusSelected);
         fitGraph();
-        if (!dialog) focusVariable(new URLSearchParams(location.search).get("graph_variable"));
-        return { focusVariable };
+        return {
+            focusVariable,
+            destroy() { events.abort(); hideTooltip(); },
+        };
     } catch (error) {
         viewport.textContent = "The graph could not be loaded. You can download the SVG below.";
         console.error(error);
     }
 }
 
+async function createDependencyGraphController(panel, reference, dialog = null, downloadLink = null) {
+    const manifest = await loadDependencyAsset(new URL("index.json", dependencyGraphAssets), "json");
+    const template = panel.cloneNode(true);
+    let viewer;
+    let activeContext;
+    let requestId = 0;
+
+    async function open(context, variable = null, showInformation = true) {
+        context = context === "default" ? "coacch" : context || manifest.default_context;
+        const request = ++requestId;
+        const config = manifest.contexts[context];
+        if (context !== activeContext || !viewer) {
+            viewer?.destroy();
+            viewer = null;
+            const nextPanel = template.cloneNode(true);
+            panel.replaceWith(nextPanel);
+            panel = nextPanel;
+            panel.dataset.variableContext = context;
+            activeContext = context;
+            panel.querySelector(".dependency-graph-configuration").textContent = config?.label || `Unknown configuration: ${context}`;
+            if (config) {
+                const source = new URL(config.source, dependencyGraphAssets);
+                if (downloadLink) downloadLink.href = source.href;
+                const nextViewer = await initializeDependencyGraph(panel, source, dialog, reference);
+                if (request !== requestId) { nextViewer?.destroy(); return; }
+                viewer = nextViewer;
+            } else {
+                panel.querySelector(".dependency-graph-viewport").textContent = "This model configuration has no documented graph.";
+            }
+        }
+        if (request !== requestId) return;
+        viewer?.focusVariable(variable, showInformation);
+        if (!dialog && config?.variables.includes(variable)) {
+            const url = new URL(location.href);
+            url.searchParams.set("graph_context", context);
+            url.searchParams.set("graph_variable", variable);
+            url.hash = "dependency-graph";
+            history.replaceState(history.state, "", url);
+        }
+        const message = panel.querySelector(".dependency-graph-message");
+        message.replaceChildren();
+        message.hidden = !variable || !!config?.variables.includes(variable);
+        if (!message.hidden) {
+            const text = document.createElement("p");
+            text.textContent = `${variable} is unavailable in this configuration.`;
+            message.append(text);
+            const alternatives = Object.entries(manifest.contexts).filter(([, entry]) => entry.variables.includes(variable));
+            if (alternatives.length) {
+                const select = document.createElement("select");
+                select.setAttribute("aria-label", "Available model configurations");
+                alternatives.forEach(([name, entry]) => select.add(new Option(entry.label, name)));
+                const button = document.createElement("button");
+                button.type = "button";
+                button.textContent = "Open available configuration";
+                button.addEventListener("click", () => open(select.value, variable));
+                message.append(select, button);
+            } else {
+                text.textContent += " No documented graph contains this variable.";
+            }
+        }
+    }
+    return { open };
+}
+
 document$.subscribe(() => {
+    const pageContext = document.querySelector("[data-documentation-context]")?.dataset.documentationContext || "coacch";
     const panel = document.querySelector("#dependency-graph-viewer");
-    if (panel) initializeDependencyGraph(panel, document.querySelector("#dependency-graph-source").href);
+    if (panel) {
+        const controller = createDependencyGraphController(panel, document, null, document.querySelector("#dependency-graph-source"));
+        function selectFromUrl() {
+            const query = new URLSearchParams(location.search);
+            controller.then(graph => graph.open(query.get("graph_context") || pageContext, query.get("graph_variable")));
+        }
+        selectFromUrl();
+        window.addEventListener("popstate", selectFromUrl);
+    }
 
     let dialog;
     let graphReady;
     // MathJax creates equation links later, so handle clicks on the page itself.
     const content = document.querySelector(".md-content");
     if (!content) return;
-    content.addEventListener("click", async event => {
-        const link = event.target.closest('a[href*="#var__"]');
-        if (!link || !link.hash.startsWith("#var__")) return;
-        if (event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
-        event.preventDefault();
-        const reference = dependencyGraphPage;
-        const variable = decodeURIComponent(link.hash.slice("#var__".length));
+    async function openVariable(hash) {
+        const { context, variable } = parseDependencyLink(hash, pageContext);
         if (!dialog) {
             dialog = document.createElement("dialog");
             dialog.className = "dependency-graph-modal";
@@ -312,24 +418,34 @@ document$.subscribe(() => {
                 <p>Loading dependency graph…</p>`;
             dialog.querySelector("button").addEventListener("click", () => dialog.close());
             document.body.append(dialog);
-            // Reuse the reference page's controls and graph, loaded once per page.
             graphReady = (async () => {
-                const response = await fetch(reference);
-                if (!response.ok) throw new Error(`Reference page request failed: ${response.status}`);
-                const page = new DOMParser().parseFromString(await response.text(), "text/html");
+                const html = await loadDependencyAsset(dependencyGraphPage);
+                const page = new DOMParser().parseFromString(html, "text/html");
                 const graphPanel = page.querySelector("#dependency-graph-viewer");
-                const source = new URL(page.querySelector("#dependency-graph-source").getAttribute("href"), reference);
                 dialog.querySelector("p").replaceWith(graphPanel);
-                return initializeDependencyGraph(graphPanel, source, dialog, page);
+                return createDependencyGraphController(graphPanel, page, dialog);
             })();
         }
         dialog.showModal();
         try {
             const graph = await graphReady;
-            if (dialog.open) graph?.focusVariable(variable);
+            if (dialog.open) await graph.open(context, variable);
         } catch (error) {
-            dialog.querySelector("p").textContent = "The graph could not be loaded. Please try the variable reference page.";
             console.error(error);
+            const message = dialog.querySelector(".dependency-graph-viewport, p");
+            if (message) message.textContent = "The graph could not be loaded. Please try the variable reference page.";
         }
+    }
+    content.addEventListener("click", event => {
+        const link = event.target.closest('a[href*="#var__"]');
+        if (!link || !link.hash.startsWith("#var__")) return;
+        if (event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+        event.preventDefault();
+        openVariable(link.hash);
     });
+    function openFromHash() {
+        if (content.isConnected && location.hash.startsWith("#var__")) openVariable(location.hash);
+    }
+    openFromHash();
+    window.addEventListener("hashchange", openFromHash);
 });

@@ -160,7 +160,10 @@ class _VariableHTMLRenderer(HTMLParser):
         variable = resolve_variable_reference(
             marker, self.page_context, self.page_path, self.catalogue
         )
-        url = f"#var__{quote(variable.name, safe='_.')}"
+        target = variable.name
+        if len(marker.split("::")) == 3:
+            target = f"{variable.context}::{target}"
+        url = f"#var__{quote(target, safe=':_.')}"
         link = f'<a href="{escape(url, quote=True)}"><code>{escape(variable.name)}</code></a>'
         if marker.startswith("varref::"):
             return link + punctuation

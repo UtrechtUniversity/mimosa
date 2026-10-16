@@ -2,10 +2,12 @@ import re
 import yaml
 import sys, os
 import pandas as pd
+from html import escape
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../../"))
 
 from docs.scripts.variable_docs import (
+    DOCUMENTATION_CONFIGS,
     clear_documentation_cache,
     get_documentation_context,
     get_variable_catalogue,
@@ -15,6 +17,7 @@ from docs.scripts.variable_rendering import (
     expand_variable_reference,
     render_variable_markers,
 )
+from docs.scripts import generate_dependency_graph
 from mimosa.common.config.parseconfig import (
     get_nested,
     flatten,
@@ -237,11 +240,27 @@ def on_page_content(html, **kwargs):
         page = kwargs["page"]
         reference = kwargs["files"].get_file_from_path("variables.md")
         if reference is None:
-            raise ValueError(f"{page.file.src_uri}: Variable reference page variables.md is missing")
+            raise ValueError(
+                f"{page.file.src_uri}: Variable reference page variables.md is missing"
+            )
         html = render_variable_markers(
-            html, get_variable_catalogue(), page.meta.get("variable_context"),
-            page.file.src_uri, page.url, reference.url,
+            html,
+            get_variable_catalogue(),
+            page.meta.get("variable_context"),
+            page.file.src_uri,
+            page.url,
+            reference.url,
         )
+    if "page" in kwargs:
+        page = kwargs["page"]
+        graph_context = page.meta.get("variable_context") or "coacch"
+        if graph_context == "default":
+            graph_context = "coacch"
+        if graph_context not in DOCUMENTATION_CONFIGS:
+            raise ValueError(
+                f"{page.file.src_uri}: Unknown variable context {graph_context!r}"
+            )
+        html += f'<span hidden data-documentation-context="{escape(graph_context, quote=True)}"></span>'
     return html
 
 
@@ -254,6 +273,13 @@ def on_shutdown(**kwargs):
     clear_documentation_cache()
 
 
+import time
+
+
 def on_pre_build(**kwargs):
     # Reuse the catalogue across live rebuilds within the same serve session.
+    t0 = time.time()
+    generate_dependency_graph.main()
+    t1 = time.time()
+    print(f"Dependency graphs generated in {t1 - t0:.2f} seconds")
     get_variable_catalogue()

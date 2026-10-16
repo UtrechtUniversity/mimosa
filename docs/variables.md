@@ -8,17 +8,20 @@ Each entry lists a model variable's description, units, dimensions and availabil
 
 ## Dependency graph
 
-This graph shows the actual variables and dependencies for **ACCREU with sectoral
-adaptation and solver-controlled adaptation spending**. Faint dashed links refer
+This graph shows the variables and dependencies for the selected model configuration.
+Links use the documentation page's configuration, with optional context overrides.
+Faint dashed links refer
 to the previous time step. Click a node to select it; click empty graph space or
 press Escape to clear the selection. Click and drag to pan the zoomed-in graph.
 Double-click empty space to fit the graph.
 Use **Fit graph** for the overview, or **Focus selected** to read a neighbourhood.
 Hover over a node to read its variable reference information.
 
-[Download the graph as SVG](assets/dependency-graph.svg){id="dependency-graph-source" download}
+[Download the graph as SVG](assets/dependency-graphs/coacch.svg){id="dependency-graph-source" download}
 
-<div class="dependency-graph" id="dependency-graph-viewer" data-variable-context="accreu_sectoral">
+<div class="dependency-graph" id="dependency-graph-viewer" data-variable-context="coacch">
+  <p class="dependency-graph-configuration"></p>
+  <div class="dependency-graph-message" role="status" hidden></div>
   <div class="dependency-graph-controls">
     <label>Variable <select aria-label="Graph variable"></select></label>
     <button type="button" data-action="zoom-out" aria-label="Zoom out">−</button>

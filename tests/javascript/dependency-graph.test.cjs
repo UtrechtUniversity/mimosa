@@ -13,6 +13,7 @@ function element(children = {}) {
         dataset: {},
         style: {},
         attributes: {},
+        isConnected: true,
         classList: {
             add: name => classes.add(name),
             remove: name => classes.delete(name),
@@ -24,7 +25,7 @@ function element(children = {}) {
         setAttribute(name, value) { this.attributes[name] = value; },
         removeAttribute(name) { delete this.attributes[name]; },
         removeAttributeNS() {},
-        append(child) { this.children = [...(this.children || []), child]; },
+        append(...children) { this.children = [...(this.children || []), ...children]; },
         replaceChildren(...children) { this.children = children; },
         getBoundingClientRect: () => ({ left: 0, top: 0, right: 100, bottom: 40, width: 100, height: 40 }),
     });
@@ -76,6 +77,7 @@ async function viewer(reference) {
         setTimeout, clearTimeout,
         requestAnimationFrame: callback => callback(),
         URL,
+        AbortController,
         fetch: async () => ({ ok: true, text: async () => "graph" }),
         DOMParser: class { parseFromString() { return { documentElement: svg }; } },
         Option: class {},
@@ -230,6 +232,90 @@ test("hover information stays open while moving from the node into the card", as
     assert.equal(tooltip.hidden, true);
 });
 
+test("opening a variable link shows its information immediately and clears on Escape", async () => {
+    const card = element();
+    card.querySelectorAll = () => [];
+    const reference = { getElementById: () => ({ closest: () => ({ cloneNode: () => card }) }) };
+    const { graph, tooltip, dialog } = await viewer(reference);
+    graph.focusVariable("input", true);
+    assert.equal(tooltip.hidden, false);
+    dialog.dispatchEvent(new Event("cancel", { cancelable: true }));
+    assert.equal(tooltip.hidden, true);
+    graph.destroy();
+    const afterDestroy = new Event("cancel", { cancelable: true });
+    dialog.dispatchEvent(afterDestroy);
+    assert.equal(afterDestroy.defaultPrevented, false);
+});
+
+test("context changes replace the graph, preserve its settings, and offer valid alternatives", async () => {
+    const panels = [];
+    function graphPanel() {
+        const panel = element({
+            ".dependency-graph-configuration": element(),
+            ".dependency-graph-message": element(),
+            ".dependency-graph-viewport": element(),
+        });
+        panel.cloneNode = graphPanel;
+        panel.replaceWith = next => { panel.isConnected = false; panels.push(next); };
+        return panel;
+    }
+    const manifest = { default_context: "coacch", contexts: {
+        coacch: { label: "damage module: COACCH", source: "coacch.svg", variables: ["shared"] },
+        accreu_sectoral: { label: "damage module: ACCREU · adaptation: sectoral", source: "accreu_sectoral.svg", variables: ["shared", "sectoral"] },
+    } };
+    const initialized = [];
+    const focused = [];
+    let destroyed = 0;
+    const context = {
+        URL, console,
+        document$: { subscribe() {} },
+        location: { href: "https://example.org/variables/" },
+        history: { replaceState(state, title, url) { context.location.href = String(url); } },
+        document: {
+            currentScript: { src: "https://example.org/assets/dependency-graph.js" },
+            createElement() {
+                const node = element();
+                node.add = option => { node.value ||= option.value; };
+                return node;
+            },
+        },
+        Option: class { constructor(label, value) { this.value = value; } },
+        fetch: async () => ({ ok: true, json: async () => manifest }),
+    };
+    vm.createContext(context);
+    vm.runInContext(source, context);
+    context.initializeDependencyGraph = async panel => {
+        initialized.push(panel.dataset.variableContext);
+        return {
+            focusVariable: (name, show) => focused.push([name, show]),
+            destroy: () => destroyed++,
+        };
+    };
+    const download = {};
+    const controller = await context.createDependencyGraphController(graphPanel(), {}, null, download);
+    await controller.open("accreu_sectoral", "sectoral");
+    await controller.open("accreu_sectoral", "shared");
+    assert.deepEqual(initialized, ["accreu_sectoral"]);
+    await controller.open("coacch", "shared");
+    assert.equal(destroyed, 1);
+    assert.deepEqual(initialized, ["accreu_sectoral", "coacch"]);
+    assert.equal(download.href, "https://example.org/assets/dependency-graphs/coacch.svg");
+    assert.equal(panels.at(-1).querySelector(".dependency-graph-configuration").textContent, "damage module: COACCH");
+    assert.deepEqual(focused.at(-1), ["shared", true]);
+
+    await controller.open("coacch", "sectoral");
+    const message = panels.at(-1).querySelector(".dependency-graph-message");
+    assert.equal(message.hidden, false);
+    const [, select, button] = message.children;
+    assert.equal(select.value, "accreu_sectoral");
+    button.dispatchEvent(new Event("click"));
+    await new Promise(setImmediate);
+    assert.deepEqual(initialized, ["accreu_sectoral", "coacch", "accreu_sectoral"]);
+    assert.deepEqual(focused.at(-1), ["sectoral", true]);
+    await controller.open("unknown", "shared");
+    assert.match(panels.at(-1).querySelector(".dependency-graph-viewport").textContent, /no documented graph/);
+});
+
 for (const prefix of ["", "/mimosa"]) {
     test(`links created after page setup resolve from the site root ${prefix || "/"}`, async () => {
         let onPage;
@@ -242,10 +328,13 @@ for (const prefix of ["", "/mimosa"]) {
         dialog.showModal = () => { dialog.open = true; opens++; };
         const context = {
             URL, console,
+            location: { hash: "" },
+            window: new EventTarget(),
             document$: { subscribe(callback) { onPage = callback; } },
             document: {
                 currentScript: { src: `https://example.org${prefix}/assets/dependency-graph.js` },
-                querySelector: selector => selector === ".md-content" ? content : null,
+                querySelector: selector => selector === ".md-content" ? content : selector === "[data-documentation-context]"
+                    ? { dataset: { documentationContext: "accreu_sectoral" } } : null,
                 createElement: () => dialog,
                 body: { append() {} },
             },
@@ -255,22 +344,20 @@ for (const prefix of ["", "/mimosa"]) {
             },
             DOMParser: class {
                 parseFromString() {
-                    return { querySelector: selector => selector === "#dependency-graph-viewer"
-                        ? graphPanel : { getAttribute: () => "../assets/dependency-graph.svg" } };
+                    return { querySelector: selector => selector === "#dependency-graph-viewer" ? graphPanel : null };
                 }
             },
         };
         vm.createContext(context);
         vm.runInContext(source, context);
-        context.initializeDependencyGraph = async (panel, source, modal) => {
+        context.createDependencyGraphController = async (panel, reference, modal) => {
             assert.equal(panel, graphPanel);
-            assert.equal(String(source), `https://example.org${prefix}/assets/dependency-graph.svg`);
             assert.equal(modal, dialog);
-            return { focusVariable: name => selections.push(name) };
+            return { open: (configuration, name) => selections.push([configuration, name]) };
         };
         onPage();
 
-        for (const name of ["damage_costs", "riverine_adaptation_costs_abs"]) {
+        for (const name of ["damage_costs", "coacch::riverine_adaptation_costs_abs"]) {
             // A click on a nested MathJax element bubbles to the page container.
             const link = { hash: `#var__${name}` };
             const click = Object.assign(new Event("click", { cancelable: true }), { button: 0 });
@@ -284,8 +371,13 @@ for (const prefix of ["", "/mimosa"]) {
             await new Promise(setImmediate);
             assert.equal(click.defaultPrevented, true);
         }
-        assert.deepEqual(selections, ["damage_costs", "riverine_adaptation_costs_abs"]);
+        assert.deepEqual(selections, [["accreu_sectoral", "damage_costs"], ["coacch", "riverine_adaptation_costs_abs"]]);
         assert.deepEqual(requests, [`https://example.org${prefix}/variables/`]);
         assert.equal(opens, 2);
+        context.location.hash = "#var__coacch::damage_costs";
+        context.window.dispatchEvent(new Event("hashchange"));
+        await new Promise(setImmediate);
+        assert.deepEqual(selections.at(-1), ["coacch", "damage_costs"]);
+        assert.equal(opens, 3);
     });
 }

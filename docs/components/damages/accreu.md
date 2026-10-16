@@ -14,6 +14,7 @@ During the ACCREU project, new damage estimates were developed for [:material-ho
 [riverine_adaptation_costs_abs](#var__riverine_adaptation_costs_abs), or
 [global_welfare](#var__global_welfare).
 Press Escape to clear the selection, then Escape again to close the graph.
+For comparison, open [damage_costs with COACCH](#var__coacch::damage_costs).
 
 Usage:
 
