@@ -104,6 +104,11 @@ for a variable present with either setting, are omitted.
 
 ## Validation
 
+Plotly charts in content tabs are resized when a tab opens by
+`docs/assets/plotly-resize.js`. It waits until the new tab is visible and resizes
+only initialized, visible plots, including those inside nested tabs. Keep this
+script in `extra_javascript` when changing the plotting plugin or theme.
+
 Dependency graphs are generated automatically for every entry in
 `DOCUMENTATION_CONFIGS` when running `mkdocs build` or `mkdocs serve` in the
 `accreu` environment. Install Graphviz and PyGraphviz first with
