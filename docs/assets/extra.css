@@ -290,3 +290,78 @@ a[href*="variables/#"]:not(:has(code))::before {
     background: #f5f5f5;
     padding: 5px 5px;
 }
+
+/* Small, standalone prototype for exploring dependency highlighting. */
+.dependency-demo {
+    border: 1px solid var(--md-default-fg-color--lightest);
+    border-radius: .4rem;
+    padding: .8rem;
+    background: var(--md-default-bg-color);
+
+    .dependency-demo-legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: .4rem 1rem;
+        font-size: .65rem;
+
+        span::before {
+            content: "";
+            display: inline-block;
+            width: .5rem;
+            height: .5rem;
+            margin-right: .3rem;
+            border-radius: 50%;
+            background: var(--color-mimosa);
+        }
+
+        .demo-incoming-key::before { background: #2297d5; }
+        .demo-outgoing-key::before { background: #ed6a2f; }
+    }
+
+    .dependency-demo-viewport { overflow-x: auto; }
+    svg { display: block; width: 100%; min-width: 540px; }
+
+    .demo-edge {
+        fill: none;
+        stroke: #999;
+        stroke-width: 2;
+        opacity: .2;
+    }
+
+    .demo-edge.incoming { stroke: #2297d5; stroke-width: 3; opacity: 1; }
+    .demo-edge.outgoing { stroke: #ed6a2f; stroke-width: 3; opacity: 1; }
+
+    .demo-node {
+        cursor: pointer;
+
+        rect {
+            fill: var(--md-default-bg-color);
+            stroke: var(--md-default-fg-color--lighter);
+            stroke-width: 2;
+        }
+
+        text {
+            fill: var(--md-default-fg-color);
+            font-family: var(--md-code-font-family);
+            font-size: 13px;
+        }
+
+        &.is-selected rect {
+            fill: color-mix(in srgb, var(--color-mimosa) 18%, var(--md-default-bg-color));
+            stroke: var(--color-mimosa);
+            stroke-width: 4;
+        }
+
+        &.is-selected text { font-weight: bold; }
+        &.is-incoming rect { stroke: #2297d5; }
+        &.is-outgoing rect { stroke: #ed6a2f; }
+        &.is-muted { opacity: .3; }
+        &:hover rect, &:focus-visible rect { stroke-width: 4; }
+        &:focus-visible { outline: 2px solid var(--md-accent-fg-color); outline-offset: 4px; }
+    }
+
+    .dependency-demo-status {
+        margin-bottom: 0;
+        font-size: .65rem;
+    }
+}

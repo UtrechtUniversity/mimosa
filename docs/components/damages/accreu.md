@@ -9,6 +9,12 @@ During the ACCREU project, new damage estimates were developed for [:material-ho
 [:material-waves-arrow-up: sea-level rise](accreu.md#sea-level-rise) and [:material-heart-pulse: mortality](accreu.md#mortality). Moreover, adaptation costs and effectiveness were estimated for all sectors
 (except mortality).
 
+**Try the dependency graph demo:** highlight
+[demo_damage](../../variables.md?demo_variable=demo_damage#dependency-graph-demo),
+[demo_adaptation](../../variables.md?demo_variable=demo_adaptation#dependency-graph-demo), or
+[demo_welfare](../../variables.md?demo_variable=demo_welfare#dependency-graph-demo).
+These are invented variables for testing the interaction.
+
 Usage:
 
 === "Damages only"
