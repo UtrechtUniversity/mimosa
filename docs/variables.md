@@ -8,16 +8,7 @@ Each entry lists a model variable's description, units, dimensions and availabil
 
 ## Dependency graph
 
-This graph shows the variables and dependencies for the selected model configuration.
-Links use the documentation page's configuration, with optional context overrides.
-Faint dashed links refer
-to the previous time step. Click a node to select it; click empty graph space or
-press Escape to clear the selection. Click and drag to pan the zoomed-in graph.
-Double-click empty space to fit the graph.
-Use **Fit graph** for the overview, or **Focus selected** to read a neighbourhood.
-Hover over a node to read its variable reference information.
-
-[Download the graph as SVG](assets/dependency-graphs/coacch.svg){id="dependency-graph-source" download}
+This graph shows the variables and dependencies in MIMOSA. The graph is interactive: you can zoom, pan, and click on variables to see their details. Use the controls above the graph to select a variable, zoom in/out, fit the graph to the viewport, or focus on a selected variable.
 
 <div class="dependency-graph" id="dependency-graph-viewer" data-variable-context="coacch">
   <p class="dependency-graph-configuration"></p>

@@ -278,8 +278,4 @@ import time
 
 def on_pre_build(**kwargs):
     # Reuse the catalogue across live rebuilds within the same serve session.
-    t0 = time.time()
-    generate_dependency_graph.main()
-    t1 = time.time()
-    print(f"Dependency graphs generated in {t1 - t0:.2f} seconds")
     get_variable_catalogue()
