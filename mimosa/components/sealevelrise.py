@@ -11,7 +11,7 @@ reference year.
 from typing import Sequence
 
 from mimosa.common import (
-    AbstractModel,
+    ConcreteModel,
     Param,
     Var,
     GeneralConstraint,
@@ -20,7 +20,6 @@ from mimosa.common import (
     exp,
     tanh,
     quant,
-    ModelContext,
 )
 
 
@@ -87,9 +86,11 @@ SLR_PROJECTION_PARAMETER_SETS = {
     },
 }
 
+from mimosa.core.model_inputs import ModelInputs
+
 
 def get_constraints(
-    m: AbstractModel, context: ModelContext
+    m: ConcreteModel, inputs: ModelInputs
 ) -> Sequence[GeneralConstraint]:
     r"""
     The sea-level-rise (SLR) component represents thermal expansion, glaciers,
@@ -112,7 +113,7 @@ def get_constraints(
     The projection can be selected before model construction with:
 
     ```python
-    params["model structure"]["sealevelrise options"]["projection"] = "high"
+    params["sealevelrise"]["projection"] = "high"
     ```
 
     # Thermal expansion
@@ -121,8 +122,8 @@ def get_constraints(
     box relaxes towards a temperature-dependent equilibrium:
 
     $$
-    S_{i,t}=\beta_i T_{t-1}+
-    \left(S_{i,t-1}-\beta_i T_{t-1}\right)e^{-\Delta t/\tau_i},
+    S_{i,t}=\beta_i \href{./#var__temperature}{T_{t-1}}+
+    \left(S_{i,t-1}-\beta_i \href{./#var__temperature}{T_{t-1}}\right)e^{-\Delta t/\tau_i},
     \qquad i\in\{\text{fast},\text{slow}\}.
     $$
 
@@ -150,8 +151,8 @@ def get_constraints(
     $$
 
     $$
-    S_{\mathrm{GL},t}=S^*_{\mathrm{GL}}(T_{t-1})+
-    \left(S_{\mathrm{GL},t-1}-S^*_{\mathrm{GL}}(T_{t-1})\right)
+    \href{./#var__slr_cumgsic}{S_{\mathrm{GL},t}}=S^*_{\mathrm{GL}}(\href{./#var__temperature}{T_{t-1}})+
+    \left(\href{./#var__slr_cumgsic}{S_{\mathrm{GL},t-1}}-S^*_{\mathrm{GL}}(\href{./#var__temperature}{T_{t-1}})\right)
     e^{-\Delta t/\tau_{\mathrm{GL}}}.
     $$
 
@@ -181,14 +182,14 @@ def get_constraints(
     loss at high warming while retaining differentiability for optimisation:
 
     $$
-    T_{A,t}=\lambda_A T_{t-1}+
-    \left(T_{A,t-1}-\lambda_A T_{t-1}\right)e^{-\Delta t/\tau_A},
+    \href{./#var__slr_antarctic_ocean_temp}{T_{A,t}}=\lambda_A \href{./#var__temperature}{T_{t-1}}+
+    \left(\href{./#var__slr_antarctic_ocean_temp}{T_{A,t-1}}-\lambda_A \href{./#var__temperature}{T_{t-1}}\right)e^{-\Delta t/\tau_A},
     $$
 
     $$
-    S_{\mathrm{AIS},t}=S_{\mathrm{AIS},t-1}+\Delta t
-    \left[r_0+r_1T_{A,t}+r_f\sigma((T_{A,t}-T_{crit})/w_A)\right]
-    \left(1-\frac{S_{\mathrm{AIS},t-1}}{P_{\mathrm{AIS}}}\right).
+    \href{./#var__slr_cumais}{S_{\mathrm{AIS},t}}=\href{./#var__slr_cumais}{S_{\mathrm{AIS},t-1}}+\Delta t
+    \left[r_0+r_1\href{./#var__slr_antarctic_ocean_temp}{T_{A,t}}+r_f\sigma((\href{./#var__slr_antarctic_ocean_temp}{T_{A,t}}-T_{crit})/w_A)\right]
+    \left(1-\frac{\href{./#var__slr_cumais}{S_{\mathrm{AIS},t-1}}}{P_{\mathrm{AIS}}}\right).
     $$
 
     The scaling and delay between global surface warming and Antarctic
@@ -210,15 +211,15 @@ def get_constraints(
     is added explicitly:
 
     $$
-    S_{\mathrm{LWS},t}=S_{\mathrm{LWS},t-1}+\Delta t\,r_{\mathrm{LWS}},
+    \href{./#var__slr_cumlws}{S_{\mathrm{LWS},t}}=\href{./#var__slr_cumlws}{S_{\mathrm{LWS},t-1}}+\Delta t\,r_{\mathrm{LWS}},
     \qquad r_{\mathrm{LWS}}=0.0004\ \mathrm{m\,yr^{-1}}.
     $$
 
     # Total sea-level rise
 
     $$
-    S_t=S_{\mathrm{thermal},t}+S_{\mathrm{GL},t}
-        +S_{\mathrm{GIS},t}+S_{\mathrm{AIS},t}+S_{\mathrm{LWS},t}.
+    \href{./#var__total_SLR}{S_t}=\href{./#var__slr_thermal}{S_{\mathrm{thermal},t}}+\href{./#var__slr_cumgsic}{S_{\mathrm{GL},t}}
+        +\href{./#var__slr_cumgis}{S_{\mathrm{GIS},t}}+\href{./#var__slr_cumais}{S_{\mathrm{AIS},t}}+\href{./#var__slr_cumlws}{S_{\mathrm{LWS},t}}.
     $$
 
     ## Calibration against IPCC AR6
@@ -274,7 +275,7 @@ def get_constraints(
     - [Wong, Bakker and Keller (2017), Antarctic fast dynamics](https://doi.org/10.1007/s10584-017-2039-4).
     """
 
-    projection = context.option("sealevelrise", "projection", default="central")
+    projection = inputs.config_value("sealevelrise.projection")
     try:
         slr_params = SLR_PROJECTION_PARAMETER_SETS[projection]
     except KeyError as exc:
@@ -483,7 +484,7 @@ def get_constraints(
     return constraints
 
 
-def slr_initial_value(value_at_initial_year, m: AbstractModel):
+def slr_initial_value(value_at_initial_year, m: ConcreteModel):
     """Interpolate a component value from the common reference year.
 
     The central initial values are specified for 2025. Linear interpolation is
@@ -508,7 +509,7 @@ def slr_thermal_expansion(
     temperature,
     sensitivity,
     timescale,
-    m: AbstractModel,
+    m: ConcreteModel,
     period_length,
 ):
     """Update one thermal-expansion response box."""
@@ -517,7 +518,7 @@ def slr_thermal_expansion(
     return relax_to_equilibrium(slr_thermal, equilibrium, timescale, period_length)
 
 
-def slr_gsic_equilibrium(temperature, m: AbstractModel):
+def slr_gsic_equilibrium(temperature, m: ConcreteModel):
     """Temperature-dependent equilibrium glacier contribution."""
 
     return m.slr_gsic_total_ice * tanh(
@@ -525,7 +526,7 @@ def slr_gsic_equilibrium(temperature, m: AbstractModel):
     )
 
 
-def slr_gsic(cumgsic, temperature, m: AbstractModel, period_length):
+def slr_gsic(cumgsic, temperature, m: ConcreteModel, period_length):
     """Relax the glacier contribution towards its finite equilibrium."""
 
     equilibrium = slr_gsic_equilibrium(temperature, m)
@@ -540,7 +541,7 @@ def logistic(x):
     return 1 / (1 + exp(-x))
 
 
-def slr_gis_equilibrium(temperature, m: AbstractModel):
+def slr_gis_equilibrium(temperature, m: ConcreteModel):
     """Bounded Greenland equilibrium contribution, normalised at 0 degree C."""
 
     threshold = m.slr_gis_threshold
@@ -551,7 +552,7 @@ def slr_gis_equilibrium(temperature, m: AbstractModel):
     return m.slr_gis_total_ice * fraction_melted
 
 
-def slr_gis_timescale(temperature, m: AbstractModel):
+def slr_gis_timescale(temperature, m: ConcreteModel):
     """Greenland response time, decreasing smoothly as warming increases."""
 
     return m.slr_gis_base_timescale * exp(
@@ -559,7 +560,7 @@ def slr_gis_timescale(temperature, m: AbstractModel):
     )
 
 
-def slr_gis(cumgis, temperature, m: AbstractModel, period_length):
+def slr_gis(cumgis, temperature, m: ConcreteModel, period_length):
     """Update the Greenland contribution using delayed equilibrium response."""
 
     equilibrium = slr_gis_equilibrium(temperature, m)
@@ -581,7 +582,7 @@ def slr_antarctic_ocean_temperature(
     )
 
 
-def slr_ais_rate(ocean_temperature, m: AbstractModel):
+def slr_ais_rate(ocean_temperature, m: ConcreteModel):
     """Antarctic contribution rate in metres of sea level per year."""
 
     fast_fraction = logistic(
@@ -595,7 +596,7 @@ def slr_ais_rate(ocean_temperature, m: AbstractModel):
     )
 
 
-def slr_ais(cumais, ocean_temperature, m: AbstractModel, period_length):
+def slr_ais(cumais, ocean_temperature, m: ConcreteModel, period_length):
     """Update the Antarctic contribution, subject to its finite ice stock."""
 
     remaining_fraction = 1 - cumais / m.slr_ais_total_ice

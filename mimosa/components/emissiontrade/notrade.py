@@ -6,18 +6,19 @@ Type: no trade
 
 from typing import Sequence
 from mimosa.common import (
-    AbstractModel,
+    ConcreteModel,
     GeneralConstraint,
     Param,
     quant,
     RegionalEquation,
     Var,
-    ModelContext,
 )
+
+from mimosa.core.model_inputs import ModelInputs
 
 
 def get_constraints(
-    m: AbstractModel, context: ModelContext
+    m: ConcreteModel, inputs: ModelInputs
 ) -> Sequence[GeneralConstraint]:
     """
     Without emission trading, both trading balances are always zero:
@@ -37,7 +38,7 @@ def get_constraints(
     Without trade, regional emission allowances are simply equal to regional emissions:
 
     $$
-    \\text{regional emission allowances}_{t,r} = \\text{regional emissions}_{t,r}.
+    \\href{./#var__coacch::regional_emission_allowances}{\\text{regional emission allowances}_{t,r}} = \\href{./#var__coacch::regional_emissions}{\\text{regional emissions}_{t,r}}.
     $$
     """
     constraints = []  # No constraints here

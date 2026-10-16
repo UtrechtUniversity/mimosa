@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 import numpy as np
 from pyomo.core.base.units_container import PintUnitExtractionVisitor
 
-from pyomo.environ import Var, Constraint, Param
+from pyomo.environ import Var, Constraint, Param as PyomoParam
 import pyomo.environ
 
 # Monkey patch to make sure that the unit stays the same after calling a arctan-function.
@@ -345,7 +345,7 @@ def add_constraint(m, constraints, names=None):
 
 
 class UsefulVar:
-    def __init__(self, m, var: typing.Union[Var, Param]):
+    def __init__(self, m, var: typing.Union[Var, PyomoParam]):
         self.m = m
         self.var = var
 
@@ -369,7 +369,7 @@ def get_all_time_dependent_params(m):
     """Returns all parameters with time and region dimensions"""
     return [
         UsefulVar(m, param)
-        for param in m.component_objects(Param)
+        for param in m.component_objects(PyomoParam)
         if "t" in get_indices(param) and not param.name.startswith("_")
     ]
 

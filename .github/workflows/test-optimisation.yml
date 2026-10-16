@@ -28,7 +28,7 @@ jobs:
       - name: Install mimosa
         shell: bash -l {0}
         run: |
-          pip install .
+          python -m pip install ".[test]"
 
       - name: Dependency check
         shell: bash -l {0}
@@ -69,7 +69,7 @@ jobs:
       - name: Install mimosa
         shell: bash -l {0}
         run: |
-          pip install .
+          python -m pip install ".[test]"
 
       - name: Dependency check
         shell: bash -l {0}

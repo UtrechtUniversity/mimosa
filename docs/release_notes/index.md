@@ -3,6 +3,11 @@
 Release notes describe important changes to MIMOSA, including changes that may require updates to
 existing run scripts or model extensions.
 
+## In development
+
+- [MIMOSA 1.5.0](1.5.0.md) — parameter construction with input-source metadata and
+  native Pyomo components; model construction still uses the abstract pipeline.
+
 ## Latest release
 
 - [MIMOSA 1.4.0](1.4.0.md) — variable model-period lengths, derived global cost output, runtime

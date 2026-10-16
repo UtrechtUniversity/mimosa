@@ -2,18 +2,16 @@ from dataclasses import dataclass
 from typing import Iterator, List, Tuple
 
 from mimosa.common import (
-    AbstractModel,
     ConcreteModel,
     data,
     regional_params,
     TransformationFactory,
-    ModelContext,
 )
 from mimosa.common.config.parseconfig import check_params, parse_param_values
-from mimosa.abstract_model import ALL_COMPONENTS, create_abstract_model
+from mimosa.model_builder import create_model
 from mimosa.components import emissions
-from mimosa.concrete_model.instantiate_params import InstantiatedModel
 from mimosa.concrete_model import custom_constraints
+from mimosa.core.model_inputs import ModelInputs
 
 
 @dataclass(frozen=True)
@@ -23,7 +21,7 @@ class ModelBuildResult:
     concrete_model: ConcreteModel
     params: dict
     equations: list
-    context: ModelContext
+    inputs: ModelInputs
 
     def __iter__(self) -> Iterator:
         """Preserve the former three-value tuple-unpacking interface."""
@@ -36,19 +34,17 @@ class Preprocessor:
     """
     Handles the initialization of the MIMOSA model:
     - Checks parameters for validity
-    - Loads all the equations and creates an abstract model
-    - Loads the data and parameter values to instantiate the model
+    - Loads the data and prepares explicit input lookup
+    - Builds initialized concrete components and collects their equations
     - Performs preprocessing tasks
     """
 
     concrete_model: ConcreteModel
     equations: list
     parser_tree: dict
-    model_context: ModelContext
-    _abstract_model: AbstractModel
+    inputs: ModelInputs
     _data_store: data.DataStore
     _regional_param_store: regional_params.RegionalParamStore
-    instantiated_model: InstantiatedModel
 
     def __init__(self, params):
         self._params = params
@@ -58,21 +54,19 @@ class Preprocessor:
         Creates the MIMOSA concrete_model based on the provided parameters.
         This method performs the following steps:
         1. Checks and parses the parameters for validity.
-        2. Creates an abstract model based on the specified modules.
-        3. Loads the necessary data and regional parameters.
-        4. Instantiates the abstract model with the loaded data and parameters.
-        5. Applies custom constraints and Pyomo transformations.
-        6. Fixes initial abatement after variable propagation.
+        2. Loads the necessary data, regional parameters and input lookup.
+        3. Builds the concrete model with initialized inputs and selected modules.
+        4. Applies custom constraints and Pyomo transformations.
+        5. Fixes initial abatement after variable propagation.
 
         Returns:
             ModelBuildResult: Named references to the concrete model, parsed
-                parameters, simulation equations, and model context.
+                parameters, simulation equations, and input lookup.
         """
         self._check_and_parse_params()
-        self.model_context = self._create_model_context()
-        self._abstract_model, self.equations = self._create_abstract_model()
         self._data_store, self._regional_param_store = self._load_data()
-        self.concrete_model = self._instantiate_model()
+        self.inputs = self._create_model_inputs()
+        self.concrete_model, self.equations = self._create_model()
         self._apply_custom_constraints()
         self._apply_pyomo_transformations()
         emissions.fix_initial_abatement(self.concrete_model)
@@ -81,7 +75,7 @@ class Preprocessor:
             concrete_model=self.concrete_model,
             params=self.parsed_params,
             equations=self.equations,
-            context=self.model_context,
+            inputs=self.inputs,
         )
 
     @property
@@ -104,29 +98,22 @@ class Preprocessor:
         self._params = params
         self.parser_tree = parser_tree
 
-    def _create_model_context(self) -> ModelContext:
-        model_params = self._params["model structure"]
-
-        return ModelContext(
-            components={
-                component.name: component.read_config(model_params)
-                for component in ALL_COMPONENTS
-            }
+    def _create_model_inputs(self) -> ModelInputs:
+        """Prepare input lookup using the already-loaded stores and config."""
+        return ModelInputs(
+            params=self.parsed_params,
+            parser_tree=self.parser_tree,
+            data_store=self._data_store,
+            regional_store=self._regional_param_store,
         )
 
-    def _create_abstract_model(self) -> Tuple[AbstractModel, List]:
-        """
-        Loads all the equations and creates an abstract_model.
-        `abstract` here means that the model is not yet instantiated with data.
-
-        Returns:
-            AbstractModel: model corresponding to the damage/objective module combination
-        """
-        return create_abstract_model(self.model_context)
+    def _create_model(self) -> Tuple[ConcreteModel, List]:
+        """Build the selected components directly on a concrete model."""
+        return create_model(self.inputs)
 
     def _load_data(self):
         """
-        Loads the data and parameter values to instantiate the model.
+        Loads the data and parameter values for explicit input lookup.
         Returns:
             tuple: (data_store, regional_param_store)
         """
@@ -137,25 +124,14 @@ class Preprocessor:
 
         return data_store, regional_param_store
 
-    def _instantiate_model(self) -> ConcreteModel:
-        """
-        Instantiates the abstract model with the data and parameters.
-        Returns:
-            ConcreteModel: instantiated model ready for simulation
-        """
-        self.instantiated_model = InstantiatedModel(
-            self._abstract_model, self._regional_param_store, self._data_store
-        )
-        return self.instantiated_model.concrete_model
-
     def _apply_custom_constraints(self) -> None:
-        """Apply configured constraints to the instantiated concrete model."""
+        """Apply configured constraints to the initialized concrete model."""
         if self._params.get("custom_constraints") is not None:
             custom_constraints.set_custom_constraints(self.concrete_model, self._params)
 
     def _apply_pyomo_transformations(self) -> None:
         """
-        Apply Pyomo transformations after model instantiation and customization.
+        Apply Pyomo transformations after model construction and customization.
 
         These transformations initialize non-fixed variables to the midpoint of
         their bounds, detect de-facto fixed variables, and, for multi-region

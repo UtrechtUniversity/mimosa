@@ -61,18 +61,18 @@ model = MIMOSA(params)
 With the utility objective, MIMOSA calculates:
 
 $$
-\text{NPV}_t =
-\text{NPV}_{t-1}
+\href{./#var__NPV}{\text{NPV}_t} =
+\href{./#var__NPV}{\text{NPV}_{t-1}}
 + \Delta t \cdot e^{-\text{PRTP}(\text{year}_t-\text{begin year})}
-\cdot \text{yearly welfare}_t,
+\cdot \href{./#var__global_welfare}{\text{yearly welfare}_t},
 $$
 
 This is a discrete approximation of the integral of discounted yearly welfare from the beginning year $t_0$ to the final year $T$:
 
 $$
-\text{NPV}(T) =
+\href{./#var__NPV}{\text{NPV}(T)} =
 \int_{t_0}^{T}
-e^{-\text{PRTP}(t-t_0)} \cdot \text{yearly welfare}(t)\, dt.
+e^{-\text{PRTP}(t-t_0)} \cdot \href{./#var__global_welfare}{\text{yearly welfare}(t)}\, dt.
 $$
 
 MIMOSA maximises the final value of `NPV`. With the global-cost objective, `global_welfare` is replaced by:
@@ -80,8 +80,8 @@ MIMOSA maximises the final value of `NPV`. With the global-cost objective, `glob
 $$
 \text{global costs}_t =
 \sum_r \left(
-\text{mitigation costs abs}_{t,r}
-+ \text{damage costs}_{t,r} \cdot \text{GDP gross}_{t,r}
+\href{./#var__objective_globalcosts::mitigation_costs_abs}{\text{mitigation costs abs}_{t,r}}
++ \href{./#var__objective_globalcosts::damage_costs}{\text{damage costs}_{t,r}} \cdot \href{./#var__objective_globalcosts::GDP_gross}{\text{GDP gross}_{t,r}}
 \right),
 $$
 

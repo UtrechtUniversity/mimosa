@@ -13,13 +13,13 @@ from mimosa import MIMOSA
 from mimosa.common.config.parseconfig import check_params
 from mimosa.common import value
 
-
 params, parser_tree = check_params({}, return_parser_tree=True)
 
 
 # Create an instance of the MIMOSA model to get the names of each parameter to be parsed
 model = MIMOSA(params, prerun=False)
 param_store = model.preprocessor._regional_param_store
+inputs = model.preprocessor.inputs
 
 COLORS = [
     "#5492cd",

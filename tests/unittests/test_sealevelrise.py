@@ -3,7 +3,7 @@ import pytest
 from mimosa.components import sealevelrise
 
 
-class MockAbstractModel:
+class MockModel:
     beginyear = 2025
     slr_reference_year = 1900
     slr_initial_year = 2025
@@ -30,7 +30,7 @@ class MockAbstractModel:
 
 @pytest.fixture
 def m():
-    return MockAbstractModel()
+    return MockModel()
 
 
 def test_initial_values_share_1900_reference(m):

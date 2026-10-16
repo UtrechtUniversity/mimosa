@@ -132,9 +132,7 @@ def _deactivate_trivial_constraints_if_required(model):
             active_equalities += 1
         relevant_variables.update(
             variable
-            for variable in identify_variables(
-                constraint.body, include_fixed=False
-            )
+            for variable in identify_variables(constraint.body, include_fixed=False)
             if not variable.fixed
         )
 
@@ -146,6 +144,4 @@ def _deactivate_trivial_constraints_if_required(model):
         )
 
     if len(relevant_variables) < active_equalities:
-        TransformationFactory("contrib.deactivate_trivial_constraints").apply_to(
-            model
-        )
+        TransformationFactory("contrib.deactivate_trivial_constraints").apply_to(model)

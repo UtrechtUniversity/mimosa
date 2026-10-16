@@ -1,5 +1,6 @@
 ---
 icon: material/earth
+variable_context: emissiontrade
 ---
 
 [:octicons-arrow-left-24: Back to general structure](index.md)
@@ -21,12 +22,12 @@ With emission trading, the two pairs are connected through the trading balances:
 
 $$
 \begin{align}
-\text{attributed emission reductions}_{t,r}
-    &= \text{regional emission reductions}_{t,r}
-       + \text{emission reduction trading balance}_{t,r},\\
-\text{mitigation costs abs}_{t,r}
-    &= \text{domestic mitigation costs abs}_{t,r}
-       + \text{mitigation cost trading balance}_{t,r}.
+\href{./#var__attributed_emission_reductions}{\text{attributed emission reductions}_{t,r}}
+    &= \href{./#var__regional_emission_reductions}{\text{regional emission reductions}_{t,r}}
+       + \href{./#var__emission_reduction_trading_balance}{\text{emission reduction trading balance}_{t,r}},\\
+\href{./#var__mitigation_costs_abs}{\text{mitigation costs abs}_{t,r}}
+    &= \href{./#var__domestic_mitigation_costs_abs}{\text{domestic mitigation costs abs}_{t,r}}
+       + \href{./#var__mitigation_cost_trading_balance}{\text{mitigation cost trading balance}_{t,r}}.
 \end{align}
 $$
 
@@ -53,7 +54,7 @@ The exact units are determined by the configured [model units](../extending/unit
 For every timestep with emission trading, the payments sum to zero across regions:
 
 $$
-\sum_r \text{mitigation cost trading balance}_{t,r} = 0.
+\sum_r \href{./#var__mitigation_cost_trading_balance}{\text{mitigation cost trading balance}_{t,r}} = 0.
 $$
 
 Because all payments are converted at the same global carbon price, the emission reduction trading balances also sum to zero. Therefore, trading changes the regional attribution of reductions and costs, but not their global totals. Small non-zero sums can occur in numerical results because of solver tolerances.
@@ -61,9 +62,9 @@ Because all payments are converted at the same global carbon price, the emission
 The regional emission allowances are calculated from the reductions attributed to a region:
 
 $$
-\text{regional emission allowances}_{t,r}
-    = \text{baseline emissions}_{t,r}
-      - \text{attributed emission reductions}_{t,r}.
+\href{./#var__regional_emission_allowances}{\text{regional emission allowances}_{t,r}}
+    = \href{./#var__baseline_emissions}{\text{baseline emissions}_{t,r}}
+      - \href{./#var__attributed_emission_reductions}{\text{attributed emission reductions}_{t,r}}.
 $$
 
 Without emission trading, `regional_emission_allowances` is simply equal to `regional_emissions`.

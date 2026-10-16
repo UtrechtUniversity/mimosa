@@ -5,7 +5,7 @@ Effort sharing
 
 from typing import Sequence
 from mimosa.common import (
-    AbstractModel,
+    ConcreteModel,
     Var,
     Param,
     GeneralConstraint,
@@ -18,18 +18,32 @@ from mimosa.common import (
     quant,
     value,
     soft_min,
-    ModelContext,
 )
+
+from mimosa.core.model_inputs import ModelInputs
 
 
 def get_constraints(
-    m: AbstractModel, context: ModelContext
+    m: ConcreteModel, inputs: ModelInputs
 ) -> Sequence[GeneralConstraint]:
     """
     Usage:
     ```python hl_lines="2"
     params = load_params()
     params["model structure"]["effortsharing module"] = "equal_mitigation_costs"
+
+    # Effort-sharing regimes require emission trading to be feasible:
+    params["model structure"]["emissiontrade module"] = "emissiontrade"
+
+    # Cost-minimisation is typically used, to allocate real mitigation effort to regions with the lowest costs:
+    params["model structure"]["welfare module"] = "cost_minimising"
+
+    # Often, the effort sharing regimes require financial transfers larger than the mitigation costs:
+    params["economics"]["MAC"]["rel_mitigation_costs_min_level"] = -0.5
+
+    # Optionally set a carbon budget:
+    params["emissions"]["carbonbudget"] = "700 GtCO2"
+
     model = MIMOSA(params)
     ```
 
@@ -37,10 +51,10 @@ def get_constraints(
     percentage of GDP) should be the same for every region:
 
     $$
-    \\text{mitigation costs}_{t,r} = \\text{common level}_t,
+    \\href{./#var__effortsharing_equal_mitigation_costs::mitigation_costs}{\\text{mitigation costs}_{t,r}} = \\href{./#var__effortsharing_equal_mitigation_costs::effort_sharing_common_level}{\\text{common level}_t},
     $$
 
-    where the variable $\\text{common level}_t$ can have arbitrary values and is purely used as a common
+    where the variable $\\href{./#var__effortsharing_equal_mitigation_costs::effort_sharing_common_level}{\\text{common level}_t}$ can have arbitrary values and is purely used as a common
     value accross all the regions[^1].
 
     [^1]: Implementing every regional condition as an exact equality can give IPOPT too many or

@@ -2,23 +2,28 @@ import re
 import yaml
 import sys, os
 import pandas as pd
+from html import escape
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../../"))
 
-from mimosa import MIMOSA
+from docs.scripts.variable_docs import (
+    DOCUMENTATION_CONFIGS,
+    clear_documentation_cache,
+    get_documentation_context,
+    get_variable_catalogue,
+)
+from docs.scripts.variable_rendering import (
+    REFERENCE_MARKER,
+    expand_variable_reference,
+    render_variable_markers,
+)
+from docs.scripts import generate_dependency_graph
 from mimosa.common.config.parseconfig import (
     get_nested,
-    check_params,
     flatten,
     load_default_yaml,
 )
 from mimosa.common.config.utils.parsers import PARSER_FACTORY
-
-# Get the default parameters and the parser tree
-params, parser_tree = check_params({}, return_parser_tree=True)
-
-# Create the model only to inspect its parameters; no baseline simulation is needed.
-model = MIMOSA(params, prerun=False).concrete_model
 
 
 def markdown_parse_param_reference(markdown):
@@ -30,6 +35,7 @@ def markdown_parse_param_reference(markdown):
         return markdown
 
     # Build the parameter reference
+    parser_tree = get_documentation_context().parser_tree
     reference_markdown = recursive_param_print(parser_tree, "", [], "")
 
     # Replace the reference in the markdown
@@ -49,7 +55,7 @@ def markdown_parse_parser_types(markdown):
 
 """
 
-    flattened_parser_tree = flatten(parser_tree)
+    flattened_parser_tree = flatten(get_documentation_context().parser_tree)
     default_yaml = load_default_yaml()
 
     for parser_type, parser in PARSER_FACTORY.parsers.items():
@@ -138,6 +144,8 @@ def on_page_markdown(markdown, **kwargs):
     markdown = markdown_parse_param_reference(markdown)
     markdown = markdown_parse_parser_types(markdown)
     markdown = markdown_parse_region_defs(markdown)
+    if REFERENCE_MARKER in markdown:
+        markdown = expand_variable_reference(markdown, get_variable_catalogue())
 
     return markdown
 
@@ -196,6 +204,8 @@ def _print_param(tree, mainkey, breadcrumbs, indent=""):
 
 
 def on_page_content(html, **kwargs):
+    context = get_documentation_context()
+    model, parser_tree = context.model, context.parser_tree
     pattern = re.compile(r"(param::([a-zA-Z0-9_]+))")
     for match, param_name in re.findall(pattern, html):
         try:
@@ -226,4 +236,57 @@ def on_page_content(html, **kwargs):
 
         except AttributeError:
             pass
+    if "var::" in html or "varref::" in html:
+        page = kwargs["page"]
+        reference = kwargs["files"].get_file_from_path("variables.md")
+        if reference is None:
+            raise ValueError(
+                f"{page.file.src_uri}: Variable reference page variables.md is missing"
+            )
+        html = render_variable_markers(
+            html,
+            get_variable_catalogue(),
+            page.meta.get("variable_context"),
+            page.file.src_uri,
+            page.url,
+            reference.url,
+        )
+    if "page" in kwargs:
+        page = kwargs["page"]
+        graph_context = page.meta.get("variable_context") or "coacch"
+        if graph_context == "default":
+            graph_context = "coacch"
+        if graph_context not in DOCUMENTATION_CONFIGS:
+            raise ValueError(
+                f"{page.file.src_uri}: Unknown variable context {graph_context!r}"
+            )
+        html += f'<span hidden data-documentation-context="{escape(graph_context, quote=True)}"></span>'
     return html
+
+
+def on_startup(**kwargs):
+    # Start each build command or serve session with fresh model metadata.
+    generate_dependency_graph.get_dependency_graph_assets.cache_clear()
+    clear_documentation_cache()
+
+
+def on_shutdown(**kwargs):
+    generate_dependency_graph.get_dependency_graph_assets.cache_clear()
+    clear_documentation_cache()
+
+
+import time
+
+
+def on_pre_build(**kwargs):
+    # Reuse the catalogue across live rebuilds within the same serve session.
+    get_variable_catalogue()
+
+
+def on_files(files, config, **kwargs):
+    from mkdocs.structure.files import File
+
+    # Virtual files go straight to the site, avoiding watched source changes.
+    for path, content in generate_dependency_graph.get_dependency_graph_assets().items():
+        files.append(File.generated(config, path, content=content))
+    return files

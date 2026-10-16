@@ -9,7 +9,7 @@ import numpy as np
 
 from typing import Sequence
 from mimosa.common import (
-    AbstractModel,
+    ConcreteModel,
     Var,
     Param,
     GeneralConstraint,
@@ -23,18 +23,32 @@ from mimosa.common import (
     quant,
     value,
     soft_min,
-    ModelContext,
 )
+
+from mimosa.core.model_inputs import ModelInputs
 
 
 def get_constraints(
-    m: AbstractModel, context: ModelContext
+    m: ConcreteModel, inputs: ModelInputs
 ) -> Sequence[GeneralConstraint]:
     """
     Usage:
     ```python hl_lines="2"
     params = load_params()
     params["model structure"]["effortsharing module"] = "equal_cumulative_per_cap"
+
+    # Effort-sharing regimes require emission trading to be feasible:
+    params["model structure"]["emissiontrade module"] = "emissiontrade"
+
+    # Cost-minimisation is typically used, to allocate real mitigation effort to regions with the lowest costs:
+    params["model structure"]["welfare module"] = "cost_minimising"
+
+    # Often, the effort sharing regimes require financial transfers larger than the mitigation costs:
+    params["economics"]["MAC"]["rel_mitigation_costs_min_level"] = -0.5
+
+    # Optionally set a carbon budget:
+    params["emissions"]["carbonbudget"] = "700 GtCO2"
+
     model = MIMOSA(params)
     ```
 
@@ -64,9 +78,11 @@ def get_constraints(
 
     historical_emissions, historical_population = _load_data()
     m.effortsharing_ecpc_discount_rate = Param(
-        doc="::effort sharing.ecpc_discount_rate"
+        initialize=inputs.config("effort sharing.ecpc_discount_rate")
     )
-    m.effortsharing_ecpc_start_year = Param(doc="::effort sharing.ecpc_start_year")
+    m.effortsharing_ecpc_start_year = Param(
+        initialize=inputs.config("effort sharing.ecpc_start_year")
+    )
     m.effortsharing_ecpc_historical_debt = Param(
         m.t,  # Constant over time
         m.regions,
@@ -83,7 +99,7 @@ def get_constraints(
     )
 
     m.effortsharing_ecpc_repayment_endyear = Param(
-        doc="::effort sharing.ecpc_repayment_endyear"
+        initialize=inputs.config("effort sharing.ecpc_repayment_endyear")
     )
 
     m.effortsharing_ecpc_annual_debt_repayment = Param(

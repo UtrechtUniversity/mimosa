@@ -1,18 +1,57 @@
 # Running MIMOSA
 
 ### Base run
+
 A basic run of MIMOSA requires 4 steps: loading the parameters, building the model instance, solving the model and finally saving the output.
 With this code, the default parameter values are used (see [Parameter reference](../parameters.md)).
 
-``` python
+```python
 --8<-- "tests/runs/run_base.py"
 ```
 
-1.   Read the default parameters
-2.   Build the model using the parameters
-3.   Once the model is built, send the model to the solver.<br>
-     Note that if you use the NEOS solver, use the syntax `model1.solve(use_neos=True, neos_email="your.email@email.com")`
-4.   Export the output to the file output/run1.csv
+1.  Read the default parameters
+2.  Build the model using the parameters
+3.  Once the model is built, send the model to the solver.<br>
+    Note that if you use the NEOS solver, use the syntax `model1.solve(use_neos=True, neos_email="your.email@email.com")`
+4.  Export the output to the file output/run1.csv
+
+### ACCREU cost-benefit analysis
+
+[Doing an ACCREU run](accreu.md).
+
+ACCREU adaptation expenditure is a solver control by default, and `solve()`
+therefore optimises mitigation and adaptation jointly. To use the ordered
+cost-benefit workflow, select analytical adaptation and the sequential strategy.
+One call to `solve()` then first optimises mitigation without adaptation and
+evaluates analytical optimal adaptation along the resulting pathway. The final
+values are loaded into the public model, so they can be saved normally:
+
+```python
+from mimosa import MIMOSA, load_params
+
+params = load_params()
+params["model structure"]["damage module"] = "ACCREU"
+options = params["economics"]["damages"]["accreu"]
+options["adaptation"] = "sectoral"
+options["adaptation_determination"] = "analytical_optimum"
+options["cba_strategy"] = "mitigation_then_adaptation"
+
+model = MIMOSA(params)
+model.solve()
+model.save("run_accreu_cba")
+```
+
+For an adaptation-only scenario, select `analytical_optimum` and call
+`run_simulation()` without controls. `run_nopolicy_baseline()` always disables
+both mitigation and adaptation so avoided damages have a consistent reference.
+The sequential strategy rejects a fixed carbon budget. Transferred pathways
+remain available as `model.workflow_control_values` for diagnostics.
+
+The `joint` strategy also supports `analytical_optimum`. In that combination,
+MIMOSA performs one ordinary optimisation: the solver chooses mitigation while
+adaptation responds through its analytical optimum equations. This differs from
+`mitigation_then_adaptation`, which first chooses mitigation in a model without
+adaptation.
 
 ### Configuring the time grid
 
@@ -49,6 +88,6 @@ These output files can be easily imported for plotting software (like using [Plo
 
 [Open the MIMOSA Dashboard :octicons-arrow-right-24:](https://dashboard-mimosa.onrender.com/){.md-button}
 
-??? info "Derived global cost variables"
+??? info "Derived global variables"
 
-    :::mimosa.export.save.add_derived_global_cost_rows
+    :::mimosa.export.save.add_derived_global_rows

@@ -7,7 +7,7 @@ from typing import Sequence
 
 import numpy as np
 from mimosa.common import (
-    AbstractModel,
+    ConcreteModel,
     ConcreteModel,
     Param,
     Var,
@@ -22,12 +22,12 @@ from mimosa.common import (
     value,
     quant,
     trapezoid,
-    ModelContext,
 )
+from mimosa.core.model_inputs import ModelInputs
 
 
 def get_constraints(
-    m: AbstractModel, context: ModelContext
+    m: ConcreteModel, inputs: ModelInputs
 ) -> Sequence[GeneralConstraint]:
     """
 
@@ -47,11 +47,10 @@ def get_constraints(
 
     # First set baseline emission functions (cumulative emissions and global cumulative emissions)
     _set_baseline_emissions(m)
-
     constraints = (
-        _get_emissions_constraints(m)
-        + _get_temperature_constraints(m)
-        + _get_inertia_and_budget_constraints(m)
+        _get_emissions_constraints(m, inputs)
+        + _get_temperature_constraints(m, inputs)
+        + _get_inertia_and_budget_constraints(m, inputs)
     )
 
     return constraints
@@ -63,7 +62,7 @@ def fix_initial_abatement(m: ConcreteModel) -> None:
         m.relative_abatement[0, region].fix(0)
 
 
-def _set_baseline_emissions(m: AbstractModel) -> None:
+def _set_baseline_emissions(m: ConcreteModel) -> None:
 
     # Create a param for the regional cumulative baseline emissions
     def _calc_cum_baseline_emissions(m, t, r):
@@ -98,7 +97,9 @@ def _set_baseline_emissions(m: AbstractModel) -> None:
     )
 
 
-def _get_emissions_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
+def _get_emissions_constraints(
+    m: ConcreteModel, inputs: ModelInputs
+) -> Sequence[GeneralConstraint]:
     """
     ## Baseline emissions
 
@@ -112,7 +113,7 @@ def _get_emissions_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     If this parameter is set to true, baseline emissions are calculated as:
 
     $$
-    \\text{baseline emissions}_{t,r} = \\text{baseline carbon intensity}_{t,r} \\cdot \\text{GDP}_{\\text{net}, t,r}
+    \\href{./#var__baseline_emissions}{\\text{baseline emissions}_{t,r}} = \\text{baseline carbon intensity}_{t,r} \\cdot \\href{./#var__GDP_net}{\\text{GDP}_{\\text{net}, t,r}}
     $$
 
     ??? info "Baseline emissions values"
@@ -129,13 +130,13 @@ def _get_emissions_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     (see [Mitigation](mitigation.md)). The regional emissions are then calculated as:
 
     $$
-    \\text{regional emissions}_{t,r} = (1 - \\text{relative abatement}_{t,r}) \\cdot \\text{baseline emissions}_{t,r}
+    \\href{./#var__regional_emissions}{\\text{regional emissions}_{t,r}} = (1 - \\href{./#var__relative_abatement}{\\text{relative abatement}_{t,r}}) \\cdot \\href{./#var__baseline_emissions}{\\text{baseline emissions}_{t,r}}
     $$
 
     In the first period, reductions are assumed to be zero:
 
     $$
-    \\text{regional emissions}_{0,r} = \\text{baseline emissions}_{0,r}.
+    \\href{./#var__regional_emissions}{\\text{regional emissions}_{0,r}} = \\href{./#var__baseline_emissions}{\\text{baseline emissions}_{0,r}}.
     $$
 
     ## Global and cumulative emissions
@@ -143,7 +144,7 @@ def _get_emissions_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     The regional emissions are aggregated to global emissions:
 
     $$
-    \\text{global emissions}_{t} = \\sum_r \\text{regional emissions}_{t,r},
+    \\href{./#var__global_emissions}{\\text{global emissions}_{t}} = \\sum_r \\href{./#var__regional_emissions}{\\text{regional emissions}_{t,r}},
     $$
 
     which are used to calculate the cumulative emissions. There are two ways to calculate them:
@@ -154,15 +155,15 @@ def _get_emissions_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
 
         $$
         \\begin{aligned}
-        \\text{cumulative emissions}_{t} & = \\text{cumulative emissions}_{t-1} \\\\ 
-        & + \\frac{\\Delta t}{2} \\cdot (\\text{global emissions}_{t} + \\text{global emissions}_{t-1}) ,\\text{for } t > 0.
+        \\href{./#var__global_cumulative_emissions}{\\text{cumulative emissions}_{t}} & = \\href{./#var__global_cumulative_emissions}{\\text{cumulative emissions}_{t-1}} \\\\
+        & + \\frac{\\Delta t}{2} \\cdot (\\href{./#var__global_emissions}{\\text{global emissions}_{t}} + \\href{./#var__global_emissions}{\\text{global emissions}_{t-1}}) ,\\text{for } t > 0.
         \\end{aligned}
         $$
 
     === "Simple sum"
 
         $$
-        \\text{cumulative emissions}_{t} = \\text{cumulative emissions}_{t-1} + \\Delta t \\cdot \\text{global emissions}_{t}
+        \\href{./#var__global_cumulative_emissions}{\\text{cumulative emissions}_{t}} = \\href{./#var__global_cumulative_emissions}{\\text{cumulative emissions}_{t-1}} + \\Delta t \\cdot \\href{./#var__global_emissions}{\\text{global emissions}_{t}}
         $$
 
     ## Exogenous emissions pulse
@@ -176,7 +177,7 @@ def _get_emissions_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
 
     ## Parameters defined in this module
     - param::use_carbon_intensity_for_baseline
-    - param::cumulative_emissions_trapz
+    - param::global_cumulative_emissions_trapz
     - param::emissions_pulse_year
     - param::emissions_pulse_amount
 
@@ -195,7 +196,7 @@ def _get_emissions_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
         units=quant.unit("emissionsrate_unit"),
     )
     m.use_carbon_intensity_for_baseline = Param(
-        doc="::emissions.baseline carbon intensity"
+        initialize=inputs.config("emissions.baseline carbon intensity")
     )
 
     m.relative_abatement = Var(
@@ -210,12 +211,14 @@ def _get_emissions_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     )
 
     # If set, delay mitigation until after a given year by setting a bound on relative_abatement:
-    m.delay_mitigation_year = Param(doc="::emissions.delay_mitigation_until_year")
+    m.delay_mitigation_year = Param(
+        initialize=inputs.config("emissions.delay_mitigation_until_year")
+    )
     constraints.append(
         RegionalConstraint(
             lambda m, t, r: (
                 m.relative_abatement[t, r] <= 0.001
-                if m.delay_mitigation_year is not False
+                if value(m.delay_mitigation_year) is not False
                 and m.year(t) <= m.delay_mitigation_year
                 else Constraint.Skip
             )
@@ -229,10 +232,13 @@ def _get_emissions_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     m.global_emissions = Var(m.t, units=quant.unit("emissionsrate_unit"))
 
     m.global_cumulative_emissions_trapz = Param(
-        doc="::emissions.cumulative_emissions_trapz"
+        initialize=inputs.config("emissions.cumulative_emissions_trapz")
     )
-    m.emissions_pulse_year = Param(doc="::emissions.pulse.year")
-    m.emissions_pulse_amount = Param(doc="::emissions.pulse.amount")
+    m.emissions_pulse_year = Param(initialize=inputs.config("emissions.pulse.year"))
+    m.emissions_pulse_amount = Param(
+        initialize=inputs.config("emissions.pulse.amount"),
+        validate=_validate_emissions_pulse,
+    )
 
     constraints.extend(
         [
@@ -315,7 +321,19 @@ def _get_emissions_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     return constraints
 
 
-def _get_temperature_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
+def _validate_emissions_pulse(m, pulse_amount):
+    """A nonzero pulse must fall on the initialized model's calendar grid."""
+    pulse_year = value(m.emissions_pulse_year)
+    if pulse_amount != 0 and pulse_year not in {m.year(t) for t in m.t}:
+        raise ValueError(
+            f"Emissions pulse year {pulse_year} is not on the model time grid."
+        )
+    return True
+
+
+def _get_temperature_constraints(
+    m: ConcreteModel, inputs: ModelInputs
+) -> Sequence[GeneralConstraint]:
     """
 
     The global temperature change is calculated as a linear function of cumulative emissions, with a slope
@@ -323,7 +341,7 @@ def _get_temperature_constraints(m: AbstractModel) -> Sequence[GeneralConstraint
     showed that this performed better than the default two-box DICE climate module.
 
     $$
-    \\text{temperature}_{t} = T_0 + \\text{TCRE} \\cdot \\text{cumulative emissions}_{t},
+    \\href{./#var__temperature}{\\text{temperature}_{t}} = T_0 + \\text{TCRE} \\cdot \\href{./#var__global_cumulative_emissions}{\\text{cumulative emissions}_{t}},
     $$
 
     where [$T_0$](../parameters.md#temperature.initial) is the initial temperature at the start of the run (2025 by default),
@@ -374,7 +392,7 @@ def _get_temperature_constraints(m: AbstractModel) -> Sequence[GeneralConstraint
     If this parameter is set, the following constraint is active:
 
     $$
-    \\text{temperature}_{t} \\leq \\text{temperature target}
+    \\href{./#var__temperature}{\\text{temperature}_{t}} \\leq \\text{temperature target}
     $$
 
     ## Parameters defined in this module
@@ -385,12 +403,15 @@ def _get_temperature_constraints(m: AbstractModel) -> Sequence[GeneralConstraint
 
     constraints = []
 
-    m.T0 = Param(units=quant.unit("degC_above_PI"), doc="::temperature.initial")
+    m.T0 = Param(
+        units=quant.unit("degC_above_PI"),
+        initialize=inputs.config("temperature.initial"),
+    )
     m.temperature = Var(
         m.t, initialize=lambda m, t: m.T0, units=quant.unit("degC_above_PI")
     )
-    m.TCRE = Param(doc="::temperature.TCRE")
-    m.temperature_target = Param(doc="::temperature.target")
+    m.TCRE = Param(initialize=inputs.config("temperature.TCRE"))
+    m.temperature_target = Param(initialize=inputs.config("temperature.target"))
     constraints.extend(
         [
             GlobalEquation(
@@ -410,7 +431,9 @@ def _get_temperature_constraints(m: AbstractModel) -> Sequence[GeneralConstraint
         ]
     )
 
-    m.perc_reversible_damages = Param(doc="::economics.damages.percentage reversible")
+    m.perc_reversible_damages = Param(
+        initialize=inputs.config("economics.damages.percentage reversible")
+    )
 
     # m.overshoot = Var(m.t, initialize=0)
     # m.overshootdot = DerivativeVar(m.overshoot, wrt=m.t)
@@ -434,7 +457,7 @@ def _get_temperature_constraints(m: AbstractModel) -> Sequence[GeneralConstraint
 
 
 def _get_inertia_and_budget_constraints(
-    m: AbstractModel,
+    m: ConcreteModel, inputs: ModelInputs
 ) -> Sequence[GeneralConstraint]:
     """
     MIMOSA allows several types of constraints on emissions: a global carbon budget, inertia constraints,
@@ -446,7 +469,7 @@ def _get_inertia_and_budget_constraints(
     If a carbon budget is defined using the parameter [`carbonbudget`](../parameters.md#emissions.carbonbudget), the following constraint is active:
 
     $$
-    \\text{cumulative emissions}_{t} - \\text{budget} \\leq 0,
+    \\href{./#var__global_cumulative_emissions}{\\text{cumulative emissions}_{t}} - \\text{budget} \\leq 0,
     $$
 
     for $t \\geq 2100$. Note that the [`carbonbudget`](../parameters.md#emissions.carbonbudget) parameter unit should be
@@ -466,13 +489,13 @@ def _get_inertia_and_budget_constraints(
 
 
         $$
-        \\text{global emissions}_{t} - \\text{global emissions}_{t-1} \\geq \\Delta t \\cdot \\text{inertia_global} \\cdot \\text{scaling factor},
+        \\href{./#var__global_emissions}{\\text{global emissions}_{t}} - \\href{./#var__global_emissions}{\\text{global emissions}_{t-1}} \\geq \\Delta t \\cdot \\text{inertia_global} \\cdot \\text{scaling factor},
         $$
 
         with the scaling factor the global baseline emissions in the starting year:
 
         $$
-        \\text{scaling factor} = \\left( \\sum_r \\text{baseline emissions}_{t=0,r}\\right)
+        \\text{scaling factor} = \\left( \\sum_r \\href{./#var__baseline_emissions}{\\text{baseline emissions}_{t=0,r}}\\right)
         $$
 
         By default, the [`inertia_global`](../parameters.md#emissions.inertia.global) is set to `False`, such that there is no global inertia
@@ -481,7 +504,7 @@ def _get_inertia_and_budget_constraints(
     === "Regional inertia"
 
         $$
-        \\text{regional emissions}_{t,r} - \\text{regional emissions}_{t-1,r} \\geq \\Delta t \\cdot \\text{inertia_regional} \\cdot \\text{baseline emissions}_{t=0,r}.
+        \\href{./#var__regional_emissions}{\\text{regional emissions}_{t,r}} - \\href{./#var__regional_emissions}{\\text{regional emissions}_{t-1,r}} \\geq \\Delta t \\cdot \\text{inertia_regional} \\cdot \\href{./#var__baseline_emissions}{\\text{baseline emissions}_{t=0,r}}.
         $$
 
         By default, the [`inertia_regional`](../parameters.md#emissions.inertia.regional) parameter is active, such that regional emissions cannot be reduced by more than 5% of the initial baseline emissions per year. This is
@@ -500,11 +523,11 @@ def _get_inertia_and_budget_constraints(
     are limited to -20 GtCO<sub>2</sub>/yr, and regional emissions to -10 GtCO<sub>2</sub>/yr:
 
     $$
-    \\text{global emissions}_t \\geq \\text{global min level},
+    \\href{./#var__global_emissions}{\\text{global emissions}_t} \\geq \\text{global min level},
     $$
 
     $$
-    \\text{regional emissions}_t \\geq \\text{regional min level}.
+    \\href{./#var__regional_emissions}{\\text{regional emissions}_t} \\geq \\text{regional min level}.
     $$
 
     Note that currently, the minimum regional emission level is the same for every region, but this could be easily changed if needed (see
@@ -516,7 +539,7 @@ def _get_inertia_and_budget_constraints(
     this effect is to impose a constraint on the growth of emissions after 2100. By default, emissions are not allowed to grow after 2100:
 
     $$
-    \\text{regional emissions}_{t,r} - \\text{regional emissions}_{t-1,r} \\leq 0, \\text{if } t - 1 > 2100,
+    \\href{./#var__regional_emissions}{\\text{regional emissions}_{t,r}} - \\href{./#var__regional_emissions}{\\text{regional emissions}_{t-1,r}} \\leq 0, \\text{if } t - 1 > 2100,
     $$
 
     if the parameter [`non_increasing_emissions_after_2100`](../parameters.md#emissions.non increasing emissions after 2100) is set to `True`.
@@ -524,7 +547,7 @@ def _get_inertia_and_budget_constraints(
     When a carbon budget is imposed, it is also possible to impose a net-zero emissions constraint after the budget year (2100):
 
     $$
-    \\text{global emissions}_{t} \\leq 0, \\text{if } t \\geq 2100,
+    \\href{./#var__global_emissions}{\\text{global emissions}_{t}} \\leq 0, \\text{if } t \\geq 2100,
     $$
     if the parameter [`no_pos_emissions_after_budget_year`](../parameters.md#emissions.not positive after budget year) is set to `True`,
     **and** if a carbon budget is specified. Otherwise, this constraint is ignored.
@@ -543,16 +566,18 @@ def _get_inertia_and_budget_constraints(
 
     constraints = []
 
-    m.budget = Param(doc="::emissions.carbonbudget")
-    m.inertia_global = Param(doc="::emissions.inertia.global")
-    m.inertia_regional = Param(doc="::emissions.inertia.regional")
-    m.global_min_level = Param(doc="::emissions.global min level")
-    m.regional_min_level = Param(doc="::emissions.regional min level")
+    m.budget = Param(initialize=inputs.config("emissions.carbonbudget"))
+    m.inertia_global = Param(initialize=inputs.config("emissions.inertia.global"))
+    m.inertia_regional = Param(initialize=inputs.config("emissions.inertia.regional"))
+    m.global_min_level = Param(initialize=inputs.config("emissions.global min level"))
+    m.regional_min_level = Param(
+        initialize=inputs.config("emissions.regional min level")
+    )
     m.non_increasing_emissions_after_2100 = Param(
-        doc="::emissions.non increasing emissions after 2100"
+        initialize=inputs.config("emissions.non increasing emissions after 2100")
     )
     m.no_pos_emissions_after_budget_year = Param(
-        doc="::emissions.not positive after budget year"
+        initialize=inputs.config("emissions.not positive after budget year")
     )
     constraints.extend(
         [
@@ -597,7 +622,7 @@ def _get_inertia_and_budget_constraints(
                     if value(m.inertia_regional) is not False
                     and t > 0
                     and (
-                        m.delay_mitigation_year is False
+                        value(m.delay_mitigation_year) is False
                         or m.year(t) >= m.delay_mitigation_year
                     )
                     else Constraint.Skip

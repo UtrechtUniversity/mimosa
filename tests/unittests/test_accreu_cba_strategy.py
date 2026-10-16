@@ -1,0 +1,284 @@
+from types import SimpleNamespace
+
+import pytest
+
+from mimosa import MIMOSA, load_params
+from mimosa.common.config.parseconfig import check_params
+from mimosa.common.config.utils import get_nested
+
+
+def _inputs(
+    module="ACCREU",
+    adaptation="sectoral",
+    strategy="mitigation_then_adaptation",
+    determination="analytical_optimum",
+):
+    params = load_params()
+    structure = params["model structure"]
+    structure["damage module"] = module
+    params["economics"]["damages"]["accreu"].update(
+        {
+            "adaptation": adaptation,
+            "cba_strategy": strategy,
+            "adaptation_determination": determination,
+        }
+    )
+    return SimpleNamespace(
+        config_value=lambda path: get_nested(params, path.split("."))
+    )
+
+
+@pytest.mark.parametrize(
+    ("module", "adaptation", "strategy", "determination", "expected"),
+    [
+        (
+            "ACCREU",
+            "sectoral",
+            "mitigation_then_adaptation",
+            "analytical_optimum",
+            True,
+        ),
+        ("ACCREU", "combined", "joint", "solver_control", False),
+        ("ACCREU", "sectoral", "joint", "analytical_optimum", False),
+        (
+            "ACCREU",
+            "noadaptation",
+            "mitigation_then_adaptation",
+            "solver_control",
+            False,
+        ),
+        (
+            "COACCH",
+            "sectoral",
+            "mitigation_then_adaptation",
+            "solver_control",
+            False,
+        ),
+    ],
+)
+def test_sequential_workflow_selection(
+    module, adaptation, strategy, determination, expected
+):
+    model = MIMOSA.__new__(MIMOSA)
+    model.inputs = _inputs(module, adaptation, strategy, determination)
+
+    assert model._uses_sequential_accreu_cba() is expected
+
+
+def test_cba_configuration_defaults_and_validation():
+    params = load_params()
+    options = params["economics"]["damages"]["accreu"]
+
+    assert options["cba_strategy"] == "mitigation_then_adaptation"
+    assert options["adaptation_determination"] == "analytical_optimum"
+
+    for value in ["mitigation_then_adaptation", "joint"]:
+        params = load_params()
+        params["economics"]["damages"]["accreu"]["cba_strategy"] = value
+        assert (
+            check_params(params)["economics"]["damages"]["accreu"]["cba_strategy"]
+            == value
+        )
+
+    params["economics"]["damages"]["accreu"]["cba_strategy"] = "unknown"
+    with pytest.raises(ValueError):
+        check_params(params)
+
+    for value in ["solver_control", "analytical_optimum"]:
+        params = load_params()
+        params["economics"]["damages"]["accreu"]["adaptation_determination"] = value
+        assert (
+            check_params(params)["economics"]["damages"]["accreu"][
+                "adaptation_determination"
+            ]
+            == value
+        )
+
+    params["economics"]["damages"]["accreu"]["adaptation_determination"] = "unknown"
+    with pytest.raises(ValueError):
+        check_params(params)
+
+
+def test_sequential_solve_rejects_solver_control_adaptation():
+    model = MIMOSA.__new__(MIMOSA)
+    model.inputs = _inputs(
+        strategy="mitigation_then_adaptation", determination="solver_control"
+    )
+    model.status = "old status"
+    model.solve_runtime = 10
+    model.workflow_control_values = {"old": "controls"}
+
+    with pytest.raises(ValueError, match="analytical_optimum"):
+        model.solve(verbose=False)
+
+    assert model.status is None
+    assert model.solve_runtime is None
+    assert model.workflow_control_values is None
+
+
+def test_joint_analytical_adaptation_uses_ordinary_solve(monkeypatch):
+    calls = []
+    model = MIMOSA.__new__(MIMOSA)
+    model.inputs = _inputs(strategy="joint", determination="analytical_optimum")
+    model.status = None
+    model.solve_runtime = None
+    model.workflow_control_values = None
+    monkeypatch.setattr(
+        model,
+        "_solve_model_normally",
+        lambda **kwargs: calls.append(kwargs),
+    )
+
+    model.solve(verbose=False, ipopt_maxiter=123)
+
+    assert calls == [{"verbose": False, "use_neos": False, "ipopt_maxiter": 123}]
+
+
+def test_sequential_workflow_copies_params_forwards_options_and_replays(monkeypatch):
+    params = load_params()
+    params["model structure"]["damage module"] = "ACCREU"
+    options = params["economics"]["damages"]["accreu"]
+    options["adaptation"] = "sectoral"
+    options["adaptation_determination"] = "analytical_optimum"
+    options["cba_strategy"] = "mitigation_then_adaptation"
+
+    model = MIMOSA.__new__(MIMOSA)
+    model._params = params
+    model.status = None
+    model.workflow_control_values = None
+    model.concrete_model = object()
+    replay_result = object()
+    calls = []
+
+    mitigation_model = SimpleNamespace(status="ok")
+
+    def construct_mitigation_model(stage_params):
+        stage_options = stage_params["economics"]["damages"]["accreu"]
+        assert stage_params is not params
+        assert stage_options["adaptation"] == "noadaptation"
+        assert stage_options["cba_strategy"] == "joint"
+        assert stage_options["adaptation_determination"] == "solver_control"
+        mitigation_model.solve = lambda **kwargs: calls.append(("solve", kwargs))
+        return mitigation_model
+
+    monkeypatch.setattr("mimosa.mimosa.MIMOSA", construct_mitigation_model)
+    monkeypatch.setattr(
+        model,
+        "_extract_compatible_controls",
+        lambda source: {"relative_abatement": {0: 0.5}},
+    )
+    monkeypatch.setattr(
+        model,
+        "run_simulation",
+        lambda **controls: calls.append(("simulate", controls)) or replay_result,
+    )
+    model.simulator = SimpleNamespace(
+        initialize_pyomo_model=lambda target, result: calls.append(
+            ("initialize", target, result)
+        )
+    )
+
+    model._solve_accreu_mitigation_then_adaptation(
+        verbose=False, use_neos=True, neos_email="user@example.com"
+    )
+
+    assert options["adaptation"] == "sectoral"
+    assert options["adaptation_determination"] == "analytical_optimum"
+    assert options["cba_strategy"] == "mitigation_then_adaptation"
+    assert calls == [
+        (
+            "solve",
+            {
+                "verbose": False,
+                "use_neos": True,
+                "neos_email": "user@example.com",
+            },
+        ),
+        ("simulate", {"relative_abatement": {0: 0.5}}),
+        ("initialize", model.concrete_model, replay_result),
+    ]
+    assert model.workflow_control_values == {"relative_abatement": {0: 0.5}}
+    assert model.status == "ok"
+
+
+def test_sequential_workflow_rejects_fixed_carbon_budget():
+    model = MIMOSA.__new__(MIMOSA)
+    model._params = {"emissions": {"carbonbudget": object()}}
+
+    with pytest.raises(ValueError, match="without a fixed carbon budget"):
+        model._solve_accreu_mitigation_then_adaptation()
+
+
+class _Index:
+    def __init__(self, values):
+        self.values = values
+
+    def ordered_data(self):
+        return self.values
+
+
+class _Control:
+    def __init__(self, values):
+        self.values = values
+
+    def extract_values(self):
+        return self.values
+
+
+def _transfer_model(controls, times=(0, 1), regions=("A",), values=None):
+    values = values or {(0, "A"): 0.1, (1, "A"): 0.2}
+    concrete_model = SimpleNamespace(t=_Index(times), regions=_Index(regions))
+    for control in controls:
+        setattr(concrete_model, control, _Control(values))
+    model = MIMOSA.__new__(MIMOSA)
+    model.simulator = SimpleNamespace(is_prepared=True, control_variables=controls)
+    model.concrete_model = concrete_model
+    return model
+
+
+def test_control_transfer_validates_names_grids_and_indices():
+    target = _transfer_model(["relative_abatement"])
+    target.prepare_simulation = lambda: None
+
+    values = target._extract_compatible_controls(
+        _transfer_model(["relative_abatement"])
+    )
+    assert values == {"relative_abatement": {(0, "A"): 0.1, (1, "A"): 0.2}}
+
+    with pytest.raises(ValueError, match="source controls"):
+        target._extract_compatible_controls(_transfer_model(["other_control"]))
+
+    with pytest.raises(ValueError, match="t indices"):
+        target._extract_compatible_controls(
+            _transfer_model(["relative_abatement"], times=(0, 2))
+        )
+
+    with pytest.raises(ValueError, match="its indices"):
+        target._extract_compatible_controls(
+            _transfer_model(["relative_abatement"], values={(0, "A"): 0.1})
+        )
+
+
+@pytest.mark.parametrize(
+    ("determination", "expected_adaptation_controls"),
+    [
+        ("analytical_optimum", False),
+        ("solver_control", True),
+    ],
+)
+def test_determination_option_controls_whether_adaptation_is_a_control(
+    determination, expected_adaptation_controls
+):
+    params = load_params()
+    params["model structure"]["damage module"] = "ACCREU"
+    options = params["economics"]["damages"]["accreu"]
+    options["adaptation"] = "sectoral"
+    options["adaptation_determination"] = determination
+
+    model = MIMOSA(params, prerun=False)
+    model.prepare_simulation()
+    adaptation_controls = [
+        name for name in model.simulator.control_variables if "adaptation" in name
+    ]
+
+    assert bool(adaptation_controls) is expected_adaptation_controls

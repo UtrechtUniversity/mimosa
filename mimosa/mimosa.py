@@ -1,13 +1,10 @@
 """
-Creates the class MIMOSA:
-This is the main class. It builds a new AbstractModel
-using the chosen damage and objective modules, then reads in the
-parameter values and data (from the DataStore). With these values,
-it creates an `instance` of the AbstractModel. This is then sent to the solver.
-Finally, the export functions are called here.
+Builds a concrete MIMOSA model from prepared configuration and data, runs
+simulation or optimization, and exposes export functions.
 """
 
 import time
+from copy import deepcopy
 from typing import Any, Optional
 
 from mimosa.common import (
@@ -21,6 +18,7 @@ from mimosa.components.after_initialisation import avoided_damages
 from mimosa.core import simulation
 
 from mimosa.core.initializer import Preprocessor
+from mimosa.core.model_inputs import ModelInputs
 from mimosa.core.solver import Solver
 from mimosa.core.simulation import Simulator, SimulationObjectModel
 
@@ -41,18 +39,21 @@ class MIMOSA:
             more important than the initial guess.
 
     Attributes:
-        concrete_model: Instantiated Pyomo model used for optimisation.
+        concrete_model: Initialized Pyomo model used for optimisation.
         equations: Equations available to simulation mode.
-        model_context: Selected model components and their model options.
+        inputs: Prepared configuration and data lookup used to build the model.
         simulator: Simulator associated with this model.
         status: Solver status after `solve()`; `None` before a solve starts.
         solve_runtime: Wall-clock duration of the most recently completed
             `solve()` call in seconds; `None` before a solve completes.
+        workflow_control_values: Controls transferred by the most recent
+            sequential workflow; `None` for an ordinary solve.
 
     """
 
     concrete_model: ConcreteModel
     equations: list
+    inputs: ModelInputs
     _params: dict
 
     def __init__(self, params: dict, prerun: bool = True) -> None:
@@ -65,6 +66,7 @@ class MIMOSA:
 
         self.status = None  # Not started yet
         self.solve_runtime = None  # No completed solve has been timed yet
+        self.workflow_control_values = None
         self.last_saved_filename = None  # Nothing saved yes
         self.last_saved_simulation_filename = None  # Nothing saved yes
         self._extra_constraints_added = False
@@ -91,7 +93,7 @@ class MIMOSA:
         self.concrete_model = result.concrete_model
         self._params = result.params
         self.equations = result.equations
-        self.model_context = result.context
+        self.inputs = result.inputs
 
     def prepare_simulation(self):
         """
@@ -147,35 +149,59 @@ class MIMOSA:
 
         simulation_obj = self.simulator.run(**control_variables_kwargs)
         simulation_obj.runtime = time.perf_counter() - start_time
+        simulation_obj.params = self._params
         return simulation_obj
 
     def run_nopolicy_baseline(self) -> SimulationObjectModel:
         """
         Run and store the no-policy reference used for avoided damages.
 
-        All control variables are set to zero. The resulting damage costs are
-        stored in the Pyomo model as `nopolicy_damage_costs` for subsequent policy
-        runs.
+        Mitigation and adaptation are both disabled. The resulting damage costs
+        are stored in the Pyomo model as `nopolicy_damage_costs` for subsequent
+        policy runs. An ACCREU model with analytical adaptation uses a temporary
+        no-adaptation model for this reference.
 
         Returns:
             SimulationObjectModel: No-policy simulation results.
         """
 
-        # Run simulator with default relative abatement set to 0
-        nopolicy_baseline = self.run_simulation()
+        nopolicy_baseline = self._run_nopolicy_baseline_simulation()
 
         # Store the no-policy baseline damage costs in the concrete model
         m = self.concrete_model
+        added_avoided_damage_equations = False
         if not self._extra_constraints_added:
-            for constraint in avoided_damages.get_constraints(m):
-                add_constraint(m, constraint.to_pyomo_constraint(m), constraint.name)
+            avoided_damage_equations = avoided_damages.get_constraints(m)
+            for equation in avoided_damage_equations:
+                add_constraint(m, equation.to_pyomo_constraint(m), equation.name)
+            self.equations.extend(avoided_damage_equations)
             self._extra_constraints_added = True
+            added_avoided_damage_equations = True
 
         m.nopolicy_damage_costs.store_values(
             nopolicy_baseline.damage_costs.get_all_indexed()
         )
 
+        # Avoided damages are added only after the baseline is available. Include
+        # their equations in subsequent simulation runs as well as in Pyomo solves.
+        if added_avoided_damage_equations:
+            self.prepare_simulation()
+
         return nopolicy_baseline
+
+    def _run_nopolicy_baseline_simulation(self) -> SimulationObjectModel:
+        """Evaluate a reference without mitigation or analytical adaptation."""
+
+        if not self._uses_analytical_accreu_adaptation():
+            return self.run_simulation()
+
+        baseline_params = deepcopy(self._params)
+        # Analytical adaptation occurs even with zero controls, so disable it
+        # explicitly in the no-policy reference used to measure avoided damages.
+        baseline_params["economics"]["damages"]["accreu"]["adaptation"] = "noadaptation"
+
+        baseline_model = MIMOSA(baseline_params, prerun=False)
+        return baseline_model.run_simulation()
 
     @utils.timer("Model solve", True, store_as="solve_runtime")
     def solve(
@@ -196,6 +222,19 @@ class MIMOSA:
         """
         self.status = None  # Not started yet
         self.solve_runtime = None  # Do not retain timing from an earlier solve
+        self.workflow_control_values = None
+
+        if self._uses_sequential_accreu_cba():
+            self._solve_accreu_mitigation_then_adaptation(
+                verbose=verbose, use_neos=use_neos, **kwargs
+            )
+        else:
+            self._solve_model_normally(verbose=verbose, use_neos=use_neos, **kwargs)
+
+    def _solve_model_normally(
+        self, verbose: bool = True, use_neos: bool = False, **kwargs: Any
+    ) -> None:
+        """Run one ordinary optimisation without workflow orchestration."""
 
         if use_neos:
             results = self.solver.solve_neos(self.concrete_model, **kwargs)
@@ -204,6 +243,115 @@ class MIMOSA:
                 self.concrete_model, verbose=verbose, **kwargs
             )
         self.status = results.solver.status
+
+    def _uses_sequential_accreu_cba(self) -> bool:
+        """Return whether this model selects the ordered ACCREU CBA workflow."""
+
+        if self.inputs.config_value("model structure.damage module") != "ACCREU":
+            return False
+
+        options = self.inputs.config_value("economics.damages.accreu")
+        if options["adaptation"] == "noadaptation":
+            return False
+
+        strategy = options["cba_strategy"]
+        determination = options["adaptation_determination"]
+        if (
+            strategy == "mitigation_then_adaptation"
+            and determination != "analytical_optimum"
+        ):
+            raise ValueError(
+                "cba_strategy='mitigation_then_adaptation' requires "
+                "adaptation_determination="
+                f"'analytical_optimum', not '{determination}'."
+            )
+
+        return strategy == "mitigation_then_adaptation"
+
+    def _uses_analytical_accreu_adaptation(self) -> bool:
+        """Return whether ACCREU adaptation is defined analytically."""
+
+        if self.inputs.config_value("model structure.damage module") != "ACCREU":
+            return False
+
+        options = self.inputs.config_value("economics.damages.accreu")
+        return (
+            options["adaptation"] != "noadaptation"
+            and options["adaptation_determination"] == "analytical_optimum"
+        )
+
+    def _solve_accreu_mitigation_then_adaptation(
+        self, verbose: bool = True, use_neos: bool = False, **kwargs: Any
+    ) -> None:
+        """Optimise mitigation first, then evaluate analytical adaptation."""
+
+        if self._params["emissions"]["carbonbudget"] is not False:
+            raise ValueError(
+                "cba_strategy='mitigation_then_adaptation' is only "
+                "available for cost-benefit analysis without a fixed carbon budget. "
+                "Use cba_strategy='joint' for a carbon-budget run."
+            )
+
+        mitigation_params = deepcopy(self._params)
+        mitigation_options = mitigation_params["economics"]["damages"]["accreu"]
+        mitigation_options["adaptation"] = "noadaptation"
+        mitigation_options["cba_strategy"] = "joint"
+        mitigation_options["adaptation_determination"] = "solver_control"
+
+        mitigation_model = MIMOSA(mitigation_params)
+        mitigation_model.solve(verbose=verbose, use_neos=use_neos, **kwargs)
+
+        control_values = self._extract_compatible_controls(mitigation_model)
+        final_result = self.run_simulation(**control_values)
+        self.simulator.initialize_pyomo_model(self.concrete_model, final_result)
+
+        self.workflow_control_values = control_values
+        self.status = mitigation_model.status
+
+    def _extract_compatible_controls(self, source_model: "MIMOSA") -> dict:
+        """Extract controls after validating replay compatibility."""
+
+        if not source_model.simulator.is_prepared:
+            source_model.prepare_simulation()
+        if not self.simulator.is_prepared:
+            self.prepare_simulation()
+
+        source_controls = set(source_model.simulator.control_variables)
+        target_controls = set(self.simulator.control_variables)
+        if source_controls != target_controls:
+            raise ValueError(
+                "Cannot transfer controls between ACCREU CBA stages: "
+                f"source controls are {sorted(source_controls)}, while target "
+                f"controls are {sorted(target_controls)}."
+            )
+
+        for index_name in ("t", "regions"):
+            source_values = tuple(
+                getattr(source_model.concrete_model, index_name).ordered_data()
+            )
+            target_values = tuple(
+                getattr(self.concrete_model, index_name).ordered_data()
+            )
+            if source_values != target_values:
+                raise ValueError(
+                    "Cannot transfer controls between ACCREU CBA stages: "
+                    f"the {index_name} indices are incompatible."
+                )
+
+        control_values = {}
+        for name in sorted(target_controls):
+            source_values = getattr(
+                source_model.concrete_model, name
+            ).extract_values()
+            target_keys = set(getattr(self.concrete_model, name).extract_values())
+            if set(source_values) != target_keys:
+                raise ValueError(
+                    "Cannot transfer control "
+                    f"'{name}' between ACCREU CBA stages: its indices are incompatible."
+                )
+            control_values[name] = source_values
+
+        return control_values
 
     def save(self, filename: Optional[str] = None, **kwargs: Any) -> None:
         """
@@ -262,7 +410,7 @@ class MIMOSA:
         logger.info("Saving simulation to %s", filename)
         save_output(
             simulation_obj.all_vars_for_export(),
-            self._params,
+            getattr(simulation_obj, "params", None) or self._params,
             simulation_obj,
             filename,
             scenario_type="simulation",

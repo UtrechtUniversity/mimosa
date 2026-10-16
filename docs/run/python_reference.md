@@ -11,6 +11,20 @@ runs. For worked examples, see [Changing parameters](changingparams.md) and
       show_root_heading: true
       show_source: false
 
+## Loading adaptation-readiness data
+
+```python
+from mimosa import load_adaptation_readiness
+
+readiness = load_adaptation_readiness()
+factor = readiness.loc[("SSP1", "CAN"), "2030"]
+```
+
+::: mimosa.load_adaptation_readiness
+    options:
+      show_root_heading: true
+      show_source: false
+
 ## Building and running a model
 
 ::: mimosa.MIMOSA

@@ -295,6 +295,92 @@ economics:
         combined damage functions (Only used for COACCH)
       type: bool
       default: False
+    
+    accreu:
+
+      adaptation:
+        descr: >-
+          Enable sector-specific adaptation with "sectoral", disable it with
+          "noadaptation", or use "combined" labour productivity and riverine flooding
+          adaptation for diagnostics and model comparisons.
+        type: enum
+        values:
+          - sectoral
+          - combined
+          - noadaptation
+        default: noadaptation
+
+      cba_strategy:
+        descr: >-
+          How solve() coordinates mitigation and adaptation in an ACCREU
+          cost-benefit analysis. The sequential strategy first optimises mitigation
+          without adaptation and then calculates analytical optimal adaptation for
+          that pathway. The joint strategy uses the ordinary one-model solve path,
+          with adaptation either chosen by the solver or determined analytically.
+        type: enum
+        values:
+          - mitigation_then_adaptation
+          - joint
+        default: mitigation_then_adaptation
+
+      adaptation_determination:
+        descr: >-
+          How ACCREU adaptation expenditure is determined. With solver_control it
+          is a free optimisation or simulation control. With analytical_optimum it
+          is calculated from the analytical optimal-adaptation equation.
+        type: enum
+        values:
+          - solver_control
+          - analytical_optimum
+        default: analytical_optimum
+
+      adaptation_calibration:
+        descr: >-
+          Calibration of the sectoral ACCREU adaptation curves. "accreu" uses the
+          original source-model coefficients. The three "literature" options use
+          realised-effectiveness caps and cost multipliers calibrated to the low,
+          central, and high ends of literature benefit-cost ranges at a 5% discount
+          rate. They apply to both separate and combined adaptation.
+        type: enum
+        values:
+          - accreu
+          - literature_low
+          - literature
+          - literature_high
+        default: accreu
+
+      monetise_mortality:
+        descr: >-
+          Flag for whether the mortality should be monetised using the SVL
+          (Statistical Value of Life)
+        type: bool
+        default: True
+
+      mortality_svl_rel_gdp_cap:
+        descr: >-
+          If the monetise_mortality option is enabled, use this value for
+          the Statistical Value of Life (SVL), expressed as multiple of GDP per capita.
+          Note: while this assumes a global value of the SVL in relative terms,
+          the dollar value of the SVL differs per country. This has ethical implications.
+        type: float
+        default: 117.59
+        can_be_false: False
+      
+      adaptation_effectiveness_scale_factor:
+        descr: >-
+          Scales the max. effectiveness factor for the sectoral adaptation. Used to analyse
+          the effects of a less effective adaptation.
+        type: float
+        default: 1
+        min: 0
+        max: 1
+
+      delay_adaptation_until_year: &delay_until_year
+        descr: Delays adaptation until after this given year. If false, no constraint on adaptation is set.
+        type: int
+        min: 2030
+        can_be_false: True
+        default: False
 
 ##################
 
@@ -381,11 +467,8 @@ emissions:
     default: True
 
   delay_mitigation_until_year:
+    <<: *delay_until_year
     descr: Delays mitigation until after this given year. If false, mitigation is always available.
-    type: int
-    min: 2030
-    can_be_false: True
-    default: False
 
 ##################
 
@@ -460,29 +543,32 @@ temperature:
 
 ##################
 
-model structure:
-  sealevelrise options:
-    projection:
-      descr: >-
-        Deterministic sea-level-rise parameter set. The central set represents
-        an AR6-calibrated central response; low represents the lower part of
-        the AR6 likely range, and high is a low-likelihood, high-impact
-        sensitivity case. All sets share the same historical initial conditions.
-      type: enum
-      values:
-        - low
-        - central
-        - high
-      default: central
+sealevelrise:
+  projection:
+    descr: >-
+      Deterministic sea-level-rise parameter set. The central set represents
+      an AR6-calibrated central response; low represents the lower part of
+      the AR6 likely range, and high is a low-likelihood, high-impact
+      sensitivity case. All sets share the same historical initial conditions.
+    type: enum
+    values:
+      - low
+      - central
+      - high
+    default: central
 
+
+model structure:
   damage module:
     descr: Damage module to be used
     type: enum
     values:
       - COACCH
+      - ACCREU
+      - ACCREU_CGE
       - nodamage
     default: COACCH
-
+  
   emissiontrade module:
     descr: Emission trade module to be used
     type: enum
@@ -582,6 +668,12 @@ regional_parameter_files:
     COACCH:
       filename: inputdata/regionalparams/COACCH.csv
       regionstype: COACCH
+    ACCREU:
+      filename: inputdata/regionalparams/ACCREU.csv
+      regionstype: IMAGE26
+    ACCREU_CGE:
+      filename: inputdata/regionalparams/ACCREU_CGE.csv
+      regionstype: IMAGE26
 
 ##################
 
@@ -684,9 +776,4 @@ custom_constraints:
     values:
       descr: constraint name to be disabled, as used in the model
       type: str
-    default:
-
-  custom_mapping:
-    descr: Custom mapping of parameter values or variables
-    type: dict
     default:

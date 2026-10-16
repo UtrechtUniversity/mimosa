@@ -6,19 +6,20 @@ Utility and global welfare
 from typing import Sequence
 
 from mimosa.common import (
-    AbstractModel,
+    ConcreteModel,
     Param,
     Var,
     GeneralConstraint,
     RegionalEquation,
     GlobalEquation,
-    ModelContext,
 )
 from .utility_fct import calc_utility
 
+from mimosa.core.model_inputs import ModelInputs
+
 
 def get_constraints(
-    m: AbstractModel, context: ModelContext
+    m: ConcreteModel, inputs: ModelInputs
 ) -> Sequence[GeneralConstraint]:
     """
 
@@ -38,15 +39,15 @@ def get_constraints(
 
     <h3>Equations</h3>
 
-    First, calculate the global consumption $C_{t,r}$ and population $L_{t,r}$:
+    First, calculate the global consumption $\\href{./#var__welfare_cost_minimising::consumption}{C_{t,r}}$ and population $L_{t,r}$:
 
-    $$ \\widehat{C}_{t} = \\sum_r C_{t,r}, $$
+    $$ \\widehat{C}_{t} = \\sum_r \\href{./#var__welfare_cost_minimising::consumption}{C_{t,r}}, $$
 
     $$ \\widehat{L}_{t} = \\sum_r L_{t,r}. $$
 
     These are used to calculate the global utility:
 
-    $$ W_t = \\widehat{L}_t \\cdot \\text{utility}\\left( \\widehat{C}_{t}, \\widehat{L}_{t} \\right) $$
+    $$ \\href{./#var__welfare_cost_minimising::global_welfare}{W_t} = \\widehat{L}_t \\cdot \\text{utility}\\left( \\widehat{C}_{t}, \\widehat{L}_{t} \\right) $$
 
     <h3>Utility function</h3>
     :::mimosa.components.welfare.utility_fct.calc_utility
@@ -59,7 +60,7 @@ def get_constraints(
     constraints = []
 
     # Parameters
-    m.elasmu = Param(doc="::economics.elasmu")
+    m.elasmu = Param(initialize=inputs.config("economics.elasmu"))
 
     m.utility = Var(m.t, m.regions, initialize=10)
     m.global_welfare = Var(m.t)

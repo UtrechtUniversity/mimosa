@@ -12,13 +12,19 @@ The following pages explain how to add variables, equations, constraints, parame
 model components. They focus on the conventions used in MIMOSA rather than providing a general
 introduction to Pyomo.
 
-MIMOSA's shared Pyomo `AbstractModel`, time and region sets, and baseline inputs are created in
-`mimosa/base_model.py`. The components listed in `mimosa/abstract_model.py` then add their variables,
+MIMOSA's shared Pyomo `ConcreteModel`, time and region sets, and baseline inputs are created in
+`mimosa/base_model.py`. The components listed in `mimosa/model_builder.py` then add their variables,
 parameters, equations and constraints to this shared object, which is always called `m`:
 
 ```python
-m = create_base_model()
+m = create_base_model(inputs)
 ```
+
+The preprocessor prepares configuration and data lookup before construction. Base sets and
+parameters are immediately available; components add initialized parameters and variables in
+the explicit order in `create_model`. Collected constraints and the objective are attached after
+all declarations.
+There is no separate abstract-model instantiation or parameter loading from `doc`.
 
 !!! info "A note about file structure"
 
@@ -26,7 +32,7 @@ m = create_base_model()
 
     ```python title="MIMOSA file structure"
     mimosa/
-    ├── abstract_model.py # (1)!
+    ├── model_builder.py # (1)!
     ├── base_model.py # (2)!
     ├── mimosa.py
     ├── components/ # (3)!

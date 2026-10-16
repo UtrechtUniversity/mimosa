@@ -5,7 +5,7 @@ Mitigation costs
 
 from typing import Sequence
 from mimosa.common import (
-    AbstractModel,
+    ConcreteModel,
     Param,
     Var,
     GeneralConstraint,
@@ -18,12 +18,12 @@ from mimosa.common import (
     log,
     soft_min,
     quant,
-    ModelContext,
 )
+from mimosa.core.model_inputs import ModelInputs
 
 
 def get_constraints(
-    m: AbstractModel, context: ModelContext
+    m: ConcreteModel, inputs: ModelInputs
 ) -> Sequence[GeneralConstraint]:
     """
 
@@ -36,12 +36,14 @@ def get_constraints(
         :::mimosa.components.mitigation._get_learning_constraints
 
     """
-    constraints = _get_mac_constraints(m) + _get_learning_constraints(m)
+    constraints = _get_mac_constraints(m, inputs) + _get_learning_constraints(m, inputs)
 
     return constraints
 
 
-def _get_mac_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
+def _get_mac_constraints(
+    m: ConcreteModel, inputs: ModelInputs
+) -> Sequence[GeneralConstraint]:
     """
     In MIMOSA, the baseline emissions can be reduced by implementing a carbon price. This increases the price of
     carbon-intensive technologies relative to cleaner alternatives, which in turn leads to a reduction in emissions.
@@ -59,7 +61,7 @@ def _get_mac_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     to baseline emissions) and a time-dependent learning factor:
 
     $$
-    \\text{MAC}_t(a) = \\left( \\gamma \\cdot a^{\\beta}\\right) \\cdot \\text{learning factor}_t.
+    \\text{MAC}_t(a) = \\left( \\gamma \\cdot a^{\\beta}\\right) \\cdot \\href{./#var__learning_factor}{\\text{learning factor}_t}.
     $$
 
     The parameters $\\gamma$ ([`MAC_gamma`](../parameters.md#economics.MAC.gamma)) and $\\beta$ ([`MAC_beta`](../parameters.md#economics.MAC.beta))
@@ -106,20 +108,20 @@ def _get_mac_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     ### Regional MAC curve
 
     The regional MAC curve is obtained by scaling the global MAC curve by a regional scaling factor, and links the
-    regional carbon price to the regional relative mitigation $a_{t,r}$:
+    regional carbon price to the regional relative mitigation $\\href{./#var__relative_abatement}{a_{t,r}}$:
 
     $$
     \\begin{align}
-    \\text{carbon price}_{t,r} &= \\text{MAC}_{\\text{regional},t,r}(a_{t,r})\\\\
-    &= \\text{regional scaling factor}_{r} \\cdot \\text{MAC}_t(a_{t,r})\\\\
-    &= \\text{regional scaling factor}_{r} \\cdot \\left( \\gamma \\cdot a_{t,r}^{\\beta}\\right) \\cdot \\text{learning factor}_t.
+    \\href{./#var__carbon_price}{\\text{carbon price}_{t,r}} &= \\text{MAC}_{\\text{regional},t,r}(\\href{./#var__relative_abatement}{a_{t,r}})\\\\
+    &= \\text{regional scaling factor}_{r} \\cdot \\text{MAC}_t(\\href{./#var__relative_abatement}{a_{t,r}})\\\\
+    &= \\text{regional scaling factor}_{r} \\cdot \\left( \\gamma \\cdot \\href{./#var__relative_abatement}{a_{t,r}}^{\\beta}\\right) \\cdot \\href{./#var__learning_factor}{\\text{learning factor}_t}.
     \\end{align}
     $$
 
     The initial carbon price at time $t=0$ is set to zero:
 
     $$
-    \\text{carbon price}_{0,r} = 0.
+    \\href{./#var__carbon_price}{\\text{carbon price}_{0,r}} = 0.
     $$
 
     :::mimosa.components.mitigation.MAC
@@ -149,8 +151,8 @@ def _get_mac_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     
     $$
     \\begin{align}
-    \\text{domestic mitigation costs abs}_{t,r} &= \\left(\\int_0^{a_{t,r}} \\text{MAC}_{\\text{regional},t,r}(a)\\ da \\right) \\cdot \\text{baseline emissions}_{t,r}\\\\
-    &= \\text{factor}_{t,r} \\cdot \\frac{\\gamma \\cdot a_{t,r}^{\\beta+1}}{\\beta+1} \\cdot \\text{baseline emissions}_{t,r}
+    \\href{./#var__domestic_mitigation_costs_abs}{\\text{domestic mitigation costs abs}_{t,r}} &= \\left(\\int_0^{\\href{./#var__relative_abatement}{a_{t,r}}} \\text{MAC}_{\\text{regional},t,r}(a)\\ da \\right) \\cdot \\href{./#var__baseline_emissions}{\\text{baseline emissions}_{t,r}}\\\\
+    &= \\text{factor}_{t,r} \\cdot \\frac{\\gamma \\cdot \\href{./#var__relative_abatement}{a_{t,r}}^{\\beta+1}}{\\beta+1} \\cdot \\href{./#var__baseline_emissions}{\\text{baseline emissions}_{t,r}}
     \\end{align}
     $$
 
@@ -159,7 +161,7 @@ def _get_mac_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     [emission trading](emissiontrading.md) is enabled:
 
     $$
-    \\text{mitigation costs abs}_{t,r} = \\text{domestic mitigation costs abs}_{t,r} + \\text{mitigation cost trading balance}_{t,r}.
+    \\href{./#var__mitigation_costs_abs}{\\text{mitigation costs abs}_{t,r}} = \\href{./#var__domestic_mitigation_costs_abs}{\\text{domestic mitigation costs abs}_{t,r}} + \\href{./#var__emissiontrade::mitigation_cost_trading_balance}{\\text{mitigation cost trading balance}_{t,r}}.
     $$
 
 
@@ -168,14 +170,14 @@ def _get_mac_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     `mitigation_costs` contains the same costs as a fraction of gross GDP:
 
     $$
-    \\text{mitigation costs}_{t,r} = \\frac{\\text{mitigation costs abs}_{t,r}}{\\text{GDP}_{\\text{gross}, t,r}}.
+    \\href{./#var__mitigation_costs}{\\text{mitigation costs}_{t,r}} = \\frac{\\href{./#var__mitigation_costs_abs}{\\text{mitigation costs abs}_{t,r}}}{\\href{./#var__GDP_gross}{\\text{GDP}_{\\text{gross}, t,r}}}.
     $$
 
     When emission trading is allowed, some regions may even have negative mitigation costs. How negative this can become can
     be configured with the parameter [`rel_mitigation_costs_min_level`](../parameters.md#economics.MAC.rel_mitigation_costs_min_level).
 
     $$
-    \\text{mitigation costs}_{t,r} \\geq \\text{mitigation costs min level}.
+    \\href{./#var__mitigation_costs}{\\text{mitigation costs}_{t,r}} \\geq \\text{mitigation costs min level}.
     $$
 
     By default, this parameter is 0, meaning that the mitigation costs can not become negative.
@@ -194,12 +196,19 @@ def _get_mac_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     constraints = []
 
     # MAC: linking the carbon price to the relative abatement
-    m.MAC_gamma = Param(doc="::economics.MAC.gamma")
-    m.MAC_beta = Param(doc="::economics.MAC.beta")
+    m.MAC_gamma = Param(initialize=inputs.config("economics.MAC.gamma"))
+    m.MAC_beta = Param(initialize=inputs.config("economics.MAC.beta"))
+    calibration = inputs.config_value("economics.MAC.regional calibration factor")
     m.MAC_scaling_factor = Param(
         m.regions,
-        doc=lambda params: f'regional::MAC.{params["economics"]["MAC"]["regional calibration factor"]}',
+        initialize=inputs.regional("MAC", calibration),
     )  # Regional scaling of the MAC
+    ssp = inputs.config_value("SSP")
+    m.MAC_SSP_calibration_factor = Param(
+        m.t,
+        initialize=inputs.time_config(f"economics.MAC.SSP_calibration_factor.{ssp}"),
+        units=quant.unit("dimensionless"),
+    )
     m.carbon_price = Var(
         m.t,
         m.regions,
@@ -234,7 +243,7 @@ def _get_mac_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     )
     m.mitigation_costs = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
     m.mitigation_costs_min_level = Param(
-        doc="::economics.MAC.rel_mitigation_costs_min_level"
+        initialize=inputs.config("economics.MAC.rel_mitigation_costs_min_level")
     )
     constraints.extend(
         [
@@ -316,7 +325,9 @@ def _get_mac_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     return constraints
 
 
-def _get_learning_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
+def _get_learning_constraints(
+    m: ConcreteModel, inputs: ModelInputs
+) -> Sequence[GeneralConstraint]:
     """
 
     In MIMOSA, there are two ways in which the price of mitigation policy can be reduced over time:
@@ -330,7 +341,7 @@ def _get_learning_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     The learning by doing factor is defined as:
 
     $$
-    \\text{LBD factor}_t = \\left( \\xi \\cdot \\text{cumulative mitigation}_t + 1 \\right)^{\\log_2(\\rho)},
+    \\href{./#var__LBD_factor}{\\text{LBD factor}_t} = \\left( \\xi \\cdot \\text{cumulative mitigation}_t + 1 \\right)^{\\log_2(\\rho)},
     $$
 
     with $\\rho$ ([`LBD_rate`](../parameters.md#economics.MAC.LBD_rate)) the progress ratio (i.e., the reduction in
@@ -343,7 +354,7 @@ def _get_learning_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     The cumulative mitigation is equal to:
 
     $$
-    \\text{cumulative mitigation}_t = \\text{baseline cum. emissions}_t - \\text{cum. emissions}_t.
+    \\text{cumulative mitigation}_t = \\text{baseline cum. emissions}_t - \\href{./#var__global_cumulative_emissions}{\\text{cum. emissions}_t}.
     $$
 
 
@@ -353,7 +364,7 @@ def _get_learning_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     even if no mitigation has been done yet. The learning over time factor is defined as:
 
     $$
-    \\text{LOT factor}_t = \\frac{1}{(1 + \\lambda)^t},
+    \\href{./#var__LOT_factor}{\\text{LOT factor}_t} = \\frac{1}{(1 + \\lambda)^t},
     $$
 
     with $\\lambda$ ([`LOT_rate`](../parameters.md#economics.MAC.LOT_rate)) the learning rate. By default, the learning over time
@@ -370,9 +381,9 @@ def _get_learning_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     ### Technological learning
 
     # Learning by doing
-    m.LBD_rate = Param(doc="::economics.MAC.LBD_rate")
+    m.LBD_rate = Param(initialize=inputs.config("economics.MAC.LBD_rate"))
     m.log_LBD_rate = Param(initialize=log(m.LBD_rate) / log(2))
-    m.LBD_scaling = Param(doc="::economics.MAC.LBD_scaling")
+    m.LBD_scaling = Param(initialize=inputs.config("economics.MAC.LBD_scaling"))
     m.LBD_factor = Var(m.t)  # , bounds=(0,1), initialize=1)
     constraints.append(
         GlobalEquation(
@@ -396,7 +407,7 @@ def _get_learning_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
     )
 
     # Learning over time and total learning factor
-    m.LOT_rate = Param(doc="::economics.MAC.LOT_rate")
+    m.LOT_rate = Param(initialize=inputs.config("economics.MAC.LOT_rate"))
     m.LOT_factor = Var(m.t)
     m.learning_factor = Var(m.t)
     constraints.extend(
