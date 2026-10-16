@@ -11,7 +11,8 @@ Each entry lists a model variable's description, units, dimensions and availabil
 This graph shows the actual variables and dependencies for **ACCREU with sectoral
 adaptation and solver-controlled adaptation spending**. Faint dashed links refer
 to the previous time step. Click a node to select it; click empty graph space or
-press Escape to clear the selection. Double-click empty space to fit the graph.
+press Escape to clear the selection. Click and drag to pan the zoomed-in graph.
+Double-click empty space to fit the graph.
 Use **Fit graph** for the overview, or **Focus selected** to read a neighbourhood.
 
 [Download the graph as SVG](assets/dependency-graph.svg){id="dependency-graph-source" download}

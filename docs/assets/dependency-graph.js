@@ -117,6 +117,47 @@ async function initializeDependencyGraph(panel, source, dialog = null) {
             choose(select.value || null);
             focusSelected();
         });
+
+        let pan = null;
+        let dragged = false;
+        viewport.addEventListener("pointerdown", event => {
+            if (event.button !== 0 || event.pointerType === "touch" || !event.target.closest("svg")) return;
+            dragged = false;
+            pan = {
+                pointerId: event.pointerId,
+                x: event.clientX, y: event.clientY,
+                left: viewport.scrollLeft, top: viewport.scrollTop,
+            };
+        });
+        viewport.addEventListener("pointermove", event => {
+            if (!pan || event.pointerId !== pan.pointerId) return;
+            const dx = event.clientX - pan.x;
+            const dy = event.clientY - pan.y;
+            // Allow a small movement on an ordinary node click.
+            if (!dragged && Math.hypot(dx, dy) < 4) return;
+            if (!dragged) viewport.setPointerCapture(event.pointerId);
+            dragged = true;
+            viewport.classList.add("is-panning");
+            viewport.scrollLeft = pan.left - dx;
+            viewport.scrollTop = pan.top - dy;
+            event.preventDefault();
+        });
+        function endPan() {
+            pan = null;
+            viewport.classList.remove("is-panning");
+        }
+        viewport.addEventListener("pointerup", endPan);
+        viewport.addEventListener("pointercancel", endPan);
+        viewport.addEventListener("lostpointercapture", endPan);
+        viewport.addEventListener("dragstart", event => event.preventDefault());
+        // Releasing a drag must not select a node or clear the selection.
+        viewport.addEventListener("click", event => {
+            if (dragged && event.detail !== 0) {
+                event.preventDefault();
+                event.stopImmediatePropagation();
+                dragged = false;
+            }
+        }, true);
         viewport.addEventListener("click", event => {
             if (!event.target.closest(".dependency-node")) choose(null);
         });

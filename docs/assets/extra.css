@@ -391,10 +391,13 @@ a[href*="variables/#"]:not(:has(code))::before {
 
     .dependency-graph-viewport {
         overflow: auto;
+        cursor: grab;
+        user-select: none;
         height: min(65vh, 600px);
         margin-top: .5rem;
         border: 1px solid var(--md-default-fg-color--lightest);
         border-radius: .2rem;
+        &.is-panning, &.is-panning * { cursor: grabbing; }
     }
     svg { display: block; max-width: none; }
 

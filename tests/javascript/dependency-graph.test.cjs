@@ -36,6 +36,8 @@ async function viewer() {
     const viewport = element();
     Object.assign(viewport, {
         clientWidth: 500, clientHeight: 400, scrollLeft: 0, scrollTop: 0,
+        closest: selector => selector === "svg" ? svg : null,
+        setPointerCapture(id) { this.capturedPointer = id; },
         replaceChildren() {},
         scrollTo(left, top) { this.scrollLeft = left; this.scrollTop = top; },
     });
@@ -100,4 +102,59 @@ test("reopening can focus a different variable and fit still resets the zoom", a
     assert.equal(nodes[1].classList.contains("is-selected"), true);
     controls['[data-action="fit"]'].dispatchEvent(new Event("click"));
     assert.equal(output.textContent, "40%");
+});
+
+function pointerEvent(type, properties = {}) {
+    return Object.assign(new Event(type, { cancelable: true }), {
+        button: 0, pointerId: 1, pointerType: "mouse", clientX: 100, clientY: 100,
+        ...properties,
+    });
+}
+
+test("dragging pans both axes and preserves zoom and selection on release", async () => {
+    const { graph, viewport, nodes, output } = await viewer();
+    graph.focusVariable("input");
+    viewport.scrollLeft = 200;
+    viewport.scrollTop = 300;
+    viewport.dispatchEvent(pointerEvent("pointerdown"));
+    viewport.dispatchEvent(pointerEvent("pointermove", { clientX: 130, clientY: 80 }));
+    assert.deepEqual([viewport.scrollLeft, viewport.scrollTop], [170, 320]);
+    assert.equal(viewport.capturedPointer, 1);
+    assert.equal(viewport.classList.contains("is-panning"), true);
+
+    viewport.dispatchEvent(pointerEvent("pointerup"));
+    const releaseClick = Object.assign(new Event("click", { cancelable: true }), { detail: 1 });
+    viewport.dispatchEvent(releaseClick);
+    assert.equal(releaseClick.defaultPrevented, true);
+    assert.equal(viewport.classList.contains("is-panning"), false);
+    assert.equal(nodes[0].classList.contains("is-selected"), true);
+    assert.equal(output.textContent, "85%");
+
+    // A subsequent background click must still clear the selection.
+    viewport.dispatchEvent(Object.assign(new Event("click"), { detail: 1 }));
+    assert.equal(nodes[0].classList.contains("is-selected"), false);
+});
+
+test("small pointer movements remain clicks, and cancelled drags stop moving", async () => {
+    const { viewport } = await viewer();
+    viewport.dispatchEvent(pointerEvent("pointerdown"));
+    viewport.dispatchEvent(pointerEvent("pointermove", { clientX: 102, clientY: 101 }));
+    assert.deepEqual([viewport.scrollLeft, viewport.scrollTop], [0, 0]);
+    assert.equal(viewport.classList.contains("is-panning"), false);
+    viewport.dispatchEvent(pointerEvent("pointermove", { clientX: 90, clientY: 80 }));
+    viewport.dispatchEvent(pointerEvent("pointercancel"));
+    viewport.dispatchEvent(pointerEvent("pointermove", { clientX: 50, clientY: 40 }));
+    assert.deepEqual([viewport.scrollLeft, viewport.scrollTop], [10, 20]);
+    assert.equal(viewport.classList.contains("is-panning"), false);
+});
+
+test("touch gestures and secondary mouse buttons retain native behaviour", async () => {
+    const { viewport } = await viewer();
+    for (const properties of [{ pointerType: "touch" }, { button: 2 }]) {
+        viewport.dispatchEvent(pointerEvent("pointerdown", properties));
+        const move = pointerEvent("pointermove", { ...properties, clientX: 50 });
+        viewport.dispatchEvent(move);
+        assert.equal(move.defaultPrevented, false);
+        assert.equal(viewport.scrollLeft, 0);
+    }
 });

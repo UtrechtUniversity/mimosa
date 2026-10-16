@@ -115,6 +115,8 @@ Node selection uses `history.replaceState` so deep links remain shareable withou
 adding a browser-history entry for every click. Background clicks and Escape
 clear the selection and remove the variable from the URL.
 Double-clicking the graph background also restores the fit view.
+Mouse dragging pans the graph without changing its zoom or selection. Movements
+under four pixels still count as clicks; touch scrolling remains native.
 The three ACCREU graph links open the same viewer in a native dialog, loading its
 markup from the variable reference page. Modal selections leave the page URL and
 browser history unchanged. Escape clears a selected variable; when none is
