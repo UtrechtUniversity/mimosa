@@ -25,10 +25,11 @@ dependencies = [
 version = { attr = "mimosa.__version__" }
 
 [project.optional-dependencies]
-test = ["pytest"]
+test = ["pytest", "pygments"]
 
 docs = [
   "mkdocs>=1.6",
+  "pygments",
   "pygraphviz",
   "mkdocs-material",
   "mkdocs-open-in-new-tab",

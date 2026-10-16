@@ -3,7 +3,6 @@ import yaml
 import sys, os
 import pandas as pd
 from html import escape
-from mkdocs.structure.files import File
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../../"))
 
@@ -285,6 +284,8 @@ def on_pre_build(**kwargs):
 
 
 def on_files(files, config, **kwargs):
+    from mkdocs.structure.files import File
+
     # Virtual files go straight to the site, avoiding watched source changes.
     for path, content in generate_dependency_graph.get_dependency_graph_assets().items():
         files.append(File.generated(config, path, content=content))

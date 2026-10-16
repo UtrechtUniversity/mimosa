@@ -1,6 +1,7 @@
 """Variable metadata collection and shared documentation model construction."""
 
 import importlib
+import sys
 from types import SimpleNamespace
 
 import pytest
@@ -130,6 +131,11 @@ def test_provider_reuses_model_and_catalogue_without_prerun(documentation_model)
     assert first.variables[0].context == "coacch"
     assert variable_docs.get_documentation_context("coacch") is first
     assert documentation_model.calls == [(documentation_model.params, False)]
+
+
+def test_hooks_import_without_the_optional_mkdocs_package(monkeypatch):
+    monkeypatch.setitem(sys.modules, "mkdocs.structure.files", None)
+    importlib.reload(importlib.import_module("docs.scripts.mkdocs_hooks"))
 
 
 def test_hooks_and_macros_share_lazy_provider(documentation_model):
