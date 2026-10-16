@@ -3,8 +3,8 @@ document$.subscribe(async () => {
     if (!panel) return;
 
     const viewport = panel.querySelector(".dependency-demo-viewport");
-    const status = panel.querySelector(".dependency-demo-status");
     const select = panel.querySelector("select");
+    const focusButton = panel.querySelector('[data-action="focus"]');
 
     try {
         const response = await fetch(document.querySelector("#dependency-demo-source").href);
@@ -18,8 +18,9 @@ document$.subscribe(async () => {
         const nodes = Array.from(svg.querySelectorAll("g.node"));
         const edges = Array.from(svg.querySelectorAll("g.edge"));
         const { width, height } = svg.viewBox.baseVal;
+        const focusZoom = 0.85;
         let scale = 1;
-        let selected = "damage_costs";
+        let selected = null;
 
         nodes.forEach(node => {
             const name = node.querySelector("title").textContent;
@@ -30,10 +31,11 @@ document$.subscribe(async () => {
             link.setAttribute("aria-label", `Highlight ${name}`);
             link.addEventListener("click", event => {
                 event.preventDefault();
-                history.pushState(null, "", link.getAttribute("href"));
-                highlight(name);
+                choose(name);
+                if (scale < focusZoom) focusSelected();
             });
         });
+        select.add(new Option("No selection", ""));
         nodes.map(node => node.dataset.variable).sort().forEach(name => {
             select.add(new Option(name, name));
         });
@@ -45,22 +47,38 @@ document$.subscribe(async () => {
 
         function highlight(name) {
             selected = name;
-            select.value = name;
+            select.value = name || "";
+            focusButton.disabled = !name;
             const incoming = edges.filter(edge => edge.dataset.target === name).map(edge => edge.dataset.source);
             const outgoing = edges.filter(edge => edge.dataset.source === name).map(edge => edge.dataset.target);
             nodes.forEach(node => {
                 const id = node.dataset.variable;
                 node.classList.toggle("is-selected", id === name);
-                node.classList.toggle("is-incoming", incoming.includes(id));
-                node.classList.toggle("is-outgoing", outgoing.includes(id));
-                node.classList.toggle("is-muted", id !== name && !incoming.includes(id) && !outgoing.includes(id));
+                node.classList.toggle("is-incoming", id !== name && incoming.includes(id));
+                node.classList.toggle("is-outgoing", id !== name && outgoing.includes(id));
+                node.classList.toggle("is-muted", !!name && id !== name && !incoming.includes(id) && !outgoing.includes(id));
                 node.querySelector("a").setAttribute("aria-current", id === name ? "true" : "false");
             });
             edges.forEach(edge => {
                 const kind = edge.dataset.target === name ? "incoming" : edge.dataset.source === name ? "outgoing" : "normal";
-                edge.setAttribute("class", `edge demo-edge ${kind}`);
+                edge.classList.add("demo-edge");
+                edge.classList.toggle("incoming", kind === "incoming");
+                edge.classList.toggle("outgoing", kind === "outgoing");
+                edge.classList.toggle("normal", kind === "normal");
+                edge.classList.toggle("is-muted", !!name && kind === "normal");
             });
-            status.textContent = `${name} — Depends on: ${incoming.join(", ") || "none"}. Used by: ${outgoing.join(", ") || "none"}. Graph: ${nodes.length} variables, ${edges.length} links.`;
+        }
+
+        function choose(name) {
+            const url = new URL(location.href);
+            if (name) url.searchParams.set("demo_variable", name);
+            else url.searchParams.delete("demo_variable");
+            url.hash = "dependency-graph-demo";
+            history.replaceState(history.state, "", url);
+            highlight(name);
+            if (!name && document.activeElement?.closest(".demo-node")) {
+                document.activeElement.blur();
+            }
         }
 
         function setZoom(next) {
@@ -81,8 +99,9 @@ document$.subscribe(async () => {
         }
 
         function focusSelected() {
+            if (!selected) return;
             panel.classList.remove("is-overview");
-            setZoom(Math.max(scale, 0.85));
+            setZoom(Math.max(scale, focusZoom));
             const node = nodes.find(node => node.dataset.variable === selected).getBoundingClientRect();
             const frame = viewport.getBoundingClientRect();
             viewport.scrollLeft += node.left - frame.left + node.width / 2 - viewport.clientWidth / 2;
@@ -92,19 +111,30 @@ document$.subscribe(async () => {
         function selectFromUrl() {
             const requested = new URLSearchParams(location.search).get("demo_variable");
             const exists = nodes.some(node => node.dataset.variable === requested);
-            highlight(exists ? requested : "damage_costs");
+            highlight(exists ? requested : null);
             if (exists) focusSelected();
         }
 
         select.addEventListener("change", () => {
-            history.pushState(null, "", `?demo_variable=${encodeURIComponent(select.value)}#dependency-graph-demo`);
-            highlight(select.value);
+            choose(select.value || null);
             focusSelected();
+        });
+        viewport.addEventListener("click", event => {
+            if (!event.target.closest(".demo-node")) choose(null);
+        });
+        viewport.addEventListener("dblclick", event => {
+            if (!event.target.closest(".demo-node")) {
+                choose(null);
+                fitGraph();
+            }
+        });
+        window.addEventListener("keydown", event => {
+            if (event.key === "Escape") choose(null);
         });
         panel.querySelector('[data-action="zoom-in"]').addEventListener("click", () => setZoom(scale * 1.4));
         panel.querySelector('[data-action="zoom-out"]').addEventListener("click", () => setZoom(scale / 1.4));
         panel.querySelector('[data-action="fit"]').addEventListener("click", fitGraph);
-        panel.querySelector('[data-action="focus"]').addEventListener("click", focusSelected);
+        focusButton.addEventListener("click", focusSelected);
         window.addEventListener("popstate", selectFromUrl);
         fitGraph();
         selectFromUrl();

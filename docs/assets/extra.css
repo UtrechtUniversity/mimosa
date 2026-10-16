@@ -317,6 +317,7 @@ a[href*="variables/#"]:not(:has(code))::before {
         select { max-width: min(16rem, 65vw); }
         button { cursor: pointer; }
         button:hover { border-color: var(--md-accent-fg-color); }
+        button:disabled { opacity: .4; cursor: default; }
         output { min-width: 2rem; text-align: center; }
     }
 
@@ -336,8 +337,23 @@ a[href*="variables/#"]:not(:has(code))::before {
             background: var(--color-mimosa);
         }
 
-        .demo-incoming-key::before { background: #2297d5; }
-        .demo-outgoing-key::before { background: #ed6a2f; }
+        .demo-control-key::before { background: #ed6a2f; }
+        .demo-selected-key::before {
+            background: transparent;
+            border: 2px solid var(--md-default-fg-color);
+        }
+        .demo-incoming-key::before,
+        .demo-outgoing-key::before,
+        .demo-previous-key::before {
+            width: .8rem;
+            height: 0;
+            background: none;
+            border-radius: 0;
+            border-top: 2px solid #2297d5;
+            vertical-align: middle;
+        }
+        .demo-outgoing-key::before { border-color: #ed6a2f; }
+        .demo-previous-key::before { border-color: #999; border-top-style: dashed; }
     }
 
     .dependency-demo-viewport {
@@ -351,12 +367,13 @@ a[href*="variables/#"]:not(:has(code))::before {
 
     .demo-edge {
         color: #999;
-        opacity: .2;
+        opacity: .5;
 
         path { fill: none; stroke: currentColor; stroke-width: 1.5; }
         polygon { fill: currentColor; stroke: currentColor; }
     }
 
+    .demo-edge.is-muted { opacity: .15; }
     .demo-edge.incoming { color: #2297d5; opacity: 1; }
     .demo-edge.outgoing { color: #ed6a2f; opacity: 1; }
     .demo-edge.incoming path, .demo-edge.outgoing path { stroke-width: 2.5; }
@@ -364,13 +381,26 @@ a[href*="variables/#"]:not(:has(code))::before {
     &.is-overview .demo-edge.normal { opacity: .5; }
     &.is-overview .demo-node.is-muted { opacity: 1; }
 
+    .demo-edge.previous-time,
+    &.is-overview .demo-edge.previous-time {
+        opacity: .12;
+        path { stroke-dasharray: 5 5; stroke-width: 1; }
+    }
+    .demo-edge.previous-time.incoming,
+    .demo-edge.previous-time.outgoing { opacity: .4; }
+
     .demo-node {
         cursor: pointer;
 
         path {
-            fill: var(--md-default-bg-color);
-            stroke: var(--md-default-fg-color--lighter);
+            fill: color-mix(in srgb, var(--color-mimosa) 18%, var(--md-default-bg-color));
+            stroke: var(--color-mimosa);
             stroke-width: 2;
+        }
+
+        &.control path {
+            fill: color-mix(in srgb, #ed6a2f 18%, var(--md-default-bg-color));
+            stroke: #ed6a2f;
         }
 
         text {
@@ -380,8 +410,7 @@ a[href*="variables/#"]:not(:has(code))::before {
         }
 
         &.is-selected path {
-            fill: color-mix(in srgb, var(--color-mimosa) 18%, var(--md-default-bg-color));
-            stroke: var(--color-mimosa);
+            stroke: var(--md-default-fg-color);
             stroke-width: 4;
         }
 
@@ -393,10 +422,4 @@ a[href*="variables/#"]:not(:has(code))::before {
         a:focus-visible { outline: 2px solid var(--md-accent-fg-color); outline-offset: 4px; }
     }
 
-    .dependency-demo-status {
-        margin-bottom: 0;
-        font-size: .65rem;
-        max-height: 6rem;
-        overflow: auto;
-    }
 }

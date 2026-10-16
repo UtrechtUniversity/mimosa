@@ -7,7 +7,6 @@ environment. This constructs equations but never simulates or solves the model.
 from pathlib import Path
 from urllib.parse import urlencode
 
-import networkx as nx
 from networkx.drawing.nx_agraph import to_agraph
 
 from mimosa import MIMOSA, load_params
@@ -16,15 +15,8 @@ from mimosa.components.after_initialisation import avoided_damages
 
 
 def write_graph(graph, output):
-    """Lay out the same dependency data as the plot, omitting previous-time edges."""
-    current = nx.DiGraph()
-    current.add_nodes_from(graph.nodes(data=True))
-    current.add_edges_from(
-        (source, target)
-        for source, target, data in graph.edges(data=True)
-        if data["type"] == "dependency"
-    )
-    drawing = to_agraph(current)
+    """Export variable roles and both edge types, laying out by current time."""
+    drawing = to_agraph(graph)
     drawing.graph_attr.update(
         rankdir="LR", nodesep="0.35", ranksep="0.8", bgcolor="transparent"
     )
@@ -47,10 +39,21 @@ def write_graph(graph, output):
             URL="?" + urlencode({"demo_variable": name}) + "#dependency-graph-demo",
             tooltip=name,
             fillcolor="#89a041" if graph.nodes[name].get("has_equation") else "#ed6a2f",
+            **{"class": "calculated" if graph.nodes[name].get("has_equation") else "control"},
+        )
+
+    for source, target, data in graph.edges(data=True):
+        previous_time = data["type"] == "prev_time_dependency"
+        edge = drawing.get_edge(source, target)
+        edge.attr.update(
+            constraint="false" if previous_time else "true",
+            style="dashed" if previous_time else "solid",
+            color="#cccccc" if previous_time else "#999999",
+            **{"class": "previous-time" if previous_time else "current-time"},
         )
 
     drawing.draw(str(output), format="svg", prog="dot")
-    return current
+    return graph
 
 
 def main():
@@ -78,10 +81,11 @@ def main():
             graph.add_node(variable.name, has_equation=variable.name in equations)
 
     output = Path(__file__).resolve().parents[1] / "assets" / "dependency-demo.svg"
-    current = write_graph(graph, output)
+    write_graph(graph, output)
+    previous = sum(data["type"] == "prev_time_dependency" for _, _, data in graph.edges(data=True))
     print(
-        f"Exported {len(current)} variables and {current.number_of_edges()} "
-        f"current-time dependencies to {output}"
+        f"Exported {len(graph)} variables, {graph.number_of_edges() - previous} "
+        f"current-time and {previous} previous-time dependencies to {output}"
     )
 
 
