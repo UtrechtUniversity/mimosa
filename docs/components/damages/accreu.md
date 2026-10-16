@@ -9,13 +9,6 @@ During the ACCREU project, new damage estimates were developed for [:material-ho
 [:material-waves-arrow-up: sea-level rise](accreu.md#sea-level-rise) and [:material-heart-pulse: mortality](accreu.md#mortality). Moreover, adaptation costs and effectiveness were estimated for all sectors
 (except mortality).
 
-**Try the dependency graph:** open the graph for
-[damage_costs](#var__damage_costs),
-[riverine_adaptation_costs_abs](#var__riverine_adaptation_costs_abs), or
-[global_welfare](#var__global_welfare).
-Press Escape to clear the selection, then Escape again to close the graph.
-For comparison, open [damage_costs with COACCH](#var__coacch::damage_costs).
-
 Usage:
 
 === "Damages only"
@@ -43,27 +36,27 @@ $$
 
 :::mimosa.components.damages.accreu.utils.adaptation_effectiveness_fct
 
+## Impact sectors
+
+=== ":material-home-flood: Riverine flooding"
+
+    :::mimosa.components.damages.accreu.riverine_flooding.get_constraints
+
+=== ":material-human-male-male: Labour productivity"
+
+    :::mimosa.components.damages.accreu.labour_productivity.get_constraints
+
+=== ":material-waves-arrow-up: Sea level rise"
+
+    :::mimosa.components.damages.accreu.sealevelrise.get_constraints
+
+=== ":material-heart-pulse: Mortality"
+
+    :::mimosa.components.damages.accreu.mortality.get_constraints
+
 ## Total damages and adaptation
 
 :::mimosa.components.damages.accreu.all_damages.get_constraints
-
-## Impact sectors
-
-### :material-home-flood: Riverine flooding
-
-:::mimosa.components.damages.accreu.riverine_flooding.get_constraints
-
-### :material-human-male-male: Labour productivity
-
-:::mimosa.components.damages.accreu.labour_productivity.get_constraints
-
-### :material-waves-arrow-up: Sea level rise
-
-:::mimosa.components.damages.accreu.sealevelrise.get_constraints
-
-### :material-heart-pulse: Mortality
-
-:::mimosa.components.damages.accreu.mortality.get_constraints
 
 ## Advanced options
 
