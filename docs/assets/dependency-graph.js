@@ -1,13 +1,10 @@
-document$.subscribe(async () => {
-    const panel = document.querySelector("#dependency-demo");
-    if (!panel) return;
-
-    const viewport = panel.querySelector(".dependency-demo-viewport");
+async function initializeDependencyGraph(panel, source, dialog = null) {
+    const viewport = panel.querySelector(".dependency-graph-viewport");
     const select = panel.querySelector("select");
     const focusButton = panel.querySelector('[data-action="focus"]');
 
     try {
-        const response = await fetch(document.querySelector("#dependency-demo-source").href);
+        const response = await fetch(source);
         if (!response.ok) throw new Error(`Graph request failed: ${response.status}`);
         const graphDocument = new DOMParser().parseFromString(await response.text(), "image/svg+xml");
         const svg = graphDocument.documentElement;
@@ -25,9 +22,9 @@ document$.subscribe(async () => {
         nodes.forEach(node => {
             const name = node.querySelector("title").textContent;
             node.dataset.variable = name;
-            node.classList.add("demo-node");
+            node.classList.add("dependency-node");
             const link = node.querySelector("a");
-            link.setAttribute("href", `?demo_variable=${encodeURIComponent(name)}#dependency-graph-demo`);
+            link.setAttribute("href", `?graph_variable=${encodeURIComponent(name)}#dependency-graph`);
             link.setAttribute("aria-label", `Highlight ${name}`);
             link.addEventListener("click", event => {
                 event.preventDefault();
@@ -61,7 +58,7 @@ document$.subscribe(async () => {
             });
             edges.forEach(edge => {
                 const kind = edge.dataset.target === name ? "incoming" : edge.dataset.source === name ? "outgoing" : "normal";
-                edge.classList.add("demo-edge");
+                edge.classList.add("dependency-edge");
                 edge.classList.toggle("incoming", kind === "incoming");
                 edge.classList.toggle("outgoing", kind === "outgoing");
                 edge.classList.toggle("normal", kind === "normal");
@@ -70,13 +67,15 @@ document$.subscribe(async () => {
         }
 
         function choose(name) {
-            const url = new URL(location.href);
-            if (name) url.searchParams.set("demo_variable", name);
-            else url.searchParams.delete("demo_variable");
-            url.hash = "dependency-graph-demo";
-            history.replaceState(history.state, "", url);
+            if (!dialog) {
+                const url = new URL(location.href);
+                if (name) url.searchParams.set("graph_variable", name);
+                else url.searchParams.delete("graph_variable");
+                url.hash = "dependency-graph";
+                history.replaceState(history.state, "", url);
+            }
             highlight(name);
-            if (!name && document.activeElement?.closest(".demo-node")) {
+            if (!name && document.activeElement?.closest(".dependency-node")) {
                 document.activeElement.blur();
             }
         }
@@ -108,8 +107,7 @@ document$.subscribe(async () => {
             viewport.scrollTop += node.top - frame.top + node.height / 2 - viewport.clientHeight / 2;
         }
 
-        function selectFromUrl() {
-            const requested = new URLSearchParams(location.search).get("demo_variable");
+        function focusVariable(requested) {
             const exists = nodes.some(node => node.dataset.variable === requested);
             highlight(exists ? requested : null);
             if (exists) focusSelected();
@@ -120,26 +118,87 @@ document$.subscribe(async () => {
             focusSelected();
         });
         viewport.addEventListener("click", event => {
-            if (!event.target.closest(".demo-node")) choose(null);
+            if (!event.target.closest(".dependency-node")) choose(null);
         });
         viewport.addEventListener("dblclick", event => {
-            if (!event.target.closest(".demo-node")) {
+            if (!event.target.closest(".dependency-node")) {
                 choose(null);
                 fitGraph();
             }
         });
-        window.addEventListener("keydown", event => {
-            if (event.key === "Escape") choose(null);
-        });
+        if (dialog) {
+            dialog.addEventListener("cancel", event => {
+                if (selected) {
+                    event.preventDefault();
+                    choose(null);
+                }
+            });
+        } else {
+            window.addEventListener("keydown", event => {
+                if (panel.isConnected && event.key === "Escape" && !document.querySelector(".dependency-graph-modal[open]")) {
+                    choose(null);
+                }
+            });
+            window.addEventListener("popstate", () => {
+                if (panel.isConnected) focusVariable(new URLSearchParams(location.search).get("graph_variable"));
+            });
+        }
         panel.querySelector('[data-action="zoom-in"]').addEventListener("click", () => setZoom(scale * 1.4));
         panel.querySelector('[data-action="zoom-out"]').addEventListener("click", () => setZoom(scale / 1.4));
         panel.querySelector('[data-action="fit"]').addEventListener("click", fitGraph);
         focusButton.addEventListener("click", focusSelected);
-        window.addEventListener("popstate", selectFromUrl);
         fitGraph();
-        selectFromUrl();
+        if (!dialog) focusVariable(new URLSearchParams(location.search).get("graph_variable"));
+        return { focusVariable };
     } catch (error) {
         viewport.textContent = "The graph could not be loaded. You can download the SVG below.";
         console.error(error);
     }
+}
+
+document$.subscribe(() => {
+    const panel = document.querySelector("#dependency-graph-viewer");
+    if (panel) initializeDependencyGraph(panel, document.querySelector("#dependency-graph-source").href);
+
+    let dialog;
+    let graphReady;
+    document.querySelectorAll("a.dependency-graph-link").forEach(link => {
+        link.addEventListener("click", async event => {
+            if (event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+            event.preventDefault();
+            const reference = new URL(link.href);
+            const variable = reference.searchParams.get("graph_variable");
+            if (!dialog) {
+                dialog = document.createElement("dialog");
+                dialog.className = "dependency-graph-modal";
+                dialog.setAttribute("aria-labelledby", "dependency-graph-modal-title");
+                dialog.innerHTML = `
+                    <header>
+                        <h2 id="dependency-graph-modal-title">Variable dependencies</h2>
+                        <button type="button" aria-label="Close dependency graph" autofocus>×</button>
+                    </header>
+                    <p>Loading dependency graph…</p>`;
+                dialog.querySelector("button").addEventListener("click", () => dialog.close());
+                document.body.append(dialog);
+                // Reuse the reference page's controls and graph, loaded once per page.
+                graphReady = (async () => {
+                    const response = await fetch(reference);
+                    if (!response.ok) throw new Error(`Reference page request failed: ${response.status}`);
+                    const page = new DOMParser().parseFromString(await response.text(), "text/html");
+                    const graphPanel = page.querySelector("#dependency-graph-viewer");
+                    const source = new URL(page.querySelector("#dependency-graph-source").getAttribute("href"), reference);
+                    dialog.querySelector("p").replaceWith(graphPanel);
+                    return initializeDependencyGraph(graphPanel, source, dialog);
+                })();
+            }
+            dialog.showModal();
+            try {
+                const graph = await graphReady;
+                if (dialog.open) graph?.focusVariable(variable);
+            } catch (error) {
+                dialog.querySelector("p").textContent = "The graph could not be loaded. Please try the variable reference page.";
+                console.error(error);
+            }
+        });
+    });
 });

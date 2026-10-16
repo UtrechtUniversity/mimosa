@@ -1,6 +1,6 @@
-"""Export one real dependency graph for the interactive documentation prototype.
+"""Export the dependency graph for the interactive documentation viewer.
 
-Run with ``python -m docs.scripts.generate_dependency_demo`` in the accreu
+Run with ``python -m docs.scripts.generate_dependency_graph`` in the accreu
 environment. This constructs equations but never simulates or solves the model.
 """
 
@@ -35,8 +35,8 @@ def write_graph(graph, output):
             label += "\n" + "_".join(parts[middle:])
         node.attr.update(
             label=label,
-            id=f"demo-node-{name}",
-            URL="?" + urlencode({"demo_variable": name}) + "#dependency-graph-demo",
+            id=f"dependency-node-{name}",
+            URL="?" + urlencode({"graph_variable": name}) + "#dependency-graph",
             tooltip=name,
             fillcolor="#89a041" if graph.nodes[name].get("has_equation") else "#ed6a2f",
             **{"class": "calculated" if graph.nodes[name].get("has_equation") else "control"},
@@ -80,7 +80,7 @@ def main():
         if not variable.name.startswith("_"):
             graph.add_node(variable.name, has_equation=variable.name in equations)
 
-    output = Path(__file__).resolve().parents[1] / "assets" / "dependency-demo.svg"
+    output = Path(__file__).resolve().parents[1] / "assets" / "dependency-graph.svg"
     write_graph(graph, output)
     previous = sum(data["type"] == "prev_time_dependency" for _, _, data in graph.edges(data=True))
     print(

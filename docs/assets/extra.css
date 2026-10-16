@@ -291,14 +291,47 @@ a[href*="variables/#"]:not(:has(code))::before {
     padding: 5px 5px;
 }
 
-/* Standalone prototype for exploring dependency highlighting. */
-.dependency-demo {
+.dependency-graph-modal {
+    width: calc(100vw - 2rem);
+    max-width: 90rem;
+    height: 90vh;
+    max-height: 90vh;
+    padding: 1rem;
+    border: 1px solid var(--md-default-fg-color--lightest);
+    border-radius: .4rem;
+    background: var(--md-default-bg-color);
+    color: var(--md-default-fg-color);
+
+    &[open] { display: flex; flex-direction: column; }
+    &::backdrop { background: rgb(0 0 0 / 55%); }
+    header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-bottom: .8rem;
+        h2 { margin: 0; font-size: 1rem; }
+        button { cursor: pointer; font-size: 1.4rem; padding: 0 .4rem; }
+    }
+    .dependency-graph {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        min-height: 0;
+        border: 0;
+        padding: 0;
+    }
+    .dependency-graph-viewport { flex: 1; height: auto; min-height: 0; }
+}
+
+/* Interactive dependency graph. */
+.dependency-graph {
     border: 1px solid var(--md-default-fg-color--lightest);
     border-radius: .4rem;
     padding: .8rem;
     background: var(--md-default-bg-color);
 
-    .dependency-demo-controls {
+    .dependency-graph-controls {
         display: flex;
         align-items: center;
         flex-wrap: wrap;
@@ -321,7 +354,7 @@ a[href*="variables/#"]:not(:has(code))::before {
         output { min-width: 2rem; text-align: center; }
     }
 
-    .dependency-demo-legend {
+    .dependency-graph-legend {
         display: flex;
         flex-wrap: wrap;
         gap: .4rem 1rem;
@@ -337,14 +370,14 @@ a[href*="variables/#"]:not(:has(code))::before {
             background: var(--color-mimosa);
         }
 
-        .demo-control-key::before { background: #ed6a2f; }
-        .demo-selected-key::before {
+        .dependency-control-key::before { background: #ed6a2f; }
+        .dependency-selected-key::before {
             background: transparent;
             border: 2px solid var(--md-default-fg-color);
         }
-        .demo-incoming-key::before,
-        .demo-outgoing-key::before,
-        .demo-previous-key::before {
+        .dependency-incoming-key::before,
+        .dependency-outgoing-key::before,
+        .dependency-previous-key::before {
             width: .8rem;
             height: 0;
             background: none;
@@ -352,11 +385,11 @@ a[href*="variables/#"]:not(:has(code))::before {
             border-top: 2px solid #2297d5;
             vertical-align: middle;
         }
-        .demo-outgoing-key::before { border-color: #ed6a2f; }
-        .demo-previous-key::before { border-color: #999; border-top-style: dashed; }
+        .dependency-outgoing-key::before { border-color: #ed6a2f; }
+        .dependency-previous-key::before { border-color: #999; border-top-style: dashed; }
     }
 
-    .dependency-demo-viewport {
+    .dependency-graph-viewport {
         overflow: auto;
         height: min(65vh, 600px);
         margin-top: .5rem;
@@ -365,7 +398,7 @@ a[href*="variables/#"]:not(:has(code))::before {
     }
     svg { display: block; max-width: none; }
 
-    .demo-edge {
+    .dependency-edge {
         color: #999;
         opacity: .5;
 
@@ -373,23 +406,23 @@ a[href*="variables/#"]:not(:has(code))::before {
         polygon { fill: currentColor; stroke: currentColor; }
     }
 
-    .demo-edge.is-muted { opacity: .15; }
-    .demo-edge.incoming { color: #2297d5; opacity: 1; }
-    .demo-edge.outgoing { color: #ed6a2f; opacity: 1; }
-    .demo-edge.incoming path, .demo-edge.outgoing path { stroke-width: 2.5; }
+    .dependency-edge.is-muted { opacity: .15; }
+    .dependency-edge.incoming { color: #2297d5; opacity: 1; }
+    .dependency-edge.outgoing { color: #ed6a2f; opacity: 1; }
+    .dependency-edge.incoming path, .dependency-edge.outgoing path { stroke-width: 2.5; }
 
-    &.is-overview .demo-edge.normal { opacity: .5; }
-    &.is-overview .demo-node.is-muted { opacity: 1; }
+    &.is-overview .dependency-edge.normal { opacity: .5; }
+    &.is-overview .dependency-node.is-muted { opacity: 1; }
 
-    .demo-edge.previous-time,
-    &.is-overview .demo-edge.previous-time {
+    .dependency-edge.previous-time,
+    &.is-overview .dependency-edge.previous-time {
         opacity: .12;
         path { stroke-dasharray: 5 5; stroke-width: 1; }
     }
-    .demo-edge.previous-time.incoming,
-    .demo-edge.previous-time.outgoing { opacity: .4; }
+    .dependency-edge.previous-time.incoming,
+    .dependency-edge.previous-time.outgoing { opacity: .4; }
 
-    .demo-node {
+    .dependency-node {
         cursor: pointer;
 
         path {

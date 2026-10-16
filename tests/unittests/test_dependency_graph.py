@@ -5,7 +5,7 @@ from xml.etree import ElementTree
 import networkx as nx
 import pytest
 
-from docs.scripts.generate_dependency_demo import write_graph
+from docs.scripts.generate_dependency_graph import write_graph
 
 
 def test_export_keeps_roles_isolated_variables_and_previous_time_edges(tmp_path):
@@ -40,5 +40,5 @@ def test_export_keeps_roles_isolated_variables_and_previous_time_edges(tmp_path)
         assert ("control" if name == "input" else "calculated") in node.get("class").split()
         link = node.find(".//svg:a", namespace)
         assert link.attrib["{http://www.w3.org/1999/xlink}href"] == (
-            f"?demo_variable={name}#dependency-graph-demo"
+            f"?graph_variable={name}#dependency-graph"
         )

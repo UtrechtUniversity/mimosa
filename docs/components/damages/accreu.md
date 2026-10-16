@@ -9,10 +9,11 @@ During the ACCREU project, new damage estimates were developed for [:material-ho
 [:material-waves-arrow-up: sea-level rise](accreu.md#sea-level-rise) and [:material-heart-pulse: mortality](accreu.md#mortality). Moreover, adaptation costs and effectiveness were estimated for all sectors
 (except mortality).
 
-**Try the dependency graph demo:** highlight
-[damage_costs](../../variables.md?demo_variable=damage_costs#dependency-graph-demo),
-[riverine_adaptation_costs_abs](../../variables.md?demo_variable=riverine_adaptation_costs_abs#dependency-graph-demo), or
-[global_welfare](../../variables.md?demo_variable=global_welfare#dependency-graph-demo).
+**Try the dependency graph:** open the graph for
+[damage_costs](../../variables.md?graph_variable=damage_costs#dependency-graph){.dependency-graph-link},
+[riverine_adaptation_costs_abs](../../variables.md?graph_variable=riverine_adaptation_costs_abs#dependency-graph){.dependency-graph-link}, or
+[global_welfare](../../variables.md?graph_variable=global_welfare#dependency-graph){.dependency-graph-link}.
+Press Escape to clear the selection, then Escape again to close the graph.
 
 Usage:
 

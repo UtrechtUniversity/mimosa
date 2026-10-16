@@ -8,9 +8,9 @@
  viewBox="0.00 0.00 2868.00 1812.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 1808.43)">
 <!-- GDP_gross -->
-<g id="demo&#45;node&#45;GDP_gross" class="node calculated">
+<g id="dependency&#45;node&#45;GDP_gross" class="node calculated">
 <title>GDP_gross</title>
-<g id="a_demo&#45;node&#45;GDP_gross"><a xlink:href="?demo_variable=GDP_gross#dependency-graph-demo" xlink:title="GDP_gross">
+<g id="a_dependency&#45;node&#45;GDP_gross"><a xlink:href="?graph_variable=GDP_gross#dependency-graph" xlink:title="GDP_gross">
 <path fill="#89a041" stroke="black" d="M159.16,-1096C159.16,-1096 129.16,-1096 129.16,-1096 123.16,-1096 117.16,-1090 117.16,-1084 117.16,-1084 117.16,-1066.6 117.16,-1066.6 117.16,-1060.6 123.16,-1054.6 129.16,-1054.6 129.16,-1054.6 159.16,-1054.6 159.16,-1054.6 165.16,-1054.6 171.16,-1060.6 171.16,-1066.6 171.16,-1066.6 171.16,-1084 171.16,-1084 171.16,-1090 165.16,-1096 159.16,-1096"/>
 <text xml:space="preserve" text-anchor="middle" x="144.16" y="-1076.45" font-family="sans-serif" font-size="13.00">GDP</text>
 <text xml:space="preserve" text-anchor="middle" x="144.16" y="-1062.95" font-family="sans-serif" font-size="13.00">gross</text>
@@ -18,9 +18,9 @@
 </g>
 </g>
 <!-- baseline_emissions -->
-<g id="demo&#45;node&#45;baseline_emissions" class="node calculated">
+<g id="dependency&#45;node&#45;baseline_emissions" class="node calculated">
 <title>baseline_emissions</title>
-<g id="a_demo&#45;node&#45;baseline_emissions"><a xlink:href="?demo_variable=baseline_emissions#dependency-graph-demo" xlink:title="baseline_emissions">
+<g id="a_dependency&#45;node&#45;baseline_emissions"><a xlink:href="?graph_variable=baseline_emissions#dependency-graph" xlink:title="baseline_emissions">
 <path fill="#89a041" stroke="black" d="M298.44,-1096C298.44,-1096 243.03,-1096 243.03,-1096 237.03,-1096 231.03,-1090 231.03,-1084 231.03,-1084 231.03,-1066.6 231.03,-1066.6 231.03,-1060.6 237.03,-1054.6 243.03,-1054.6 243.03,-1054.6 298.44,-1054.6 298.44,-1054.6 304.44,-1054.6 310.44,-1060.6 310.44,-1066.6 310.44,-1066.6 310.44,-1084 310.44,-1084 310.44,-1090 304.44,-1096 298.44,-1096"/>
 <text xml:space="preserve" text-anchor="middle" x="270.74" y="-1076.45" font-family="sans-serif" font-size="13.00">baseline</text>
 <text xml:space="preserve" text-anchor="middle" x="270.74" y="-1062.95" font-family="sans-serif" font-size="13.00">emissions</text>
@@ -34,9 +34,9 @@
 <polygon fill="#999999" stroke="#999999" points="222.07,-1077.75 229.06,-1075.3 222.06,-1072.85 222.07,-1077.75"/>
 </g>
 <!-- GDP_net -->
-<g id="demo&#45;node&#45;GDP_net" class="node calculated">
+<g id="dependency&#45;node&#45;GDP_net" class="node calculated">
 <title>GDP_net</title>
-<g id="a_demo&#45;node&#45;GDP_net"><a xlink:href="?demo_variable=GDP_net#dependency-graph-demo" xlink:title="GDP_net">
+<g id="a_dependency&#45;node&#45;GDP_net"><a xlink:href="?graph_variable=GDP_net#dependency-graph" xlink:title="GDP_net">
 <path fill="#89a041" stroke="black" d="M2084.93,-1154C2084.93,-1154 2054.93,-1154 2054.93,-1154 2048.93,-1154 2042.93,-1148 2042.93,-1142 2042.93,-1142 2042.93,-1124.6 2042.93,-1124.6 2042.93,-1118.6 2048.93,-1112.6 2054.93,-1112.6 2054.93,-1112.6 2084.93,-1112.6 2084.93,-1112.6 2090.93,-1112.6 2096.93,-1118.6 2096.93,-1124.6 2096.93,-1124.6 2096.93,-1142 2096.93,-1142 2096.93,-1148 2090.93,-1154 2084.93,-1154"/>
 <text xml:space="preserve" text-anchor="middle" x="2069.93" y="-1134.45" font-family="sans-serif" font-size="13.00">GDP</text>
 <text xml:space="preserve" text-anchor="middle" x="2069.93" y="-1120.95" font-family="sans-serif" font-size="13.00">net</text>
@@ -50,9 +50,9 @@
 <polygon fill="#999999" stroke="#999999" points="2034.23,-1117.54 2041.47,-1119.14 2036.8,-1113.37 2034.23,-1117.54"/>
 </g>
 <!-- slr_adaptation_costs -->
-<g id="demo&#45;node&#45;slr_adaptation_costs" class="node calculated">
+<g id="dependency&#45;node&#45;slr_adaptation_costs" class="node calculated">
 <title>slr_adaptation_costs</title>
-<g id="a_demo&#45;node&#45;slr_adaptation_costs"><a xlink:href="?demo_variable=slr_adaptation_costs#dependency-graph-demo" xlink:title="slr_adaptation_costs">
+<g id="a_dependency&#45;node&#45;slr_adaptation_costs"><a xlink:href="?graph_variable=slr_adaptation_costs#dependency-graph" xlink:title="slr_adaptation_costs">
 <path fill="#89a041" stroke="black" d="M1320.74,-1235C1320.74,-1235 1239.83,-1235 1239.83,-1235 1233.83,-1235 1227.83,-1229 1227.83,-1223 1227.83,-1223 1227.83,-1205.6 1227.83,-1205.6 1227.83,-1199.6 1233.83,-1193.6 1239.83,-1193.6 1239.83,-1193.6 1320.74,-1193.6 1320.74,-1193.6 1326.74,-1193.6 1332.74,-1199.6 1332.74,-1205.6 1332.74,-1205.6 1332.74,-1223 1332.74,-1223 1332.74,-1229 1326.74,-1235 1320.74,-1235"/>
 <text xml:space="preserve" text-anchor="middle" x="1280.29" y="-1215.45" font-family="sans-serif" font-size="13.00">slr_adaptation</text>
 <text xml:space="preserve" text-anchor="middle" x="1280.29" y="-1201.95" font-family="sans-serif" font-size="13.00">costs</text>
@@ -66,9 +66,9 @@
 <polygon fill="#999999" stroke="#999999" points="1219.27,-1224.93 1225.89,-1221.6 1218.63,-1220.07 1219.27,-1224.93"/>
 </g>
 <!-- riverine_adaptation_costs -->
-<g id="demo&#45;node&#45;riverine_adaptation_costs" class="node calculated">
+<g id="dependency&#45;node&#45;riverine_adaptation_costs" class="node calculated">
 <title>riverine_adaptation_costs</title>
-<g id="a_demo&#45;node&#45;riverine_adaptation_costs"><a xlink:href="?demo_variable=riverine_adaptation_costs#dependency-graph-demo" xlink:title="riverine_adaptation_costs">
+<g id="a_dependency&#45;node&#45;riverine_adaptation_costs"><a xlink:href="?graph_variable=riverine_adaptation_costs#dependency-graph" xlink:title="riverine_adaptation_costs">
 <path fill="#89a041" stroke="black" d="M1335.74,-1301C1335.74,-1301 1224.83,-1301 1224.83,-1301 1218.83,-1301 1212.83,-1295 1212.83,-1289 1212.83,-1289 1212.83,-1271.6 1212.83,-1271.6 1212.83,-1265.6 1218.83,-1259.6 1224.83,-1259.6 1224.83,-1259.6 1335.74,-1259.6 1335.74,-1259.6 1341.74,-1259.6 1347.74,-1265.6 1347.74,-1271.6 1347.74,-1271.6 1347.74,-1289 1347.74,-1289 1347.74,-1295 1341.74,-1301 1335.74,-1301"/>
 <text xml:space="preserve" text-anchor="middle" x="1280.29" y="-1281.45" font-family="sans-serif" font-size="13.00">riverine_adaptation</text>
 <text xml:space="preserve" text-anchor="middle" x="1280.29" y="-1267.95" font-family="sans-serif" font-size="13.00">costs</text>
@@ -82,9 +82,9 @@
 <polygon fill="#999999" stroke="#999999" points="1204.63,-1295.25 1211.14,-1291.69 1203.83,-1290.42 1204.63,-1295.25"/>
 </g>
 <!-- labourprod_adaptation_costs -->
-<g id="demo&#45;node&#45;labourprod_adaptation_costs" class="node calculated">
+<g id="dependency&#45;node&#45;labourprod_adaptation_costs" class="node calculated">
 <title>labourprod_adaptation_costs</title>
-<g id="a_demo&#45;node&#45;labourprod_adaptation_costs"><a xlink:href="?demo_variable=labourprod_adaptation_costs#dependency-graph-demo" xlink:title="labourprod_adaptation_costs">
+<g id="a_dependency&#45;node&#45;labourprod_adaptation_costs"><a xlink:href="?graph_variable=labourprod_adaptation_costs#dependency-graph" xlink:title="labourprod_adaptation_costs">
 <path fill="#89a041" stroke="black" d="M1345.87,-1433C1345.87,-1433 1214.71,-1433 1214.71,-1433 1208.71,-1433 1202.71,-1427 1202.71,-1421 1202.71,-1421 1202.71,-1403.6 1202.71,-1403.6 1202.71,-1397.6 1208.71,-1391.6 1214.71,-1391.6 1214.71,-1391.6 1345.87,-1391.6 1345.87,-1391.6 1351.87,-1391.6 1357.87,-1397.6 1357.87,-1403.6 1357.87,-1403.6 1357.87,-1421 1357.87,-1421 1357.87,-1427 1351.87,-1433 1345.87,-1433"/>
 <text xml:space="preserve" text-anchor="middle" x="1280.29" y="-1413.45" font-family="sans-serif" font-size="13.00">labourprod_adaptation</text>
 <text xml:space="preserve" text-anchor="middle" x="1280.29" y="-1399.95" font-family="sans-serif" font-size="13.00">costs</text>
@@ -98,9 +98,9 @@
 <polygon fill="#999999" stroke="#999999" points="1194.9,-1436.02 1201.13,-1431.99 1193.75,-1431.26 1194.9,-1436.02"/>
 </g>
 <!-- mortality_svl -->
-<g id="demo&#45;node&#45;mortality_svl" class="node calculated">
+<g id="dependency&#45;node&#45;mortality_svl" class="node calculated">
 <title>mortality_svl</title>
-<g id="a_demo&#45;node&#45;mortality_svl"><a xlink:href="?demo_variable=mortality_svl#dependency-graph-demo" xlink:title="mortality_svl">
+<g id="a_dependency&#45;node&#45;mortality_svl"><a xlink:href="?graph_variable=mortality_svl#dependency-graph" xlink:title="mortality_svl">
 <path fill="#89a041" stroke="black" d="M462.48,-83C462.48,-83 416.07,-83 416.07,-83 410.07,-83 404.07,-77 404.07,-71 404.07,-71 404.07,-53.6 404.07,-53.6 404.07,-47.6 410.07,-41.6 416.07,-41.6 416.07,-41.6 462.48,-41.6 462.48,-41.6 468.48,-41.6 474.48,-47.6 474.48,-53.6 474.48,-53.6 474.48,-71 474.48,-71 474.48,-77 468.48,-83 462.48,-83"/>
 <text xml:space="preserve" text-anchor="middle" x="439.27" y="-63.45" font-family="sans-serif" font-size="13.00">mortality</text>
 <text xml:space="preserve" text-anchor="middle" x="439.27" y="-49.95" font-family="sans-serif" font-size="13.00">svl</text>
@@ -114,9 +114,9 @@
 <polygon fill="#999999" stroke="#999999" points="395.06,-59.28 402.23,-57.41 395.46,-54.4 395.06,-59.28"/>
 </g>
 <!-- mortality_damage_costs -->
-<g id="demo&#45;node&#45;mortality_damage_costs" class="node calculated">
+<g id="dependency&#45;node&#45;mortality_damage_costs" class="node calculated">
 <title>mortality_damage_costs</title>
-<g id="a_demo&#45;node&#45;mortality_damage_costs"><a xlink:href="?demo_variable=mortality_damage_costs#dependency-graph-demo" xlink:title="mortality_damage_costs">
+<g id="a_dependency&#45;node&#45;mortality_damage_costs"><a xlink:href="?graph_variable=mortality_damage_costs#dependency-graph" xlink:title="mortality_damage_costs">
 <path fill="#89a041" stroke="black" d="M1735.06,-252C1735.06,-252 1633.15,-252 1633.15,-252 1627.15,-252 1621.15,-246 1621.15,-240 1621.15,-240 1621.15,-222.6 1621.15,-222.6 1621.15,-216.6 1627.15,-210.6 1633.15,-210.6 1633.15,-210.6 1735.06,-210.6 1735.06,-210.6 1741.06,-210.6 1747.06,-216.6 1747.06,-222.6 1747.06,-222.6 1747.06,-240 1747.06,-240 1747.06,-246 1741.06,-252 1735.06,-252"/>
 <text xml:space="preserve" text-anchor="middle" x="1684.11" y="-232.45" font-family="sans-serif" font-size="13.00">mortality_damage</text>
 <text xml:space="preserve" text-anchor="middle" x="1684.11" y="-218.95" font-family="sans-serif" font-size="13.00">costs</text>
@@ -130,9 +130,9 @@
 <polygon fill="#999999" stroke="#999999" points="1612.24,-227.04 1619.43,-225.24 1612.69,-222.16 1612.24,-227.04"/>
 </g>
 <!-- damage_costs_abs -->
-<g id="demo&#45;node&#45;damage_costs_abs" class="node calculated">
+<g id="dependency&#45;node&#45;damage_costs_abs" class="node calculated">
 <title>damage_costs_abs</title>
-<g id="a_demo&#45;node&#45;damage_costs_abs"><a xlink:href="?demo_variable=damage_costs_abs#dependency-graph-demo" xlink:title="damage_costs_abs">
+<g id="a_dependency&#45;node&#45;damage_costs_abs"><a xlink:href="?graph_variable=damage_costs_abs#dependency-graph" xlink:title="damage_costs_abs">
 <path fill="#89a041" stroke="black" d="M2111.51,-1068C2111.51,-1068 2028.35,-1068 2028.35,-1068 2022.35,-1068 2016.35,-1062 2016.35,-1056 2016.35,-1056 2016.35,-1038.6 2016.35,-1038.6 2016.35,-1032.6 2022.35,-1026.6 2028.35,-1026.6 2028.35,-1026.6 2111.51,-1026.6 2111.51,-1026.6 2117.51,-1026.6 2123.51,-1032.6 2123.51,-1038.6 2123.51,-1038.6 2123.51,-1056 2123.51,-1056 2123.51,-1062 2117.51,-1068 2111.51,-1068"/>
 <text xml:space="preserve" text-anchor="middle" x="2069.93" y="-1048.45" font-family="sans-serif" font-size="13.00">damage_costs</text>
 <text xml:space="preserve" text-anchor="middle" x="2069.93" y="-1034.95" font-family="sans-serif" font-size="13.00">abs</text>
@@ -146,9 +146,9 @@
 <polygon fill="#999999" stroke="#999999" points="2063.75,-1018.15 2066.85,-1024.89 2068.62,-1017.68 2063.75,-1018.15"/>
 </g>
 <!-- global_GDP_gross -->
-<g id="demo&#45;node&#45;global_GDP_gross" class="node calculated">
+<g id="dependency&#45;node&#45;global_GDP_gross" class="node calculated">
 <title>global_GDP_gross</title>
-<g id="a_demo&#45;node&#45;global_GDP_gross"><a xlink:href="?demo_variable=global_GDP_gross#dependency-graph-demo" xlink:title="global_GDP_gross">
+<g id="a_dependency&#45;node&#45;global_GDP_gross"><a xlink:href="?graph_variable=global_GDP_gross#dependency-graph" xlink:title="global_GDP_gross">
 <path fill="#89a041" stroke="black" d="M1718.19,-1609C1718.19,-1609 1650.03,-1609 1650.03,-1609 1644.03,-1609 1638.03,-1603 1638.03,-1597 1638.03,-1597 1638.03,-1579.6 1638.03,-1579.6 1638.03,-1573.6 1644.03,-1567.6 1650.03,-1567.6 1650.03,-1567.6 1718.19,-1567.6 1718.19,-1567.6 1724.19,-1567.6 1730.19,-1573.6 1730.19,-1579.6 1730.19,-1579.6 1730.19,-1597 1730.19,-1597 1730.19,-1603 1724.19,-1609 1718.19,-1609"/>
 <text xml:space="preserve" text-anchor="middle" x="1684.11" y="-1589.45" font-family="sans-serif" font-size="13.00">global_GDP</text>
 <text xml:space="preserve" text-anchor="middle" x="1684.11" y="-1575.95" font-family="sans-serif" font-size="13.00">gross</text>
@@ -162,9 +162,9 @@
 <polygon fill="#999999" stroke="#999999" points="1630.43,-1609.82 1636.27,-1605.25 1628.85,-1605.18 1630.43,-1609.82"/>
 </g>
 <!-- adaptation_costs_abs -->
-<g id="demo&#45;node&#45;adaptation_costs_abs" class="node calculated">
+<g id="dependency&#45;node&#45;adaptation_costs_abs" class="node calculated">
 <title>adaptation_costs_abs</title>
-<g id="a_demo&#45;node&#45;adaptation_costs_abs"><a xlink:href="?demo_variable=adaptation_costs_abs#dependency-graph-demo" xlink:title="adaptation_costs_abs">
+<g id="a_dependency&#45;node&#45;adaptation_costs_abs"><a xlink:href="?graph_variable=adaptation_costs_abs#dependency-graph" xlink:title="adaptation_costs_abs">
 <path fill="#89a041" stroke="black" d="M1733.19,-1419C1733.19,-1419 1635.03,-1419 1635.03,-1419 1629.03,-1419 1623.03,-1413 1623.03,-1407 1623.03,-1407 1623.03,-1389.6 1623.03,-1389.6 1623.03,-1383.6 1629.03,-1377.6 1635.03,-1377.6 1635.03,-1377.6 1733.19,-1377.6 1733.19,-1377.6 1739.19,-1377.6 1745.19,-1383.6 1745.19,-1389.6 1745.19,-1389.6 1745.19,-1407 1745.19,-1407 1745.19,-1413 1739.19,-1419 1733.19,-1419"/>
 <text xml:space="preserve" text-anchor="middle" x="1684.11" y="-1399.45" font-family="sans-serif" font-size="13.00">adaptation_costs</text>
 <text xml:space="preserve" text-anchor="middle" x="1684.11" y="-1385.95" font-family="sans-serif" font-size="13.00">abs</text>
@@ -178,9 +178,9 @@
 <polygon fill="#999999" stroke="#999999" points="1650.77,-1426.45 1654.94,-1420.31 1647.85,-1422.51 1650.77,-1426.45"/>
 </g>
 <!-- market_and_non_market_damage_costs -->
-<g id="demo&#45;node&#45;market_and_non_market_damage_costs" class="node calculated">
+<g id="dependency&#45;node&#45;market_and_non_market_damage_costs" class="node calculated">
 <title>market_and_non_market_damage_costs</title>
-<g id="a_demo&#45;node&#45;market_and_non_market_damage_costs"><a xlink:href="?demo_variable=market_and_non_market_damage_costs#dependency-graph-demo" xlink:title="market_and_non_market_damage_costs">
+<g id="a_dependency&#45;node&#45;market_and_non_market_damage_costs"><a xlink:href="?graph_variable=market_and_non_market_damage_costs#dependency-graph" xlink:title="market_and_non_market_damage_costs">
 <path fill="#89a041" stroke="black" d="M2570.83,-358C2570.83,-358 2439.67,-358 2439.67,-358 2433.67,-358 2427.67,-352 2427.67,-346 2427.67,-346 2427.67,-328.6 2427.67,-328.6 2427.67,-322.6 2433.67,-316.6 2439.67,-316.6 2439.67,-316.6 2570.83,-316.6 2570.83,-316.6 2576.83,-316.6 2582.83,-322.6 2582.83,-328.6 2582.83,-328.6 2582.83,-346 2582.83,-346 2582.83,-352 2576.83,-358 2570.83,-358"/>
 <text xml:space="preserve" text-anchor="middle" x="2505.25" y="-338.45" font-family="sans-serif" font-size="13.00">market_and_non</text>
 <text xml:space="preserve" text-anchor="middle" x="2505.25" y="-324.95" font-family="sans-serif" font-size="13.00">market_damage_costs</text>
@@ -194,9 +194,9 @@
 <polygon fill="#999999" stroke="#999999" points="2484.67,-310.31 2490.52,-314.88 2488.8,-307.67 2484.67,-310.31"/>
 </g>
 <!-- mitigation_costs -->
-<g id="demo&#45;node&#45;mitigation_costs" class="node calculated">
+<g id="dependency&#45;node&#45;mitigation_costs" class="node calculated">
 <title>mitigation_costs</title>
-<g id="a_demo&#45;node&#45;mitigation_costs"><a xlink:href="?demo_variable=mitigation_costs#dependency-graph-demo" xlink:title="mitigation_costs">
+<g id="a_dependency&#45;node&#45;mitigation_costs"><a xlink:href="?graph_variable=mitigation_costs#dependency-graph" xlink:title="mitigation_costs">
 <path fill="#89a041" stroke="black" d="M868.55,-672C868.55,-672 815.39,-672 815.39,-672 809.39,-672 803.39,-666 803.39,-660 803.39,-660 803.39,-642.6 803.39,-642.6 803.39,-636.6 809.39,-630.6 815.39,-630.6 815.39,-630.6 868.55,-630.6 868.55,-630.6 874.55,-630.6 880.55,-636.6 880.55,-642.6 880.55,-642.6 880.55,-660 880.55,-660 880.55,-666 874.55,-672 868.55,-672"/>
 <text xml:space="preserve" text-anchor="middle" x="841.97" y="-652.45" font-family="sans-serif" font-size="13.00">mitigation</text>
 <text xml:space="preserve" text-anchor="middle" x="841.97" y="-638.95" font-family="sans-serif" font-size="13.00">costs</text>
@@ -210,9 +210,9 @@
 <polygon fill="#999999" stroke="#999999" points="795.6,-666.99 801.58,-662.61 794.17,-662.31 795.6,-666.99"/>
 </g>
 <!-- global_avoided_damage_costs -->
-<g id="demo&#45;node&#45;global_avoided_damage_costs" class="node calculated">
+<g id="dependency&#45;node&#45;global_avoided_damage_costs" class="node calculated">
 <title>global_avoided_damage_costs</title>
-<g id="a_demo&#45;node&#45;global_avoided_damage_costs"><a xlink:href="?demo_variable=global_avoided_damage_costs#dependency-graph-demo" xlink:title="global_avoided_damage_costs">
+<g id="a_dependency&#45;node&#45;global_avoided_damage_costs"><a xlink:href="?graph_variable=global_avoided_damage_costs#dependency-graph" xlink:title="global_avoided_damage_costs">
 <path fill="#89a041" stroke="black" d="M2328.79,-1723C2328.79,-1723 2241.88,-1723 2241.88,-1723 2235.88,-1723 2229.88,-1717 2229.88,-1711 2229.88,-1711 2229.88,-1693.6 2229.88,-1693.6 2229.88,-1687.6 2235.88,-1681.6 2241.88,-1681.6 2241.88,-1681.6 2328.79,-1681.6 2328.79,-1681.6 2334.79,-1681.6 2340.79,-1687.6 2340.79,-1693.6 2340.79,-1693.6 2340.79,-1711 2340.79,-1711 2340.79,-1717 2334.79,-1723 2328.79,-1723"/>
 <text xml:space="preserve" text-anchor="middle" x="2285.34" y="-1703.45" font-family="sans-serif" font-size="13.00">global_avoided</text>
 <text xml:space="preserve" text-anchor="middle" x="2285.34" y="-1689.95" font-family="sans-serif" font-size="13.00">damage_costs</text>
@@ -226,9 +226,9 @@
 <polygon fill="#999999" stroke="#999999" points="2243.81,-1729.83 2248.67,-1724.23 2241.38,-1725.58 2243.81,-1729.83"/>
 </g>
 <!-- regional_emissions -->
-<g id="demo&#45;node&#45;regional_emissions" class="node calculated">
+<g id="dependency&#45;node&#45;regional_emissions" class="node calculated">
 <title>regional_emissions</title>
-<g id="a_demo&#45;node&#45;regional_emissions"><a xlink:href="?demo_variable=regional_emissions#dependency-graph-demo" xlink:title="regional_emissions">
+<g id="a_dependency&#45;node&#45;regional_emissions"><a xlink:href="?graph_variable=regional_emissions#dependency-graph" xlink:title="regional_emissions">
 <path fill="#89a041" stroke="black" d="M466.98,-1096C466.98,-1096 411.57,-1096 411.57,-1096 405.57,-1096 399.57,-1090 399.57,-1084 399.57,-1084 399.57,-1066.6 399.57,-1066.6 399.57,-1060.6 405.57,-1054.6 411.57,-1054.6 411.57,-1054.6 466.98,-1054.6 466.98,-1054.6 472.98,-1054.6 478.98,-1060.6 478.98,-1066.6 478.98,-1066.6 478.98,-1084 478.98,-1084 478.98,-1090 472.98,-1096 466.98,-1096"/>
 <text xml:space="preserve" text-anchor="middle" x="439.27" y="-1076.45" font-family="sans-serif" font-size="13.00">regional</text>
 <text xml:space="preserve" text-anchor="middle" x="439.27" y="-1062.95" font-family="sans-serif" font-size="13.00">emissions</text>
@@ -242,9 +242,9 @@
 <polygon fill="#999999" stroke="#999999" points="390.67,-1077.75 397.67,-1075.3 390.67,-1072.85 390.67,-1077.75"/>
 </g>
 <!-- regional_emission_reductions -->
-<g id="demo&#45;node&#45;regional_emission_reductions" class="node calculated">
+<g id="dependency&#45;node&#45;regional_emission_reductions" class="node calculated">
 <title>regional_emission_reductions</title>
-<g id="a_demo&#45;node&#45;regional_emission_reductions"><a xlink:href="?demo_variable=regional_emission_reductions#dependency-graph-demo" xlink:title="regional_emission_reductions">
+<g id="a_dependency&#45;node&#45;regional_emission_reductions"><a xlink:href="?graph_variable=regional_emission_reductions#dependency-graph" xlink:title="regional_emission_reductions">
 <path fill="#89a041" stroke="black" d="M682.39,-1037C682.39,-1037 578.23,-1037 578.23,-1037 572.23,-1037 566.23,-1031 566.23,-1025 566.23,-1025 566.23,-1007.6 566.23,-1007.6 566.23,-1001.6 572.23,-995.6 578.23,-995.6 578.23,-995.6 682.39,-995.6 682.39,-995.6 688.39,-995.6 694.39,-1001.6 694.39,-1007.6 694.39,-1007.6 694.39,-1025 694.39,-1025 694.39,-1031 688.39,-1037 682.39,-1037"/>
 <text xml:space="preserve" text-anchor="middle" x="630.31" y="-1017.45" font-family="sans-serif" font-size="13.00">regional_emission</text>
 <text xml:space="preserve" text-anchor="middle" x="630.31" y="-1003.95" font-family="sans-serif" font-size="13.00">reductions</text>
@@ -258,9 +258,9 @@
 <polygon fill="#999999" stroke="#999999" points="557.54,-1021.66 564.39,-1018.81 557.26,-1016.77 557.54,-1021.66"/>
 </g>
 <!-- domestic_mitigation_costs_abs -->
-<g id="demo&#45;node&#45;domestic_mitigation_costs_abs" class="node calculated">
+<g id="dependency&#45;node&#45;domestic_mitigation_costs_abs" class="node calculated">
 <title>domestic_mitigation_costs_abs</title>
-<g id="a_demo&#45;node&#45;domestic_mitigation_costs_abs"><a xlink:href="?demo_variable=domestic_mitigation_costs_abs#dependency-graph-demo" xlink:title="domestic_mitigation_costs_abs">
+<g id="a_dependency&#45;node&#45;domestic_mitigation_costs_abs"><a xlink:href="?graph_variable=domestic_mitigation_costs_abs#dependency-graph" xlink:title="domestic_mitigation_costs_abs">
 <path fill="#89a041" stroke="black" d="M496.23,-1162C496.23,-1162 382.32,-1162 382.32,-1162 376.32,-1162 370.32,-1156 370.32,-1150 370.32,-1150 370.32,-1132.6 370.32,-1132.6 370.32,-1126.6 376.32,-1120.6 382.32,-1120.6 382.32,-1120.6 496.23,-1120.6 496.23,-1120.6 502.23,-1120.6 508.23,-1126.6 508.23,-1132.6 508.23,-1132.6 508.23,-1150 508.23,-1150 508.23,-1156 502.23,-1162 496.23,-1162"/>
 <text xml:space="preserve" text-anchor="middle" x="439.27" y="-1142.45" font-family="sans-serif" font-size="13.00">domestic_mitigation</text>
 <text xml:space="preserve" text-anchor="middle" x="439.27" y="-1128.95" font-family="sans-serif" font-size="13.00">costs_abs</text>
@@ -280,9 +280,9 @@
 <polygon fill="#cccccc" stroke="#cccccc" points="310.09,-1100.9 303.55,-1097.4 306.48,-1104.21 310.09,-1100.9"/>
 </g>
 <!-- investments -->
-<g id="demo&#45;node&#45;investments" class="node calculated">
+<g id="dependency&#45;node&#45;investments" class="node calculated">
 <title>investments</title>
-<g id="a_demo&#45;node&#45;investments"><a xlink:href="?demo_variable=investments#dependency-graph-demo" xlink:title="investments">
+<g id="a_dependency&#45;node&#45;investments"><a xlink:href="?graph_variable=investments#dependency-graph" xlink:title="investments">
 <path fill="#89a041" stroke="black" d="M2319.04,-1119.3C2319.04,-1119.3 2251.63,-1119.3 2251.63,-1119.3 2245.63,-1119.3 2239.63,-1113.3 2239.63,-1107.3 2239.63,-1107.3 2239.63,-1095.3 2239.63,-1095.3 2239.63,-1089.3 2245.63,-1083.3 2251.63,-1083.3 2251.63,-1083.3 2319.04,-1083.3 2319.04,-1083.3 2325.04,-1083.3 2331.04,-1089.3 2331.04,-1095.3 2331.04,-1095.3 2331.04,-1107.3 2331.04,-1107.3 2331.04,-1113.3 2325.04,-1119.3 2319.04,-1119.3"/>
 <text xml:space="preserve" text-anchor="middle" x="2285.34" y="-1095.7" font-family="sans-serif" font-size="13.00">investments</text>
 </a>
@@ -295,9 +295,9 @@
 <polygon fill="#999999" stroke="#999999" points="2231.25,-1111.74 2237.81,-1108.28 2230.53,-1106.89 2231.25,-1111.74"/>
 </g>
 <!-- global_GDP_net -->
-<g id="demo&#45;node&#45;global_GDP_net" class="node calculated">
+<g id="dependency&#45;node&#45;global_GDP_net" class="node calculated">
 <title>global_GDP_net</title>
-<g id="a_demo&#45;node&#45;global_GDP_net"><a xlink:href="?demo_variable=global_GDP_net#dependency-graph-demo" xlink:title="global_GDP_net">
+<g id="a_dependency&#45;node&#45;global_GDP_net"><a xlink:href="?graph_variable=global_GDP_net#dependency-graph" xlink:title="global_GDP_net">
 <path fill="#89a041" stroke="black" d="M2319.42,-1186C2319.42,-1186 2251.26,-1186 2251.26,-1186 2245.26,-1186 2239.26,-1180 2239.26,-1174 2239.26,-1174 2239.26,-1156.6 2239.26,-1156.6 2239.26,-1150.6 2245.26,-1144.6 2251.26,-1144.6 2251.26,-1144.6 2319.42,-1144.6 2319.42,-1144.6 2325.42,-1144.6 2331.42,-1150.6 2331.42,-1156.6 2331.42,-1156.6 2331.42,-1174 2331.42,-1174 2331.42,-1180 2325.42,-1186 2319.42,-1186"/>
 <text xml:space="preserve" text-anchor="middle" x="2285.34" y="-1166.45" font-family="sans-serif" font-size="13.00">global_GDP</text>
 <text xml:space="preserve" text-anchor="middle" x="2285.34" y="-1152.95" font-family="sans-serif" font-size="13.00">net</text>
@@ -311,9 +311,9 @@
 <polygon fill="#999999" stroke="#999999" points="2230.12,-1159.65 2237.4,-1158.26 2230.85,-1154.8 2230.12,-1159.65"/>
 </g>
 <!-- consumption -->
-<g id="demo&#45;node&#45;consumption" class="node calculated">
+<g id="dependency&#45;node&#45;consumption" class="node calculated">
 <title>consumption</title>
-<g id="a_demo&#45;node&#45;consumption"><a xlink:href="?demo_variable=consumption#dependency-graph-demo" xlink:title="consumption">
+<g id="a_dependency&#45;node&#45;consumption"><a xlink:href="?graph_variable=consumption#dependency-graph" xlink:title="consumption">
 <path fill="#89a041" stroke="black" d="M2321.29,-753.3C2321.29,-753.3 2249.38,-753.3 2249.38,-753.3 2243.38,-753.3 2237.38,-747.3 2237.38,-741.3 2237.38,-741.3 2237.38,-729.3 2237.38,-729.3 2237.38,-723.3 2243.38,-717.3 2249.38,-717.3 2249.38,-717.3 2321.29,-717.3 2321.29,-717.3 2327.29,-717.3 2333.29,-723.3 2333.29,-729.3 2333.29,-729.3 2333.29,-741.3 2333.29,-741.3 2333.29,-747.3 2327.29,-753.3 2321.29,-753.3"/>
 <text xml:space="preserve" text-anchor="middle" x="2285.34" y="-729.7" font-family="sans-serif" font-size="13.00">consumption</text>
 </a>
@@ -326,9 +326,9 @@
 <polygon fill="#999999" stroke="#999999" points="2281.09,-762.4 2280.23,-755.03 2276.31,-761.32 2281.09,-762.4"/>
 </g>
 <!-- GDP_loss -->
-<g id="demo&#45;node&#45;GDP_loss" class="node calculated">
+<g id="dependency&#45;node&#45;GDP_loss" class="node calculated">
 <title>GDP_loss</title>
-<g id="a_demo&#45;node&#45;GDP_loss"><a xlink:href="?demo_variable=GDP_loss#dependency-graph-demo" xlink:title="GDP_loss">
+<g id="a_dependency&#45;node&#45;GDP_loss"><a xlink:href="?graph_variable=GDP_loss#dependency-graph" xlink:title="GDP_loss">
 <path fill="#89a041" stroke="black" d="M2300.34,-1252C2300.34,-1252 2270.34,-1252 2270.34,-1252 2264.34,-1252 2258.34,-1246 2258.34,-1240 2258.34,-1240 2258.34,-1222.6 2258.34,-1222.6 2258.34,-1216.6 2264.34,-1210.6 2270.34,-1210.6 2270.34,-1210.6 2300.34,-1210.6 2300.34,-1210.6 2306.34,-1210.6 2312.34,-1216.6 2312.34,-1222.6 2312.34,-1222.6 2312.34,-1240 2312.34,-1240 2312.34,-1246 2306.34,-1252 2300.34,-1252"/>
 <text xml:space="preserve" text-anchor="middle" x="2285.34" y="-1232.45" font-family="sans-serif" font-size="13.00">GDP</text>
 <text xml:space="preserve" text-anchor="middle" x="2285.34" y="-1218.95" font-family="sans-serif" font-size="13.00">loss</text>
@@ -342,9 +342,9 @@
 <polygon fill="#999999" stroke="#999999" points="2249.37,-1220.86 2256.79,-1221.07 2251.13,-1216.28 2249.37,-1220.86"/>
 </g>
 <!-- adaptation_costs -->
-<g id="demo&#45;node&#45;adaptation_costs" class="node calculated">
+<g id="dependency&#45;node&#45;adaptation_costs" class="node calculated">
 <title>adaptation_costs</title>
-<g id="a_demo&#45;node&#45;adaptation_costs"><a xlink:href="?demo_variable=adaptation_costs#dependency-graph-demo" xlink:title="adaptation_costs">
+<g id="a_dependency&#45;node&#45;adaptation_costs"><a xlink:href="?graph_variable=adaptation_costs#dependency-graph" xlink:title="adaptation_costs">
 <path fill="#89a041" stroke="black" d="M1515.53,-1345C1515.53,-1345 1456.37,-1345 1456.37,-1345 1450.37,-1345 1444.37,-1339 1444.37,-1333 1444.37,-1333 1444.37,-1315.6 1444.37,-1315.6 1444.37,-1309.6 1450.37,-1303.6 1456.37,-1303.6 1456.37,-1303.6 1515.53,-1303.6 1515.53,-1303.6 1521.53,-1303.6 1527.53,-1309.6 1527.53,-1315.6 1527.53,-1315.6 1527.53,-1333 1527.53,-1333 1527.53,-1339 1521.53,-1345 1515.53,-1345"/>
 <text xml:space="preserve" text-anchor="middle" x="1485.95" y="-1325.45" font-family="sans-serif" font-size="13.00">adaptation</text>
 <text xml:space="preserve" text-anchor="middle" x="1485.95" y="-1311.95" font-family="sans-serif" font-size="13.00">costs</text>
@@ -370,9 +370,9 @@
 <polygon fill="#999999" stroke="#999999" points="1437.2,-1347.66 1442.65,-1342.63 1435.25,-1343.16 1437.2,-1347.66"/>
 </g>
 <!-- mortality_damage_costs_abs -->
-<g id="demo&#45;node&#45;mortality_damage_costs_abs" class="node calculated">
+<g id="dependency&#45;node&#45;mortality_damage_costs_abs" class="node calculated">
 <title>mortality_damage_costs_abs</title>
-<g id="a_demo&#45;node&#45;mortality_damage_costs_abs"><a xlink:href="?demo_variable=mortality_damage_costs_abs#dependency-graph-demo" xlink:title="mortality_damage_costs_abs">
+<g id="a_dependency&#45;node&#45;mortality_damage_costs_abs"><a xlink:href="?graph_variable=mortality_damage_costs_abs#dependency-graph" xlink:title="mortality_damage_costs_abs">
 <path fill="#89a041" stroke="black" d="M1536.9,-311C1536.9,-311 1434.99,-311 1434.99,-311 1428.99,-311 1422.99,-305 1422.99,-299 1422.99,-299 1422.99,-281.6 1422.99,-281.6 1422.99,-275.6 1428.99,-269.6 1434.99,-269.6 1434.99,-269.6 1536.9,-269.6 1536.9,-269.6 1542.9,-269.6 1548.9,-275.6 1548.9,-281.6 1548.9,-281.6 1548.9,-299 1548.9,-299 1548.9,-305 1542.9,-311 1536.9,-311"/>
 <text xml:space="preserve" text-anchor="middle" x="1485.95" y="-291.45" font-family="sans-serif" font-size="13.00">mortality_damage</text>
 <text xml:space="preserve" text-anchor="middle" x="1485.95" y="-277.95" font-family="sans-serif" font-size="13.00">costs_abs</text>
@@ -386,9 +386,9 @@
 <polygon fill="#999999" stroke="#999999" points="1414.19,-288.38 1421.32,-286.34 1414.48,-283.49 1414.19,-288.38"/>
 </g>
 <!-- global_damage_costs -->
-<g id="demo&#45;node&#45;global_damage_costs" class="node calculated">
+<g id="dependency&#45;node&#45;global_damage_costs" class="node calculated">
 <title>global_damage_costs</title>
-<g id="a_demo&#45;node&#45;global_damage_costs"><a xlink:href="?demo_variable=global_damage_costs#dependency-graph-demo" xlink:title="global_damage_costs">
+<g id="a_dependency&#45;node&#45;global_damage_costs"><a xlink:href="?graph_variable=global_damage_costs#dependency-graph" xlink:title="global_damage_costs">
 <path fill="#89a041" stroke="black" d="M2329.17,-1490C2329.17,-1490 2241.51,-1490 2241.51,-1490 2235.51,-1490 2229.51,-1484 2229.51,-1478 2229.51,-1478 2229.51,-1460.6 2229.51,-1460.6 2229.51,-1454.6 2235.51,-1448.6 2241.51,-1448.6 2241.51,-1448.6 2329.17,-1448.6 2329.17,-1448.6 2335.17,-1448.6 2341.17,-1454.6 2341.17,-1460.6 2341.17,-1460.6 2341.17,-1478 2341.17,-1478 2341.17,-1484 2335.17,-1490 2329.17,-1490"/>
 <text xml:space="preserve" text-anchor="middle" x="2285.34" y="-1470.45" font-family="sans-serif" font-size="13.00">global_damage</text>
 <text xml:space="preserve" text-anchor="middle" x="2285.34" y="-1456.95" font-family="sans-serif" font-size="13.00">costs</text>
@@ -402,9 +402,9 @@
 <polygon fill="#999999" stroke="#999999" points="2262.11,-1442.61 2268.12,-1446.96 2266.13,-1439.81 2262.11,-1442.61"/>
 </g>
 <!-- market_and_non_market_damage_costs_abs -->
-<g id="demo&#45;node&#45;market_and_non_market_damage_costs_abs" class="node calculated">
+<g id="dependency&#45;node&#45;market_and_non_market_damage_costs_abs" class="node calculated">
 <title>market_and_non_market_damage_costs_abs</title>
-<g id="a_demo&#45;node&#45;market_and_non_market_damage_costs_abs"><a xlink:href="?demo_variable=market_and_non_market_damage_costs_abs#dependency-graph-demo" xlink:title="market_and_non_market_damage_costs_abs">
+<g id="a_dependency&#45;node&#45;market_and_non_market_damage_costs_abs"><a xlink:href="?graph_variable=market_and_non_market_damage_costs_abs#dependency-graph" xlink:title="market_and_non_market_damage_costs_abs">
 <path fill="#89a041" stroke="black" d="M2357.67,-501C2357.67,-501 2213.01,-501 2213.01,-501 2207.01,-501 2201.01,-495 2201.01,-489 2201.01,-489 2201.01,-471.6 2201.01,-471.6 2201.01,-465.6 2207.01,-459.6 2213.01,-459.6 2213.01,-459.6 2357.67,-459.6 2357.67,-459.6 2363.67,-459.6 2369.67,-465.6 2369.67,-471.6 2369.67,-471.6 2369.67,-489 2369.67,-489 2369.67,-495 2363.67,-501 2357.67,-501"/>
 <text xml:space="preserve" text-anchor="middle" x="2285.34" y="-481.45" font-family="sans-serif" font-size="13.00">market_and_non_market</text>
 <text xml:space="preserve" text-anchor="middle" x="2285.34" y="-467.95" font-family="sans-serif" font-size="13.00">damage_costs_abs</text>
@@ -418,9 +418,9 @@
 <polygon fill="#999999" stroke="#999999" points="2275.73,-510.13 2275.9,-502.71 2271.14,-508.4 2275.73,-510.13"/>
 </g>
 <!-- total_direct_costs_abs -->
-<g id="demo&#45;node&#45;total_direct_costs_abs" class="node calculated">
+<g id="dependency&#45;node&#45;total_direct_costs_abs" class="node calculated">
 <title>total_direct_costs_abs</title>
-<g id="a_demo&#45;node&#45;total_direct_costs_abs"><a xlink:href="?demo_variable=total_direct_costs_abs#dependency-graph-demo" xlink:title="total_direct_costs_abs">
+<g id="a_dependency&#45;node&#45;total_direct_costs_abs"><a xlink:href="?graph_variable=total_direct_costs_abs#dependency-graph" xlink:title="total_direct_costs_abs">
 <path fill="#89a041" stroke="black" d="M2316.42,-1318C2316.42,-1318 2254.26,-1318 2254.26,-1318 2248.26,-1318 2242.26,-1312 2242.26,-1306 2242.26,-1306 2242.26,-1288.6 2242.26,-1288.6 2242.26,-1282.6 2248.26,-1276.6 2254.26,-1276.6 2254.26,-1276.6 2316.42,-1276.6 2316.42,-1276.6 2322.42,-1276.6 2328.42,-1282.6 2328.42,-1288.6 2328.42,-1288.6 2328.42,-1306 2328.42,-1306 2328.42,-1312 2322.42,-1318 2316.42,-1318"/>
 <text xml:space="preserve" text-anchor="middle" x="2285.34" y="-1298.45" font-family="sans-serif" font-size="13.00">total_direct</text>
 <text xml:space="preserve" text-anchor="middle" x="2285.34" y="-1284.95" font-family="sans-serif" font-size="13.00">costs_abs</text>
@@ -446,9 +446,9 @@
 <polygon fill="#999999" stroke="#999999" points="2221.62,-1492.02 2227.58,-1487.6 2220.17,-1487.34 2221.62,-1492.02"/>
 </g>
 <!-- global_adaptation_costs -->
-<g id="demo&#45;node&#45;global_adaptation_costs" class="node calculated">
+<g id="dependency&#45;node&#45;global_adaptation_costs" class="node calculated">
 <title>global_adaptation_costs</title>
-<g id="a_demo&#45;node&#45;global_adaptation_costs"><a xlink:href="?demo_variable=global_adaptation_costs#dependency-graph-demo" xlink:title="global_adaptation_costs">
+<g id="a_dependency&#45;node&#45;global_adaptation_costs"><a xlink:href="?graph_variable=global_adaptation_costs#dependency-graph" xlink:title="global_adaptation_costs">
 <path fill="#89a041" stroke="black" d="M1926.85,-1432C1926.85,-1432 1824.19,-1432 1824.19,-1432 1818.19,-1432 1812.19,-1426 1812.19,-1420 1812.19,-1420 1812.19,-1402.6 1812.19,-1402.6 1812.19,-1396.6 1818.19,-1390.6 1824.19,-1390.6 1824.19,-1390.6 1926.85,-1390.6 1926.85,-1390.6 1932.85,-1390.6 1938.85,-1396.6 1938.85,-1402.6 1938.85,-1402.6 1938.85,-1420 1938.85,-1420 1938.85,-1426 1932.85,-1432 1926.85,-1432"/>
 <text xml:space="preserve" text-anchor="middle" x="1875.52" y="-1412.45" font-family="sans-serif" font-size="13.00">global_adaptation</text>
 <text xml:space="preserve" text-anchor="middle" x="1875.52" y="-1398.95" font-family="sans-serif" font-size="13.00">costs</text>
@@ -462,9 +462,9 @@
 <polygon fill="#999999" stroke="#999999" points="1847.53,-1439.88 1850.97,-1433.31 1844.18,-1436.3 1847.53,-1439.88"/>
 </g>
 <!-- global_mitigation_costs -->
-<g id="demo&#45;node&#45;global_mitigation_costs" class="node calculated">
+<g id="dependency&#45;node&#45;global_mitigation_costs" class="node calculated">
 <title>global_mitigation_costs</title>
-<g id="a_demo&#45;node&#45;global_mitigation_costs"><a xlink:href="?demo_variable=global_mitigation_costs#dependency-graph-demo" xlink:title="global_mitigation_costs">
+<g id="a_dependency&#45;node&#45;global_mitigation_costs"><a xlink:href="?graph_variable=global_mitigation_costs#dependency-graph" xlink:title="global_mitigation_costs">
 <path fill="#89a041" stroke="black" d="M1923.85,-1550C1923.85,-1550 1827.19,-1550 1827.19,-1550 1821.19,-1550 1815.19,-1544 1815.19,-1538 1815.19,-1538 1815.19,-1520.6 1815.19,-1520.6 1815.19,-1514.6 1821.19,-1508.6 1827.19,-1508.6 1827.19,-1508.6 1923.85,-1508.6 1923.85,-1508.6 1929.85,-1508.6 1935.85,-1514.6 1935.85,-1520.6 1935.85,-1520.6 1935.85,-1538 1935.85,-1538 1935.85,-1544 1929.85,-1550 1923.85,-1550"/>
 <text xml:space="preserve" text-anchor="middle" x="1875.52" y="-1530.45" font-family="sans-serif" font-size="13.00">global_mitigation</text>
 <text xml:space="preserve" text-anchor="middle" x="1875.52" y="-1516.95" font-family="sans-serif" font-size="13.00">costs</text>
@@ -496,9 +496,9 @@
 <polygon fill="#999999" stroke="#999999" points="558.61,-1040.93 564.56,-1036.51 557.15,-1036.26 558.61,-1040.93"/>
 </g>
 <!-- global_emissions -->
-<g id="demo&#45;node&#45;global_emissions" class="node calculated">
+<g id="dependency&#45;node&#45;global_emissions" class="node calculated">
 <title>global_emissions</title>
-<g id="a_demo&#45;node&#45;global_emissions"><a xlink:href="?demo_variable=global_emissions#dependency-graph-demo" xlink:title="global_emissions">
+<g id="a_dependency&#45;node&#45;global_emissions"><a xlink:href="?graph_variable=global_emissions#dependency-graph" xlink:title="global_emissions">
 <path fill="#89a041" stroke="black" d="M658.01,-960C658.01,-960 602.6,-960 602.6,-960 596.6,-960 590.6,-954 590.6,-948 590.6,-948 590.6,-930.6 590.6,-930.6 590.6,-924.6 596.6,-918.6 602.6,-918.6 602.6,-918.6 658.01,-918.6 658.01,-918.6 664.01,-918.6 670.01,-924.6 670.01,-930.6 670.01,-930.6 670.01,-948 670.01,-948 670.01,-954 664.01,-960 658.01,-960"/>
 <text xml:space="preserve" text-anchor="middle" x="630.31" y="-940.45" font-family="sans-serif" font-size="13.00">global</text>
 <text xml:space="preserve" text-anchor="middle" x="630.31" y="-926.95" font-family="sans-serif" font-size="13.00">emissions</text>
@@ -512,9 +512,9 @@
 <polygon fill="#999999" stroke="#999999" points="593.15,-967.31 597.49,-961.29 590.35,-963.29 593.15,-967.31"/>
 </g>
 <!-- regional_emission_allowances -->
-<g id="demo&#45;node&#45;regional_emission_allowances" class="node calculated">
+<g id="dependency&#45;node&#45;regional_emission_allowances" class="node calculated">
 <title>regional_emission_allowances</title>
-<g id="a_demo&#45;node&#45;regional_emission_allowances"><a xlink:href="?demo_variable=regional_emission_allowances#dependency-graph-demo" xlink:title="regional_emission_allowances">
+<g id="a_dependency&#45;node&#45;regional_emission_allowances"><a xlink:href="?graph_variable=regional_emission_allowances#dependency-graph" xlink:title="regional_emission_allowances">
 <path fill="#89a041" stroke="black" d="M682.39,-1103C682.39,-1103 578.23,-1103 578.23,-1103 572.23,-1103 566.23,-1097 566.23,-1091 566.23,-1091 566.23,-1073.6 566.23,-1073.6 566.23,-1067.6 572.23,-1061.6 578.23,-1061.6 578.23,-1061.6 682.39,-1061.6 682.39,-1061.6 688.39,-1061.6 694.39,-1067.6 694.39,-1073.6 694.39,-1073.6 694.39,-1091 694.39,-1091 694.39,-1097 688.39,-1103 682.39,-1103"/>
 <text xml:space="preserve" text-anchor="middle" x="630.31" y="-1083.45" font-family="sans-serif" font-size="13.00">regional_emission</text>
 <text xml:space="preserve" text-anchor="middle" x="630.31" y="-1069.95" font-family="sans-serif" font-size="13.00">allowances</text>
@@ -528,9 +528,9 @@
 <polygon fill="#999999" stroke="#999999" points="557.41,-1082.09 564.5,-1079.9 557.59,-1077.19 557.41,-1082.09"/>
 </g>
 <!-- global_cost_per_emission_reduction_unit -->
-<g id="demo&#45;node&#45;global_cost_per_emission_reduction_unit" class="node calculated">
+<g id="dependency&#45;node&#45;global_cost_per_emission_reduction_unit" class="node calculated">
 <title>global_cost_per_emission_reduction_unit</title>
-<g id="a_demo&#45;node&#45;global_cost_per_emission_reduction_unit"><a xlink:href="?demo_variable=global_cost_per_emission_reduction_unit#dependency-graph-demo" xlink:title="global_cost_per_emission_reduction_unit">
+<g id="a_dependency&#45;node&#45;global_cost_per_emission_reduction_unit"><a xlink:href="?graph_variable=global_cost_per_emission_reduction_unit#dependency-graph" xlink:title="global_cost_per_emission_reduction_unit">
 <path fill="#89a041" stroke="black" d="M912.42,-1178C912.42,-1178 771.51,-1178 771.51,-1178 765.51,-1178 759.51,-1172 759.51,-1166 759.51,-1166 759.51,-1148.6 759.51,-1148.6 759.51,-1142.6 765.51,-1136.6 771.51,-1136.6 771.51,-1136.6 912.42,-1136.6 912.42,-1136.6 918.42,-1136.6 924.42,-1142.6 924.42,-1148.6 924.42,-1148.6 924.42,-1166 924.42,-1166 924.42,-1172 918.42,-1178 912.42,-1178"/>
 <text xml:space="preserve" text-anchor="middle" x="841.97" y="-1158.45" font-family="sans-serif" font-size="13.00">global_cost_per</text>
 <text xml:space="preserve" text-anchor="middle" x="841.97" y="-1144.95" font-family="sans-serif" font-size="13.00">emission_reduction_unit</text>
@@ -544,9 +544,9 @@
 <polygon fill="#999999" stroke="#999999" points="763.54,-1134.36 770.88,-1135.45 765.82,-1130.02 763.54,-1134.36"/>
 </g>
 <!-- global_emission_reduction_per_cost_unit -->
-<g id="demo&#45;node&#45;global_emission_reduction_per_cost_unit" class="node calculated">
+<g id="dependency&#45;node&#45;global_emission_reduction_per_cost_unit" class="node calculated">
 <title>global_emission_reduction_per_cost_unit</title>
-<g id="a_demo&#45;node&#45;global_emission_reduction_per_cost_unit"><a xlink:href="?demo_variable=global_emission_reduction_per_cost_unit#dependency-graph-demo" xlink:title="global_emission_reduction_per_cost_unit">
+<g id="a_dependency&#45;node&#45;global_emission_reduction_per_cost_unit"><a xlink:href="?graph_variable=global_emission_reduction_per_cost_unit#dependency-graph" xlink:title="global_emission_reduction_per_cost_unit">
 <path fill="#89a041" stroke="black" d="M919.55,-874C919.55,-874 764.39,-874 764.39,-874 758.39,-874 752.39,-868 752.39,-862 752.39,-862 752.39,-844.6 752.39,-844.6 752.39,-838.6 758.39,-832.6 764.39,-832.6 764.39,-832.6 919.55,-832.6 919.55,-832.6 925.55,-832.6 931.55,-838.6 931.55,-844.6 931.55,-844.6 931.55,-862 931.55,-862 931.55,-868 925.55,-874 919.55,-874"/>
 <text xml:space="preserve" text-anchor="middle" x="841.97" y="-854.45" font-family="sans-serif" font-size="13.00">global_emission_reduction</text>
 <text xml:space="preserve" text-anchor="middle" x="841.97" y="-840.95" font-family="sans-serif" font-size="13.00">per_cost_unit</text>
@@ -560,9 +560,9 @@
 <polygon fill="#999999" stroke="#999999" points="811.31,-881.64 815.09,-875.26 808.16,-877.89 811.31,-881.64"/>
 </g>
 <!-- mitigation_costs_abs -->
-<g id="demo&#45;node&#45;mitigation_costs_abs" class="node calculated">
+<g id="dependency&#45;node&#45;mitigation_costs_abs" class="node calculated">
 <title>mitigation_costs_abs</title>
-<g id="a_demo&#45;node&#45;mitigation_costs_abs"><a xlink:href="?demo_variable=mitigation_costs_abs#dependency-graph-demo" xlink:title="mitigation_costs_abs">
+<g id="a_dependency&#45;node&#45;mitigation_costs_abs"><a xlink:href="?graph_variable=mitigation_costs_abs#dependency-graph" xlink:title="mitigation_costs_abs">
 <path fill="#89a041" stroke="black" d="M676.39,-1178C676.39,-1178 584.23,-1178 584.23,-1178 578.23,-1178 572.23,-1172 572.23,-1166 572.23,-1166 572.23,-1148.6 572.23,-1148.6 572.23,-1142.6 578.23,-1136.6 584.23,-1136.6 584.23,-1136.6 676.39,-1136.6 676.39,-1136.6 682.39,-1136.6 688.39,-1142.6 688.39,-1148.6 688.39,-1148.6 688.39,-1166 688.39,-1166 688.39,-1172 682.39,-1178 676.39,-1178"/>
 <text xml:space="preserve" text-anchor="middle" x="630.31" y="-1158.45" font-family="sans-serif" font-size="13.00">mitigation_costs</text>
 <text xml:space="preserve" text-anchor="middle" x="630.31" y="-1144.95" font-family="sans-serif" font-size="13.00">abs</text>
@@ -576,9 +576,9 @@
 <polygon fill="#999999" stroke="#999999" points="563.07,-1154.15 570.25,-1152.3 563.48,-1149.27 563.07,-1154.15"/>
 </g>
 <!-- capital_stock -->
-<g id="demo&#45;node&#45;capital_stock" class="node calculated">
+<g id="dependency&#45;node&#45;capital_stock" class="node calculated">
 <title>capital_stock</title>
-<g id="a_demo&#45;node&#45;capital_stock"><a xlink:href="?demo_variable=capital_stock#dependency-graph-demo" xlink:title="capital_stock">
+<g id="a_dependency&#45;node&#45;capital_stock"><a xlink:href="?graph_variable=capital_stock#dependency-graph" xlink:title="capital_stock">
 <path fill="#89a041" stroke="black" d="M47.16,-1096C47.16,-1096 12,-1096 12,-1096 6,-1096 0,-1090 0,-1084 0,-1084 0,-1066.6 0,-1066.6 0,-1060.6 6,-1054.6 12,-1054.6 12,-1054.6 47.16,-1054.6 47.16,-1054.6 53.16,-1054.6 59.16,-1060.6 59.16,-1066.6 59.16,-1066.6 59.16,-1084 59.16,-1084 59.16,-1090 53.16,-1096 47.16,-1096"/>
 <text xml:space="preserve" text-anchor="middle" x="29.58" y="-1076.45" font-family="sans-serif" font-size="13.00">capital</text>
 <text xml:space="preserve" text-anchor="middle" x="29.58" y="-1062.95" font-family="sans-serif" font-size="13.00">stock</text>
@@ -592,9 +592,9 @@
 <polygon fill="#cccccc" stroke="#cccccc" points="65.79,-1050.17 60.82,-1055.67 68.14,-1054.47 65.79,-1050.17"/>
 </g>
 <!-- global_GDP_loss -->
-<g id="demo&#45;node&#45;global_GDP_loss" class="node calculated">
+<g id="dependency&#45;node&#45;global_GDP_loss" class="node calculated">
 <title>global_GDP_loss</title>
-<g id="a_demo&#45;node&#45;global_GDP_loss"><a xlink:href="?demo_variable=global_GDP_loss#dependency-graph-demo" xlink:title="global_GDP_loss">
+<g id="a_dependency&#45;node&#45;global_GDP_loss"><a xlink:href="?graph_variable=global_GDP_loss#dependency-graph" xlink:title="global_GDP_loss">
 <path fill="#89a041" stroke="black" d="M2539.33,-1186C2539.33,-1186 2471.17,-1186 2471.17,-1186 2465.17,-1186 2459.17,-1180 2459.17,-1174 2459.17,-1174 2459.17,-1156.6 2459.17,-1156.6 2459.17,-1150.6 2465.17,-1144.6 2471.17,-1144.6 2471.17,-1144.6 2539.33,-1144.6 2539.33,-1144.6 2545.33,-1144.6 2551.33,-1150.6 2551.33,-1156.6 2551.33,-1156.6 2551.33,-1174 2551.33,-1174 2551.33,-1180 2545.33,-1186 2539.33,-1186"/>
 <text xml:space="preserve" text-anchor="middle" x="2505.25" y="-1166.45" font-family="sans-serif" font-size="13.00">global_GDP</text>
 <text xml:space="preserve" text-anchor="middle" x="2505.25" y="-1152.95" font-family="sans-serif" font-size="13.00">loss</text>
@@ -608,9 +608,9 @@
 <polygon fill="#999999" stroke="#999999" points="2450.38,-1167.75 2457.38,-1165.3 2450.38,-1162.85 2450.38,-1167.75"/>
 </g>
 <!-- utility -->
-<g id="demo&#45;node&#45;utility" class="node calculated">
+<g id="dependency&#45;node&#45;utility" class="node calculated">
 <title>utility</title>
-<g id="a_demo&#45;node&#45;utility"><a xlink:href="?demo_variable=utility#dependency-graph-demo" xlink:title="utility">
+<g id="a_dependency&#45;node&#45;utility"><a xlink:href="?graph_variable=utility#dependency-graph" xlink:title="utility">
 <path fill="#89a041" stroke="black" d="M2520.25,-753.3C2520.25,-753.3 2490.25,-753.3 2490.25,-753.3 2484.25,-753.3 2478.25,-747.3 2478.25,-741.3 2478.25,-741.3 2478.25,-729.3 2478.25,-729.3 2478.25,-723.3 2484.25,-717.3 2490.25,-717.3 2490.25,-717.3 2520.25,-717.3 2520.25,-717.3 2526.25,-717.3 2532.25,-723.3 2532.25,-729.3 2532.25,-729.3 2532.25,-741.3 2532.25,-741.3 2532.25,-747.3 2526.25,-753.3 2520.25,-753.3"/>
 <text xml:space="preserve" text-anchor="middle" x="2505.25" y="-729.7" font-family="sans-serif" font-size="13.00">utility</text>
 </a>
@@ -623,9 +623,9 @@
 <polygon fill="#999999" stroke="#999999" points="2469.38,-737.75 2476.38,-735.3 2469.38,-732.85 2469.38,-737.75"/>
 </g>
 <!-- indirect_costs -->
-<g id="demo&#45;node&#45;indirect_costs" class="node calculated">
+<g id="dependency&#45;node&#45;indirect_costs" class="node calculated">
 <title>indirect_costs</title>
-<g id="a_demo&#45;node&#45;indirect_costs"><a xlink:href="?demo_variable=indirect_costs#dependency-graph-demo" xlink:title="indirect_costs">
+<g id="a_dependency&#45;node&#45;indirect_costs"><a xlink:href="?graph_variable=indirect_costs#dependency-graph" xlink:title="indirect_costs">
 <path fill="#89a041" stroke="black" d="M2525.08,-1254C2525.08,-1254 2485.42,-1254 2485.42,-1254 2479.42,-1254 2473.42,-1248 2473.42,-1242 2473.42,-1242 2473.42,-1224.6 2473.42,-1224.6 2473.42,-1218.6 2479.42,-1212.6 2485.42,-1212.6 2485.42,-1212.6 2525.08,-1212.6 2525.08,-1212.6 2531.08,-1212.6 2537.08,-1218.6 2537.08,-1224.6 2537.08,-1224.6 2537.08,-1242 2537.08,-1242 2537.08,-1248 2531.08,-1254 2525.08,-1254"/>
 <text xml:space="preserve" text-anchor="middle" x="2505.25" y="-1234.45" font-family="sans-serif" font-size="13.00">indirect</text>
 <text xml:space="preserve" text-anchor="middle" x="2505.25" y="-1220.95" font-family="sans-serif" font-size="13.00">costs</text>
@@ -639,9 +639,9 @@
 <polygon fill="#999999" stroke="#999999" points="2464.41,-1235.39 2471.43,-1233 2464.45,-1230.49 2464.41,-1235.39"/>
 </g>
 <!-- global_cumulative_emissions -->
-<g id="demo&#45;node&#45;global_cumulative_emissions" class="node calculated">
+<g id="dependency&#45;node&#45;global_cumulative_emissions" class="node calculated">
 <title>global_cumulative_emissions</title>
-<g id="a_demo&#45;node&#45;global_cumulative_emissions"><a xlink:href="?demo_variable=global_cumulative_emissions#dependency-graph-demo" xlink:title="global_cumulative_emissions">
+<g id="a_dependency&#45;node&#45;global_cumulative_emissions"><a xlink:href="?graph_variable=global_cumulative_emissions#dependency-graph" xlink:title="global_cumulative_emissions">
 <path fill="#89a041" stroke="black" d="M893.67,-738C893.67,-738 790.26,-738 790.26,-738 784.26,-738 778.26,-732 778.26,-726 778.26,-726 778.26,-708.6 778.26,-708.6 778.26,-702.6 784.26,-696.6 790.26,-696.6 790.26,-696.6 893.67,-696.6 893.67,-696.6 899.67,-696.6 905.67,-702.6 905.67,-708.6 905.67,-708.6 905.67,-726 905.67,-726 905.67,-732 899.67,-738 893.67,-738"/>
 <text xml:space="preserve" text-anchor="middle" x="841.97" y="-718.45" font-family="sans-serif" font-size="13.00">global_cumulative</text>
 <text xml:space="preserve" text-anchor="middle" x="841.97" y="-704.95" font-family="sans-serif" font-size="13.00">emissions</text>
@@ -655,9 +655,9 @@
 <polygon fill="#999999" stroke="#999999" points="818.15,-746.35 821.02,-739.52 814.51,-743.07 818.15,-746.35"/>
 </g>
 <!-- relative_abatement -->
-<g id="demo&#45;node&#45;relative_abatement" class="node control">
+<g id="dependency&#45;node&#45;relative_abatement" class="node control">
 <title>relative_abatement</title>
-<g id="a_demo&#45;node&#45;relative_abatement"><a xlink:href="?demo_variable=relative_abatement#dependency-graph-demo" xlink:title="relative_abatement">
+<g id="a_dependency&#45;node&#45;relative_abatement"><a xlink:href="?graph_variable=relative_abatement#dependency-graph" xlink:title="relative_abatement">
 <path fill="#ed6a2f" stroke="black" d="M300.32,-1162C300.32,-1162 241.16,-1162 241.16,-1162 235.16,-1162 229.16,-1156 229.16,-1150 229.16,-1150 229.16,-1132.6 229.16,-1132.6 229.16,-1126.6 235.16,-1120.6 241.16,-1120.6 241.16,-1120.6 300.32,-1120.6 300.32,-1120.6 306.32,-1120.6 312.32,-1126.6 312.32,-1132.6 312.32,-1132.6 312.32,-1150 312.32,-1150 312.32,-1156 306.32,-1162 300.32,-1162"/>
 <text xml:space="preserve" text-anchor="middle" x="270.74" y="-1142.45" font-family="sans-serif" font-size="13.00">relative</text>
 <text xml:space="preserve" text-anchor="middle" x="270.74" y="-1128.95" font-family="sans-serif" font-size="13.00">abatement</text>
@@ -677,9 +677,9 @@
 <polygon fill="#999999" stroke="#999999" points="361.54,-1143.75 368.54,-1141.3 361.54,-1138.85 361.54,-1143.75"/>
 </g>
 <!-- carbon_price -->
-<g id="demo&#45;node&#45;carbon_price" class="node calculated">
+<g id="dependency&#45;node&#45;carbon_price" class="node calculated">
 <title>carbon_price</title>
-<g id="a_demo&#45;node&#45;carbon_price"><a xlink:href="?demo_variable=carbon_price#dependency-graph-demo" xlink:title="carbon_price">
+<g id="a_dependency&#45;node&#45;carbon_price"><a xlink:href="?graph_variable=carbon_price#dependency-graph" xlink:title="carbon_price">
 <path fill="#89a041" stroke="black" d="M457.98,-1382C457.98,-1382 420.57,-1382 420.57,-1382 414.57,-1382 408.57,-1376 408.57,-1370 408.57,-1370 408.57,-1352.6 408.57,-1352.6 408.57,-1346.6 414.57,-1340.6 420.57,-1340.6 420.57,-1340.6 457.98,-1340.6 457.98,-1340.6 463.98,-1340.6 469.98,-1346.6 469.98,-1352.6 469.98,-1352.6 469.98,-1370 469.98,-1370 469.98,-1376 463.98,-1382 457.98,-1382"/>
 <text xml:space="preserve" text-anchor="middle" x="439.27" y="-1362.45" font-family="sans-serif" font-size="13.00">carbon</text>
 <text xml:space="preserve" text-anchor="middle" x="439.27" y="-1348.95" font-family="sans-serif" font-size="13.00">price</text>
@@ -699,9 +699,9 @@
 <polygon fill="#cccccc" stroke="#cccccc" points="884,-745.89 879.62,-739.9 879.31,-747.31 884,-745.89"/>
 </g>
 <!-- global_relative_cumulative_emissions -->
-<g id="demo&#45;node&#45;global_relative_cumulative_emissions" class="node calculated">
+<g id="dependency&#45;node&#45;global_relative_cumulative_emissions" class="node calculated">
 <title>global_relative_cumulative_emissions</title>
-<g id="a_demo&#45;node&#45;global_relative_cumulative_emissions"><a xlink:href="?demo_variable=global_relative_cumulative_emissions#dependency-graph-demo" xlink:title="global_relative_cumulative_emissions">
+<g id="a_dependency&#45;node&#45;global_relative_cumulative_emissions"><a xlink:href="?graph_variable=global_relative_cumulative_emissions#dependency-graph" xlink:title="global_relative_cumulative_emissions">
 <path fill="#89a041" stroke="black" d="M1130.46,-1111C1130.46,-1111 1003.8,-1111 1003.8,-1111 997.8,-1111 991.8,-1105 991.8,-1099 991.8,-1099 991.8,-1081.6 991.8,-1081.6 991.8,-1075.6 997.8,-1069.6 1003.8,-1069.6 1003.8,-1069.6 1130.46,-1069.6 1130.46,-1069.6 1136.46,-1069.6 1142.46,-1075.6 1142.46,-1081.6 1142.46,-1081.6 1142.46,-1099 1142.46,-1099 1142.46,-1105 1136.46,-1111 1130.46,-1111"/>
 <text xml:space="preserve" text-anchor="middle" x="1067.13" y="-1091.45" font-family="sans-serif" font-size="13.00">global_relative</text>
 <text xml:space="preserve" text-anchor="middle" x="1067.13" y="-1077.95" font-family="sans-serif" font-size="13.00">cumulative_emissions</text>
@@ -715,9 +715,9 @@
 <polygon fill="#999999" stroke="#999999" points="994.53,-1065.99 1001.55,-1068.38 997.55,-1062.13 994.53,-1065.99"/>
 </g>
 <!-- temperature -->
-<g id="demo&#45;node&#45;temperature" class="node calculated">
+<g id="dependency&#45;node&#45;temperature" class="node calculated">
 <title>temperature</title>
-<g id="a_demo&#45;node&#45;temperature"><a xlink:href="?demo_variable=temperature#dependency-graph-demo" xlink:title="temperature">
+<g id="a_dependency&#45;node&#45;temperature"><a xlink:href="?graph_variable=temperature#dependency-graph" xlink:title="temperature">
 <path fill="#89a041" stroke="black" d="M1101.21,-734.3C1101.21,-734.3 1033.05,-734.3 1033.05,-734.3 1027.05,-734.3 1021.05,-728.3 1021.05,-722.3 1021.05,-722.3 1021.05,-710.3 1021.05,-710.3 1021.05,-704.3 1027.05,-698.3 1033.05,-698.3 1033.05,-698.3 1101.21,-698.3 1101.21,-698.3 1107.21,-698.3 1113.21,-704.3 1113.21,-710.3 1113.21,-710.3 1113.21,-722.3 1113.21,-722.3 1113.21,-728.3 1107.21,-734.3 1101.21,-734.3"/>
 <text xml:space="preserve" text-anchor="middle" x="1067.13" y="-710.7" font-family="sans-serif" font-size="13.00">temperature</text>
 </a>
@@ -730,9 +730,9 @@
 <polygon fill="#999999" stroke="#999999" points="1012.08,-718.99 1019.07,-716.51 1012.06,-714.09 1012.08,-718.99"/>
 </g>
 <!-- LBD_factor -->
-<g id="demo&#45;node&#45;LBD_factor" class="node calculated">
+<g id="dependency&#45;node&#45;LBD_factor" class="node calculated">
 <title>LBD_factor</title>
-<g id="a_demo&#45;node&#45;LBD_factor"><a xlink:href="?demo_variable=LBD_factor#dependency-graph-demo" xlink:title="LBD_factor">
+<g id="a_dependency&#45;node&#45;LBD_factor"><a xlink:href="?graph_variable=LBD_factor#dependency-graph" xlink:title="LBD_factor">
 <path fill="#89a041" stroke="black" d="M159.16,-1517C159.16,-1517 129.16,-1517 129.16,-1517 123.16,-1517 117.16,-1511 117.16,-1505 117.16,-1505 117.16,-1487.6 117.16,-1487.6 117.16,-1481.6 123.16,-1475.6 129.16,-1475.6 129.16,-1475.6 159.16,-1475.6 159.16,-1475.6 165.16,-1475.6 171.16,-1481.6 171.16,-1487.6 171.16,-1487.6 171.16,-1505 171.16,-1505 171.16,-1511 165.16,-1517 159.16,-1517"/>
 <text xml:space="preserve" text-anchor="middle" x="144.16" y="-1497.45" font-family="sans-serif" font-size="13.00">LBD</text>
 <text xml:space="preserve" text-anchor="middle" x="144.16" y="-1483.95" font-family="sans-serif" font-size="13.00">factor</text>
@@ -746,9 +746,9 @@
 <polygon fill="#cccccc" stroke="#cccccc" points="175.81,-1467.83 171.98,-1474.18 178.93,-1471.6 175.81,-1467.83"/>
 </g>
 <!-- slr_thermal_fast -->
-<g id="demo&#45;node&#45;slr_thermal_fast" class="node calculated">
+<g id="dependency&#45;node&#45;slr_thermal_fast" class="node calculated">
 <title>slr_thermal_fast</title>
-<g id="a_demo&#45;node&#45;slr_thermal_fast"><a xlink:href="?demo_variable=slr_thermal_fast#dependency-graph-demo" xlink:title="slr_thermal_fast">
+<g id="a_dependency&#45;node&#45;slr_thermal_fast"><a xlink:href="?graph_variable=slr_thermal_fast#dependency-graph" xlink:title="slr_thermal_fast">
 <path fill="#89a041" stroke="black" d="M661.39,-564C661.39,-564 599.23,-564 599.23,-564 593.23,-564 587.23,-558 587.23,-552 587.23,-552 587.23,-534.6 587.23,-534.6 587.23,-528.6 593.23,-522.6 599.23,-522.6 599.23,-522.6 661.39,-522.6 661.39,-522.6 667.39,-522.6 673.39,-528.6 673.39,-534.6 673.39,-534.6 673.39,-552 673.39,-552 673.39,-558 667.39,-564 661.39,-564"/>
 <text xml:space="preserve" text-anchor="middle" x="630.31" y="-544.45" font-family="sans-serif" font-size="13.00">slr_thermal</text>
 <text xml:space="preserve" text-anchor="middle" x="630.31" y="-530.95" font-family="sans-serif" font-size="13.00">fast</text>
@@ -762,9 +762,9 @@
 <polygon fill="#cccccc" stroke="#cccccc" points="637.27,-572.47 633.97,-565.82 632.41,-573.08 637.27,-572.47"/>
 </g>
 <!-- slr_thermal_slow -->
-<g id="demo&#45;node&#45;slr_thermal_slow" class="node calculated">
+<g id="dependency&#45;node&#45;slr_thermal_slow" class="node calculated">
 <title>slr_thermal_slow</title>
-<g id="a_demo&#45;node&#45;slr_thermal_slow"><a xlink:href="?demo_variable=slr_thermal_slow#dependency-graph-demo" xlink:title="slr_thermal_slow">
+<g id="a_dependency&#45;node&#45;slr_thermal_slow"><a xlink:href="?graph_variable=slr_thermal_slow#dependency-graph" xlink:title="slr_thermal_slow">
 <path fill="#89a041" stroke="black" d="M661.39,-480C661.39,-480 599.23,-480 599.23,-480 593.23,-480 587.23,-474 587.23,-468 587.23,-468 587.23,-450.6 587.23,-450.6 587.23,-444.6 593.23,-438.6 599.23,-438.6 599.23,-438.6 661.39,-438.6 661.39,-438.6 667.39,-438.6 673.39,-444.6 673.39,-450.6 673.39,-450.6 673.39,-468 673.39,-468 673.39,-474 667.39,-480 661.39,-480"/>
 <text xml:space="preserve" text-anchor="middle" x="630.31" y="-460.45" font-family="sans-serif" font-size="13.00">slr_thermal</text>
 <text xml:space="preserve" text-anchor="middle" x="630.31" y="-446.95" font-family="sans-serif" font-size="13.00">slow</text>
@@ -778,9 +778,9 @@
 <polygon fill="#cccccc" stroke="#cccccc" points="674.81,-483.8 667.82,-481.32 671.74,-487.61 674.81,-483.8"/>
 </g>
 <!-- slr_cumgsic -->
-<g id="demo&#45;node&#45;slr_cumgsic" class="node calculated">
+<g id="dependency&#45;node&#45;slr_cumgsic" class="node calculated">
 <title>slr_cumgsic</title>
-<g id="a_demo&#45;node&#45;slr_cumgsic"><a xlink:href="?demo_variable=slr_cumgsic#dependency-graph-demo" xlink:title="slr_cumgsic">
+<g id="a_dependency&#45;node&#45;slr_cumgsic"><a xlink:href="?graph_variable=slr_cumgsic#dependency-graph" xlink:title="slr_cumgsic">
 <path fill="#89a041" stroke="black" d="M864.42,-588C864.42,-588 819.51,-588 819.51,-588 813.51,-588 807.51,-582 807.51,-576 807.51,-576 807.51,-558.6 807.51,-558.6 807.51,-552.6 813.51,-546.6 819.51,-546.6 819.51,-546.6 864.42,-546.6 864.42,-546.6 870.42,-546.6 876.42,-552.6 876.42,-558.6 876.42,-558.6 876.42,-576 876.42,-576 876.42,-582 870.42,-588 864.42,-588"/>
 <text xml:space="preserve" text-anchor="middle" x="841.97" y="-568.45" font-family="sans-serif" font-size="13.00">slr</text>
 <text xml:space="preserve" text-anchor="middle" x="841.97" y="-554.95" font-family="sans-serif" font-size="13.00">cumgsic</text>
@@ -794,9 +794,9 @@
 <polygon fill="#cccccc" stroke="#cccccc" points="885.33,-587.65 878.03,-586.35 882.92,-591.92 885.33,-587.65"/>
 </g>
 <!-- slr_cumgis -->
-<g id="demo&#45;node&#45;slr_cumgis" class="node calculated">
+<g id="dependency&#45;node&#45;slr_cumgis" class="node calculated">
 <title>slr_cumgis</title>
-<g id="a_demo&#45;node&#45;slr_cumgis"><a xlink:href="?demo_variable=slr_cumgis#dependency-graph-demo" xlink:title="slr_cumgis">
+<g id="a_dependency&#45;node&#45;slr_cumgis"><a xlink:href="?graph_variable=slr_cumgis#dependency-graph" xlink:title="slr_cumgis">
 <path fill="#89a041" stroke="black" d="M861.05,-438C861.05,-438 822.89,-438 822.89,-438 816.89,-438 810.89,-432 810.89,-426 810.89,-426 810.89,-408.6 810.89,-408.6 810.89,-402.6 816.89,-396.6 822.89,-396.6 822.89,-396.6 861.05,-396.6 861.05,-396.6 867.05,-396.6 873.05,-402.6 873.05,-408.6 873.05,-408.6 873.05,-426 873.05,-426 873.05,-432 867.05,-438 861.05,-438"/>
 <text xml:space="preserve" text-anchor="middle" x="841.97" y="-418.45" font-family="sans-serif" font-size="13.00">slr</text>
 <text xml:space="preserve" text-anchor="middle" x="841.97" y="-404.95" font-family="sans-serif" font-size="13.00">cumgis</text>
@@ -810,9 +810,9 @@
 <polygon fill="#cccccc" stroke="#cccccc" points="881.98,-431.12 874.62,-430.27 879.84,-435.53 881.98,-431.12"/>
 </g>
 <!-- slr_antarctic_ocean_temp -->
-<g id="demo&#45;node&#45;slr_antarctic_ocean_temp" class="node calculated">
+<g id="dependency&#45;node&#45;slr_antarctic_ocean_temp" class="node calculated">
 <title>slr_antarctic_ocean_temp</title>
-<g id="a_demo&#45;node&#45;slr_antarctic_ocean_temp"><a xlink:href="?demo_variable=slr_antarctic_ocean_temp#dependency-graph-demo" xlink:title="slr_antarctic_ocean_temp">
+<g id="a_dependency&#45;node&#45;slr_antarctic_ocean_temp"><a xlink:href="?graph_variable=slr_antarctic_ocean_temp#dependency-graph" xlink:title="slr_antarctic_ocean_temp">
 <path fill="#89a041" stroke="black" d="M665.14,-354C665.14,-354 595.48,-354 595.48,-354 589.48,-354 583.48,-348 583.48,-342 583.48,-342 583.48,-324.6 583.48,-324.6 583.48,-318.6 589.48,-312.6 595.48,-312.6 595.48,-312.6 665.14,-312.6 665.14,-312.6 671.14,-312.6 677.14,-318.6 677.14,-324.6 677.14,-324.6 677.14,-342 677.14,-342 677.14,-348 671.14,-354 665.14,-354"/>
 <text xml:space="preserve" text-anchor="middle" x="630.31" y="-334.45" font-family="sans-serif" font-size="13.00">slr_antarctic</text>
 <text xml:space="preserve" text-anchor="middle" x="630.31" y="-320.95" font-family="sans-serif" font-size="13.00">ocean_temp</text>
@@ -826,9 +826,9 @@
 <polygon fill="#cccccc" stroke="#cccccc" points="657.03,-359.3 650.73,-355.38 653.21,-362.37 657.03,-359.3"/>
 </g>
 <!-- riverine_damage_costs_gross -->
-<g id="demo&#45;node&#45;riverine_damage_costs_gross" class="node calculated">
+<g id="dependency&#45;node&#45;riverine_damage_costs_gross" class="node calculated">
 <title>riverine_damage_costs_gross</title>
-<g id="a_demo&#45;node&#45;riverine_damage_costs_gross"><a xlink:href="?demo_variable=riverine_damage_costs_gross#dependency-graph-demo" xlink:title="riverine_damage_costs_gross">
+<g id="a_dependency&#45;node&#45;riverine_damage_costs_gross"><a xlink:href="?graph_variable=riverine_damage_costs_gross#dependency-graph" xlink:title="riverine_damage_costs_gross">
 <path fill="#89a041" stroke="black" d="M1328.24,-795C1328.24,-795 1232.33,-795 1232.33,-795 1226.33,-795 1220.33,-789 1220.33,-783 1220.33,-783 1220.33,-765.6 1220.33,-765.6 1220.33,-759.6 1226.33,-753.6 1232.33,-753.6 1232.33,-753.6 1328.24,-753.6 1328.24,-753.6 1334.24,-753.6 1340.24,-759.6 1340.24,-765.6 1340.24,-765.6 1340.24,-783 1340.24,-783 1340.24,-789 1334.24,-795 1328.24,-795"/>
 <text xml:space="preserve" text-anchor="middle" x="1280.29" y="-775.45" font-family="sans-serif" font-size="13.00">riverine_damage</text>
 <text xml:space="preserve" text-anchor="middle" x="1280.29" y="-761.95" font-family="sans-serif" font-size="13.00">costs_gross</text>
@@ -842,9 +842,9 @@
 <polygon fill="#999999" stroke="#999999" points="1211.3,-758.17 1218.7,-757.66 1212.6,-753.44 1211.3,-758.17"/>
 </g>
 <!-- labourprod_damage_costs_gross -->
-<g id="demo&#45;node&#45;labourprod_damage_costs_gross" class="node calculated">
+<g id="dependency&#45;node&#45;labourprod_damage_costs_gross" class="node calculated">
 <title>labourprod_damage_costs_gross</title>
-<g id="a_demo&#45;node&#45;labourprod_damage_costs_gross"><a xlink:href="?demo_variable=labourprod_damage_costs_gross#dependency-graph-demo" xlink:title="labourprod_damage_costs_gross">
+<g id="a_dependency&#45;node&#45;labourprod_damage_costs_gross"><a xlink:href="?graph_variable=labourprod_damage_costs_gross#dependency-graph" xlink:title="labourprod_damage_costs_gross">
 <path fill="#89a041" stroke="black" d="M1338.37,-861C1338.37,-861 1222.21,-861 1222.21,-861 1216.21,-861 1210.21,-855 1210.21,-849 1210.21,-849 1210.21,-831.6 1210.21,-831.6 1210.21,-825.6 1216.21,-819.6 1222.21,-819.6 1222.21,-819.6 1338.37,-819.6 1338.37,-819.6 1344.37,-819.6 1350.37,-825.6 1350.37,-831.6 1350.37,-831.6 1350.37,-849 1350.37,-849 1350.37,-855 1344.37,-861 1338.37,-861"/>
 <text xml:space="preserve" text-anchor="middle" x="1280.29" y="-841.45" font-family="sans-serif" font-size="13.00">labourprod_damage</text>
 <text xml:space="preserve" text-anchor="middle" x="1280.29" y="-827.95" font-family="sans-serif" font-size="13.00">costs_gross</text>
@@ -858,9 +858,9 @@
 <polygon fill="#999999" stroke="#999999" points="1218.01,-817.84 1225.39,-818.58 1220.08,-813.4 1218.01,-817.84"/>
 </g>
 <!-- labourprod_damage_costs_benefits -->
-<g id="demo&#45;node&#45;labourprod_damage_costs_benefits" class="node calculated">
+<g id="dependency&#45;node&#45;labourprod_damage_costs_benefits" class="node calculated">
 <title>labourprod_damage_costs_benefits</title>
-<g id="a_demo&#45;node&#45;labourprod_damage_costs_benefits"><a xlink:href="?demo_variable=labourprod_damage_costs_benefits#dependency-graph-demo" xlink:title="labourprod_damage_costs_benefits">
+<g id="a_dependency&#45;node&#45;labourprod_damage_costs_benefits"><a xlink:href="?graph_variable=labourprod_damage_costs_benefits#dependency-graph" xlink:title="labourprod_damage_costs_benefits">
 <path fill="#89a041" stroke="black" d="M1544.03,-995C1544.03,-995 1427.87,-995 1427.87,-995 1421.87,-995 1415.87,-989 1415.87,-983 1415.87,-983 1415.87,-965.6 1415.87,-965.6 1415.87,-959.6 1421.87,-953.6 1427.87,-953.6 1427.87,-953.6 1544.03,-953.6 1544.03,-953.6 1550.03,-953.6 1556.03,-959.6 1556.03,-965.6 1556.03,-965.6 1556.03,-983 1556.03,-983 1556.03,-989 1550.03,-995 1544.03,-995"/>
 <text xml:space="preserve" text-anchor="middle" x="1485.95" y="-975.45" font-family="sans-serif" font-size="13.00">labourprod_damage</text>
 <text xml:space="preserve" text-anchor="middle" x="1485.95" y="-961.95" font-family="sans-serif" font-size="13.00">costs_benefits</text>
@@ -874,9 +874,9 @@
 <polygon fill="#999999" stroke="#999999" points="1421.16,-950.08 1428.21,-952.38 1424.13,-946.18 1421.16,-950.08"/>
 </g>
 <!-- mortality_heat_related -->
-<g id="demo&#45;node&#45;mortality_heat_related" class="node calculated">
+<g id="dependency&#45;node&#45;mortality_heat_related" class="node calculated">
 <title>mortality_heat_related</title>
-<g id="a_demo&#45;node&#45;mortality_heat_related"><a xlink:href="?demo_variable=mortality_heat_related#dependency-graph-demo" xlink:title="mortality_heat_related">
+<g id="a_dependency&#45;node&#45;mortality_heat_related"><a xlink:href="?graph_variable=mortality_heat_related#dependency-graph" xlink:title="mortality_heat_related">
 <path fill="#89a041" stroke="black" d="M1320.37,-402C1320.37,-402 1240.21,-402 1240.21,-402 1234.21,-402 1228.21,-396 1228.21,-390 1228.21,-390 1228.21,-372.6 1228.21,-372.6 1228.21,-366.6 1234.21,-360.6 1240.21,-360.6 1240.21,-360.6 1320.37,-360.6 1320.37,-360.6 1326.37,-360.6 1332.37,-366.6 1332.37,-372.6 1332.37,-372.6 1332.37,-390 1332.37,-390 1332.37,-396 1326.37,-402 1320.37,-402"/>
 <text xml:space="preserve" text-anchor="middle" x="1280.29" y="-382.45" font-family="sans-serif" font-size="13.00">mortality_heat</text>
 <text xml:space="preserve" text-anchor="middle" x="1280.29" y="-368.95" font-family="sans-serif" font-size="13.00">related</text>
@@ -890,9 +890,9 @@
 <polygon fill="#999999" stroke="#999999" points="1221.5,-402.83 1226.51,-397.36 1219.19,-398.51 1221.5,-402.83"/>
 </g>
 <!-- mortality_cold_related -->
-<g id="demo&#45;node&#45;mortality_cold_related" class="node calculated">
+<g id="dependency&#45;node&#45;mortality_cold_related" class="node calculated">
 <title>mortality_cold_related</title>
-<g id="a_demo&#45;node&#45;mortality_cold_related"><a xlink:href="?demo_variable=mortality_cold_related#dependency-graph-demo" xlink:title="mortality_cold_related">
+<g id="a_dependency&#45;node&#45;mortality_cold_related"><a xlink:href="?graph_variable=mortality_cold_related#dependency-graph" xlink:title="mortality_cold_related">
 <path fill="#89a041" stroke="black" d="M1319.62,-468C1319.62,-468 1240.96,-468 1240.96,-468 1234.96,-468 1228.96,-462 1228.96,-456 1228.96,-456 1228.96,-438.6 1228.96,-438.6 1228.96,-432.6 1234.96,-426.6 1240.96,-426.6 1240.96,-426.6 1319.62,-426.6 1319.62,-426.6 1325.62,-426.6 1331.62,-432.6 1331.62,-438.6 1331.62,-438.6 1331.62,-456 1331.62,-456 1331.62,-462 1325.62,-468 1319.62,-468"/>
 <text xml:space="preserve" text-anchor="middle" x="1280.29" y="-448.45" font-family="sans-serif" font-size="13.00">mortality_cold</text>
 <text xml:space="preserve" text-anchor="middle" x="1280.29" y="-434.95" font-family="sans-serif" font-size="13.00">related</text>
@@ -906,9 +906,9 @@
 <polygon fill="#999999" stroke="#999999" points="1259.33,-476.7 1261.72,-469.68 1255.47,-473.68 1259.33,-476.7"/>
 </g>
 <!-- learning_factor -->
-<g id="demo&#45;node&#45;learning_factor" class="node calculated">
+<g id="dependency&#45;node&#45;learning_factor" class="node calculated">
 <title>learning_factor</title>
-<g id="a_demo&#45;node&#45;learning_factor"><a xlink:href="?demo_variable=learning_factor#dependency-graph-demo" xlink:title="learning_factor">
+<g id="a_dependency&#45;node&#45;learning_factor"><a xlink:href="?graph_variable=learning_factor#dependency-graph" xlink:title="learning_factor">
 <path fill="#89a041" stroke="black" d="M292.82,-1484C292.82,-1484 248.66,-1484 248.66,-1484 242.66,-1484 236.66,-1478 236.66,-1472 236.66,-1472 236.66,-1454.6 236.66,-1454.6 236.66,-1448.6 242.66,-1442.6 248.66,-1442.6 248.66,-1442.6 292.82,-1442.6 292.82,-1442.6 298.82,-1442.6 304.82,-1448.6 304.82,-1454.6 304.82,-1454.6 304.82,-1472 304.82,-1472 304.82,-1478 298.82,-1484 292.82,-1484"/>
 <text xml:space="preserve" text-anchor="middle" x="270.74" y="-1464.45" font-family="sans-serif" font-size="13.00">learning</text>
 <text xml:space="preserve" text-anchor="middle" x="270.74" y="-1450.95" font-family="sans-serif" font-size="13.00">factor</text>
@@ -928,9 +928,9 @@
 <polygon fill="#cccccc" stroke="#cccccc" points="668.51,-572.02 664.29,-565.91 663.78,-573.31 668.51,-572.02"/>
 </g>
 <!-- slr_thermal -->
-<g id="demo&#45;node&#45;slr_thermal" class="node calculated">
+<g id="dependency&#45;node&#45;slr_thermal" class="node calculated">
 <title>slr_thermal</title>
-<g id="a_demo&#45;node&#45;slr_thermal"><a xlink:href="?demo_variable=slr_thermal#dependency-graph-demo" xlink:title="slr_thermal">
+<g id="a_dependency&#45;node&#45;slr_thermal"><a xlink:href="?graph_variable=slr_thermal#dependency-graph" xlink:title="slr_thermal">
 <path fill="#89a041" stroke="black" d="M862.17,-522C862.17,-522 821.76,-522 821.76,-522 815.76,-522 809.76,-516 809.76,-510 809.76,-510 809.76,-492.6 809.76,-492.6 809.76,-486.6 815.76,-480.6 821.76,-480.6 821.76,-480.6 862.17,-480.6 862.17,-480.6 868.17,-480.6 874.17,-486.6 874.17,-492.6 874.17,-492.6 874.17,-510 874.17,-510 874.17,-516 868.17,-522 862.17,-522"/>
 <text xml:space="preserve" text-anchor="middle" x="841.97" y="-502.45" font-family="sans-serif" font-size="13.00">slr</text>
 <text xml:space="preserve" text-anchor="middle" x="841.97" y="-488.95" font-family="sans-serif" font-size="13.00">thermal</text>
@@ -962,9 +962,9 @@
 <polygon fill="#cccccc" stroke="#cccccc" points="883.17,-590.99 877.34,-586.4 879.04,-593.62 883.17,-590.99"/>
 </g>
 <!-- total_SLR -->
-<g id="demo&#45;node&#45;total_SLR" class="node calculated">
+<g id="dependency&#45;node&#45;total_SLR" class="node calculated">
 <title>total_SLR</title>
-<g id="a_demo&#45;node&#45;total_SLR"><a xlink:href="?demo_variable=total_SLR#dependency-graph-demo" xlink:title="total_SLR">
+<g id="a_dependency&#45;node&#45;total_SLR"><a xlink:href="?graph_variable=total_SLR#dependency-graph" xlink:title="total_SLR">
 <path fill="#89a041" stroke="black" d="M1082.13,-555C1082.13,-555 1052.13,-555 1052.13,-555 1046.13,-555 1040.13,-549 1040.13,-543 1040.13,-543 1040.13,-525.6 1040.13,-525.6 1040.13,-519.6 1046.13,-513.6 1052.13,-513.6 1052.13,-513.6 1082.13,-513.6 1082.13,-513.6 1088.13,-513.6 1094.13,-519.6 1094.13,-525.6 1094.13,-525.6 1094.13,-543 1094.13,-543 1094.13,-549 1088.13,-555 1082.13,-555"/>
 <text xml:space="preserve" text-anchor="middle" x="1067.13" y="-535.45" font-family="sans-serif" font-size="13.00">total</text>
 <text xml:space="preserve" text-anchor="middle" x="1067.13" y="-521.95" font-family="sans-serif" font-size="13.00">SLR</text>
@@ -996,9 +996,9 @@
 <polygon fill="#cccccc" stroke="#cccccc" points="668.51,-362.02 664.29,-355.91 663.78,-363.31 668.51,-362.02"/>
 </g>
 <!-- slr_cumais -->
-<g id="demo&#45;node&#45;slr_cumais" class="node calculated">
+<g id="dependency&#45;node&#45;slr_cumais" class="node calculated">
 <title>slr_cumais</title>
-<g id="a_demo&#45;node&#45;slr_cumais"><a xlink:href="?demo_variable=slr_cumais#dependency-graph-demo" xlink:title="slr_cumais">
+<g id="a_dependency&#45;node&#45;slr_cumais"><a xlink:href="?graph_variable=slr_cumais#dependency-graph" xlink:title="slr_cumais">
 <path fill="#89a041" stroke="black" d="M861.05,-354C861.05,-354 822.89,-354 822.89,-354 816.89,-354 810.89,-348 810.89,-342 810.89,-342 810.89,-324.6 810.89,-324.6 810.89,-318.6 816.89,-312.6 822.89,-312.6 822.89,-312.6 861.05,-312.6 861.05,-312.6 867.05,-312.6 873.05,-318.6 873.05,-324.6 873.05,-324.6 873.05,-342 873.05,-342 873.05,-348 867.05,-354 861.05,-354"/>
 <text xml:space="preserve" text-anchor="middle" x="841.97" y="-334.45" font-family="sans-serif" font-size="13.00">slr</text>
 <text xml:space="preserve" text-anchor="middle" x="841.97" y="-320.95" font-family="sans-serif" font-size="13.00">cumais</text>
@@ -1012,9 +1012,9 @@
 <polygon fill="#999999" stroke="#999999" points="802.17,-335.75 809.17,-333.3 802.17,-330.85 802.17,-335.75"/>
 </g>
 <!-- riverine_damage_costs -->
-<g id="demo&#45;node&#45;riverine_damage_costs" class="node calculated">
+<g id="dependency&#45;node&#45;riverine_damage_costs" class="node calculated">
 <title>riverine_damage_costs</title>
-<g id="a_demo&#45;node&#45;riverine_damage_costs"><a xlink:href="?demo_variable=riverine_damage_costs#dependency-graph-demo" xlink:title="riverine_damage_costs">
+<g id="a_dependency&#45;node&#45;riverine_damage_costs"><a xlink:href="?graph_variable=riverine_damage_costs#dependency-graph" xlink:title="riverine_damage_costs">
 <path fill="#89a041" stroke="black" d="M1533.9,-1061C1533.9,-1061 1437.99,-1061 1437.99,-1061 1431.99,-1061 1425.99,-1055 1425.99,-1049 1425.99,-1049 1425.99,-1031.6 1425.99,-1031.6 1425.99,-1025.6 1431.99,-1019.6 1437.99,-1019.6 1437.99,-1019.6 1533.9,-1019.6 1533.9,-1019.6 1539.9,-1019.6 1545.9,-1025.6 1545.9,-1031.6 1545.9,-1031.6 1545.9,-1049 1545.9,-1049 1545.9,-1055 1539.9,-1061 1533.9,-1061"/>
 <text xml:space="preserve" text-anchor="middle" x="1485.95" y="-1041.45" font-family="sans-serif" font-size="13.00">riverine_damage</text>
 <text xml:space="preserve" text-anchor="middle" x="1485.95" y="-1027.95" font-family="sans-serif" font-size="13.00">costs</text>
@@ -1028,9 +1028,9 @@
 <polygon fill="#999999" stroke="#999999" points="1421.16,-1016.08 1428.21,-1018.38 1424.13,-1012.18 1421.16,-1016.08"/>
 </g>
 <!-- labourprod_damage_costs -->
-<g id="demo&#45;node&#45;labourprod_damage_costs" class="node calculated">
+<g id="dependency&#45;node&#45;labourprod_damage_costs" class="node calculated">
 <title>labourprod_damage_costs</title>
-<g id="a_demo&#45;node&#45;labourprod_damage_costs"><a xlink:href="?demo_variable=labourprod_damage_costs#dependency-graph-demo" xlink:title="labourprod_damage_costs">
+<g id="a_dependency&#45;node&#45;labourprod_damage_costs"><a xlink:href="?graph_variable=labourprod_damage_costs#dependency-graph" xlink:title="labourprod_damage_costs">
 <path fill="#89a041" stroke="black" d="M1544.03,-1279C1544.03,-1279 1427.87,-1279 1427.87,-1279 1421.87,-1279 1415.87,-1273 1415.87,-1267 1415.87,-1267 1415.87,-1249.6 1415.87,-1249.6 1415.87,-1243.6 1421.87,-1237.6 1427.87,-1237.6 1427.87,-1237.6 1544.03,-1237.6 1544.03,-1237.6 1550.03,-1237.6 1556.03,-1243.6 1556.03,-1249.6 1556.03,-1249.6 1556.03,-1267 1556.03,-1267 1556.03,-1273 1550.03,-1279 1544.03,-1279"/>
 <text xml:space="preserve" text-anchor="middle" x="1485.95" y="-1259.45" font-family="sans-serif" font-size="13.00">labourprod_damage</text>
 <text xml:space="preserve" text-anchor="middle" x="1485.95" y="-1245.95" font-family="sans-serif" font-size="13.00">costs</text>
@@ -1044,9 +1044,9 @@
 <polygon fill="#999999" stroke="#999999" points="1471.83,-1230.37 1476.59,-1236.06 1476.41,-1228.64 1471.83,-1230.37"/>
 </g>
 <!-- labourprod_damage_costs_net -->
-<g id="demo&#45;node&#45;labourprod_damage_costs_net" class="node calculated">
+<g id="dependency&#45;node&#45;labourprod_damage_costs_net" class="node calculated">
 <title>labourprod_damage_costs_net</title>
-<g id="a_demo&#45;node&#45;labourprod_damage_costs_net"><a xlink:href="?demo_variable=labourprod_damage_costs_net#dependency-graph-demo" xlink:title="labourprod_damage_costs_net">
+<g id="a_dependency&#45;node&#45;labourprod_damage_costs_net"><a xlink:href="?graph_variable=labourprod_damage_costs_net#dependency-graph" xlink:title="labourprod_damage_costs_net">
 <path fill="#89a041" stroke="black" d="M1742.19,-1009C1742.19,-1009 1626.03,-1009 1626.03,-1009 1620.03,-1009 1614.03,-1003 1614.03,-997 1614.03,-997 1614.03,-979.6 1614.03,-979.6 1614.03,-973.6 1620.03,-967.6 1626.03,-967.6 1626.03,-967.6 1742.19,-967.6 1742.19,-967.6 1748.19,-967.6 1754.19,-973.6 1754.19,-979.6 1754.19,-979.6 1754.19,-997 1754.19,-997 1754.19,-1003 1748.19,-1009 1742.19,-1009"/>
 <text xml:space="preserve" text-anchor="middle" x="1684.11" y="-989.45" font-family="sans-serif" font-size="13.00">labourprod_damage</text>
 <text xml:space="preserve" text-anchor="middle" x="1684.11" y="-975.95" font-family="sans-serif" font-size="13.00">costs_net</text>
@@ -1060,9 +1060,9 @@
 <polygon fill="#999999" stroke="#999999" points="1605.1,-985.19 1612.26,-983.24 1605.45,-980.3 1605.1,-985.19"/>
 </g>
 <!-- mortality_net -->
-<g id="demo&#45;node&#45;mortality_net" class="node calculated">
+<g id="dependency&#45;node&#45;mortality_net" class="node calculated">
 <title>mortality_net</title>
-<g id="a_demo&#45;node&#45;mortality_net"><a xlink:href="?demo_variable=mortality_net#dependency-graph-demo" xlink:title="mortality_net">
+<g id="a_dependency&#45;node&#45;mortality_net"><a xlink:href="?graph_variable=mortality_net#dependency-graph" xlink:title="mortality_net">
 <path fill="#89a041" stroke="black" d="M1509.15,-435C1509.15,-435 1462.74,-435 1462.74,-435 1456.74,-435 1450.74,-429 1450.74,-423 1450.74,-423 1450.74,-405.6 1450.74,-405.6 1450.74,-399.6 1456.74,-393.6 1462.74,-393.6 1462.74,-393.6 1509.15,-393.6 1509.15,-393.6 1515.15,-393.6 1521.15,-399.6 1521.15,-405.6 1521.15,-405.6 1521.15,-423 1521.15,-423 1521.15,-429 1515.15,-435 1509.15,-435"/>
 <text xml:space="preserve" text-anchor="middle" x="1485.95" y="-415.45" font-family="sans-serif" font-size="13.00">mortality</text>
 <text xml:space="preserve" text-anchor="middle" x="1485.95" y="-401.95" font-family="sans-serif" font-size="13.00">net</text>
@@ -1100,9 +1100,9 @@
 <polygon fill="#999999" stroke="#999999" points="1030.89,-531.57 1038.17,-530.17 1031.6,-526.72 1030.89,-531.57"/>
 </g>
 <!-- slr_damage_costs_gross -->
-<g id="demo&#45;node&#45;slr_damage_costs_gross" class="node calculated">
+<g id="dependency&#45;node&#45;slr_damage_costs_gross" class="node calculated">
 <title>slr_damage_costs_gross</title>
-<g id="a_demo&#45;node&#45;slr_damage_costs_gross"><a xlink:href="?demo_variable=slr_damage_costs_gross#dependency-graph-demo" xlink:title="slr_damage_costs_gross">
+<g id="a_dependency&#45;node&#45;slr_damage_costs_gross"><a xlink:href="?graph_variable=slr_damage_costs_gross#dependency-graph" xlink:title="slr_damage_costs_gross">
 <path fill="#89a041" stroke="black" d="M1314.37,-629C1314.37,-629 1246.21,-629 1246.21,-629 1240.21,-629 1234.21,-623 1234.21,-617 1234.21,-617 1234.21,-599.6 1234.21,-599.6 1234.21,-593.6 1240.21,-587.6 1246.21,-587.6 1246.21,-587.6 1314.37,-587.6 1314.37,-587.6 1320.37,-587.6 1326.37,-593.6 1326.37,-599.6 1326.37,-599.6 1326.37,-617 1326.37,-617 1326.37,-623 1320.37,-629 1314.37,-629"/>
 <text xml:space="preserve" text-anchor="middle" x="1280.29" y="-609.45" font-family="sans-serif" font-size="13.00">slr_damage</text>
 <text xml:space="preserve" text-anchor="middle" x="1280.29" y="-595.95" font-family="sans-serif" font-size="13.00">costs_gross</text>
@@ -1128,9 +1128,9 @@
 <polygon fill="#cccccc" stroke="#cccccc" points="881.07,-352.9 874.53,-349.4 877.45,-356.21 881.07,-352.9"/>
 </g>
 <!-- slr_cumlws -->
-<g id="demo&#45;node&#45;slr_cumlws" class="node calculated">
+<g id="dependency&#45;node&#45;slr_cumlws" class="node calculated">
 <title>slr_cumlws</title>
-<g id="a_demo&#45;node&#45;slr_cumlws"><a xlink:href="?demo_variable=slr_cumlws#dependency-graph-demo" xlink:title="slr_cumlws">
+<g id="a_dependency&#45;node&#45;slr_cumlws"><a xlink:href="?graph_variable=slr_cumlws#dependency-graph" xlink:title="slr_cumlws">
 <path fill="#89a041" stroke="black" d="M862.17,-1094C862.17,-1094 821.76,-1094 821.76,-1094 815.76,-1094 809.76,-1088 809.76,-1082 809.76,-1082 809.76,-1064.6 809.76,-1064.6 809.76,-1058.6 815.76,-1052.6 821.76,-1052.6 821.76,-1052.6 862.17,-1052.6 862.17,-1052.6 868.17,-1052.6 874.17,-1058.6 874.17,-1064.6 874.17,-1064.6 874.17,-1082 874.17,-1082 874.17,-1088 868.17,-1094 862.17,-1094"/>
 <text xml:space="preserve" text-anchor="middle" x="841.97" y="-1074.45" font-family="sans-serif" font-size="13.00">slr</text>
 <text xml:space="preserve" text-anchor="middle" x="841.97" y="-1060.95" font-family="sans-serif" font-size="13.00">cumlws</text>
@@ -1150,9 +1150,9 @@
 <polygon fill="#cccccc" stroke="#cccccc" points="881.9,-1094.23 875.56,-1090.39 878.13,-1097.35 881.9,-1094.23"/>
 </g>
 <!-- slr_damage_costs -->
-<g id="demo&#45;node&#45;slr_damage_costs" class="node calculated">
+<g id="dependency&#45;node&#45;slr_damage_costs" class="node calculated">
 <title>slr_damage_costs</title>
-<g id="a_demo&#45;node&#45;slr_damage_costs"><a xlink:href="?demo_variable=slr_damage_costs#dependency-graph-demo" xlink:title="slr_damage_costs">
+<g id="a_dependency&#45;node&#45;slr_damage_costs"><a xlink:href="?graph_variable=slr_damage_costs#dependency-graph" xlink:title="slr_damage_costs">
 <path fill="#89a041" stroke="black" d="M1518.9,-929C1518.9,-929 1452.99,-929 1452.99,-929 1446.99,-929 1440.99,-923 1440.99,-917 1440.99,-917 1440.99,-899.6 1440.99,-899.6 1440.99,-893.6 1446.99,-887.6 1452.99,-887.6 1452.99,-887.6 1518.9,-887.6 1518.9,-887.6 1524.9,-887.6 1530.9,-893.6 1530.9,-899.6 1530.9,-899.6 1530.9,-917 1530.9,-917 1530.9,-923 1524.9,-929 1518.9,-929"/>
 <text xml:space="preserve" text-anchor="middle" x="1485.95" y="-909.45" font-family="sans-serif" font-size="13.00">slr_damage</text>
 <text xml:space="preserve" text-anchor="middle" x="1485.95" y="-895.95" font-family="sans-serif" font-size="13.00">costs</text>
@@ -1166,9 +1166,9 @@
 <polygon fill="#999999" stroke="#999999" points="1467.84,-881.02 1473.3,-886.04 1472.16,-878.71 1467.84,-881.02"/>
 </g>
 <!-- damage_costs -->
-<g id="demo&#45;node&#45;damage_costs" class="node calculated">
+<g id="dependency&#45;node&#45;damage_costs" class="node calculated">
 <title>damage_costs</title>
-<g id="a_demo&#45;node&#45;damage_costs"><a xlink:href="?demo_variable=damage_costs#dependency-graph-demo" xlink:title="damage_costs">
+<g id="a_dependency&#45;node&#45;damage_costs"><a xlink:href="?graph_variable=damage_costs#dependency-graph" xlink:title="damage_costs">
 <path fill="#89a041" stroke="black" d="M1897.6,-1068C1897.6,-1068 1853.44,-1068 1853.44,-1068 1847.44,-1068 1841.44,-1062 1841.44,-1056 1841.44,-1056 1841.44,-1038.6 1841.44,-1038.6 1841.44,-1032.6 1847.44,-1026.6 1853.44,-1026.6 1853.44,-1026.6 1897.6,-1026.6 1897.6,-1026.6 1903.6,-1026.6 1909.6,-1032.6 1909.6,-1038.6 1909.6,-1038.6 1909.6,-1056 1909.6,-1056 1909.6,-1062 1903.6,-1068 1897.6,-1068"/>
 <text xml:space="preserve" text-anchor="middle" x="1875.52" y="-1048.45" font-family="sans-serif" font-size="13.00">damage</text>
 <text xml:space="preserve" text-anchor="middle" x="1875.52" y="-1034.95" font-family="sans-serif" font-size="13.00">costs</text>
@@ -1182,9 +1182,9 @@
 <polygon fill="#999999" stroke="#999999" points="1845.65,-1022.09 1852.44,-1025.09 1849,-1018.51 1845.65,-1022.09"/>
 </g>
 <!-- slr_adaptation_costs_abs -->
-<g id="demo&#45;node&#45;slr_adaptation_costs_abs" class="node control">
+<g id="dependency&#45;node&#45;slr_adaptation_costs_abs" class="node control">
 <title>slr_adaptation_costs_abs</title>
-<g id="a_demo&#45;node&#45;slr_adaptation_costs_abs"><a xlink:href="?demo_variable=slr_adaptation_costs_abs#dependency-graph-demo" xlink:title="slr_adaptation_costs_abs">
+<g id="a_dependency&#45;node&#45;slr_adaptation_costs_abs"><a xlink:href="?graph_variable=slr_adaptation_costs_abs#dependency-graph" xlink:title="slr_adaptation_costs_abs">
 <path fill="#ed6a2f" stroke="black" d="M1107.58,-979C1107.58,-979 1026.67,-979 1026.67,-979 1020.67,-979 1014.67,-973 1014.67,-967 1014.67,-967 1014.67,-949.6 1014.67,-949.6 1014.67,-943.6 1020.67,-937.6 1026.67,-937.6 1026.67,-937.6 1107.58,-937.6 1107.58,-937.6 1113.58,-937.6 1119.58,-943.6 1119.58,-949.6 1119.58,-949.6 1119.58,-967 1119.58,-967 1119.58,-973 1113.58,-979 1107.58,-979"/>
 <text xml:space="preserve" text-anchor="middle" x="1067.13" y="-959.45" font-family="sans-serif" font-size="13.00">slr_adaptation</text>
 <text xml:space="preserve" text-anchor="middle" x="1067.13" y="-945.95" font-family="sans-serif" font-size="13.00">costs_abs</text>
@@ -1198,9 +1198,9 @@
 <polygon fill="#999999" stroke="#999999" points="1262.77,-1187 1268.13,-1192.12 1267.13,-1184.77 1262.77,-1187"/>
 </g>
 <!-- slr_adaptation_level -->
-<g id="demo&#45;node&#45;slr_adaptation_level" class="node calculated">
+<g id="dependency&#45;node&#45;slr_adaptation_level" class="node calculated">
 <title>slr_adaptation_level</title>
-<g id="a_demo&#45;node&#45;slr_adaptation_level"><a xlink:href="?demo_variable=slr_adaptation_level#dependency-graph-demo" xlink:title="slr_adaptation_level">
+<g id="a_dependency&#45;node&#45;slr_adaptation_level"><a xlink:href="?graph_variable=slr_adaptation_level#dependency-graph" xlink:title="slr_adaptation_level">
 <path fill="#89a041" stroke="black" d="M1320.74,-979C1320.74,-979 1239.83,-979 1239.83,-979 1233.83,-979 1227.83,-973 1227.83,-967 1227.83,-967 1227.83,-949.6 1227.83,-949.6 1227.83,-943.6 1233.83,-937.6 1239.83,-937.6 1239.83,-937.6 1320.74,-937.6 1320.74,-937.6 1326.74,-937.6 1332.74,-943.6 1332.74,-949.6 1332.74,-949.6 1332.74,-967 1332.74,-967 1332.74,-973 1326.74,-979 1320.74,-979"/>
 <text xml:space="preserve" text-anchor="middle" x="1280.29" y="-959.45" font-family="sans-serif" font-size="13.00">slr_adaptation</text>
 <text xml:space="preserve" text-anchor="middle" x="1280.29" y="-945.95" font-family="sans-serif" font-size="13.00">level</text>
@@ -1244,9 +1244,9 @@
 <polygon fill="#999999" stroke="#999999" points="2007.34,-1049.75 2014.34,-1047.3 2007.34,-1044.85 2007.34,-1049.75"/>
 </g>
 <!-- avoided_damage_costs -->
-<g id="demo&#45;node&#45;avoided_damage_costs" class="node calculated">
+<g id="dependency&#45;node&#45;avoided_damage_costs" class="node calculated">
 <title>avoided_damage_costs</title>
-<g id="a_demo&#45;node&#45;avoided_damage_costs"><a xlink:href="?demo_variable=avoided_damage_costs#dependency-graph-demo" xlink:title="avoided_damage_costs">
+<g id="a_dependency&#45;node&#45;avoided_damage_costs"><a xlink:href="?graph_variable=avoided_damage_costs#dependency-graph" xlink:title="avoided_damage_costs">
 <path fill="#89a041" stroke="black" d="M2119.38,-1664C2119.38,-1664 2020.47,-1664 2020.47,-1664 2014.47,-1664 2008.47,-1658 2008.47,-1652 2008.47,-1652 2008.47,-1634.6 2008.47,-1634.6 2008.47,-1628.6 2014.47,-1622.6 2020.47,-1622.6 2020.47,-1622.6 2119.38,-1622.6 2119.38,-1622.6 2125.38,-1622.6 2131.38,-1628.6 2131.38,-1634.6 2131.38,-1634.6 2131.38,-1652 2131.38,-1652 2131.38,-1658 2125.38,-1664 2119.38,-1664"/>
 <text xml:space="preserve" text-anchor="middle" x="2069.93" y="-1644.45" font-family="sans-serif" font-size="13.00">avoided_damage</text>
 <text xml:space="preserve" text-anchor="middle" x="2069.93" y="-1630.95" font-family="sans-serif" font-size="13.00">costs</text>
@@ -1266,9 +1266,9 @@
 <polygon fill="#999999" stroke="#999999" points="1832.51,-1048.99 1839.55,-1046.67 1832.6,-1044.09 1832.51,-1048.99"/>
 </g>
 <!-- riverine_adaptation_costs_abs -->
-<g id="demo&#45;node&#45;riverine_adaptation_costs_abs" class="node control">
+<g id="dependency&#45;node&#45;riverine_adaptation_costs_abs" class="node control">
 <title>riverine_adaptation_costs_abs</title>
-<g id="a_demo&#45;node&#45;riverine_adaptation_costs_abs"><a xlink:href="?demo_variable=riverine_adaptation_costs_abs#dependency-graph-demo" xlink:title="riverine_adaptation_costs_abs">
+<g id="a_dependency&#45;node&#45;riverine_adaptation_costs_abs"><a xlink:href="?graph_variable=riverine_adaptation_costs_abs#dependency-graph" xlink:title="riverine_adaptation_costs_abs">
 <path fill="#ed6a2f" stroke="black" d="M1122.58,-1045C1122.58,-1045 1011.67,-1045 1011.67,-1045 1005.67,-1045 999.67,-1039 999.67,-1033 999.67,-1033 999.67,-1015.6 999.67,-1015.6 999.67,-1009.6 1005.67,-1003.6 1011.67,-1003.6 1011.67,-1003.6 1122.58,-1003.6 1122.58,-1003.6 1128.58,-1003.6 1134.58,-1009.6 1134.58,-1015.6 1134.58,-1015.6 1134.58,-1033 1134.58,-1033 1134.58,-1039 1128.58,-1045 1122.58,-1045"/>
 <text xml:space="preserve" text-anchor="middle" x="1067.13" y="-1025.45" font-family="sans-serif" font-size="13.00">riverine_adaptation</text>
 <text xml:space="preserve" text-anchor="middle" x="1067.13" y="-1011.95" font-family="sans-serif" font-size="13.00">costs_abs</text>
@@ -1282,9 +1282,9 @@
 <polygon fill="#999999" stroke="#999999" points="1208.4,-1256.12 1215.5,-1258.28 1211.29,-1252.17 1208.4,-1256.12"/>
 </g>
 <!-- riverine_adaptation_level -->
-<g id="demo&#45;node&#45;riverine_adaptation_level" class="node calculated">
+<g id="dependency&#45;node&#45;riverine_adaptation_level" class="node calculated">
 <title>riverine_adaptation_level</title>
-<g id="a_demo&#45;node&#45;riverine_adaptation_level"><a xlink:href="?demo_variable=riverine_adaptation_level#dependency-graph-demo" xlink:title="riverine_adaptation_level">
+<g id="a_dependency&#45;node&#45;riverine_adaptation_level"><a xlink:href="?graph_variable=riverine_adaptation_level#dependency-graph" xlink:title="riverine_adaptation_level">
 <path fill="#89a041" stroke="black" d="M1335.74,-1058C1335.74,-1058 1224.83,-1058 1224.83,-1058 1218.83,-1058 1212.83,-1052 1212.83,-1046 1212.83,-1046 1212.83,-1028.6 1212.83,-1028.6 1212.83,-1022.6 1218.83,-1016.6 1224.83,-1016.6 1224.83,-1016.6 1335.74,-1016.6 1335.74,-1016.6 1341.74,-1016.6 1347.74,-1022.6 1347.74,-1028.6 1347.74,-1028.6 1347.74,-1046 1347.74,-1046 1347.74,-1052 1341.74,-1058 1335.74,-1058"/>
 <text xml:space="preserve" text-anchor="middle" x="1280.29" y="-1038.45" font-family="sans-serif" font-size="13.00">riverine_adaptation</text>
 <text xml:space="preserve" text-anchor="middle" x="1280.29" y="-1024.95" font-family="sans-serif" font-size="13.00">level</text>
@@ -1316,9 +1316,9 @@
 <polygon fill="#999999" stroke="#999999" points="1832.23,-1036.69 1839.64,-1036.44 1833.69,-1032.02 1832.23,-1036.69"/>
 </g>
 <!-- labourprod_adaptation_costs_abs -->
-<g id="demo&#45;node&#45;labourprod_adaptation_costs_abs" class="node control">
+<g id="dependency&#45;node&#45;labourprod_adaptation_costs_abs" class="node control">
 <title>labourprod_adaptation_costs_abs</title>
-<g id="a_demo&#45;node&#45;labourprod_adaptation_costs_abs"><a xlink:href="?demo_variable=labourprod_adaptation_costs_abs#dependency-graph-demo" xlink:title="labourprod_adaptation_costs_abs">
+<g id="a_dependency&#45;node&#45;labourprod_adaptation_costs_abs"><a xlink:href="?graph_variable=labourprod_adaptation_costs_abs#dependency-graph" xlink:title="labourprod_adaptation_costs_abs">
 <path fill="#ed6a2f" stroke="black" d="M1132.71,-1382C1132.71,-1382 1001.55,-1382 1001.55,-1382 995.55,-1382 989.55,-1376 989.55,-1370 989.55,-1370 989.55,-1352.6 989.55,-1352.6 989.55,-1346.6 995.55,-1340.6 1001.55,-1340.6 1001.55,-1340.6 1132.71,-1340.6 1132.71,-1340.6 1138.71,-1340.6 1144.71,-1346.6 1144.71,-1352.6 1144.71,-1352.6 1144.71,-1370 1144.71,-1370 1144.71,-1376 1138.71,-1382 1132.71,-1382"/>
 <text xml:space="preserve" text-anchor="middle" x="1067.13" y="-1362.45" font-family="sans-serif" font-size="13.00">labourprod_adaptation</text>
 <text xml:space="preserve" text-anchor="middle" x="1067.13" y="-1348.95" font-family="sans-serif" font-size="13.00">costs_abs</text>
@@ -1332,9 +1332,9 @@
 <polygon fill="#999999" stroke="#999999" points="1193.67,-1394.14 1201.05,-1393.4 1194.82,-1389.38 1193.67,-1394.14"/>
 </g>
 <!-- labourprod_adaptation_level -->
-<g id="demo&#45;node&#45;labourprod_adaptation_level" class="node calculated">
+<g id="dependency&#45;node&#45;labourprod_adaptation_level" class="node calculated">
 <title>labourprod_adaptation_level</title>
-<g id="a_demo&#45;node&#45;labourprod_adaptation_level"><a xlink:href="?demo_variable=labourprod_adaptation_level#dependency-graph-demo" xlink:title="labourprod_adaptation_level">
+<g id="a_dependency&#45;node&#45;labourprod_adaptation_level"><a xlink:href="?graph_variable=labourprod_adaptation_level#dependency-graph" xlink:title="labourprod_adaptation_level">
 <path fill="#89a041" stroke="black" d="M1345.87,-1367C1345.87,-1367 1214.71,-1367 1214.71,-1367 1208.71,-1367 1202.71,-1361 1202.71,-1355 1202.71,-1355 1202.71,-1337.6 1202.71,-1337.6 1202.71,-1331.6 1208.71,-1325.6 1214.71,-1325.6 1214.71,-1325.6 1345.87,-1325.6 1345.87,-1325.6 1351.87,-1325.6 1357.87,-1331.6 1357.87,-1337.6 1357.87,-1337.6 1357.87,-1355 1357.87,-1355 1357.87,-1361 1351.87,-1367 1345.87,-1367"/>
 <text xml:space="preserve" text-anchor="middle" x="1280.29" y="-1347.45" font-family="sans-serif" font-size="13.00">labourprod_adaptation</text>
 <text xml:space="preserve" text-anchor="middle" x="1280.29" y="-1333.95" font-family="sans-serif" font-size="13.00">level</text>
@@ -1360,9 +1360,9 @@
 <polygon fill="#999999" stroke="#999999" points="1613.49,-254.8 1619.49,-250.44 1612.08,-250.11 1613.49,-254.8"/>
 </g>
 <!-- non_market_damage_costs_abs -->
-<g id="demo&#45;node&#45;non_market_damage_costs_abs" class="node calculated">
+<g id="dependency&#45;node&#45;non_market_damage_costs_abs" class="node calculated">
 <title>non_market_damage_costs_abs</title>
-<g id="a_demo&#45;node&#45;non_market_damage_costs_abs"><a xlink:href="?demo_variable=non_market_damage_costs_abs#dependency-graph-demo" xlink:title="non_market_damage_costs_abs">
+<g id="a_dependency&#45;node&#45;non_market_damage_costs_abs"><a xlink:href="?graph_variable=non_market_damage_costs_abs#dependency-graph" xlink:title="non_market_damage_costs_abs">
 <path fill="#89a041" stroke="black" d="M2131.01,-501C2131.01,-501 2008.85,-501 2008.85,-501 2002.85,-501 1996.85,-495 1996.85,-489 1996.85,-489 1996.85,-471.6 1996.85,-471.6 1996.85,-465.6 2002.85,-459.6 2008.85,-459.6 2008.85,-459.6 2131.01,-459.6 2131.01,-459.6 2137.01,-459.6 2143.01,-465.6 2143.01,-471.6 2143.01,-471.6 2143.01,-489 2143.01,-489 2143.01,-495 2137.01,-501 2131.01,-501"/>
 <text xml:space="preserve" text-anchor="middle" x="2069.93" y="-481.45" font-family="sans-serif" font-size="13.00">non_market_damage</text>
 <text xml:space="preserve" text-anchor="middle" x="2069.93" y="-467.95" font-family="sans-serif" font-size="13.00">costs_abs</text>
@@ -1406,9 +1406,9 @@
 <polygon fill="#999999" stroke="#999999" points="2465.62,-1247.2 2471.64,-1242.88 2464.24,-1242.5 2465.62,-1247.2"/>
 </g>
 <!-- global_indirect_costs -->
-<g id="demo&#45;node&#45;global_indirect_costs" class="node calculated">
+<g id="dependency&#45;node&#45;global_indirect_costs" class="node calculated">
 <title>global_indirect_costs</title>
-<g id="a_demo&#45;node&#45;global_indirect_costs"><a xlink:href="?demo_variable=global_indirect_costs#dependency-graph-demo" xlink:title="global_indirect_costs">
+<g id="a_dependency&#45;node&#45;global_indirect_costs"><a xlink:href="?graph_variable=global_indirect_costs#dependency-graph" xlink:title="global_indirect_costs">
 <path fill="#89a041" stroke="black" d="M2735.99,-1250C2735.99,-1250 2652.83,-1250 2652.83,-1250 2646.83,-1250 2640.83,-1244 2640.83,-1238 2640.83,-1238 2640.83,-1220.6 2640.83,-1220.6 2640.83,-1214.6 2646.83,-1208.6 2652.83,-1208.6 2652.83,-1208.6 2735.99,-1208.6 2735.99,-1208.6 2741.99,-1208.6 2747.99,-1214.6 2747.99,-1220.6 2747.99,-1220.6 2747.99,-1238 2747.99,-1238 2747.99,-1244 2741.99,-1250 2735.99,-1250"/>
 <text xml:space="preserve" text-anchor="middle" x="2694.41" y="-1230.45" font-family="sans-serif" font-size="13.00">global_indirect</text>
 <text xml:space="preserve" text-anchor="middle" x="2694.41" y="-1216.95" font-family="sans-serif" font-size="13.00">costs</text>
@@ -1470,9 +1470,9 @@
 <polygon fill="#999999" stroke="#999999" points="1806.19,-1529.77 1813.26,-1527.51 1806.33,-1524.87 1806.19,-1529.77"/>
 </g>
 <!-- LOT_factor -->
-<g id="demo&#45;node&#45;LOT_factor" class="node calculated">
+<g id="dependency&#45;node&#45;LOT_factor" class="node calculated">
 <title>LOT_factor</title>
-<g id="a_demo&#45;node&#45;LOT_factor"><a xlink:href="?demo_variable=LOT_factor#dependency-graph-demo" xlink:title="LOT_factor">
+<g id="a_dependency&#45;node&#45;LOT_factor"><a xlink:href="?graph_variable=LOT_factor#dependency-graph" xlink:title="LOT_factor">
 <path fill="#89a041" stroke="black" d="M159.16,-1451C159.16,-1451 129.16,-1451 129.16,-1451 123.16,-1451 117.16,-1445 117.16,-1439 117.16,-1439 117.16,-1421.6 117.16,-1421.6 117.16,-1415.6 123.16,-1409.6 129.16,-1409.6 129.16,-1409.6 159.16,-1409.6 159.16,-1409.6 165.16,-1409.6 171.16,-1415.6 171.16,-1421.6 171.16,-1421.6 171.16,-1439 171.16,-1439 171.16,-1445 165.16,-1451 159.16,-1451"/>
 <text xml:space="preserve" text-anchor="middle" x="144.16" y="-1431.45" font-family="sans-serif" font-size="13.00">LOT</text>
 <text xml:space="preserve" text-anchor="middle" x="144.16" y="-1417.95" font-family="sans-serif" font-size="13.00">factor</text>
@@ -1504,9 +1504,9 @@
 <polygon fill="#999999" stroke="#999999" points="2631.71,-1210.79 2639.13,-1210.74 2633.3,-1206.16 2631.71,-1210.79"/>
 </g>
 <!-- global_welfare -->
-<g id="demo&#45;node&#45;global_welfare" class="node calculated">
+<g id="dependency&#45;node&#45;global_welfare" class="node calculated">
 <title>global_welfare</title>
-<g id="a_demo&#45;node&#45;global_welfare"><a xlink:href="?demo_variable=global_welfare#dependency-graph-demo" xlink:title="global_welfare">
+<g id="a_dependency&#45;node&#45;global_welfare"><a xlink:href="?graph_variable=global_welfare#dependency-graph" xlink:title="global_welfare">
 <path fill="#89a041" stroke="black" d="M2714.24,-756C2714.24,-756 2674.58,-756 2674.58,-756 2668.58,-756 2662.58,-750 2662.58,-744 2662.58,-744 2662.58,-726.6 2662.58,-726.6 2662.58,-720.6 2668.58,-714.6 2674.58,-714.6 2674.58,-714.6 2714.24,-714.6 2714.24,-714.6 2720.24,-714.6 2726.24,-720.6 2726.24,-726.6 2726.24,-726.6 2726.24,-744 2726.24,-744 2726.24,-750 2720.24,-756 2714.24,-756"/>
 <text xml:space="preserve" text-anchor="middle" x="2694.41" y="-736.45" font-family="sans-serif" font-size="13.00">global</text>
 <text xml:space="preserve" text-anchor="middle" x="2694.41" y="-722.95" font-family="sans-serif" font-size="13.00">welfare</text>
@@ -1520,9 +1520,9 @@
 <polygon fill="#999999" stroke="#999999" points="2653.62,-737.75 2660.62,-735.3 2653.62,-732.85 2653.62,-737.75"/>
 </g>
 <!-- NPV -->
-<g id="demo&#45;node&#45;NPV" class="node calculated">
+<g id="dependency&#45;node&#45;NPV" class="node calculated">
 <title>NPV</title>
-<g id="a_demo&#45;node&#45;NPV"><a xlink:href="?demo_variable=NPV#dependency-graph-demo" xlink:title="NPV">
+<g id="a_dependency&#45;node&#45;NPV"><a xlink:href="?graph_variable=NPV#dependency-graph" xlink:title="NPV">
 <path fill="#89a041" stroke="black" d="M2847.99,-753.3C2847.99,-753.3 2817.99,-753.3 2817.99,-753.3 2811.99,-753.3 2805.99,-747.3 2805.99,-741.3 2805.99,-741.3 2805.99,-729.3 2805.99,-729.3 2805.99,-723.3 2811.99,-717.3 2817.99,-717.3 2817.99,-717.3 2847.99,-717.3 2847.99,-717.3 2853.99,-717.3 2859.99,-723.3 2859.99,-729.3 2859.99,-729.3 2859.99,-741.3 2859.99,-741.3 2859.99,-747.3 2853.99,-753.3 2847.99,-753.3"/>
 <text xml:space="preserve" text-anchor="middle" x="2832.99" y="-729.7" font-family="sans-serif" font-size="13.00">NPV</text>
 </a>
