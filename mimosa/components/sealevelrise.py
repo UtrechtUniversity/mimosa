@@ -122,8 +122,8 @@ def get_constraints(
     box relaxes towards a temperature-dependent equilibrium:
 
     $$
-    S_{i,t}=\beta_i T_{t-1}+
-    \left(S_{i,t-1}-\beta_i T_{t-1}\right)e^{-\Delta t/\tau_i},
+    S_{i,t}=\beta_i \href{./#var__temperature}{T_{t-1}}+
+    \left(S_{i,t-1}-\beta_i \href{./#var__temperature}{T_{t-1}}\right)e^{-\Delta t/\tau_i},
     \qquad i\in\{\text{fast},\text{slow}\}.
     $$
 
@@ -151,8 +151,8 @@ def get_constraints(
     $$
 
     $$
-    S_{\mathrm{GL},t}=S^*_{\mathrm{GL}}(T_{t-1})+
-    \left(S_{\mathrm{GL},t-1}-S^*_{\mathrm{GL}}(T_{t-1})\right)
+    \href{./#var__slr_cumgsic}{S_{\mathrm{GL},t}}=S^*_{\mathrm{GL}}(\href{./#var__temperature}{T_{t-1}})+
+    \left(\href{./#var__slr_cumgsic}{S_{\mathrm{GL},t-1}}-S^*_{\mathrm{GL}}(\href{./#var__temperature}{T_{t-1}})\right)
     e^{-\Delta t/\tau_{\mathrm{GL}}}.
     $$
 
@@ -182,14 +182,14 @@ def get_constraints(
     loss at high warming while retaining differentiability for optimisation:
 
     $$
-    T_{A,t}=\lambda_A T_{t-1}+
-    \left(T_{A,t-1}-\lambda_A T_{t-1}\right)e^{-\Delta t/\tau_A},
+    \href{./#var__slr_antarctic_ocean_temp}{T_{A,t}}=\lambda_A \href{./#var__temperature}{T_{t-1}}+
+    \left(\href{./#var__slr_antarctic_ocean_temp}{T_{A,t-1}}-\lambda_A \href{./#var__temperature}{T_{t-1}}\right)e^{-\Delta t/\tau_A},
     $$
 
     $$
-    S_{\mathrm{AIS},t}=S_{\mathrm{AIS},t-1}+\Delta t
-    \left[r_0+r_1T_{A,t}+r_f\sigma((T_{A,t}-T_{crit})/w_A)\right]
-    \left(1-\frac{S_{\mathrm{AIS},t-1}}{P_{\mathrm{AIS}}}\right).
+    \href{./#var__slr_cumais}{S_{\mathrm{AIS},t}}=\href{./#var__slr_cumais}{S_{\mathrm{AIS},t-1}}+\Delta t
+    \left[r_0+r_1\href{./#var__slr_antarctic_ocean_temp}{T_{A,t}}+r_f\sigma((\href{./#var__slr_antarctic_ocean_temp}{T_{A,t}}-T_{crit})/w_A)\right]
+    \left(1-\frac{\href{./#var__slr_cumais}{S_{\mathrm{AIS},t-1}}}{P_{\mathrm{AIS}}}\right).
     $$
 
     The scaling and delay between global surface warming and Antarctic
@@ -211,15 +211,15 @@ def get_constraints(
     is added explicitly:
 
     $$
-    S_{\mathrm{LWS},t}=S_{\mathrm{LWS},t-1}+\Delta t\,r_{\mathrm{LWS}},
+    \href{./#var__slr_cumlws}{S_{\mathrm{LWS},t}}=\href{./#var__slr_cumlws}{S_{\mathrm{LWS},t-1}}+\Delta t\,r_{\mathrm{LWS}},
     \qquad r_{\mathrm{LWS}}=0.0004\ \mathrm{m\,yr^{-1}}.
     $$
 
     # Total sea-level rise
 
     $$
-    S_t=S_{\mathrm{thermal},t}+S_{\mathrm{GL},t}
-        +S_{\mathrm{GIS},t}+S_{\mathrm{AIS},t}+S_{\mathrm{LWS},t}.
+    \href{./#var__total_SLR}{S_t}=\href{./#var__slr_thermal}{S_{\mathrm{thermal},t}}+\href{./#var__slr_cumgsic}{S_{\mathrm{GL},t}}
+        +\href{./#var__slr_cumgis}{S_{\mathrm{GIS},t}}+\href{./#var__slr_cumais}{S_{\mathrm{AIS},t}}+\href{./#var__slr_cumlws}{S_{\mathrm{LWS},t}}.
     $$
 
     ## Calibration against IPCC AR6

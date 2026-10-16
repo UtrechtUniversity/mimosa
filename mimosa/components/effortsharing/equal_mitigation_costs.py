@@ -51,10 +51,10 @@ def get_constraints(
     percentage of GDP) should be the same for every region:
 
     $$
-    \\text{mitigation costs}_{t,r} = \\text{common level}_t,
+    \\href{./#var__effortsharing_equal_mitigation_costs::mitigation_costs}{\\text{mitigation costs}_{t,r}} = \\href{./#var__effortsharing_equal_mitigation_costs::effort_sharing_common_level}{\\text{common level}_t},
     $$
 
-    where the variable $\\text{common level}_t$ can have arbitrary values and is purely used as a common
+    where the variable $\\href{./#var__effortsharing_equal_mitigation_costs::effort_sharing_common_level}{\\text{common level}_t}$ can have arbitrary values and is purely used as a common
     value accross all the regions[^1].
 
     [^1]: Implementing every regional condition as an exact equality can give IPOPT too many or

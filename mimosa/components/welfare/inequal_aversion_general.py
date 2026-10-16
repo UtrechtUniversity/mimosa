@@ -24,21 +24,21 @@ def get_constraints(
     """
     <h3>General inequality aversion</h3>
 
-    This setting makes the weight given to inequality between regions explicit. Let $C_{t,r}$
+    This setting makes the weight given to inequality between regions explicit. Let $\\href{./#var__welfare_inequal_aversion_general::consumption}{C_{t,r}}$
     be regional consumption, $L_{t,r}$ population, $\\eta$ the inequality-aversion parameter
     (`inequal_aversion`), and $\\mu$ the elasticity of marginal utility (`elasmu`). MIMOSA first
     calculates:
 
     $$
-    U_{t,r} = L_{t,r}
-    \\left(\\frac{C_{t,r}}{L_{t,r}}\\right)^{1-\\eta}.
+    \\href{./#var__welfare_inequal_aversion_general::utility}{U_{t,r}} = L_{t,r}
+    \\left(\\frac{\\href{./#var__welfare_inequal_aversion_general::consumption}{C_{t,r}}}{L_{t,r}}\\right)^{1-\\eta}.
     $$
 
     The regional values are then aggregated into yearly welfare:
 
     $$
-    W_t = \\frac{L_t}{1-\\mu}
-    \\left(\\frac{\\sum_r U_{t,r}}{L_t}\\right)^{
+    \\href{./#var__welfare_inequal_aversion_general::global_welfare}{W_t} = \\frac{L_t}{1-\\mu}
+    \\left(\\frac{\\sum_r \\href{./#var__welfare_inequal_aversion_general::utility}{U_{t,r}}}{L_t}\\right)^{
     \\frac{1-\\mu}{1-\\eta}}.
     $$
 

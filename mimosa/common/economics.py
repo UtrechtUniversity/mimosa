@@ -33,16 +33,16 @@ def get_TFP_value(m, t, r):
 
 def calc_dKdt(K, dk, I, dt):
     """
-    $$ \\frac{\\partial K_{t,r}}{\\partial t} = \\frac{1}{\\Delta t} \\cdot ((1 - dk)^{\\Delta t}  - 1) \\cdot K_{t,r} + I_{t,r}.$$
+    $$ \\frac{\\partial \\href{./#var__capital_stock}{K_{t,r}}}{\\partial t} = \\frac{1}{\\Delta t} \\cdot ((1 - dk)^{\\Delta t}  - 1) \\cdot \\href{./#var__capital_stock}{K_{t,r}} + \\href{./#var__investments}{I_{t,r}}.$$
     """
     return ((1 - dk) ** dt - 1) / dt * K + I
 
 
 def calc_GDP(TFP, L, K, alpha):
     """
-    $$ \\text{GDP}_{\\text{gross},t,r} = \\text{TFP}\\_{t,r} \\cdot L^{1-\\alpha}\\_{t,r} \\cdot K^{\\alpha}\\_{t,r}, $$
+    $$ \\href{./#var__GDP_gross}{\\text{GDP}_{\\text{gross},t,r}} = \\text{TFP}\\_{t,r} \\cdot L^{1-\\alpha}\\_{t,r} \\cdot \\href{./#var__capital_stock}{K^{\\alpha}\\_{t,r}}, $$
     with $\\text{TFP}$ the total factor productivity (exogenously calibrated from the baseline SSP scenarios)
-    $L$ the labor (represented by the total population), $K$ the capital stock and $\\alpha$ the share of capital in the production function.
+    $L$ the labor (represented by the total population), $\\href{./#var__capital_stock}{K}$ the capital stock and $\\alpha$ the share of capital in the production function.
 
     """
     return TFP * L ** (1 - alpha) * K**alpha

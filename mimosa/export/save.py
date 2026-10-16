@@ -144,7 +144,7 @@ def add_derived_global_rows(rows, m, all_variables):
     $$
     \\text{global costs}_t =
     \\frac{\\sum_r \\text{absolute costs}_{t,r}}
-    {\\text{global GDP gross}_t}.
+    {\\href{./#var__global_GDP_gross}{\\text{global GDP gross}_t}}.
     $$
 
     Otherwise, absolute regional costs are reconstructed from the GDP-relative
@@ -153,8 +153,8 @@ def add_derived_global_rows(rows, m, all_variables):
     $$
     \\text{global costs}_t =
     \\frac{\\sum_r \\left(\\text{costs}_{t,r}
-    \\cdot \\text{GDP gross}_{t,r}\\right)}
-    {\\text{global GDP gross}_t}.
+    \\cdot \\href{./#var__GDP_gross}{\\text{GDP gross}_{t,r}}\\right)}
+    {\\href{./#var__global_GDP_gross}{\\text{global GDP gross}_t}}.
     $$
 
     Regional adaptation effectiveness variables measured as

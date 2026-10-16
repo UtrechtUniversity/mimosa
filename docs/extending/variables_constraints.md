@@ -58,7 +58,7 @@ These equations are implemented in MIMOSA as Equations: either `GlobalEquation` 
 `RegionalEquation` (for time- and region-dependent equations). In our example, the carbon intensity equation
 
 $$
-\text{carbon intensity}_{t,r} = \frac{\text{regional emissions}_{t,r}}{\text{GDP}_{t,r}}
+\text{carbon intensity}_{t,r} = \frac{\href{./#var__regional_emissions}{\text{regional emissions}_{t,r}}}{\href{./#var__GDP_net}{\text{GDP}_{t,r}}}
 $$
 
 would be implemented as a `RegionalEquation`:

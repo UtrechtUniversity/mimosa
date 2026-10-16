@@ -113,7 +113,7 @@ def _get_emissions_constraints(
     If this parameter is set to true, baseline emissions are calculated as:
 
     $$
-    \\text{baseline emissions}_{t,r} = \\text{baseline carbon intensity}_{t,r} \\cdot \\text{GDP}_{\\text{net}, t,r}
+    \\href{./#var__baseline_emissions}{\\text{baseline emissions}_{t,r}} = \\text{baseline carbon intensity}_{t,r} \\cdot \\href{./#var__GDP_net}{\\text{GDP}_{\\text{net}, t,r}}
     $$
 
     ??? info "Baseline emissions values"
@@ -130,13 +130,13 @@ def _get_emissions_constraints(
     (see [Mitigation](mitigation.md)). The regional emissions are then calculated as:
 
     $$
-    \\text{regional emissions}_{t,r} = (1 - \\text{relative abatement}_{t,r}) \\cdot \\text{baseline emissions}_{t,r}
+    \\href{./#var__regional_emissions}{\\text{regional emissions}_{t,r}} = (1 - \\href{./#var__relative_abatement}{\\text{relative abatement}_{t,r}}) \\cdot \\href{./#var__baseline_emissions}{\\text{baseline emissions}_{t,r}}
     $$
 
     In the first period, reductions are assumed to be zero:
 
     $$
-    \\text{regional emissions}_{0,r} = \\text{baseline emissions}_{0,r}.
+    \\href{./#var__regional_emissions}{\\text{regional emissions}_{0,r}} = \\href{./#var__baseline_emissions}{\\text{baseline emissions}_{0,r}}.
     $$
 
     ## Global and cumulative emissions
@@ -144,7 +144,7 @@ def _get_emissions_constraints(
     The regional emissions are aggregated to global emissions:
 
     $$
-    \\text{global emissions}_{t} = \\sum_r \\text{regional emissions}_{t,r},
+    \\href{./#var__global_emissions}{\\text{global emissions}_{t}} = \\sum_r \\href{./#var__regional_emissions}{\\text{regional emissions}_{t,r}},
     $$
 
     which are used to calculate the cumulative emissions. There are two ways to calculate them:
@@ -155,15 +155,15 @@ def _get_emissions_constraints(
 
         $$
         \\begin{aligned}
-        \\text{cumulative emissions}_{t} & = \\text{cumulative emissions}_{t-1} \\\\ 
-        & + \\frac{\\Delta t}{2} \\cdot (\\text{global emissions}_{t} + \\text{global emissions}_{t-1}) ,\\text{for } t > 0.
+        \\href{./#var__global_cumulative_emissions}{\\text{cumulative emissions}_{t}} & = \\href{./#var__global_cumulative_emissions}{\\text{cumulative emissions}_{t-1}} \\\\
+        & + \\frac{\\Delta t}{2} \\cdot (\\href{./#var__global_emissions}{\\text{global emissions}_{t}} + \\href{./#var__global_emissions}{\\text{global emissions}_{t-1}}) ,\\text{for } t > 0.
         \\end{aligned}
         $$
 
     === "Simple sum"
 
         $$
-        \\text{cumulative emissions}_{t} = \\text{cumulative emissions}_{t-1} + \\Delta t \\cdot \\text{global emissions}_{t}
+        \\href{./#var__global_cumulative_emissions}{\\text{cumulative emissions}_{t}} = \\href{./#var__global_cumulative_emissions}{\\text{cumulative emissions}_{t-1}} + \\Delta t \\cdot \\href{./#var__global_emissions}{\\text{global emissions}_{t}}
         $$
 
     ## Exogenous emissions pulse
@@ -341,7 +341,7 @@ def _get_temperature_constraints(
     showed that this performed better than the default two-box DICE climate module.
 
     $$
-    \\text{temperature}_{t} = T_0 + \\text{TCRE} \\cdot \\text{cumulative emissions}_{t},
+    \\href{./#var__temperature}{\\text{temperature}_{t}} = T_0 + \\text{TCRE} \\cdot \\href{./#var__global_cumulative_emissions}{\\text{cumulative emissions}_{t}},
     $$
 
     where [$T_0$](../parameters.md#temperature.initial) is the initial temperature at the start of the run (2025 by default),
@@ -392,7 +392,7 @@ def _get_temperature_constraints(
     If this parameter is set, the following constraint is active:
 
     $$
-    \\text{temperature}_{t} \\leq \\text{temperature target}
+    \\href{./#var__temperature}{\\text{temperature}_{t}} \\leq \\text{temperature target}
     $$
 
     ## Parameters defined in this module
@@ -469,7 +469,7 @@ def _get_inertia_and_budget_constraints(
     If a carbon budget is defined using the parameter [`carbonbudget`](../parameters.md#emissions.carbonbudget), the following constraint is active:
 
     $$
-    \\text{cumulative emissions}_{t} - \\text{budget} \\leq 0,
+    \\href{./#var__global_cumulative_emissions}{\\text{cumulative emissions}_{t}} - \\text{budget} \\leq 0,
     $$
 
     for $t \\geq 2100$. Note that the [`carbonbudget`](../parameters.md#emissions.carbonbudget) parameter unit should be
@@ -489,13 +489,13 @@ def _get_inertia_and_budget_constraints(
 
 
         $$
-        \\text{global emissions}_{t} - \\text{global emissions}_{t-1} \\geq \\Delta t \\cdot \\text{inertia_global} \\cdot \\text{scaling factor},
+        \\href{./#var__global_emissions}{\\text{global emissions}_{t}} - \\href{./#var__global_emissions}{\\text{global emissions}_{t-1}} \\geq \\Delta t \\cdot \\text{inertia_global} \\cdot \\text{scaling factor},
         $$
 
         with the scaling factor the global baseline emissions in the starting year:
 
         $$
-        \\text{scaling factor} = \\left( \\sum_r \\text{baseline emissions}_{t=0,r}\\right)
+        \\text{scaling factor} = \\left( \\sum_r \\href{./#var__baseline_emissions}{\\text{baseline emissions}_{t=0,r}}\\right)
         $$
 
         By default, the [`inertia_global`](../parameters.md#emissions.inertia.global) is set to `False`, such that there is no global inertia
@@ -504,7 +504,7 @@ def _get_inertia_and_budget_constraints(
     === "Regional inertia"
 
         $$
-        \\text{regional emissions}_{t,r} - \\text{regional emissions}_{t-1,r} \\geq \\Delta t \\cdot \\text{inertia_regional} \\cdot \\text{baseline emissions}_{t=0,r}.
+        \\href{./#var__regional_emissions}{\\text{regional emissions}_{t,r}} - \\href{./#var__regional_emissions}{\\text{regional emissions}_{t-1,r}} \\geq \\Delta t \\cdot \\text{inertia_regional} \\cdot \\href{./#var__baseline_emissions}{\\text{baseline emissions}_{t=0,r}}.
         $$
 
         By default, the [`inertia_regional`](../parameters.md#emissions.inertia.regional) parameter is active, such that regional emissions cannot be reduced by more than 5% of the initial baseline emissions per year. This is
@@ -523,11 +523,11 @@ def _get_inertia_and_budget_constraints(
     are limited to -20 GtCO<sub>2</sub>/yr, and regional emissions to -10 GtCO<sub>2</sub>/yr:
 
     $$
-    \\text{global emissions}_t \\geq \\text{global min level},
+    \\href{./#var__global_emissions}{\\text{global emissions}_t} \\geq \\text{global min level},
     $$
 
     $$
-    \\text{regional emissions}_t \\geq \\text{regional min level}.
+    \\href{./#var__regional_emissions}{\\text{regional emissions}_t} \\geq \\text{regional min level}.
     $$
 
     Note that currently, the minimum regional emission level is the same for every region, but this could be easily changed if needed (see
@@ -539,7 +539,7 @@ def _get_inertia_and_budget_constraints(
     this effect is to impose a constraint on the growth of emissions after 2100. By default, emissions are not allowed to grow after 2100:
 
     $$
-    \\text{regional emissions}_{t,r} - \\text{regional emissions}_{t-1,r} \\leq 0, \\text{if } t - 1 > 2100,
+    \\href{./#var__regional_emissions}{\\text{regional emissions}_{t,r}} - \\href{./#var__regional_emissions}{\\text{regional emissions}_{t-1,r}} \\leq 0, \\text{if } t - 1 > 2100,
     $$
 
     if the parameter [`non_increasing_emissions_after_2100`](../parameters.md#emissions.non increasing emissions after 2100) is set to `True`.
@@ -547,7 +547,7 @@ def _get_inertia_and_budget_constraints(
     When a carbon budget is imposed, it is also possible to impose a net-zero emissions constraint after the budget year (2100):
 
     $$
-    \\text{global emissions}_{t} \\leq 0, \\text{if } t \\geq 2100,
+    \\href{./#var__global_emissions}{\\text{global emissions}_{t}} \\leq 0, \\text{if } t \\geq 2100,
     $$
     if the parameter [`no_pos_emissions_after_budget_year`](../parameters.md#emissions.not positive after budget year) is set to `True`,
     **and** if a carbon budget is specified. Otherwise, this constraint is ignored.

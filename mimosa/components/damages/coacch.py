@@ -32,7 +32,7 @@ def get_constraints(
     the temperature-dependent curve includes SLR impacts and the separate SLR damage term is zero.
 
     $$
-    \\text{damages}_{t,r} = \\text{damages}_{\\text{non-SLR},t,r} + \\text{damages}_{\\text{SLR},t,r}
+    \\href{./#var__damage_costs}{\\text{damages}_{t,r}} = \\href{./#var__non_slr_damage_costs}{\\text{damages}_{\\text{non-SLR},t,r}} + \\href{./#var__slr_damage_costs}{\\text{damages}_{\\text{SLR},t,r}}
     $$
 
     :::mimosa.components.damages.coacch.get_constraints_temperature_dependent
@@ -120,7 +120,7 @@ def get_constraints_temperature_dependent(
     Combining these three transformations, the damages are calculated as:
 
     $$
-    \\text{damages}_{\\text{non-SLR},t,r} = a_{q,r} \\cdot \\big( D(\\text{temperature}_t - 0.6; b_{1,r}, b_{2,r}) -  D(T_0 - 0.6; b_{1,r}, b_{2,r}) \\big).
+    \\href{./#var__non_slr_damage_costs}{\\text{damages}_{\\text{non-SLR},t,r}} = a_{q,r} \\cdot \\big( D(\\href{./#var__temperature}{\\text{temperature}_t} - 0.6; b_{1,r}, b_{2,r}) -  D(T_0 - 0.6; b_{1,r}, b_{2,r}) \\big).
     $$
 
     All the damage coefficients are region-dependent (see [Damage functions and coefficients](coacch.md#damage-functions-and-coefficients)).
@@ -244,7 +244,7 @@ def get_constraints_slr(
     The SLR damage costs therefore become:
 
     $$
-    \\text{damages}_{\\text{SLR},t,r} = a_{q,r} \\cdot \\big( D_{\\text{\\{form\\}}_r}(\\text{SLR}_t; \\cdot) - D_{\\text{\\{form\\}}_r}(\\text{SLR}_0; \\cdot) \\big).
+    \\href{./#var__slr_damage_costs}{\\text{damages}_{\\text{SLR},t,r}} = a_{q,r} \\cdot \\big( D_{\\text{\\{form\\}}_r}(\\href{./#var__total_SLR}{\\text{SLR}_t}; \\cdot) - D_{\\text{\\{form\\}}_r}(\\href{./#var__total_SLR}{\\text{SLR}_0}; \\cdot) \\big).
     $$
 
     """

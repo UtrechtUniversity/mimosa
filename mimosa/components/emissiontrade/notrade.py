@@ -38,7 +38,7 @@ def get_constraints(
     Without trade, regional emission allowances are simply equal to regional emissions:
 
     $$
-    \\text{regional emission allowances}_{t,r} = \\text{regional emissions}_{t,r}.
+    \\href{./#var__coacch::regional_emission_allowances}{\\text{regional emission allowances}_{t,r}} = \\href{./#var__coacch::regional_emissions}{\\text{regional emissions}_{t,r}}.
     $$
     """
     constraints = []  # No constraints here

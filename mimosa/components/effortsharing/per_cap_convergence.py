@@ -59,13 +59,13 @@ def get_constraints(
     Therefore, two functions are needed. First, the allowances for equal per capita emissions (EPC):
 
     $$
-    \\text{allowances}_{\\text{EPC}, t, r} = \\frac{\\text{population}_{t,r}}{\\sum_{s} \\text{population}_{t,s}} \\cdot \\text{global emissions}_{t},
+    \\text{allowances}_{\\text{EPC}, t, r} = \\frac{\\text{population}_{t,r}}{\\sum_{s} \\text{population}_{t,s}} \\cdot \\href{./#var__effortsharing_per_cap_convergence::global_emissions}{\\text{global emissions}_{t}},
     $$
 
     and second the allowances for grandfathering (GF):
 
     $$
-    \\text{allowances}_{\\text{GF}, t, r} = \\frac{\\text{baseline emissions}_{0,r}}{\\sum_{s} \\text{baseline emissions}_{0,s}} \\cdot \\text{global emissions}_{t},
+    \\text{allowances}_{\\text{GF}, t, r} = \\frac{\\href{./#var__effortsharing_per_cap_convergence::baseline_emissions}{\\text{baseline emissions}_{0,r}}}{\\sum_{s} \\href{./#var__effortsharing_per_cap_convergence::baseline_emissions}{\\text{baseline emissions}_{0,s}}} \\cdot \\href{./#var__effortsharing_per_cap_convergence::global_emissions}{\\text{global emissions}_{t}},
     $$
 
     :::mimosa.components.effortsharing.per_cap_convergence.percapconv_share_rule
@@ -76,7 +76,7 @@ def get_constraints(
     reductions within that region because reductions can be traded:
 
     $$
-    \\text{allowances}_{t,r} = \\text{baseline emissions}_{t,r} - \\text{attributed emission reductions}_{t,r}
+    \\href{./#var__effortsharing_per_cap_convergence::regional_emission_allowances}{\\text{allowances}_{t,r}} = \\href{./#var__effortsharing_per_cap_convergence::baseline_emissions}{\\text{baseline emissions}_{t,r}} - \\href{./#var__effortsharing_per_cap_convergence::attributed_emission_reductions}{\\text{attributed emission reductions}_{t,r}}
     $$
 
 
@@ -119,7 +119,7 @@ def percapconv_share_rule(m, t, r):
     only the equal per capita emissions are used:
 
     $$
-    \\text{allowances}_{t, r} = \\begin{cases}
+    \\href{./#var__effortsharing_per_cap_convergence::regional_emission_allowances}{\\text{allowances}_{t, r}} = \\begin{cases}
     x \\cdot \\text{allowances}_{\\text{GF}, t, r} + (1-x) \\cdot (\\text{allowances}_{\\text{EPC}, t, r}), & \\text{if } t < \\text{convergence year}, \\\\
     \\text{allowances}_{\\text{EPC}, t, r}, & \\text{if } t \\geq \\text{convergence year},\\\\
     \\text{allowances}_{\\text{GF},t,r}, & \\text{if } \\text{convergence year} = \\text{false}.

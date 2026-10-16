@@ -27,25 +27,25 @@ def get_constraints(
     receive financial transfers up to its level of climate damages:
 
     $$
-    \\text{financial transfer abs}_{t,r} \\geq - \\text{damage costs}_{t,r} \\cdot \\text{GDP}_{\\text{gross},t,r}
+    \\href{./#var__financialtransfer_globaldamagepool::financial_transfer_abs}{\\text{financial transfer abs}_{t,r}} \\geq - \\href{./#var__financialtransfer_globaldamagepool::damage_costs}{\\text{damage costs}_{t,r}} \\cdot \\href{./#var__financialtransfer_globaldamagepool::GDP_gross}{\\text{GDP}_{\\text{gross},t,r}}
     $$
 
     The sum of financial transfers per time period should be zero, since it is a redistribution
     of costs:
 
     $$
-    \\sum_r \\text{financial transfer abs}_{t,r} = 0
+    \\sum_r \\href{./#var__financialtransfer_globaldamagepool::financial_transfer_abs}{\\text{financial transfer abs}_{t,r}} = 0
     $$
 
     Also, in the first year, no financial transfers are allowed:
 
-    $$ \\text{financial transfer abs}_{0,r} = 0. $$
+    $$ \\href{./#var__financialtransfer_globaldamagepool::financial_transfer_abs}{\\text{financial transfer abs}_{0,r}} = 0. $$
 
     `financial_transfer_abs` is expressed in currency units (dollars), while
     `financial_transfer` is expressed as a fraction of gross GDP:
 
     $$
-    \\text{financial transfer}_{t,r} = \\frac{\\text{financial transfer abs}_{t,r}}{\\text{GDP}_{\\text{gross},t,r}}
+    \\href{./#var__financialtransfer_globaldamagepool::financial_transfer}{\\text{financial transfer}_{t,r}} = \\frac{\\href{./#var__financialtransfer_globaldamagepool::financial_transfer_abs}{\\text{financial transfer abs}_{t,r}}}{\\href{./#var__financialtransfer_globaldamagepool::GDP_gross}{\\text{GDP}_{\\text{gross},t,r}}}
     $$
 
 

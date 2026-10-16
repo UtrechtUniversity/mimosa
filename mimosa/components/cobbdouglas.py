@@ -50,17 +50,17 @@ def get_constraints(
 
     ## Investments and consumption
 
-    This net GDP is then split in a part of investments ($I_t$) and a part of consumption ($C_t$), according to a fixed savings rate ($\\text{sr}$):
+    This net GDP is then split in a part of investments ($\\href{./#var__investments}{I_t}$) and a part of consumption ($\\href{./#var__consumption}{C_t}$), according to a fixed savings rate ($\\text{sr}$):
 
-    $$ I_{t,r} = \\text{sr} \\cdot \\text{GDP}_{\\text{net},t,r}, $$
+    $$ \\href{./#var__investments}{I_{t,r}} = \\text{sr} \\cdot \\href{./#var__GDP_net}{\\text{GDP}_{\\text{net},t,r}}, $$
 
-    $$ C_{t,r} = (1 - \\text{sr}) \\cdot \\text{GDP}_{\\text{net},t,r}. $$
+    $$ \\href{./#var__consumption}{C_{t,r}} = (1 - \\text{sr}) \\cdot \\href{./#var__GDP_net}{\\text{GDP}_{\\text{net},t,r}}. $$
 
     ## Capital stock
 
-    The capital stock $K_t$ grows over time according to the investments and the depreciation of the capital stock:
+    The capital stock $\\href{./#var__capital_stock}{K_t}$ grows over time according to the investments and the depreciation of the capital stock:
 
-    $$ K_{t,r} = K_{t-1,r} + \\Delta t \\cdot \\frac{\\partial K_{t,r}}{\\partial t}, $$
+    $$ \\href{./#var__capital_stock}{K_{t,r}} = \\href{./#var__capital_stock}{K_{t-1,r}} + \\Delta t \\cdot \\frac{\\partial \\href{./#var__capital_stock}{K_{t,r}}}{\\partial t}, $$
 
     with the change in capital stock calculated by:
 
@@ -69,7 +69,7 @@ def get_constraints(
     Since this only gives the change in capital stock, we need to add the initial capital stock to get the actual capital stock.
     This is calculated as a region-dependent multiple of the initial GDP:
 
-    $$ K_{t=0,r} = \\text{init_capitalstock_factor}_r \\cdot \\text{GDP}_{t=0,r}. $$
+    $$ \\href{./#var__capital_stock}{K_{t=0,r}} = \\text{init_capitalstock_factor}_r \\cdot \\text{GDP}_{t=0,r}. $$
 
     The regional initial capital stock factors are calibrated from capital-stock-to-GDP ratios in
     the [IMF Investment and Capital Stock Dataset](https://data.imf.org/en/Datasets/ICSD).
