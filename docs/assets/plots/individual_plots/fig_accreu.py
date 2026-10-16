@@ -164,14 +164,15 @@ def fig_damages_global(
         y = a + b * (x - 1.1) ** power
     else:
         raise ValueError(f"Unknown form {form}")
-    fig.add_scatter(
-        x=list(x),
-        y=list(y),
-        mode="lines",
-        line={"color": "black", "dash": "dot"},
-        name="Fit",
-        showlegend=False,
-    )
+    for dash, color in [("solid", "#FFF"), ("dot", "#000")]:
+        fig.add_scatter(
+            x=list(x),
+            y=list(y),
+            mode="lines",
+            line={"color": color, "dash": dash},
+            name="Fit",
+            showlegend=False,
+        )
 
     fig.update_layout(
         margin={"l": 30, "r": 10, "b": 30, "t": 5}, height=250
@@ -200,14 +201,15 @@ def fig_adaptation_global(df, sector, maxval=700, groupvar="RCP"):
     )
     x = np.linspace(0, maxval) / 1000
     y = a * (1 - np.exp(-b * x))
-    fig.add_scatter(
-        x=list(x * 1000),
-        y=list(y),
-        mode="lines",
-        line={"color": "black", "dash": "dot"},
-        name="Fit",
-        showlegend=False,
-    )
+    for dash, color in [("solid", "#FFF"), ("dot", "#000")]:
+        fig.add_scatter(
+            x=list(x * 1000),
+            y=list(y),
+            mode="lines",
+            line={"color": color, "dash": dash},
+            name="Fit",
+            showlegend=False,
+        )
 
     fig.update_layout(
         margin={"l": 30, "r": 10, "b": 30, "t": 5}, height=250
