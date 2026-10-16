@@ -12,6 +12,7 @@ function element(children = {}) {
     return Object.assign(new EventTarget(), {
         dataset: {},
         style: {},
+        attributes: {},
         classList: {
             add: name => classes.add(name),
             remove: name => classes.delete(name),
@@ -19,15 +20,20 @@ function element(children = {}) {
             contains: name => classes.has(name),
         },
         querySelector: selector => children[selector],
-        setAttribute() {},
-        getBoundingClientRect: () => ({ left: 0, top: 0, width: 100, height: 40 }),
+        closest: () => null,
+        setAttribute(name, value) { this.attributes[name] = value; },
+        removeAttribute(name) { delete this.attributes[name]; },
+        removeAttributeNS() {},
+        append(child) { this.children = [...(this.children || []), child]; },
+        replaceChildren(...children) { this.children = children; },
+        getBoundingClientRect: () => ({ left: 0, top: 0, right: 100, bottom: 40, width: 100, height: 40 }),
     });
 }
 
-async function viewer() {
+async function viewer(reference) {
     const links = [element(), element()];
     const nodes = ["input", "output"].map((name, index) => element({
-        title: { textContent: name }, a: links[index],
+        title: { textContent: name, remove() {} }, a: links[index],
     }));
     const edge = element({ title: { textContent: "input->output" } });
     const svg = element();
@@ -51,13 +57,24 @@ async function viewer() {
         ".dependency-graph-viewport": viewport, select, output, ...controls,
     });
     const dialog = element();
+    dialog.getBoundingClientRect = () => ({ left: 0, top: 0, right: 800, bottom: 600 });
+    panel.closest = () => dialog;
+    panel.dataset.variableContext = "accreu_sectoral";
+    const tooltip = element();
+    tooltip.offsetWidth = 300;
+    tooltip.offsetHeight = 200;
     let historyWrites = 0;
     const context = {
         document$: { subscribe() {} },
         document: {
             activeElement: null,
             currentScript: { src: "https://example.org/mimosa/assets/dependency-graph.js" },
+            createElement: () => tooltip,
+            getElementById: () => null,
         },
+        window: { innerWidth: 800, innerHeight: 600 },
+        setTimeout, clearTimeout,
+        requestAnimationFrame: callback => callback(),
         URL,
         fetch: async () => ({ ok: true, text: async () => "graph" }),
         DOMParser: class { parseFromString() { return { documentElement: svg }; } },
@@ -67,8 +84,9 @@ async function viewer() {
     };
     vm.createContext(context);
     vm.runInContext(source, context);
-    const graph = await context.initializeDependencyGraph(panel, "graph.svg", dialog);
-    return { graph, dialog, nodes, links, viewport, output, controls, historyWrites: () => historyWrites };
+    links.forEach(link => link.addEventListener("focus", () => { context.document.activeElement = link; }));
+    const graph = await context.initializeDependencyGraph(panel, "graph.svg", dialog, reference || context.document);
+    return { graph, dialog, nodes, links, viewport, output, controls, tooltip, historyWrites: () => historyWrites };
 }
 
 test("Escape clears the selection before allowing the modal to close", async () => {
@@ -161,6 +179,55 @@ test("touch gestures and secondary mouse buttons retain native behaviour", async
         assert.equal(move.defaultPrevented, false);
         assert.equal(viewport.scrollLeft, 0);
     }
+});
+
+test("node information reuses the matching reference entry without duplicate IDs", async () => {
+    const copiedAnchor = element();
+    copiedAnchor.setAttribute("id", "variable-accreu_sectoral--input");
+    const card = element();
+    card.querySelectorAll = selector => selector === "[id]" ? [copiedAnchor] : [];
+    const reference = {
+        getElementById(id) {
+            assert.equal(id, "variable-accreu_sectoral--input");
+            return { closest: () => ({ cloneNode: () => card }) };
+        },
+    };
+    const { links, nodes, tooltip, viewport } = await viewer(reference);
+    links[0].dispatchEvent(new Event("focus"));
+    assert.equal(tooltip.hidden, false);
+    assert.equal(tooltip.children[0], card);
+    assert.equal(copiedAnchor.attributes.id, undefined);
+    assert.equal(links[0].attributes["aria-describedby"], tooltip.id);
+    assert.equal(nodes.some(node => node.classList.contains("is-selected")), false);
+    assert.equal(tooltip.style.left, "108px");
+    nodes[0].getBoundingClientRect = () => ({ left: 690, right: 790, top: 580 });
+    links[0].dispatchEvent(new Event("focus"));
+    assert.equal(tooltip.style.left, "382px");
+    assert.equal(tooltip.style.top, "392px");
+    nodes[0].getBoundingClientRect = () => ({ left: 290, right: 510, top: 400, bottom: 440 });
+    links[0].dispatchEvent(new Event("focus"));
+    assert.equal(tooltip.style.left, "290px");
+    assert.equal(tooltip.style.top, "192px");
+    viewport.dispatchEvent(new Event("scroll"));
+    assert.equal(tooltip.hidden, true);
+    assert.equal(links[0].attributes["aria-describedby"], undefined);
+});
+
+test("hover information stays open while moving from the node into the card", async () => {
+    const card = element();
+    card.querySelectorAll = () => [];
+    const reference = { getElementById: () => ({ closest: () => ({ cloneNode: () => card }) }) };
+    const { nodes, tooltip, dialog } = await viewer(reference);
+    nodes[0].dispatchEvent(new Event("pointerenter"));
+    assert.equal(tooltip.hidden, true);
+    await new Promise(resolve => setTimeout(resolve, 280));
+    assert.equal(tooltip.hidden, false);
+    nodes[0].dispatchEvent(new Event("pointerleave"));
+    tooltip.dispatchEvent(new Event("pointerenter"));
+    await new Promise(resolve => setTimeout(resolve, 180));
+    assert.equal(tooltip.hidden, false);
+    dialog.dispatchEvent(new Event("close"));
+    assert.equal(tooltip.hidden, true);
 });
 
 for (const prefix of ["", "/mimosa"]) {

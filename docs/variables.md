@@ -14,10 +14,11 @@ to the previous time step. Click a node to select it; click empty graph space or
 press Escape to clear the selection. Click and drag to pan the zoomed-in graph.
 Double-click empty space to fit the graph.
 Use **Fit graph** for the overview, or **Focus selected** to read a neighbourhood.
+Hover over a node to read its variable reference information.
 
 [Download the graph as SVG](assets/dependency-graph.svg){id="dependency-graph-source" download}
 
-<div class="dependency-graph" id="dependency-graph-viewer">
+<div class="dependency-graph" id="dependency-graph-viewer" data-variable-context="accreu_sectoral">
   <div class="dependency-graph-controls">
     <label>Variable <select aria-label="Graph variable"></select></label>
     <button type="button" data-action="zoom-out" aria-label="Zoom out">−</button>

@@ -126,6 +126,9 @@ container, including links created later by MathJax.
 Modal selections leave the page URL and
 browser history unchanged. Escape clears a selected variable; when none is
 selected, Escape closes the dialog. The close button always closes it.
+Node hover cards clone the matching variable-reference admonition, using the
+graph panel's `data-variable-context` to choose the metadata variant. They reuse
+the reference page already loaded for the modal, including availability examples.
 
 Activate the `accreu` Conda environment, then run:
 

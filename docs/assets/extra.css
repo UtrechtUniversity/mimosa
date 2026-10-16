@@ -334,6 +334,20 @@ mjx-container a[href*="#var__"] {
     .dependency-graph-viewport { flex: 1; height: auto; min-height: 0; }
 }
 
+.dependency-graph-tooltip {
+    position: fixed;
+    z-index: 10;
+    width: min(30rem, calc(100vw - 3rem));
+    max-height: min(65vh, 32rem);
+    overflow: auto;
+    border-radius: .3rem;
+    background: var(--md-default-bg-color);
+    box-shadow: 0 .2rem .8rem rgb(0 0 0 / 25%);
+    user-select: text;
+
+    .admonition { margin: 0; }
+}
+
 /* Interactive dependency graph. */
 .dependency-graph {
     border: 1px solid var(--md-default-fg-color--lightest);

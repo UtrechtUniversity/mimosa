@@ -1,7 +1,87 @@
 // Resolve the reference page from this asset, independently of the current page.
 const dependencyGraphPage = new URL("../variables/", document.currentScript.src);
 
-async function initializeDependencyGraph(panel, source, dialog = null) {
+function initializeDependencyTooltips(panel, nodes, reference) {
+    const tooltip = document.createElement("div");
+    tooltip.className = "dependency-graph-tooltip md-typeset";
+    tooltip.id = panel.closest("dialog") ? "dependency-graph-modal-tooltip" : "dependency-graph-tooltip";
+    tooltip.setAttribute("role", "tooltip");
+    tooltip.hidden = true;
+    panel.append(tooltip);
+    let activeNode = null;
+    let showTimer;
+    let hideTimer;
+
+    function hide() {
+        clearTimeout(showTimer);
+        clearTimeout(hideTimer);
+        tooltip.hidden = true;
+        activeNode?.querySelector("a").removeAttribute("aria-describedby");
+        activeNode = null;
+    }
+
+    function show(node) {
+        hide();
+        const anchor = reference.getElementById(`variable-${panel.dataset.variableContext}--${node.dataset.variable}`);
+        const entry = anchor?.closest(".admonition.variable");
+        if (!entry) return;
+        const card = entry.cloneNode(true);
+        card.querySelectorAll(".variable_anchor, .md-clipboard").forEach(element => element.remove());
+        card.querySelectorAll("[id]").forEach(element => element.removeAttribute("id"));
+        tooltip.replaceChildren(card);
+        tooltip.hidden = false;
+        activeNode = node;
+        node.querySelector("a").setAttribute("aria-describedby", tooltip.id);
+
+        const bounds = panel.closest("dialog")?.getBoundingClientRect() || {
+            left: 0, top: 0, right: window.innerWidth, bottom: window.innerHeight,
+        };
+        const rect = node.getBoundingClientRect();
+        const width = tooltip.offsetWidth;
+        const height = tooltip.offsetHeight;
+        let left = rect.right + width + 12 < bounds.right ? rect.right + 8 : rect.left - width - 8;
+        let top = rect.top;
+        if (left < bounds.left + 8) {
+            // When neither side has room, place the card above or below the node.
+            left = rect.left;
+            top = rect.top - height - 8;
+            if (top < bounds.top + 8) top = rect.bottom + 8;
+        }
+        tooltip.style.left = `${Math.max(bounds.left + 8, Math.min(left, bounds.right - width - 8))}px`;
+        tooltip.style.top = `${Math.max(bounds.top + 8, Math.min(top, bounds.bottom - height - 8))}px`;
+    }
+
+    function scheduleHide() {
+        clearTimeout(showTimer);
+        clearTimeout(hideTimer);
+        hideTimer = setTimeout(hide, 150);
+    }
+    nodes.forEach(node => {
+        // Replace Graphviz's native name-only tooltip with the reference entry.
+        node.querySelector("title").remove();
+        const link = node.querySelector("a");
+        link.removeAttributeNS("http://www.w3.org/1999/xlink", "title");
+        node.addEventListener("pointerenter", () => {
+            clearTimeout(hideTimer);
+            showTimer = setTimeout(() => show(node), 250);
+        });
+        node.addEventListener("pointerleave", scheduleHide);
+        link.addEventListener("focus", () => requestAnimationFrame(() => {
+            // Let the browser scroll a keyboard-focused node into view first.
+            if (document.activeElement === link) show(node);
+        }));
+        link.addEventListener("blur", scheduleHide);
+    });
+    tooltip.addEventListener("pointerenter", () => clearTimeout(hideTimer));
+    tooltip.addEventListener("pointerleave", scheduleHide);
+    tooltip.addEventListener("focusin", () => clearTimeout(hideTimer));
+    tooltip.addEventListener("focusout", scheduleHide);
+    panel.querySelector(".dependency-graph-viewport").addEventListener("scroll", hide);
+    panel.closest("dialog")?.addEventListener("close", hide);
+    return hide;
+}
+
+async function initializeDependencyGraph(panel, source, dialog = null, reference = document) {
     const viewport = panel.querySelector(".dependency-graph-viewport");
     const select = panel.querySelector("select");
     const focusButton = panel.querySelector('[data-action="focus"]');
@@ -35,6 +115,7 @@ async function initializeDependencyGraph(panel, source, dialog = null) {
                 if (scale < focusZoom) focusSelected();
             });
         });
+        const hideTooltip = initializeDependencyTooltips(panel, nodes, reference);
         select.add(new Option("No selection", ""));
         nodes.map(node => node.dataset.variable).sort().forEach(name => {
             select.add(new Option(name, name));
@@ -70,6 +151,7 @@ async function initializeDependencyGraph(panel, source, dialog = null) {
         }
 
         function choose(name) {
+            hideTooltip();
             if (!dialog) {
                 const url = new URL(location.href);
                 if (name) url.searchParams.set("graph_variable", name);
@@ -84,6 +166,7 @@ async function initializeDependencyGraph(panel, source, dialog = null) {
         }
 
         function setZoom(next) {
+            hideTooltip();
             const centerX = (viewport.scrollLeft + viewport.clientWidth / 2) / scale;
             const centerY = (viewport.scrollTop + viewport.clientHeight / 2) / scale;
             scale = Math.max(0.05, Math.min(3, next));
@@ -125,6 +208,7 @@ async function initializeDependencyGraph(panel, source, dialog = null) {
         let dragged = false;
         viewport.addEventListener("pointerdown", event => {
             if (event.button !== 0 || event.pointerType === "touch" || !event.target.closest("svg")) return;
+            hideTooltip();
             dragged = false;
             pan = {
                 pointerId: event.pointerId,
@@ -236,7 +320,7 @@ document$.subscribe(() => {
                 const graphPanel = page.querySelector("#dependency-graph-viewer");
                 const source = new URL(page.querySelector("#dependency-graph-source").getAttribute("href"), reference);
                 dialog.querySelector("p").replaceWith(graphPanel);
-                return initializeDependencyGraph(graphPanel, source, dialog);
+                return initializeDependencyGraph(graphPanel, source, dialog, page);
             })();
         }
         dialog.showModal();
