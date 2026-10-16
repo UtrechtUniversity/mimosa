@@ -355,8 +355,25 @@ mjx-container a[href*="#var__"] {
     padding: .8rem;
     background: var(--md-default-bg-color);
 
+    .dependency-graph-header {
+        display: flex;
+        flex-wrap: wrap;
+        flex-shrink: 0;
+        align-items: flex-start;
+        gap: .6rem 1rem;
+    }
+    .dependency-graph-toolbar,
+    .dependency-graph-parameters {
+        flex: 1 1 24rem;
+        min-width: 0;
+    }
+    .dependency-graph-parameters-title {
+        margin: 0 0 .25rem;
+        font-size: .65rem;
+        font-weight: 600;
+    }
     .dependency-graph-configuration {
-        margin: 0 0 .6rem;
+        margin: 0;
         font-size: .65rem;
         .highlight { margin: 0; }
         pre { margin: 0; max-height: 25vh; overflow: auto; }
@@ -394,7 +411,7 @@ mjx-container a[href*="#var__"] {
             color: var(--md-default-fg-color);
             padding: .25rem .4rem;
         }
-        select { max-width: min(16rem, 65vw); }
+        select { min-width: 0; max-width: min(16rem, 65vw); }
         button { cursor: pointer; }
         button:hover { border-color: var(--md-accent-fg-color); }
         button:disabled { opacity: .4; cursor: default; }
@@ -502,7 +519,7 @@ mjx-container a[href*="#var__"] {
         &.is-outgoing path { stroke: #ed6a2f; }
         &.is-muted { opacity: .3; }
         &:hover path, &:focus-within path { stroke-width: 4; }
-        a:focus-visible { outline: 2px solid var(--md-accent-fg-color); outline-offset: 4px; }
+        a:focus-visible, a:focus { outline: none; }
     }
 
 }
