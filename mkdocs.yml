@@ -15,7 +15,7 @@ nav:
           - ACCREU damages and adaptation: components/damages/accreu.md
       - Effort-sharing: components/effortsharing.md
       - Emission trading: components/emissiontrading.md
-      - Financial transfers: components/financialtransfers.md
+      - Damage cost pool: components/financialtransfers.md
       - Region definitions: components/regions.md
   - Parameter reference: parameters.md
   - Variable reference: variables.md
