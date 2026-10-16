@@ -52,7 +52,7 @@ def test_full_entries_and_inline_links_in_prose_and_lists(catalogue):
         "<p>See varref::damage_costs.</p><ul><li>var::damage_costs</li></ul>", catalogue
     )
 
-    assert html.count('href="../../../variables/#variable-coacch--damage_costs"') == 2
+    assert html.count('href="#var__damage_costs"') == 2
     assert html.count("Damage &amp; adaptation &lt;costs&gt;") == 1
     assert "Units: <code>fraction_of_GDP</code>" in html
     assert "dimensions: <code>t, regions</code>" in html
@@ -86,7 +86,7 @@ def test_explicit_context_in_rendered_marker_overrides_page(catalogue):
     html = render("<p>var::accreu_sectoral::damage_costs</p>", catalogue)
 
     assert "Residual damages" in html
-    assert "#variable-accreu_sectoral--damage_costs" in html
+    assert 'href="#var__damage_costs"' in html
     assert "Damage &amp; adaptation" not in html
 
 
@@ -270,13 +270,11 @@ def test_strict_site_build_renders_pages_docstrings_and_reference(
     reference_file = "variables/index.html" if directory_urls else "variables.html"
     html = (site.root / "site" / page_file).read_text(encoding="utf-8")
     reference = (site.root / "site" / reference_file).read_text(encoding="utf-8")
-    reference_url = "../../variables/" if directory_urls else "../variables.html"
 
     assert html.count("Damage &amp; adaptation &lt;costs&gt;") == 1
     assert "Residual damages" in html
     assert "Constraint macros still render." in html
-    assert html.count(f'href="{reference_url}#variable-coacch--damage_costs"') == 3
-    assert f'href="{reference_url}#variable-accreu_sectoral--damage_costs"' in html
+    assert html.count('href="#var__damage_costs"') == 4
     assert "var::missing_literal" in html
     assert "varref::missing_literal" in html
     assert 'id="variable-coacch_noadaptation--damage_costs"' in reference

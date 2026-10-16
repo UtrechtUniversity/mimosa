@@ -5,13 +5,13 @@ from html import escape
 from html.parser import HTMLParser
 from itertools import product
 from textwrap import indent
+from urllib.parse import quote
 
 from docs.scripts.variable_availability import availability_requirements
 from docs.scripts.variable_docs import get_documentation_context
 from docs.scripts.variable_references import (
     group_variables,
     resolve_variable_reference,
-    variable_reference_url,
 )
 
 REFERENCE_MARKER = "{variables::reference}"
@@ -160,7 +160,7 @@ class _VariableHTMLRenderer(HTMLParser):
         variable = resolve_variable_reference(
             marker, self.page_context, self.page_path, self.catalogue
         )
-        url = variable_reference_url(variable, self.page_url, self.reference_url)
+        url = f"#var__{quote(variable.name, safe='_.')}"
         link = f'<a href="{escape(url, quote=True)}"><code>{escape(variable.name)}</code></a>'
         if marker.startswith("varref::"):
             return link + punctuation

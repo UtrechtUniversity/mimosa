@@ -52,8 +52,8 @@ Entries are merged only when their name, description, units, dimensions, declare
 unit status and baseline requirement match. A merged entry retains all of its
 contexts and their anchors, such as `variable-accreu_sectoral--damage_costs`.
 Editing descriptions or regrouping entries therefore preserves existing links.
-The URL helper calculates links from the current page's output URL, supporting
-both directory URLs and `.html` pages.
+Marker links use `#var__name` to open the dependency graph, independently of the
+current page's path. Reference anchors remain available for looking up metadata.
 
 ## Rendering variable documentation
 
@@ -75,6 +75,9 @@ Use `var::damage_costs` for a linked name, description, units and dimensions, or
 `var::coacch::damage_costs` overrides the page default. These markers also work in
 component docstrings rendered on that page. Markers in inline code, code blocks,
 existing links, HTML attributes, comments, scripts and styles remain literal.
+Both forms generate graph links such as `#var__damage_costs`. Context selection
+still controls inline metadata and validation; the graph currently uses its one
+ACCREU sectoral configuration.
 
 The standalone `{variables::reference}` marker generates the complete reference
 in `docs/variables.md` as flat `variable` admonitions, matching the
