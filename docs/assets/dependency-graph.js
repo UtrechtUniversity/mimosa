@@ -1,3 +1,6 @@
+// Resolve the reference page from this asset, independently of the current page.
+const dependencyGraphPage = new URL("../variables/", document.currentScript.src);
+
 async function initializeDependencyGraph(panel, source, dialog = null) {
     const viewport = panel.querySelector(".dependency-graph-viewport");
     const select = panel.querySelector("select");
@@ -203,12 +206,16 @@ document$.subscribe(() => {
 
     let dialog;
     let graphReady;
-    document.querySelectorAll("a.dependency-graph-link").forEach(link => {
-        link.addEventListener("click", async event => {
+    // MathJax creates equation links later, so handle clicks on the page itself.
+    const content = document.querySelector(".md-content");
+    if (!content) return;
+    content.addEventListener("click", async event => {
+            const link = event.target.closest('a[href^="#var__"]');
+            if (!link) return;
             if (event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
             event.preventDefault();
-            const reference = new URL(link.href);
-            const variable = reference.searchParams.get("graph_variable");
+            const reference = dependencyGraphPage;
+            const variable = decodeURIComponent(link.hash.slice("#var__".length));
             if (!dialog) {
                 dialog = document.createElement("dialog");
                 dialog.className = "dependency-graph-modal";
@@ -240,6 +247,5 @@ document$.subscribe(() => {
                 dialog.querySelector("p").textContent = "The graph could not be loaded. Please try the variable reference page.";
                 console.error(error);
             }
-        });
     });
 });

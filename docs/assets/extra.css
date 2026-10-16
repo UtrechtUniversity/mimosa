@@ -142,7 +142,9 @@ nav.md-nav a[target=_blank]::after {
 a[href*="parameters/#"] code,
 a[href*="parameters/#"]:not(:has(code)),
 a[href*="variables/#"] code,
-a[href*="variables/#"]:not(:has(code)) {
+a[href*="variables/#"]:not(:has(code)),
+a[href^="#var__"] code,
+a[href^="#var__"]:not(:has(code)) {
     position: relative;
     padding: 0.1rem .2rem 0.1rem 1.3rem;
     white-space: nowrap;
@@ -162,7 +164,9 @@ a[href*="parameters/#"]:not(:has(code))::before {
 }
 
 a[href*="variables/#"] code::before,
-a[href*="variables/#"]:not(:has(code))::before {
+a[href*="variables/#"]:not(:has(code))::before,
+a[href^="#var__"] code::before,
+a[href^="#var__"]:not(:has(code))::before {
     content: "";
     height: .9rem;
     width: .9rem;
@@ -172,6 +176,12 @@ a[href*="variables/#"]:not(:has(code))::before {
     left: 0.3em;
     background-color: currentcolor;
     mask-image: var(--md-admonition-icon--variable)
+}
+
+/* Equation links keep their mathematical spacing, without a variable icon. */
+mjx-container a[href^="#var__"] {
+    padding: 0;
+    &::before { content: none; }
 }
 
 .center_align_plotly .plot-container.plotly .svg-container {

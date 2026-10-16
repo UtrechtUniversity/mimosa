@@ -54,7 +54,11 @@ async function viewer() {
     let historyWrites = 0;
     const context = {
         document$: { subscribe() {} },
-        document: { activeElement: null },
+        document: {
+            activeElement: null,
+            currentScript: { src: "https://example.org/mimosa/assets/dependency-graph.js" },
+        },
+        URL,
         fetch: async () => ({ ok: true, text: async () => "graph" }),
         DOMParser: class { parseFromString() { return { documentElement: svg }; } },
         Option: class {},
@@ -158,3 +162,61 @@ test("touch gestures and secondary mouse buttons retain native behaviour", async
         assert.equal(viewport.scrollLeft, 0);
     }
 });
+
+for (const prefix of ["", "/mimosa"]) {
+    test(`short graph links resolve from the site root ${prefix || "/"}`, async () => {
+        let onPage;
+        let opens = 0;
+        const requests = [];
+        const selections = [];
+        const graphPanel = {};
+        const links = ["damage_costs", "riverine_adaptation_costs_abs"].map(name =>
+            Object.assign(element(), { hash: `#var__${name}` })
+        );
+        const dialog = element({ button: element(), p: { replaceWith() {} } });
+        dialog.showModal = () => { dialog.open = true; opens++; };
+        const context = {
+            URL, console,
+            document$: { subscribe(callback) { onPage = callback; } },
+            document: {
+                currentScript: { src: `https://example.org${prefix}/assets/dependency-graph.js` },
+                querySelector: () => null,
+                querySelectorAll(selector) {
+                    assert.equal(selector, 'a[href^="#var__"]');
+                    return links;
+                },
+                createElement: () => dialog,
+                body: { append() {} },
+            },
+            fetch: async url => {
+                requests.push(String(url));
+                return { ok: true, text: async () => "reference page" };
+            },
+            DOMParser: class {
+                parseFromString() {
+                    return { querySelector: selector => selector === "#dependency-graph-viewer"
+                        ? graphPanel : { getAttribute: () => "../assets/dependency-graph.svg" } };
+                }
+            },
+        };
+        vm.createContext(context);
+        vm.runInContext(source, context);
+        context.initializeDependencyGraph = async (panel, source, modal) => {
+            assert.equal(panel, graphPanel);
+            assert.equal(String(source), `https://example.org${prefix}/assets/dependency-graph.svg`);
+            assert.equal(modal, dialog);
+            return { focusVariable: name => selections.push(name) };
+        };
+        onPage();
+
+        for (const link of links) {
+            const click = Object.assign(new Event("click", { cancelable: true }), { button: 0 });
+            link.dispatchEvent(click);
+            await new Promise(setImmediate);
+            assert.equal(click.defaultPrevented, true);
+        }
+        assert.deepEqual(selections, ["damage_costs", "riverine_adaptation_costs_abs"]);
+        assert.deepEqual(requests, [`https://example.org${prefix}/variables/`]);
+        assert.equal(opens, 2);
+    });
+}

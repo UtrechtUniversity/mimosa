@@ -10,9 +10,9 @@ During the ACCREU project, new damage estimates were developed for [:material-ho
 (except mortality).
 
 **Try the dependency graph:** open the graph for
-[damage_costs](../../variables.md?graph_variable=damage_costs#dependency-graph){.dependency-graph-link},
-[riverine_adaptation_costs_abs](../../variables.md?graph_variable=riverine_adaptation_costs_abs#dependency-graph){.dependency-graph-link}, or
-[global_welfare](../../variables.md?graph_variable=global_welfare#dependency-graph){.dependency-graph-link}.
+[damage_costs](#var__damage_costs),
+[riverine_adaptation_costs_abs](#var__riverine_adaptation_costs_abs), or
+[global_welfare](#var__global_welfare).
 Press Escape to clear the selection, then Escape again to close the graph.
 
 Usage:

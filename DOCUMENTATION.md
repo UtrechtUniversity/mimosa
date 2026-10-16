@@ -117,8 +117,12 @@ clear the selection and remove the variable from the URL.
 Double-clicking the graph background also restores the fit view.
 Mouse dragging pans the graph without changing its zoom or selection. Movements
 under four pixels still count as clicks; touch scrolling remains native.
-The three ACCREU graph links open the same viewer in a native dialog, loading its
-markup from the variable reference page. Modal selections leave the page URL and
+Use `[damage_costs](#var__damage_costs)` on any documentation page to open the
+graph in a native dialog. No path or CSS class is needed. The viewer resolves
+the variable reference page relative to its own script and reuses its markup.
+In equations, use `\href{#var__temperature}{T_t}`. Clicks are handled on the page
+container, including links created later by MathJax.
+Modal selections leave the page URL and
 browser history unchanged. Escape clears a selected variable; when none is
 selected, Escape closes the dialog. The close button always closes it.
 
