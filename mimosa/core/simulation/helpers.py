@@ -67,9 +67,7 @@ def calc_dependencies(equations_dict, m: ConcreteModel):
         # also referenced at an earlier time, the hard dependency takes priority
         # in the simple directed graph used by the simulator and plot.
         eq.dependencies = sorted(dependencies)
-        eq.prev_time_dependencies = sorted(
-            previous_time_dependencies - dependencies
-        )
+        eq.prev_time_dependencies = sorted(previous_time_dependencies - dependencies)
 
 
 def sort_equations(equations_dict, return_graph=False):
@@ -158,6 +156,7 @@ def plot_dependency_graph(G, group_depth=2):
         damage_costs_gross_riverine     -> damage_costs_gross
         damage_costs_gross_labourprod   -> damage_costs_gross
         """
+        node = node.replace("global_", "")  # Remove "global_" prefix for grouping
         parts = node.split("_")
         if len(parts) <= group_depth:
             return None

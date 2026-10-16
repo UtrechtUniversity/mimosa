@@ -75,13 +75,16 @@ def get_constraints(
 
             ![Regional damage costs (without adaptation)](../../assets/fig/accreu/riverine_adapt_eff.png)
 
-    Variables created in this module:
+    <div class="tiny_table table_scrollable extra_small" markdown>
 
-    - var::riverine_damage_costs_gross
-    - var::riverine_adaptation_costs_abs
-    - var::riverine_adaptation_costs
-    - var::riverine_adaptation_level
-    - var::riverine_damage_costs
+    | Variables created in this module: |
+    | --------------------------------- |
+    | var::riverine_damage_costs_gross |
+    | var::riverine_adaptation_costs_abs |
+    | var::riverine_adaptation_costs |
+    | var::riverine_adaptation_level |
+    | var::riverine_damage_costs |
+    </div>
 
     """
 

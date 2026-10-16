@@ -244,6 +244,11 @@ a[href*="variables/#"]:not(:has(code))::before {
         margin-top: calc(-1 * var(--bottom-mask-size));
         background: linear-gradient(transparent, var(--md-default-bg-color));
         pointer-events: none;
+        opacity: 0;
+    }
+
+    &.has-more-below::after {
+        opacity: 1;
     }
 
     &.extra_small {
