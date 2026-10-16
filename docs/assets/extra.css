@@ -57,10 +57,16 @@ nav.md-nav a[target=_blank]::after {
     }
 }
 
-.param_anchor, .variable_anchor {
+.param_anchor {
     margin-top: -3em;
     padding-top: 2em;
     display: block;
+}
+
+/* Match the theme's :target specificity and leave room for the entry title. */
+.md-typeset .variable_anchor {
+    display: block;
+    scroll-margin-top: 6rem;
 }
 
 .modebar {

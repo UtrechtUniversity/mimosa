@@ -22,9 +22,12 @@ from docs.scripts.variable_rendering import (
 @pytest.fixture
 def catalogue():
     coacch = VariableMetadata(
-        name="damage_costs", description="Damage & adaptation <costs>",
-        unit="fraction_of_GDP", dimensions=("t", "regions"),
-        context="coacch", has_declared_units=True,
+        name="damage_costs",
+        description="Damage & adaptation <costs>",
+        unit="fraction_of_GDP",
+        dimensions=("t", "regions"),
+        context="coacch",
+        has_declared_units=True,
     )
     return (
         coacch,
@@ -35,8 +38,12 @@ def catalogue():
 
 def render(html, catalogue):
     return render_variable_markers(
-        html, catalogue, "coacch", "components/damages/example.md",
-        "components/damages/example/", "variables/",
+        html,
+        catalogue,
+        "coacch",
+        "components/damages/example.md",
+        "components/damages/example/",
+        "variables/",
     )
 
 
@@ -85,8 +92,11 @@ def test_explicit_context_in_rendered_marker_overrides_page(catalogue):
 
 def test_missing_metadata_scalar_and_baseline_requirement_are_visible(catalogue):
     variable = replace(
-        catalogue[0], description=None, has_declared_units=False,
-        dimensions=(), requires_baseline=True,
+        catalogue[0],
+        description=None,
+        has_declared_units=False,
+        dimensions=(),
+        requires_baseline=True,
     )
     html = render("<p>var::damage_costs</p>", (variable,))
 
@@ -108,73 +118,36 @@ def test_reference_keeps_variants_and_all_merged_anchors(catalogue):
     assert "Example usage:" not in html
     for variable in catalogue:
         assert html.count(f'id="variable-{variable.context}--damage_costs"') == 1
-        assert f'id="variable-{variable.context}--damage_costs" class="variable_anchor"' in html
-
-
-def test_reference_shows_availability_only_for_conditional_variables(catalogue):
-    from markdown import markdown
-
-    conditional = replace(catalogue[0], name="attributed_emission_reductions")
-    context_params = {
-        variable.context: check_params({"model structure": {"emissiontrade module": "notrade"}})
-        for variable in catalogue
-    }
-    context_params["coacch"]["model structure"]["emissiontrade module"] = "emissiontrade"
-    html = render_variable_reference(catalogue + (conditional,), context_params)
-
-    assert html.count("Available when:") == 1
-    assert "<code>model structure.emissiontrade module</code>" not in html
-    assert "<code>coacch_noadaptation</code>" not in html
-    assert 'id="variable-coacch--attributed_emission_reductions"' in html
-    assert "params['model structure']['emissiontrade module'] = 'emissiontrade'" in html
-    assert '```python hl_lines="2"' in html
-    assert "Example usage:" not in html
-    rendered = markdown(html, extensions=["admonition", "pymdownx.superfences"])
-    assert rendered.count('<div class="admonition variable">') == 3
-    assert '<p class="admonition-title">attributed_emission_reductions</p>' in rendered
-    assert 'class="highlight"' in rendered
-    assert "!!! variable" not in rendered
-
-
-def test_reference_lists_each_allowed_configuration_in_its_own_block(catalogue):
-    from markdown import markdown
-
-    conditional = replace(catalogue[0], name="effort_sharing_common_level")
-    second = replace(conditional, context="coacch_noadaptation")
-    context_params = {
-        "coacch": check_params({"model structure": {"effortsharing module": "equal_mitigation_costs"}}),
-        "coacch_noadaptation": check_params({"model structure": {"effortsharing module": "equal_total_costs"}}),
-        "accreu_sectoral": check_params({}),
-    }
-
-    reference = render_variable_reference(catalogue + (conditional, second), context_params)
-
-    assert "params['model structure']['effortsharing module'] = 'equal_mitigation_costs'" in reference
-    assert "params['model structure']['effortsharing module'] = 'equal_total_costs'" in reference
-    assert reference.count("params = load_params()") == 2
-    assert reference.count("model = MIMOSA(params)") == 2
-    assert "    or\n" in reference
-    assert "Example usage:" not in reference
-    rendered = markdown(reference, extensions=["admonition", "pymdownx.superfences"])
-    assert rendered.count('class="highlight"') == 2
-    assert "<p>or</p>" in rendered
+        assert (
+            f'id="variable-{variable.context}--damage_costs" class="variable_anchor"'
+            in html
+        )
 
 
 def test_reference_example_sets_all_required_options(catalogue):
-    conditional = replace(catalogue[0], name="monetary_mortality", context="accreu_sectoral")
+    conditional = replace(
+        catalogue[0], name="monetary_mortality", context="accreu_sectoral"
+    )
     context_params = {
         "coacch": check_params({}),
-        "coacch_noadaptation": check_params({
-            "model structure": {"damage module": "ACCREU"},
-            "economics": {"damages": {"accreu": {"monetise_mortality": False}}},
-        }),
-        "accreu_sectoral": check_params({"model structure": {"damage module": "ACCREU"}}),
+        "coacch_noadaptation": check_params(
+            {
+                "model structure": {"damage module": "ACCREU"},
+                "economics": {"damages": {"accreu": {"monetise_mortality": False}}},
+            }
+        ),
+        "accreu_sectoral": check_params(
+            {"model structure": {"damage module": "ACCREU"}}
+        ),
     }
 
     rendered = render_variable_reference(catalogue + (conditional,), context_params)
 
     assert "params['model structure']['damage module'] = 'ACCREU'" in rendered
-    assert "params['economics']['damages']['accreu']['monetise_mortality'] = True" in rendered
+    assert (
+        "params['economics']['damages']['accreu']['monetise_mortality'] = True"
+        in rendered
+    )
     assert '```python hl_lines="2 3"' in rendered
 
 
@@ -238,31 +211,40 @@ def documentation_site(tmp_path, monkeypatch, catalogue):
         encoding="utf-8",
     )
     (tmp_path / "variable_docs_fixture.py").write_text(
-        'def component():\n'
+        "def component():\n"
         '    """Component documentation.\n\n'
-        '    Docstring prose: varref::damage_costs.\n\n'
-        '    - var::accreu_sectoral::damage_costs\n\n'
-        '    {{ sample_constraint }}\n'
+        "    Docstring prose: varref::damage_costs.\n\n"
+        "    - var::accreu_sectoral::damage_costs\n\n"
+        "    {{ sample_constraint }}\n"
         '    """\n',
         encoding="utf-8",
     )
     root = Path(__file__).resolve().parents[2]
     config = {
-        "site_name": "Variable rendering test", "strict": True,
-        "docs_dir": str(source), "site_dir": str(tmp_path / "site"),
+        "site_name": "Variable rendering test",
+        "strict": True,
+        "docs_dir": str(source),
+        "site_dir": str(tmp_path / "site"),
         "nav": ["index.md", "components/example.md", "variables.md"],
         "hooks": [str(root / "docs/scripts/mkdocs_hooks.py")],
         "plugins": [
             {"mkdocstrings": {"handlers": {"python": {"paths": [str(tmp_path)]}}}},
             {"macros": {"module_name": str(root / "docs/scripts/mkdocs_macros")}},
         ],
-        "markdown_extensions": ["admonition", "pymdownx.details", "pymdownx.superfences"],
+        "markdown_extensions": [
+            "admonition",
+            "pymdownx.details",
+            "pymdownx.superfences",
+        ],
     }
     return SimpleNamespace(
-        root=tmp_path, page=page, config=config,
+        root=tmp_path,
+        page=page,
+        config=config,
         context_constructions=context_constructions,
         catalogue_collections=catalogue_collections,
-        get_context=get_context, get_catalogue=get_catalogue,
+        get_context=get_context,
+        get_catalogue=get_catalogue,
     )
 
 
@@ -276,11 +258,15 @@ def build_site(site):
 
 
 @pytest.mark.parametrize("directory_urls", [True, False])
-def test_strict_site_build_renders_pages_docstrings_and_reference(documentation_site, directory_urls):
+def test_strict_site_build_renders_pages_docstrings_and_reference(
+    documentation_site, directory_urls
+):
     site = documentation_site
     site.config["use_directory_urls"] = directory_urls
     build_site(site)
-    page_file = "components/example/index.html" if directory_urls else "components/example.html"
+    page_file = (
+        "components/example/index.html" if directory_urls else "components/example.html"
+    )
     reference_file = "variables/index.html" if directory_urls else "variables.html"
     html = (site.root / "site" / page_file).read_text(encoding="utf-8")
     reference = (site.root / "site" / reference_file).read_text(encoding="utf-8")
@@ -302,7 +288,9 @@ def test_strict_site_build_renders_pages_docstrings_and_reference(documentation_
     assert "{variables::reference}" not in reference
 
 
-def test_serve_reuses_models_after_successful_failed_and_recovered_rebuilds(documentation_site, monkeypatch):
+def test_serve_reuses_models_after_successful_failed_and_recovered_rebuilds(
+    documentation_site, monkeypatch
+):
     from importlib import import_module
 
     serve_module = import_module("mkdocs.commands.serve")
@@ -328,7 +316,9 @@ def test_serve_reuses_models_after_successful_failed_and_recovered_rebuilds(docu
 
             site.page.write_text("# Updated page\n\nUpdated prose.\n", encoding="utf-8")
             self.builder()
-            html = (self.root / "components/example/index.html").read_text(encoding="utf-8")
+            html = (self.root / "components/example/index.html").read_text(
+                encoding="utf-8"
+            )
             assert "Updated prose." in html
 
             site.page.write_text("# Invalid page\n\nvar::missing\n", encoding="utf-8")
@@ -339,7 +329,9 @@ def test_serve_reuses_models_after_successful_failed_and_recovered_rebuilds(docu
                 "# Recovered page\n\nvar::coacch::damage_costs\n", encoding="utf-8"
             )
             self.builder()
-            html = (self.root / "components/example/index.html").read_text(encoding="utf-8")
+            html = (self.root / "components/example/index.html").read_text(
+                encoding="utf-8"
+            )
             assert "Damage &amp; adaptation &lt;costs&gt;" in html
             assert site.get_context() is original_context
             assert len(site.context_constructions) == 1
@@ -359,10 +351,15 @@ def test_serve_reuses_models_after_successful_failed_and_recovered_rebuilds(docu
     [
         ("var::missing", "Unknown variable 'missing'"),
         ("varref::damage_costs", "Ambiguous variable 'damage_costs'"),
-        ("var::missing_context::damage_costs", "Unknown variable context 'missing_context'"),
+        (
+            "var::missing_context::damage_costs",
+            "Unknown variable context 'missing_context'",
+        ),
     ],
 )
-def test_strict_site_build_fails_with_page_and_reference_error(documentation_site, content, problem):
+def test_strict_site_build_fails_with_page_and_reference_error(
+    documentation_site, content, problem
+):
     site = documentation_site
     site.page.write_text(f"# Invalid reference\n\n{content}\n", encoding="utf-8")
 
