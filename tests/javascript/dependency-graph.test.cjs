@@ -260,8 +260,8 @@ test("context changes replace the graph, preserve its settings, and offer valid 
         return panel;
     }
     const manifest = { default_context: "coacch", contexts: {
-        coacch: { label: "damage module: COACCH", source: "coacch.svg", variables: ["shared"] },
-        accreu_sectoral: { label: "damage module: ACCREU · adaptation: sectoral", source: "accreu_sectoral.svg", variables: ["shared", "sectoral"] },
+        coacch: { label: "damage module: COACCH", configuration_html: "<pre>params = load_params()</pre>", source: "coacch.svg", variables: ["shared"] },
+        accreu_sectoral: { label: "damage module: ACCREU · adaptation: sectoral", configuration_html: "<pre>ACCREU parameters</pre>", source: "accreu_sectoral.svg", variables: ["shared", "sectoral"] },
     } };
     const initialized = [];
     const focused = [];
@@ -300,7 +300,7 @@ test("context changes replace the graph, preserve its settings, and offer valid 
     assert.equal(destroyed, 1);
     assert.deepEqual(initialized, ["accreu_sectoral", "coacch"]);
     assert.equal(download.href, "https://example.org/assets/dependency-graphs/coacch.svg");
-    assert.equal(panels.at(-1).querySelector(".dependency-graph-configuration").textContent, "damage module: COACCH");
+    assert.equal(panels.at(-1).querySelector(".dependency-graph-configuration").innerHTML, manifest.contexts.coacch.configuration_html);
     assert.deepEqual(focused.at(-1), ["shared", true]);
 
     await controller.open("coacch", "sectoral");

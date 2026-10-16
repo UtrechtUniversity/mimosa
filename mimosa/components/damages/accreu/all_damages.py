@@ -38,13 +38,13 @@ def get_constraints(
     The total damage costs are the sum of the sectoral damages:
 
     $$
-    \\text{damages}_{t,r} = \\text{damages}_{\\text{riverine},t,r} + \\text{damages}_{\\text{labour prod. (net)},t,r} + \\text{damages}_{\\text{SLR},t,r}.
+    \\href{./#var__damage_costs}{\\text{damages}_{t,r}} = \\href{./#var__riverine_damage_costs}{\\text{damages}_{\\text{riverine},t,r}} + \\href{./#var__labourprod_damage_costs_net}{\\text{damages}_{\\text{labour prod. (net)},t,r}} + \\href{./#var__slr_damage_costs}{\\text{damages}_{\\text{SLR},t,r}}.
     $$
 
     Similarly, if adaptation is enabled, the total adaptation costs are the sum of the sectoral adaptation costs:
 
     $$
-    \\text{adapt. costs}_{t,r} = \\text{adapt. costs}_{\\text{riverine},t,r} + \\text{adapt. costs}_{\\text{labour prod.},t,r} + \\text{adapt. costs}_{\\text{SLR},t,r}.
+    \\href{./#var__adaptation_costs}{\\text{adapt. costs}_{t,r}} = \\href{./#var__riverine_adaptation_costs}{\\text{adapt. costs}_{\\text{riverine},t,r}} + \\href{./#var__labourprod_adaptation_costs}{\\text{adapt. costs}_{\\text{labour prod.},t,r}} + \\href{./#var__slr_adaptation_costs}{\\text{adapt. costs}_{\\text{SLR},t,r}}.
     $$
 
     As mentioned above, mortality is also included in this damage representation. However, since (the monetisation of) mortality
@@ -53,7 +53,7 @@ def get_constraints(
     this is given by the variable `market_and_non_market_damage_costs`, calculated as:
 
     $$
-    \\text{market and non-market damages}_{t,r} = \\text{damages}_{t,r} + \\frac{\\text{abs. damages}_{\\text{mortality},t,r}}{\\text{GDP}_{\\text{gross},t,r}},
+    \\href{./#var__market_and_non_market_damage_costs}{\\text{market and non-market damages}_{t,r}} = \\href{./#var__damage_costs}{\\text{damages}_{t,r}} + \\frac{\\href{./#var__mortality_damage_costs_abs}{\\text{abs. damages}_{\\text{mortality},t,r}}}{\\href{./#var__GDP_gross}{\\text{GDP}_{\\text{gross},t,r}}},
     $$
 
     where $\\text{abs. damages}_{\\text{mortality}}$ is the mortality damages in absolute terms (i.e. in currency units),
@@ -119,11 +119,22 @@ def get_constraints(
         mortality.get_constraints(m, inputs, monetise_mortality=monetise_mortality)
     )
 
-    m.damage_costs = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
-    m.damage_costs_abs = Var(m.t, m.regions, units=quant.unit("currency_unit"))
+    m.damage_costs = Var(
+        m.t,
+        m.regions,
+        units=quant.unit("fraction_of_GDP"),
+        doc="Total damages from all sectors (excluding non-market impacts like mortality), as a fraction of GDP.",
+    )
+    m.damage_costs_abs = Var(
+        m.t,
+        m.regions,
+        units=quant.unit("currency_unit"),
+        doc="Total damages from all sectors (excluding non-market impacts like mortality), in currency units.",
+    )
     m.global_damage_costs = Var(
         m.t,
         units=quant.unit("fraction_of_GDP"),
+        doc="Global total damages from all sectors (excluding non-market impacts like mortality), as a fraction of global GDP.",
     )
     # Total damages are sum of non-SLR and SLR damages
     constraints.extend(
@@ -158,11 +169,22 @@ def get_constraints(
     )
 
     if adaptation_type != "noadaptation":
-        m.adaptation_costs = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
-        m.adaptation_costs_abs = Var(m.t, m.regions, units=quant.unit("currency_unit"))
+        m.adaptation_costs = Var(
+            m.t,
+            m.regions,
+            units=quant.unit("fraction_of_GDP"),
+            doc="Total adaptation costs from all sectors, as a fraction of GDP.",
+        )
+        m.adaptation_costs_abs = Var(
+            m.t,
+            m.regions,
+            units=quant.unit("currency_unit"),
+            doc="Total adaptation costs from all sectors, in currency units.",
+        )
         m.global_adaptation_costs = Var(
             m.t,
             units=quant.unit("fraction_of_GDP"),
+            doc="Global total adaptation costs from all sectors, as a fraction of global GDP.",
         )
         m.delay_adaptation_year = Param(
             initialize=inputs.config(
@@ -213,7 +235,10 @@ def get_constraints(
     ## Non-market damages:
     if monetise_mortality:
         m.non_market_damage_costs_abs = Var(
-            m.t, m.regions, units=quant.unit("currency_unit")
+            m.t,
+            m.regions,
+            units=quant.unit("currency_unit"),
+            doc="Total non-market damages (monetised mortality), in currency units.",
         )
         constraints.append(
             RegionalEquation(
@@ -226,10 +251,16 @@ def get_constraints(
             m.t, m.regions, units=quant.unit("currency_unit"), initialize=0.0
         )
     m.market_and_non_market_damage_costs_abs = Var(
-        m.t, m.regions, units=quant.unit("currency_unit")
+        m.t,
+        m.regions,
+        units=quant.unit("currency_unit"),
+        doc="Total market and non-market damages, in currency units.",
     )
     m.market_and_non_market_damage_costs = Var(
-        m.t, m.regions, units=quant.unit("fraction_of_GDP")
+        m.t,
+        m.regions,
+        units=quant.unit("fraction_of_GDP"),
+        doc="Total market and non-market damages, as a fraction of GDP.",
     )
 
     constraints.extend(

@@ -1,15 +1,14 @@
 """The graph export keeps variable roles and both dependency types."""
 
 from xml.etree import ElementTree
-import json
-from pathlib import Path
 from types import SimpleNamespace
 
 import networkx as nx
 import pytest
 
-from docs.scripts.generate_dependency_graph import build_graph, write_graph
-from docs.scripts.variable_docs import DOCUMENTATION_CONFIGS
+from docs.scripts.generate_dependency_graph import (
+    build_graph, write_graph, configuration_example, context_graph,
+)
 from mimosa.common import ConcreteModel, Set, Var, GlobalEquation, add_constraint
 
 
@@ -71,17 +70,46 @@ def test_graph_analysis_supports_cycles_and_previous_time_without_running_model(
     assert graph.edges["b", "a"]["type"] == "dependency"
 
 
-def test_exported_graphs_cover_documentation_contexts_and_match_the_manifest():
-    directory = Path(__file__).resolve().parents[2] / "docs/assets/dependency-graphs"
-    manifest = json.loads((directory / "index.json").read_text())
-    assert manifest["default_context"] == "coacch"
-    assert set(manifest["contexts"]) == set(DOCUMENTATION_CONFIGS)
-    namespace = {"svg": "http://www.w3.org/2000/svg"}
-    for context, entry in manifest["contexts"].items():
-        root = ElementTree.parse(directory / entry["source"]).getroot()
-        nodes = [group for group in root.findall(".//svg:g", namespace) if "node" in group.get("class", "").split()]
-        assert sorted(node.find("svg:title", namespace).text for node in nodes) == entry["variables"]
-        assert entry["label"] != context
-        for node in nodes:
-            link = node.find(".//svg:a", namespace)
-            assert f"graph_context={context}" in link.attrib["{http://www.w3.org/1999/xlink}href"]
+def test_configuration_example_only_sets_overrides_and_is_executable():
+    from html import unescape
+    import re
+    from copy import deepcopy
+    from mimosa.common.config.parseconfig import check_params
+    from docs.scripts.variable_docs import DOCUMENTATION_CONFIGS
+
+    defaults = check_params({})
+    html = configuration_example(DOCUMENTATION_CONFIGS["accreu_sectoral"], defaults)
+    code = unescape(re.sub(r"<[^>]+>", "", html)).strip()
+    assert code.splitlines() == [
+        "params = load_params()",
+        "params['model structure']['damage module'] = 'ACCREU'",
+        "params['economics']['damages']['accreu']['adaptation'] = 'sectoral'",
+        "model = MIMOSA(params)",
+    ]
+    # Every example must reproduce the corresponding fully parsed configuration.
+    for settings in DOCUMENTATION_CONFIGS.values():
+        html = configuration_example(settings, defaults)
+        code = unescape(re.sub(r"<[^>]+>", "", html))
+        namespace = {"load_params": lambda: deepcopy(defaults), "MIMOSA": lambda p: p}
+        exec(code, namespace)
+        assert namespace["model"] == check_params(settings)
+
+
+def test_failed_graph_analysis_removes_temporary_baseline_constraints(monkeypatch):
+    from docs.scripts import generate_dependency_graph
+
+    m = ConcreteModel()
+    m.t = Set(initialize=[0, 1])
+    m.a = Var(m.t)
+    m.b = Var(m.t)
+    equation = GlobalEquation(m.a, lambda m, t: m.b[t])
+    context = SimpleNamespace(model=m, equations=(), baseline_equations=(equation,))
+
+    def fail_analysis(model):
+        assert hasattr(m, "constraint_a")
+        raise ValueError("Failed graph analysis")
+
+    monkeypatch.setattr(generate_dependency_graph, "build_graph", fail_analysis)
+    with pytest.raises(ValueError, match="Failed graph analysis"):
+        context_graph(context)
+    assert not hasattr(m, "constraint_a")

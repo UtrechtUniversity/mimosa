@@ -358,6 +358,8 @@ mjx-container a[href*="#var__"] {
     .dependency-graph-configuration {
         margin: 0 0 .6rem;
         font-size: .65rem;
+        .highlight { margin: 0; }
+        pre { margin: 0; max-height: 25vh; overflow: auto; }
     }
     .dependency-graph-message {
         margin-bottom: .6rem;
@@ -464,7 +466,7 @@ mjx-container a[href*="#var__"] {
 
     .dependency-edge.previous-time,
     &.is-overview .dependency-edge.previous-time {
-        opacity: .12;
+        opacity: .35;
         path { stroke-dasharray: 5 5; stroke-width: 1; }
     }
     .dependency-edge.previous-time.incoming,

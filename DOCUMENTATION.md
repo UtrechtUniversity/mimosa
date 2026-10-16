@@ -104,14 +104,20 @@ for a variable present with either setting, are omitted.
 
 ## Validation
 
-Dependency graphs are exported for every entry in `DOCUMENTATION_CONFIGS`.
-Regenerate `docs/assets/dependency-graphs/` with
-`python -m docs.scripts.generate_dependency_graph` in the `accreu` environment
-(with Graphviz and PyGraphviz installed). The export includes each SVG and an
-`index.json` listing model settings, asset paths and available variables.
-These are static assets: MkDocs rebuilds copy them without constructing extra
-models or repeating the graph layout. Regenerate them after changing equations
-or documentation configurations.
+Dependency graphs are generated automatically for every entry in
+`DOCUMENTATION_CONFIGS` when running `mkdocs build` or `mkdocs serve` in the
+`accreu` environment. Install Graphviz and PyGraphviz first with
+`conda install -c conda-forge graphviz pygraphviz`; the Python documentation
+extras include PyGraphviz, but its Graphviz system libraries must be available.
+No separate exporter command is needed.
+
+The graphs reuse the concrete models and equations already cached for variable
+references. SVG layouts and their configuration index are cached once per command
+or serve session, including after a failed rebuild. MkDocs writes these as virtual
+assets directly into the site, without creating files in the watched `docs/`
+directory. Restart `mkdocs serve` after changing model equations, variable
+metadata or documentation configurations. The configuration above each graph
+shows the parameter assignments needed to reproduce it, omitting defaults.
 
 The exporter uses the simulator's dependency analysis and retains isolated public
 variables and cyclic dependencies. Control and calculated variables have distinct

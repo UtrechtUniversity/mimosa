@@ -6,7 +6,7 @@ from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
-from pyomo.environ import ConcreteModel, Constraint, Var
+from pyomo.environ import ConcreteModel, Constraint, Set, Var
 import yaml
 
 from docs.scripts import variable_docs
@@ -181,18 +181,36 @@ def documentation_site(tmp_path, monkeypatch, catalogue):
     # MkDocs retains hook modules between configurations; each test supplies
     # fresh fake providers, which must be bound when its hook module is loaded.
     Hooks._load_hook.cache_clear()
+    from docs.scripts import generate_dependency_graph
+
+    generate_dependency_graph.get_dependency_graph_assets.cache_clear()
+    monkeypatch.setattr(variable_docs, "DOCUMENTATION_CONFIGS", {"coacch": {}})
     model = ConcreteModel()
+    model.t = Set(initialize=[0])
     model.variable = Var()
     model.sample_constraint = Constraint(
         expr=model.variable >= 0, doc="Constraint macros still render."
     )
     context_constructions = []
     catalogue_collections = []
+    graph_layouts = []
+    original_render_graph = generate_dependency_graph.render_graph
+
+    def render_graph(graph, context):
+        graph_layouts.append(context)
+        return original_render_graph(graph, context)
+
+    monkeypatch.setattr(generate_dependency_graph, "render_graph", render_graph)
 
     @lru_cache(maxsize=None)
     def get_context(context="default"):
+        if context == "default":
+            return get_context("coacch")
         context_constructions.append(context)
-        return SimpleNamespace(model=model, parser_tree={}, variables=catalogue)
+        return SimpleNamespace(
+            model=model, parser_tree={}, variables=catalogue, params=check_params({}),
+            equations=(), baseline_equations=(),
+        )
 
     @lru_cache(maxsize=1)
     def get_catalogue():
@@ -242,15 +260,17 @@ def documentation_site(tmp_path, monkeypatch, catalogue):
             "pymdownx.superfences",
         ],
     }
-    return SimpleNamespace(
+    yield SimpleNamespace(
         root=tmp_path,
         page=page,
         config=config,
         context_constructions=context_constructions,
         catalogue_collections=catalogue_collections,
+        graph_layouts=graph_layouts,
         get_context=get_context,
         get_catalogue=get_catalogue,
     )
+    generate_dependency_graph.get_dependency_graph_assets.cache_clear()
 
 
 def build_site(site):
@@ -291,6 +311,9 @@ def test_strict_site_build_renders_pages_docstrings_and_reference(
     assert "<li>Dimensions: <code>t, regions</code></li>" in reference
     assert "!!! variable" not in reference
     assert "{variables::reference}" not in reference
+    assert (site.root / "site/assets/dependency-graphs/coacch.svg").exists()
+    assert (site.root / "site/assets/dependency-graphs/index.json").exists()
+    assert not (site.root / "docs/assets/dependency-graphs").exists()
 
 
 def test_serve_reuses_models_after_successful_failed_and_recovered_rebuilds(
@@ -318,6 +341,7 @@ def test_serve_reuses_models_after_successful_failed_and_recovered_rebuilds(
             original_context = site.get_context()
             assert len(site.context_constructions) == 1
             assert len(site.catalogue_collections) == 1
+            assert site.graph_layouts == ["coacch"]
 
             site.page.write_text("# Updated page\n\nUpdated prose.\n", encoding="utf-8")
             self.builder()
@@ -341,6 +365,7 @@ def test_serve_reuses_models_after_successful_failed_and_recovered_rebuilds(
             assert site.get_context() is original_context
             assert len(site.context_constructions) == 1
             assert len(site.catalogue_collections) == 1
+            assert site.graph_layouts == ["coacch"]
 
     monkeypatch.setattr(serve_module, "LiveReloadServer", LiveReloadServer)
     config_path = site.root / "mkdocs.yml"
@@ -349,6 +374,8 @@ def test_serve_reuses_models_after_successful_failed_and_recovered_rebuilds(
 
     assert site.get_context.cache_info().currsize == 0
     assert site.get_catalogue.cache_info().currsize == 0
+    from docs.scripts.generate_dependency_graph import get_dependency_graph_assets
+    assert get_dependency_graph_assets.cache_info().currsize == 0
 
 
 @pytest.mark.parametrize(

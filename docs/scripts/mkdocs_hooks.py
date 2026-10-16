@@ -3,6 +3,7 @@ import yaml
 import sys, os
 import pandas as pd
 from html import escape
+from mkdocs.structure.files import File
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../../"))
 
@@ -266,10 +267,12 @@ def on_page_content(html, **kwargs):
 
 def on_startup(**kwargs):
     # Start each build command or serve session with fresh model metadata.
+    generate_dependency_graph.get_dependency_graph_assets.cache_clear()
     clear_documentation_cache()
 
 
 def on_shutdown(**kwargs):
+    generate_dependency_graph.get_dependency_graph_assets.cache_clear()
     clear_documentation_cache()
 
 
@@ -279,3 +282,10 @@ import time
 def on_pre_build(**kwargs):
     # Reuse the catalogue across live rebuilds within the same serve session.
     get_variable_catalogue()
+
+
+def on_files(files, config, **kwargs):
+    # Virtual files go straight to the site, avoiding watched source changes.
+    for path, content in generate_dependency_graph.get_dependency_graph_assets().items():
+        files.append(File.generated(config, path, content=content))
+    return files

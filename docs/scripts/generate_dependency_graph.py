@@ -1,26 +1,27 @@
-"""Export context-specific dependency graphs for the documentation viewer.
+"""Generate documentation graphs from the shared, cached documentation models.
 
-Run with ``python -m docs.scripts.generate_dependency_graph`` in the accreu
-environment. This constructs equations but never simulates or solves the model.
+MkDocs calls this once per build command or serve session. Only symbolic
+constraints are inspected; no simulation or optimisation is performed.
 """
 
-from copy import deepcopy
 import json
-from pathlib import Path
+from functools import lru_cache
+from types import SimpleNamespace
 from urllib.parse import urlencode
 
 import networkx as nx
 from networkx.drawing.nx_agraph import to_agraph
 
-from mimosa import MIMOSA
 from mimosa.common import Var, add_constraint
-from mimosa.components.after_initialisation import avoided_damages
 from mimosa.common.config.parseconfig import check_params
 from mimosa.core.simulation.helpers import calc_dependencies
-from docs.scripts.variable_docs import DOCUMENTATION_CONFIGS
+from docs.scripts import variable_docs
+from pygments import highlight
+from pygments.formatters import HtmlFormatter
+from pygments.lexers import PythonLexer
 
 
-def write_graph(graph, output, context=None):
+def render_graph(graph, context=None):
     """Export variable roles and both edge types, laying out by current time."""
     drawing = to_agraph(graph)
     drawing.graph_attr.update(
@@ -61,7 +62,12 @@ def write_graph(graph, output, context=None):
             **{"class": "previous-time" if previous_time else "current-time"},
         )
 
-    drawing.draw(str(output), format="svg", prog="dot")
+    return drawing.draw(format="svg", prog="dot")
+
+
+def write_graph(graph, output, context=None):
+    """Save an SVG for standalone inspection."""
+    output.write_bytes(render_graph(graph, context))
     return graph
 
 
@@ -95,41 +101,63 @@ def configuration_label(config):
     return " · ".join(settings)
 
 
-def export_context(context, output):
-    params = check_params(deepcopy(DOCUMENTATION_CONFIGS[context]))
-    model = MIMOSA(params, prerun=False)
-    # Include avoided-damage equations symbolically, without running a baseline.
-    for equation in avoided_damages.get_constraints(model.concrete_model):
-        add_constraint(
-            model.concrete_model,
-            equation.to_pyomo_constraint(model.concrete_model),
-            equation.name,
-        )
-        model.equations.append(equation)
-    graph = build_graph(model)
-    write_graph(graph, output, context)
-    settings = deepcopy(DOCUMENTATION_CONFIGS[context])
-    if params["model structure"]["damage module"] == "ACCREU":
-        accreu = params["economics"]["damages"]["accreu"]
-        if accreu["adaptation"] != "noadaptation":
-            settings["economics"]["damages"]["accreu"]["adaptation_determination"] = accreu["adaptation_determination"]
-    return {
-        "label": configuration_label(settings),
-        "source": output.name,
-        "variables": sorted(graph),
-    }
+def configuration_example(config, defaults):
+    """Show the overrides needed to reproduce this graph, omitting defaults."""
+    assignments = []
+
+    def visit(options, default_options, path=()):
+        for key, value in options.items():
+            keys = path + (key,)
+            default = default_options.get(key)
+            if isinstance(value, dict):
+                visit(value, default or {}, keys)
+            elif value != default:
+                lookup = "".join(f"[{part!r}]" for part in keys)
+                assignments.append(f"params{lookup} = {value!r}")
+
+    visit(config, defaults)
+    code = "\n".join(["params = load_params()", *assignments, "model = MIMOSA(params)"])
+    highlighted = highlight(
+        code, PythonLexer(),
+        HtmlFormatter(nowrap=True, hl_lines=list(range(2, len(assignments) + 2))),
+    )
+    return f'<div class="highlight"><pre><code>{highlighted}</code></pre></div>'
 
 
-def main():
-    output = Path(__file__).resolve().parents[1] / "assets" / "dependency-graphs"
-    output.mkdir(exist_ok=True)
+def context_graph(context):
+    """Inspect the existing model, temporarily attaching baseline equations."""
+    model = context.model
+    added_constraints = []
+    try:
+        for equation in context.baseline_equations:
+            added_constraints.append(add_constraint(
+                model, equation.to_pyomo_constraint(model), equation.name
+            ))
+        return build_graph(SimpleNamespace(
+            concrete_model=model,
+            equations=context.equations + context.baseline_equations,
+        ))
+    finally:
+        for name in added_constraints:
+            model.del_component(name)
+
+
+@lru_cache(maxsize=1)
+def get_dependency_graph_assets():
+    """Cache SVG layouts and their index across all live reloads in a session."""
+    assets = {}
     contexts = {}
-    for context in DOCUMENTATION_CONFIGS:
-        contexts[context] = export_context(context, output / f"{context}.svg")
-        print(f"Exported {context}: {len(contexts[context]['variables'])} variables")
+    defaults = check_params({})
+    for name, settings in variable_docs.DOCUMENTATION_CONFIGS.items():
+        graph = context_graph(variable_docs.get_documentation_context(name))
+        source = f"{name}.svg"
+        assets[f"assets/dependency-graphs/{source}"] = render_graph(graph, name)
+        contexts[name] = {
+            "label": configuration_label(settings),
+            "configuration_html": configuration_example(settings, defaults),
+            "source": source,
+            "variables": sorted(graph),
+        }
     manifest = {"default_context": "coacch", "contexts": contexts}
-    (output / "index.json").write_text(json.dumps(manifest, indent=2) + "\n")
-
-
-if __name__ == "__main__":
-    main()
+    assets["assets/dependency-graphs/index.json"] = json.dumps(manifest)
+    return assets

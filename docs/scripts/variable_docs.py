@@ -118,6 +118,8 @@ class DocumentationContext:
     parser_tree: dict
     variables: Tuple[VariableMetadata, ...]
     params: dict
+    equations: tuple = ()
+    baseline_equations: tuple = ()
 
 
 @lru_cache(maxsize=None)
@@ -137,15 +139,17 @@ def get_documentation_context(context: str = "default") -> DocumentationContext:
     params, parser_tree = check_params(
         deepcopy(DOCUMENTATION_CONFIGS[context]), return_parser_tree=True
     )
-    model = MIMOSA(params, prerun=False).concrete_model
-    baseline_variables = tuple(
-        equation.lhs for equation in avoided_damages.get_constraints(model)
-    )
+    engine = MIMOSA(params, prerun=False)
+    model = engine.concrete_model
+    baseline_equations = tuple(avoided_damages.get_constraints(model))
+    baseline_variables = tuple(equation.lhs for equation in baseline_equations)
     return DocumentationContext(
         model=model,
         parser_tree=parser_tree,
         variables=collect_variables(model, context, baseline_variables),
         params=params,
+        equations=tuple(engine.equations),
+        baseline_equations=baseline_equations,
     )
 
 

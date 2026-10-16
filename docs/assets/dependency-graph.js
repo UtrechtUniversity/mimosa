@@ -341,7 +341,10 @@ async function createDependencyGraphController(panel, reference, dialog = null, 
             panel = nextPanel;
             panel.dataset.variableContext = context;
             activeContext = context;
-            panel.querySelector(".dependency-graph-configuration").textContent = config?.label || `Unknown configuration: ${context}`;
+            const configuration = panel.querySelector(".dependency-graph-configuration");
+            // This HTML is generated locally from configuration parameters at build time.
+            if (config) configuration.innerHTML = config.configuration_html;
+            else configuration.textContent = `Unknown configuration: ${context}`;
             if (config) {
                 const source = new URL(config.source, dependencyGraphAssets);
                 if (downloadLink) downloadLink.href = source.href;

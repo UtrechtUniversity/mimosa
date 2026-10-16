@@ -40,8 +40,8 @@ def get_constraints(
 
     $$
     \\begin{align}
-    \\text{GDP}_{\\text{net},t,r} =\\ & \\text{GDP}_{\\text{gross},t,r} \\cdot (1 - \\text{damage costs}_{t,r}) \\\\
-    &\\ \\ \\ - \\text{mitigation costs abs}_{t,r} - \\text{financial transfer abs}_{t,r}
+    \\href{./#var__GDP_net}{\\text{GDP}_{\\text{net},t,r}} =\\ & \\href{./#var__GDP_gross}{\\text{GDP}_{\\text{gross},t,r}} \\cdot (1 - \\href{./#var__damage_costs}{\\text{damage costs}_{t,r}}) \\\\
+    &\\ \\ \\ - \\href{./#var__mitigation_costs_abs}{\\text{mitigation costs abs}_{t,r}} - \\href{./#var__financialtransfer_globaldamagepool::financial_transfer_abs}{\\text{financial transfer abs}_{t,r}}
     \\end{align}
     $$
 
@@ -130,7 +130,9 @@ def get_constraints(
     m.investments = Var(m.t, m.regions, units=quant.unit("currency_unit"))
     m.consumption = Var(m.t, m.regions, units=quant.unit("currency_unit"))
 
-    m.ignore_damages = Param(initialize=inputs.config("economics.damages.ignore damages"))
+    m.ignore_damages = Param(
+        initialize=inputs.config("economics.damages.ignore damages")
+    )
 
     m.TFP = Param(m.t, m.regions, initialize=economics.get_TFP_value)
 

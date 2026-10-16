@@ -38,14 +38,14 @@ def get_constraints(
     $$
     \\href{./#var__riverine_damage_costs_gross}{\\text{gross damages}_{\\text{riverine},t,r}}
     = a_r + b_r \\cdot \\href{./#var__temperature}{T_t}
-    + c_r \\cdot \\href{./#var__temperature}{T_t^2}.
+    + c_r \\cdot \\href{./#var__temperature}{T_t}^2.
     $$
 
     The adaptation function is fitted with a negative-exponential saturation curve, like in
     all three sectors. Subsequently, the residual damages are calculated as:
 
     $$
-    \\text{damages}_{\\text{riverine},t,r} = \\text{gross damages}_{\\text{riverine},t,r} \\cdot (1 - \\text{adapt. level}_{\\text{riverine},t,r}),
+    \\href{./#var__riverine_damage_costs}{\\text{damages}_{\\text{riverine},t,r}} = \\href{./#var__riverine_damage_costs_gross}{\\text{gross damages}_{\\text{riverine},t,r}} \\cdot (1 - \\href{./#var__riverine_adaptation_level}{\\text{adapt. level}_{\\text{riverine},t,r}}),
     $$
 
     <div class="grid cards" markdown>

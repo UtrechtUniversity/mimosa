@@ -106,7 +106,7 @@ def documentation_model(monkeypatch):
 
     def construct_model(supplied_params, *, prerun):
         calls.append((supplied_params, prerun))
-        return SimpleNamespace(concrete_model=model)
+        return SimpleNamespace(concrete_model=model, equations=())
 
     monkeypatch.setattr(variable_docs, "check_params", check_params)
     monkeypatch.setattr(variable_docs, "MIMOSA", construct_model)
@@ -285,7 +285,7 @@ def test_baseline_dependent_variables_are_declared_without_evaluating_them(
             )
 
 
-def test_catalogue_preserves_contexts_and_constructs_each_model_once(
+def test_catalogue_and_graphs_preserve_contexts_and_construct_each_model_once(
     documentation_contexts,
 ):
     contexts, constructions = documentation_contexts
@@ -306,6 +306,34 @@ def test_catalogue_preserves_contexts_and_constructs_each_model_once(
         ]
         == "inequal_aversion_general"
     )
+
+    import json
+    from xml.etree import ElementTree
+    from docs.scripts.generate_dependency_graph import get_dependency_graph_assets
+
+    pytest.importorskip("pygraphviz")
+    contexts, constructions = documentation_contexts
+    count = len(constructions)
+    get_dependency_graph_assets.cache_clear()
+    try:
+        assets = get_dependency_graph_assets()
+        assert get_dependency_graph_assets() is assets
+        assert len(constructions) == count == len(variable_docs.DOCUMENTATION_CONFIGS)
+        manifest = json.loads(assets["assets/dependency-graphs/index.json"])
+        assert set(manifest["contexts"]) == set(contexts)
+        namespace = {"svg": "http://www.w3.org/2000/svg"}
+        for name, context in contexts.items():
+            entry = manifest["contexts"][name]
+            root = ElementTree.fromstring(assets[f"assets/dependency-graphs/{entry['source']}"])
+            nodes = [g for g in root.findall(".//svg:g", namespace)
+                     if "node" in g.get("class", "").split()]
+            assert sorted(g.find("svg:title", namespace).text for g in nodes) == entry["variables"]
+            assert entry["variables"] == sorted(v.name for v in context.variables)
+            assert "load_params" in entry["configuration_html"]
+            for equation in context.baseline_equations:
+                assert not hasattr(context.model, "constraint_" + equation.name)
+    finally:
+        get_dependency_graph_assets.cache_clear()
 
 
 def test_unknown_context_is_rejected_without_building_a_model(documentation_model):

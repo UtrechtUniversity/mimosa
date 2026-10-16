@@ -11,7 +11,7 @@ Each entry lists a model variable's description, units, dimensions and availabil
 This graph shows the variables and dependencies in MIMOSA. The graph is interactive: you can zoom, pan, and click on variables to see their details. Use the controls above the graph to select a variable, zoom in/out, fit the graph to the viewport, or focus on a selected variable.
 
 <div class="dependency-graph" id="dependency-graph-viewer" data-variable-context="coacch">
-  <p class="dependency-graph-configuration"></p>
+  <div class="dependency-graph-configuration md-typeset"></div>
   <div class="dependency-graph-message" role="status" hidden></div>
   <div class="dependency-graph-controls">
     <label>Variable <select aria-label="Graph variable"></select></label>

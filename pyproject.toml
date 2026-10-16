@@ -28,7 +28,8 @@ version = { attr = "mimosa.__version__" }
 test = ["pytest"]
 
 docs = [
-  "mkdocs",
+  "mkdocs>=1.6",
+  "pygraphviz",
   "mkdocs-material",
   "mkdocs-open-in-new-tab",
   "mkdocstrings[python]",
