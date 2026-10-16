@@ -179,7 +179,7 @@ a[href^="#var__"]:not(:has(code))::before {
 }
 
 /* Equation links keep their mathematical spacing, without a variable icon. */
-mjx-container a[href^="#var__"] {
+mjx-container a[href*="#var__"] {
     padding: 0;
     &::before { content: none; }
 }

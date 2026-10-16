@@ -120,7 +120,8 @@ under four pixels still count as clicks; touch scrolling remains native.
 Use `[damage_costs](#var__damage_costs)` on any documentation page to open the
 graph in a native dialog. No path or CSS class is needed. The viewer resolves
 the variable reference page relative to its own script and reuses its markup.
-In equations, use `\href{#var__temperature}{T_t}`. Clicks are handled on the page
+In equations, use `\href{./#var__temperature}{T_t}`. The `./` avoids the macros
+plugin interpreting `{#` as a template comment. Clicks are handled on the page
 container, including links created later by MathJax.
 Modal selections leave the page URL and
 browser history unchanged. Escape clears a selected variable; when none is

@@ -164,15 +164,13 @@ test("touch gestures and secondary mouse buttons retain native behaviour", async
 });
 
 for (const prefix of ["", "/mimosa"]) {
-    test(`short graph links resolve from the site root ${prefix || "/"}`, async () => {
+    test(`links created after page setup resolve from the site root ${prefix || "/"}`, async () => {
         let onPage;
         let opens = 0;
         const requests = [];
         const selections = [];
         const graphPanel = {};
-        const links = ["damage_costs", "riverine_adaptation_costs_abs"].map(name =>
-            Object.assign(element(), { hash: `#var__${name}` })
-        );
+        const content = element();
         const dialog = element({ button: element(), p: { replaceWith() {} } });
         dialog.showModal = () => { dialog.open = true; opens++; };
         const context = {
@@ -180,11 +178,7 @@ for (const prefix of ["", "/mimosa"]) {
             document$: { subscribe(callback) { onPage = callback; } },
             document: {
                 currentScript: { src: `https://example.org${prefix}/assets/dependency-graph.js` },
-                querySelector: () => null,
-                querySelectorAll(selector) {
-                    assert.equal(selector, 'a[href^="#var__"]');
-                    return links;
-                },
+                querySelector: selector => selector === ".md-content" ? content : null,
                 createElement: () => dialog,
                 body: { append() {} },
             },
@@ -209,9 +203,17 @@ for (const prefix of ["", "/mimosa"]) {
         };
         onPage();
 
-        for (const link of links) {
+        for (const name of ["damage_costs", "riverine_adaptation_costs_abs"]) {
+            // A click on a nested MathJax element bubbles to the page container.
+            const link = { hash: `#var__${name}` };
             const click = Object.assign(new Event("click", { cancelable: true }), { button: 0 });
-            link.dispatchEvent(click);
+            Object.defineProperty(click, "target", { value: {
+                closest(selector) {
+                    assert.equal(selector, 'a[href*="#var__"]');
+                    return link;
+                },
+            } });
+            content.dispatchEvent(click);
             await new Promise(setImmediate);
             assert.equal(click.defaultPrevented, true);
         }

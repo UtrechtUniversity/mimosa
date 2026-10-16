@@ -210,42 +210,42 @@ document$.subscribe(() => {
     const content = document.querySelector(".md-content");
     if (!content) return;
     content.addEventListener("click", async event => {
-            const link = event.target.closest('a[href^="#var__"]');
-            if (!link) return;
-            if (event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
-            event.preventDefault();
-            const reference = dependencyGraphPage;
-            const variable = decodeURIComponent(link.hash.slice("#var__".length));
-            if (!dialog) {
-                dialog = document.createElement("dialog");
-                dialog.className = "dependency-graph-modal";
-                dialog.setAttribute("aria-labelledby", "dependency-graph-modal-title");
-                dialog.innerHTML = `
-                    <header>
-                        <h2 id="dependency-graph-modal-title">Variable dependencies</h2>
-                        <button type="button" aria-label="Close dependency graph" autofocus>×</button>
-                    </header>
-                    <p>Loading dependency graph…</p>`;
-                dialog.querySelector("button").addEventListener("click", () => dialog.close());
-                document.body.append(dialog);
-                // Reuse the reference page's controls and graph, loaded once per page.
-                graphReady = (async () => {
-                    const response = await fetch(reference);
-                    if (!response.ok) throw new Error(`Reference page request failed: ${response.status}`);
-                    const page = new DOMParser().parseFromString(await response.text(), "text/html");
-                    const graphPanel = page.querySelector("#dependency-graph-viewer");
-                    const source = new URL(page.querySelector("#dependency-graph-source").getAttribute("href"), reference);
-                    dialog.querySelector("p").replaceWith(graphPanel);
-                    return initializeDependencyGraph(graphPanel, source, dialog);
-                })();
-            }
-            dialog.showModal();
-            try {
-                const graph = await graphReady;
-                if (dialog.open) graph?.focusVariable(variable);
-            } catch (error) {
-                dialog.querySelector("p").textContent = "The graph could not be loaded. Please try the variable reference page.";
-                console.error(error);
-            }
+        const link = event.target.closest('a[href*="#var__"]');
+        if (!link || !link.hash.startsWith("#var__")) return;
+        if (event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+        event.preventDefault();
+        const reference = dependencyGraphPage;
+        const variable = decodeURIComponent(link.hash.slice("#var__".length));
+        if (!dialog) {
+            dialog = document.createElement("dialog");
+            dialog.className = "dependency-graph-modal";
+            dialog.setAttribute("aria-labelledby", "dependency-graph-modal-title");
+            dialog.innerHTML = `
+                <header>
+                    <h2 id="dependency-graph-modal-title">Variable dependencies</h2>
+                    <button type="button" aria-label="Close dependency graph" autofocus>×</button>
+                </header>
+                <p>Loading dependency graph…</p>`;
+            dialog.querySelector("button").addEventListener("click", () => dialog.close());
+            document.body.append(dialog);
+            // Reuse the reference page's controls and graph, loaded once per page.
+            graphReady = (async () => {
+                const response = await fetch(reference);
+                if (!response.ok) throw new Error(`Reference page request failed: ${response.status}`);
+                const page = new DOMParser().parseFromString(await response.text(), "text/html");
+                const graphPanel = page.querySelector("#dependency-graph-viewer");
+                const source = new URL(page.querySelector("#dependency-graph-source").getAttribute("href"), reference);
+                dialog.querySelector("p").replaceWith(graphPanel);
+                return initializeDependencyGraph(graphPanel, source, dialog);
+            })();
+        }
+        dialog.showModal();
+        try {
+            const graph = await graphReady;
+            if (dialog.open) graph?.focusVariable(variable);
+        } catch (error) {
+            dialog.querySelector("p").textContent = "The graph could not be loaded. Please try the variable reference page.";
+            console.error(error);
+        }
     });
 });

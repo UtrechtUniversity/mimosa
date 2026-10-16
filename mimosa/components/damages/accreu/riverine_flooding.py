@@ -36,9 +36,9 @@ def get_constraints(
     are fitted with a quadratic function of temperature:
 
     $$
-    \\href{#var__riverine_damage_costs_gross}{\\text{gross damages}_{\\text{riverine},t,r}}
-    = a_r + b_r \\cdot \\href{#var__temperature}{T_t}
-    + c_r \\cdot \\href{#var__temperature}{T_t^2}.
+    \\href{./#var__riverine_damage_costs_gross}{\\text{gross damages}_{\\text{riverine},t,r}}
+    = a_r + b_r \\cdot \\href{./#var__temperature}{T_t}
+    + c_r \\cdot \\href{./#var__temperature}{T_t^2}.
     $$
 
     The adaptation function is fitted with a negative-exponential saturation curve, like in
