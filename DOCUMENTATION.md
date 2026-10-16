@@ -146,10 +146,18 @@ the variable reference page relative to its own script and reuses its markup.
 In equations, use `\href{./#var__temperature}{T_t}`. The `./` avoids the macros
 plugin interpreting `{#` as a template comment. Clicks are handled on the page
 container, including links created later by MathJax.
+Hovering a variable link for 250 ms, or focusing it with the keyboard, shows the
+same information card as a graph node. Text, tables and equations use the page's
+context unless the link explicitly overrides it. The reference HTML is fetched
+and parsed once on demand, shared with the modal; hovering does not fetch graph
+SVGs or their index. Cards remain open when moving into them, and close on Escape,
+clicking outside, page scrolling or window resizing. Pending hover requests are cancelled
+when the pointer leaves, and listeners are removed on page navigation.
 Modal selections leave the page URL and
 browser history unchanged. Escape clears a selected variable; when none is
 selected, Escape closes the dialog. The close button always closes it. Variable
-links open with the requested node selected and its information card visible.
+links open with the requested node selected. Its information card appears on
+node hover or keyboard focus.
 Unavailable variables offer configurations that contain them.
 Node hover cards clone the matching variable-reference admonition, using the
 graph panel's `data-variable-context` to choose the metadata variant. They reuse

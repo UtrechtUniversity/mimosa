@@ -232,12 +232,16 @@ test("hover information stays open while moving from the node into the card", as
     assert.equal(tooltip.hidden, true);
 });
 
-test("opening a variable link shows its information immediately and clears on Escape", async () => {
+test("opening a variable link selects the node without opening its information", async () => {
     const card = element();
     card.querySelectorAll = () => [];
     const reference = { getElementById: () => ({ closest: () => ({ cloneNode: () => card }) }) };
-    const { graph, tooltip, dialog } = await viewer(reference);
-    graph.focusVariable("input", true);
+    const { graph, nodes, tooltip, dialog } = await viewer(reference);
+    graph.focusVariable("input");
+    assert.equal(nodes[0].classList.contains("is-selected"), true);
+    assert.equal(tooltip.hidden, true);
+    nodes[0].dispatchEvent(new Event("pointerenter"));
+    await new Promise(resolve => setTimeout(resolve, 280));
     assert.equal(tooltip.hidden, false);
     dialog.dispatchEvent(new Event("cancel", { cancelable: true }));
     assert.equal(tooltip.hidden, true);
@@ -287,7 +291,7 @@ test("context changes replace the graph, preserve its settings, and offer valid 
     context.initializeDependencyGraph = async panel => {
         initialized.push(panel.dataset.variableContext);
         return {
-            focusVariable: (name, show) => focused.push([name, show]),
+            focusVariable: name => focused.push(name),
             destroy: () => destroyed++,
         };
     };
@@ -301,7 +305,7 @@ test("context changes replace the graph, preserve its settings, and offer valid 
     assert.deepEqual(initialized, ["accreu_sectoral", "coacch"]);
     assert.equal(download.href, "https://example.org/assets/dependency-graphs/coacch.svg");
     assert.equal(panels.at(-1).querySelector(".dependency-graph-configuration").innerHTML, manifest.contexts.coacch.configuration_html);
-    assert.deepEqual(focused.at(-1), ["shared", true]);
+    assert.equal(focused.at(-1), "shared");
 
     await controller.open("coacch", "sectoral");
     const message = panels.at(-1).querySelector(".dependency-graph-message");
@@ -311,7 +315,7 @@ test("context changes replace the graph, preserve its settings, and offer valid 
     button.dispatchEvent(new Event("click"));
     await new Promise(setImmediate);
     assert.deepEqual(initialized, ["accreu_sectoral", "coacch", "accreu_sectoral"]);
-    assert.deepEqual(focused.at(-1), ["sectoral", true]);
+    assert.equal(focused.at(-1), "sectoral");
     await controller.open("unknown", "shared");
     assert.match(panels.at(-1).querySelector(".dependency-graph-viewport").textContent, /no documented graph/);
 });
@@ -322,7 +326,7 @@ for (const prefix of ["", "/mimosa"]) {
         let opens = 0;
         const requests = [];
         const selections = [];
-        const graphPanel = {};
+        const graphPanel = { cloneNode() { return this; } };
         const content = element();
         const dialog = element({ button: element(), p: { replaceWith() {} } });
         dialog.showModal = () => { dialog.open = true; opens++; };
@@ -355,6 +359,7 @@ for (const prefix of ["", "/mimosa"]) {
             assert.equal(modal, dialog);
             return { open: (configuration, name) => selections.push([configuration, name]) };
         };
+        context.initializeVariableLinkTooltips = () => ({ destroy() {} });
         onPage();
 
         for (const name of ["damage_costs", "coacch::riverine_adaptation_costs_abs"]) {
@@ -381,3 +386,177 @@ for (const prefix of ["", "/mimosa"]) {
         assert.equal(opens, 3);
     });
 }
+
+function documentationTooltips({ waitForReference, localReference = false } = {}) {
+    const content = element();
+    const tooltip = element();
+    tooltip.offsetWidth = 300;
+    tooltip.offsetHeight = 200;
+    tooltip.contains = node => node === tooltip;
+    tooltip.remove = () => { tooltip.isConnected = false; };
+    const requestedEntries = [];
+    const requests = [];
+    let parsed = 0;
+    const reference = { getElementById(id) {
+        requestedEntries.push(id);
+        if (id.endsWith("--missing")) return null;
+        return { closest: () => ({ cloneNode: () => ({ entry: id, querySelectorAll: () => [] }) }) };
+    } };
+    const timers = new Map();
+    let now = 0;
+    let timerId = 0;
+    const context = {
+        URL, AbortController, console,
+        document$: { subscribe() {} },
+        document: {
+            ...reference,
+            activeElement: null,
+            currentScript: { src: "https://example.org/mimosa/assets/dependency-graph.js" },
+            createElement: () => tooltip,
+            getElementById: id => id === "variable-link-tooltip" ? tooltip : reference.getElementById(id),
+        },
+        window: Object.assign(new EventTarget(), { innerWidth: 800, innerHeight: 600 }),
+        setTimeout(callback, delay) { timers.set(++timerId, { callback, due: now + delay }); return timerId; },
+        clearTimeout(id) { timers.delete(id); },
+        requestAnimationFrame: callback => callback(),
+        fetch: async url => {
+            requests.push(String(url));
+            await waitForReference;
+            return { ok: true, text: async () => "reference page" };
+        },
+        DOMParser: class { parseFromString() { parsed++; return reference; } },
+    };
+    if (localReference) content.querySelector = () => ({});
+    vm.createContext(context);
+    vm.runInContext(source, context);
+    const controller = context.initializeVariableLinkTooltips(content, "accreu_sectoral");
+    function link(hash) {
+        const anchor = Object.assign(element(), { hash });
+        anchor.contains = node => node === anchor || node?.parentLink === anchor;
+        return anchor;
+    }
+    function event(type, anchor, relatedTarget = null, pointerType = "mouse") {
+        const event = new Event(type);
+        Object.defineProperties(event, {
+            target: { value: { closest: () => anchor } },
+            relatedTarget: { value: relatedTarget },
+            pointerType: { value: pointerType },
+        });
+        content.dispatchEvent(event);
+    }
+    return {
+        context, content, tooltip, controller, link, event, requests, requestedEntries,
+        parsed: () => parsed,
+        async tick(milliseconds) {
+            now += milliseconds;
+            for (const [id, timer] of [...timers]) {
+                if (timer.due <= now) { timers.delete(id); timer.callback(); }
+            }
+            await new Promise(setImmediate);
+        },
+    };
+}
+
+test("late equation links inherit context, respect overrides, and share cached reference HTML", async () => {
+    const page = documentationTooltips();
+    const equationLink = page.link("#var__damage_costs");
+    page.event("pointerover", equationLink);
+    await page.tick(249);
+    assert.equal(page.tooltip.hidden, true);
+    assert.deepEqual(page.requests, []);
+    await page.tick(1);
+    assert.equal(page.tooltip.hidden, false);
+    assert.equal(page.tooltip.children[0].entry, "variable-accreu_sectoral--damage_costs");
+    assert.equal(equationLink.attributes["aria-describedby"], "variable-link-tooltip");
+
+    // Moving between MathJax children inside the same link must not dismiss it.
+    page.event("pointerout", equationLink, { parentLink: equationLink });
+    await page.tick(200);
+    assert.equal(page.tooltip.hidden, false);
+    const override = page.link("#var__coacch::damage_costs");
+    page.event("pointerover", override);
+    await page.tick(250);
+    assert.equal(page.tooltip.children[0].entry, "variable-coacch--damage_costs");
+    assert.deepEqual(page.requests, ["https://example.org/mimosa/variables/"]);
+    assert.equal(page.parsed(), 1);
+    assert.equal(equationLink.attributes["aria-describedby"], undefined);
+    page.controller.destroy();
+});
+
+test("leaving before the delay or during a request prevents a stale hover card", async () => {
+    let release;
+    const waitForReference = new Promise(resolve => { release = resolve; });
+    const page = documentationTooltips({ waitForReference });
+    const link = page.link("#var__damage_costs");
+    page.event("pointerover", link);
+    page.event("pointerout", link);
+    await page.tick(250);
+    assert.deepEqual(page.requests, []);
+    page.event("pointerover", link);
+    await page.tick(250);
+    assert.equal(page.requests.length, 1);
+    page.event("pointerout", link);
+    release();
+    await page.tick(0);
+    assert.equal(page.tooltip.hidden, true);
+    assert.deepEqual(page.requestedEntries, []);
+    page.controller.destroy();
+});
+
+test("link cards stay readable and dismiss on page scrolling, Escape, or clicking", async () => {
+    const page = documentationTooltips();
+    const link = page.link("#var__damage_costs");
+    page.event("pointerover", link);
+    await page.tick(250);
+    page.event("pointerout", link);
+    page.tooltip.dispatchEvent(new Event("pointerenter"));
+    // Clicking the card moves focus off the link after the pointer enters it.
+    page.event("focusout", link, page.tooltip);
+    await page.tick(200);
+    assert.equal(page.tooltip.hidden, false);
+    assert.equal(page.tooltip.tabIndex, -1);
+    const internalScroll = new Event("scroll");
+    Object.defineProperty(internalScroll, "target", { value: page.tooltip });
+    page.context.window.dispatchEvent(internalScroll);
+    assert.equal(page.tooltip.hidden, false);
+    const internalClick = new Event("click");
+    Object.defineProperty(internalClick, "target", { value: page.tooltip });
+    page.content.dispatchEvent(internalClick);
+    assert.equal(page.tooltip.hidden, false);
+    page.context.window.dispatchEvent(new Event("scroll"));
+    assert.equal(page.tooltip.hidden, true);
+
+    for (const dismiss of [
+        () => page.context.window.dispatchEvent(Object.assign(new Event("keydown"), { key: "Escape" })),
+        () => page.event("click", link),
+        () => page.context.window.dispatchEvent(new Event("resize")),
+    ]) {
+        page.context.document.activeElement = link;
+        page.event("focusin", link);
+        await page.tick(0);
+        assert.equal(page.tooltip.hidden, false);
+        dismiss();
+        assert.equal(page.tooltip.hidden, true);
+        assert.equal(link.attributes["aria-describedby"], undefined);
+    }
+    page.controller.destroy();
+});
+
+test("touch, unavailable entries and disposed page listeners do not open link cards", async () => {
+    const page = documentationTooltips({ localReference: true });
+    const link = page.link("#var__missing");
+    page.event("pointerover", link, null, "touch");
+    await page.tick(250);
+    assert.deepEqual(page.requestedEntries, []);
+    page.event("pointerover", link);
+    await page.tick(250);
+    assert.equal(page.tooltip.hidden, true);
+    assert.deepEqual(page.requests, []);
+    page.event("pointerover", page.link("#var__damage_costs"));
+    page.controller.destroy();
+    await page.tick(250);
+    page.event("pointerover", page.link("#var__damage_costs"));
+    await page.tick(250);
+    assert.deepEqual(page.requestedEntries, ["variable-accreu_sectoral--missing"]);
+    assert.equal(page.tooltip.isConnected, false);
+});

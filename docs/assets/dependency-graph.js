@@ -20,28 +20,43 @@ function parseDependencyLink(hash, pageContext = "coacch") {
     return { context: context === "default" ? "coacch" : context, variable: parts.at(-1) };
 }
 
-function initializeDependencyTooltips(panel, nodes, reference, signal) {
+let variableReferencePage;
+
+function loadVariableReference() {
+    if (!variableReferencePage) {
+        variableReferencePage = loadDependencyAsset(dependencyGraphPage).then(html =>
+            new DOMParser().parseFromString(html, "text/html")
+        );
+    }
+    return variableReferencePage;
+}
+
+// Graph nodes and documentation links share the same card content and placement.
+function createVariableTooltip(container, id) {
     const tooltip = document.createElement("div");
     tooltip.className = "dependency-graph-tooltip md-typeset";
-    tooltip.id = panel.closest("dialog") ? "dependency-graph-modal-tooltip" : "dependency-graph-tooltip";
+    tooltip.id = id;
     tooltip.setAttribute("role", "tooltip");
+    tooltip.tabIndex = -1;
     tooltip.hidden = true;
-    panel.append(tooltip);
-    let activeNode = null;
-    let showTimer;
+    container.append(tooltip);
+    let activeLink = null;
     let hideTimer;
 
-    function hide() {
-        clearTimeout(showTimer);
+    function keepOpen() {
         clearTimeout(hideTimer);
-        tooltip.hidden = true;
-        activeNode?.querySelector("a").removeAttribute("aria-describedby");
-        activeNode = null;
     }
 
-    function show(node) {
+    function hide() {
+        keepOpen();
+        tooltip.hidden = true;
+        activeLink?.removeAttribute("aria-describedby");
+        activeLink = null;
+    }
+
+    function show(target, link, reference, context, variable) {
         hide();
-        const anchor = reference.getElementById(`variable-${panel.dataset.variableContext}--${node.dataset.variable}`);
+        const anchor = reference.getElementById(`variable-${context}--${variable}`);
         const entry = anchor?.closest(".admonition.variable");
         if (!entry) return;
         const card = entry.cloneNode(true);
@@ -49,19 +64,19 @@ function initializeDependencyTooltips(panel, nodes, reference, signal) {
         card.querySelectorAll("[id]").forEach(element => element.removeAttribute("id"));
         tooltip.replaceChildren(card);
         tooltip.hidden = false;
-        activeNode = node;
-        node.querySelector("a").setAttribute("aria-describedby", tooltip.id);
+        activeLink = link;
+        link.setAttribute("aria-describedby", tooltip.id);
 
-        const bounds = panel.closest("dialog")?.getBoundingClientRect() || {
+        const bounds = container.closest("dialog")?.getBoundingClientRect() || {
             left: 0, top: 0, right: window.innerWidth, bottom: window.innerHeight,
         };
-        const rect = node.getBoundingClientRect();
+        const rect = target.getBoundingClientRect();
         const width = tooltip.offsetWidth;
         const height = tooltip.offsetHeight;
         let left = rect.right + width + 12 < bounds.right ? rect.right + 8 : rect.left - width - 8;
         let top = rect.top;
         if (left < bounds.left + 8) {
-            // When neither side has room, place the card above or below the node.
+            // When neither side has room, place the card above or below the target.
             left = rect.left;
             top = rect.top - height - 8;
             if (top < bounds.top + 8) top = rect.bottom + 8;
@@ -71,9 +86,36 @@ function initializeDependencyTooltips(panel, nodes, reference, signal) {
     }
 
     function scheduleHide() {
-        clearTimeout(showTimer);
-        clearTimeout(hideTimer);
+        keepOpen();
         hideTimer = setTimeout(hide, 150);
+    }
+    tooltip.addEventListener("pointerenter", keepOpen);
+    tooltip.addEventListener("pointerleave", scheduleHide);
+    tooltip.addEventListener("focusin", keepOpen);
+    tooltip.addEventListener("focusout", scheduleHide);
+    return {
+        hide, show, keepOpen, scheduleHide,
+        contains: target => tooltip.contains(target),
+        destroy() { hide(); tooltip.remove(); },
+    };
+}
+
+function initializeDependencyTooltips(panel, nodes, reference, signal) {
+    const id = panel.closest("dialog") ? "dependency-graph-modal-tooltip" : "dependency-graph-tooltip";
+    const tooltip = createVariableTooltip(panel, id);
+    let showTimer;
+
+    function hide() {
+        clearTimeout(showTimer);
+        tooltip.hide();
+    }
+    function show(node) {
+        clearTimeout(showTimer);
+        tooltip.show(node, node.querySelector("a"), reference, panel.dataset.variableContext, node.dataset.variable);
+    }
+    function scheduleHide() {
+        clearTimeout(showTimer);
+        tooltip.scheduleHide();
     }
     nodes.forEach(node => {
         // Replace Graphviz's native name-only tooltip with the reference entry.
@@ -81,7 +123,8 @@ function initializeDependencyTooltips(panel, nodes, reference, signal) {
         const link = node.querySelector("a");
         link.removeAttributeNS("http://www.w3.org/1999/xlink", "title");
         node.addEventListener("pointerenter", () => {
-            clearTimeout(hideTimer);
+            clearTimeout(showTimer);
+            tooltip.keepOpen();
             showTimer = setTimeout(() => show(node), 250);
         });
         node.addEventListener("pointerleave", scheduleHide);
@@ -91,13 +134,74 @@ function initializeDependencyTooltips(panel, nodes, reference, signal) {
         }));
         link.addEventListener("blur", scheduleHide);
     });
-    tooltip.addEventListener("pointerenter", () => clearTimeout(hideTimer));
-    tooltip.addEventListener("pointerleave", scheduleHide);
-    tooltip.addEventListener("focusin", () => clearTimeout(hideTimer));
-    tooltip.addEventListener("focusout", scheduleHide);
     panel.querySelector(".dependency-graph-viewport").addEventListener("scroll", hide);
     panel.closest("dialog")?.addEventListener("close", hide, { signal });
-    return { hide, show };
+    return { hide };
+}
+
+function initializeVariableLinkTooltips(content, pageContext) {
+    const tooltip = createVariableTooltip(content, "variable-link-tooltip");
+    const events = new AbortController();
+    const options = { signal: events.signal };
+    const localReference = content.querySelector("#dependency-graph-viewer") ? document : null;
+    let showTimer;
+    let requestId = 0;
+
+    function hide() {
+        clearTimeout(showTimer);
+        requestId++;
+        tooltip.hide();
+    }
+    function schedule(link, delay = 250) {
+        hide();
+        const request = requestId;
+        showTimer = setTimeout(async () => {
+            try {
+                const reference = localReference || await loadVariableReference();
+                if (request !== requestId || !link.isConnected) return;
+                const { context, variable } = parseDependencyLink(link.hash, pageContext);
+                tooltip.show(link, link, reference, context, variable);
+            } catch (error) {
+                console.error(error);
+            }
+        }, delay);
+    }
+    function variableLink(event) {
+        const link = event.target.closest('a[href*="#var__"]');
+        if (!link?.hash.startsWith("#var__") || link.contains(event.relatedTarget)) return null;
+        return link;
+    }
+    function leave(event) {
+        if (!variableLink(event)) return;
+        clearTimeout(showTimer);
+        requestId++;
+        if (tooltip.contains(event.relatedTarget)) tooltip.keepOpen();
+        else tooltip.scheduleHide();
+    }
+    // Delegation also covers equation anchors added later by MathJax.
+    content.addEventListener("pointerover", event => {
+        const link = variableLink(event);
+        if (link && event.pointerType !== "touch") schedule(link);
+    }, options);
+    content.addEventListener("pointerout", leave, options);
+    content.addEventListener("focusin", event => {
+        const link = variableLink(event);
+        if (link) requestAnimationFrame(() => {
+            if (document.activeElement === link && content.isConnected) schedule(link, 0);
+        });
+    }, options);
+    content.addEventListener("focusout", leave, options);
+    content.addEventListener("click", event => {
+        if (!tooltip.contains(event.target)) hide();
+    }, options);
+    window.addEventListener("keydown", event => {
+        if (event.key === "Escape") hide();
+    }, options);
+    window.addEventListener("scroll", event => {
+        if (!tooltip.contains(event.target)) hide();
+    }, { ...options, capture: true, passive: true });
+    window.addEventListener("resize", hide, options);
+    return { destroy() { hide(); events.abort(); tooltip.destroy(); } };
 }
 
 async function initializeDependencyGraph(panel, source, dialog = null, reference = document) {
@@ -135,7 +239,6 @@ async function initializeDependencyGraph(panel, source, dialog = null, reference
                 event.preventDefault();
                 choose(name);
                 if (scale < focusZoom) focusSelected();
-                showSelectedInformation();
             });
         });
         const tooltips = initializeDependencyTooltips(panel, nodes, reference, events.signal);
@@ -218,29 +321,16 @@ async function initializeDependencyGraph(panel, source, dialog = null, reference
             viewport.scrollTop += node.top - frame.top + node.height / 2 - viewport.clientHeight / 2;
         }
 
-        function showSelectedInformation() {
-            const name = selected;
-            requestAnimationFrame(() => {
-                if (name && selected === name && panel.isConnected) {
-                    tooltips.show(nodes.find(node => node.dataset.variable === name));
-                }
-            });
-        }
-
-        function focusVariable(requested, showInformation = false) {
+        function focusVariable(requested) {
             hideTooltip();
             const exists = nodes.some(node => node.dataset.variable === requested);
             highlight(exists ? requested : null);
-            if (exists) {
-                focusSelected();
-                if (showInformation) showSelectedInformation();
-            }
+            if (exists) focusSelected();
         }
 
         select.addEventListener("change", () => {
             choose(select.value || null);
             focusSelected();
-            showSelectedInformation();
         });
 
         let pan = null;
@@ -329,7 +419,7 @@ async function createDependencyGraphController(panel, reference, dialog = null, 
     let activeContext;
     let requestId = 0;
 
-    async function open(context, variable = null, showInformation = true) {
+    async function open(context, variable = null) {
         context = context === "default" ? "coacch" : context || manifest.default_context;
         const request = ++requestId;
         const config = manifest.contexts[context];
@@ -356,7 +446,7 @@ async function createDependencyGraphController(panel, reference, dialog = null, 
             }
         }
         if (request !== requestId) return;
-        viewer?.focusVariable(variable, showInformation);
+        viewer?.focusVariable(variable);
         if (!dialog && config?.variables.includes(variable)) {
             const url = new URL(location.href);
             url.searchParams.set("graph_context", context);
@@ -389,7 +479,10 @@ async function createDependencyGraphController(panel, reference, dialog = null, 
     return { open };
 }
 
+let variableLinkTooltips;
+
 document$.subscribe(() => {
+    variableLinkTooltips?.destroy();
     const pageContext = document.querySelector("[data-documentation-context]")?.dataset.documentationContext || "coacch";
     const panel = document.querySelector("#dependency-graph-viewer");
     if (panel) {
@@ -407,6 +500,7 @@ document$.subscribe(() => {
     // MathJax creates equation links later, so handle clicks on the page itself.
     const content = document.querySelector(".md-content");
     if (!content) return;
+    variableLinkTooltips = initializeVariableLinkTooltips(content, pageContext);
     async function openVariable(hash) {
         const { context, variable } = parseDependencyLink(hash, pageContext);
         if (!dialog) {
@@ -422,9 +516,8 @@ document$.subscribe(() => {
             dialog.querySelector("button").addEventListener("click", () => dialog.close());
             document.body.append(dialog);
             graphReady = (async () => {
-                const html = await loadDependencyAsset(dependencyGraphPage);
-                const page = new DOMParser().parseFromString(html, "text/html");
-                const graphPanel = page.querySelector("#dependency-graph-viewer");
+                const page = await loadVariableReference();
+                const graphPanel = page.querySelector("#dependency-graph-viewer").cloneNode(true);
                 dialog.querySelector("p").replaceWith(graphPanel);
                 return createDependencyGraphController(graphPanel, page, dialog);
             })();
