@@ -54,6 +54,9 @@ DOCUMENTATION_CONFIGS = {
     "effortsharing_equal_mitigation_costs": _effortsharing_config(
         "equal_mitigation_costs"
     ),
+    "financialtransfer_globaldamagepool": {
+        "model structure": {"financialtransfer module": "globaldamagepool"}
+    },
     "effortsharing_equal_total_costs": _effortsharing_config("equal_total_costs"),
     "effortsharing_per_cap_convergence": _effortsharing_config("per_cap_convergence"),
     "effortsharing_ability_to_pay": _effortsharing_config("ability_to_pay"),

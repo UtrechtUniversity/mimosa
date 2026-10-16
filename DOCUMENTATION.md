@@ -9,10 +9,16 @@ not included in the published MkDocs site.
 names, descriptions, units and dimensions from constructed Pyomo models.
 
 `DOCUMENTATION_CONFIGS` contains named sets of ordinary configuration overrides;
-the remaining settings use MIMOSA's defaults. The configurations cover COACCH's
-damage options, ACCREU's adaptation modes and mortality monetisation, and the
-other selectable modules. `globalcostpool` is intentionally omitted because it
-is planned for removal.
+the remaining settings use MIMOSA's defaults. Choose configurations to cover
+distinct variable declarations, rather than every selectable module. `nodamage`
+and `ACCREU_CGE` need no separate context because their variable names are already
+covered by the other damage modules. `globalcostpool` is intentionally omitted
+because it is planned for removal. These omissions are allowed by the module
+coverage test; other modules that introduce variables still require coverage.
+
+`globaldamagepool` is also currently omitted by choice. Its `financial_transfer`
+and `financial_transfer_abs` variables are therefore absent from the catalogue,
+and the financial-transfer module coverage test reports this gap.
 
 When adding a module or an option that declares different variables, add a
 representative configuration to this dictionary. Also add a context when an

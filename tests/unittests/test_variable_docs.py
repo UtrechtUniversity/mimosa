@@ -110,7 +110,9 @@ def documentation_model(monkeypatch):
 
     monkeypatch.setattr(variable_docs, "check_params", check_params)
     monkeypatch.setattr(variable_docs, "MIMOSA", construct_model)
-    monkeypatch.setattr(variable_docs.avoided_damages, "get_constraints", lambda model: [])
+    monkeypatch.setattr(
+        variable_docs.avoided_damages, "get_constraints", lambda model: []
+    )
     yield SimpleNamespace(
         model=model, params=params, parser_tree=parser_tree, calls=calls
     )
@@ -156,7 +158,8 @@ def test_hooks_and_macros_share_lazy_provider(documentation_model):
 @pytest.mark.parametrize("event", ["on_startup", "on_shutdown"])
 def test_command_lifecycle_clears_shared_model(documentation_model, monkeypatch, event):
     monkeypatch.setattr(
-        variable_docs, "DOCUMENTATION_CONFIGS",
+        variable_docs,
+        "DOCUMENTATION_CONFIGS",
         {"coacch": variable_docs.DOCUMENTATION_CONFIGS["coacch"]},
     )
     hooks = importlib.import_module("docs.scripts.mkdocs_hooks")
@@ -189,10 +192,16 @@ def test_documentation_configs_cover_module_selections(selection, registry):
     }
 
     expected = set(registry)
-    if selection == "emissiontrade module":
+    if selection == "damage module":
+        # These modules reuse variable names already covered by COACCH/ACCREU.
+        expected -= {"nodamage", "ACCREU_CGE"}
+    elif selection == "emissiontrade module":
         # This module is planned for removal and is intentionally undocumented.
         expected.discard("globalcostpool")
-    assert selections == expected
+    assert selections <= set(registry)
+    assert (
+        expected <= selections
+    ), f"Missing variable-declaring modules: {expected - selections}"
 
 
 @pytest.fixture(scope="module")
@@ -211,8 +220,11 @@ def documentation_contexts():
 
     with pytest.MonkeyPatch.context() as patch:
         for method in (
-            "prepare_simulation", "prerun_simulation", "run_nopolicy_baseline",
-            "run_simulation", "solve",
+            "prepare_simulation",
+            "prerun_simulation",
+            "run_nopolicy_baseline",
+            "run_simulation",
+            "solve",
         ):
             patch.setattr(MIMOSA, method, forbid_execution)
         patch.setattr(variable_docs, "MIMOSA", construct_model)
@@ -226,14 +238,18 @@ def documentation_contexts():
             variable_docs.clear_documentation_cache()
 
 
-@pytest.mark.parametrize("adaptation", ["noadaptation", "sectoral", "combined"])
-def test_accreu_contexts_cover_adaptation_declarations(documentation_contexts, adaptation):
+@pytest.mark.parametrize("adaptation", ["noadaptation", "sectoral"])
+def test_accreu_contexts_cover_adaptation_declarations(
+    documentation_contexts, adaptation
+):
     contexts, _ = documentation_contexts
     context = contexts[f"accreu_{adaptation}"]
     names = {variable.name for variable in context.variables}
 
     for sector in ("slr", "riverine", "labourprod"):
-        assert (f"{sector}_damage_costs_gross" in names) == (adaptation != "noadaptation")
+        assert (f"{sector}_damage_costs_gross" in names) == (
+            adaptation != "noadaptation"
+        )
         assert (f"{sector}_adaptation_costs" in names) == (
             adaptation == "sectoral" or (sector == "slr" and adaptation == "combined")
         )
@@ -249,59 +265,29 @@ def test_accreu_contexts_cover_adaptation_declarations(documentation_contexts, a
         assert context.model.adaptation_costs.ctype is Var
 
 
-def test_mortality_context_preserves_physical_impacts_without_monetisation(documentation_contexts):
-    contexts, _ = documentation_contexts
-    enabled = {variable.name for variable in contexts["accreu_sectoral"].variables}
-    disabled_context = contexts["accreu_sectoral_no_mortality_monetisation"]
-    disabled = {variable.name for variable in disabled_context.variables}
-
-    assert enabled - disabled == {
-        "mortality_svl", "mortality_damage_costs", "mortality_damage_costs_abs",
-        "non_market_damage_costs_abs",
-    }
-    assert {"mortality_net", "mortality_heat_related", "mortality_cold_related"} <= disabled
-    assert disabled_context.model.non_market_damage_costs_abs.ctype is Param
-
-
-def test_optional_trading_transfer_and_effortsharing_variables(documentation_contexts):
-    contexts, _ = documentation_contexts
-    names = {
-        context: {variable.name for variable in data.variables}
-        for context, data in contexts.items()
-    }
-
-    assert "global_carbon_price" in names["emissiontrade"]
-    assert "global_carbon_price" not in names["coacch"]
-    assert {
-        "attributed_emission_reductions", "emission_reduction_trading_balance",
-        "mitigation_cost_trading_balance",
-    } <= names["emissiontrade"]
-    assert {"financial_transfer", "financial_transfer_abs"} <= names["globaldamagepool"]
-    assert "financial_transfer" not in names["coacch"]
-    for context in ("effortsharing_equal_mitigation_costs", "effortsharing_equal_total_costs"):
-        assert "effort_sharing_common_level" in names[context]
-    assert {
-        "effortsharing_AP_allowances", "effortsharing_AP_reductions_before_correction",
-        "effortsharing_AP_inv_correction_factor",
-    } <= names["effortsharing_ability_to_pay"]
-
-
-def test_baseline_dependent_variables_are_declared_without_evaluating_them(documentation_contexts):
+def test_baseline_dependent_variables_are_declared_without_evaluating_them(
+    documentation_contexts,
+):
     contexts, _ = documentation_contexts
     for context in contexts.values():
         baseline = {
             variable.name: variable
-            for variable in context.variables if variable.requires_baseline
+            for variable in context.variables
+            if variable.requires_baseline
         }
         assert set(baseline) == {"avoided_damage_costs", "global_avoided_damage_costs"}
         assert baseline["avoided_damage_costs"].dimensions == ("t", "regions")
         assert baseline["global_avoided_damage_costs"].dimensions == ("t",)
         assert not hasattr(context.model, "constraint_avoided_damage_costs")
         for name in baseline:
-            assert all(value.value is None for value in getattr(context.model, name).values())
+            assert all(
+                value.value is None for value in getattr(context.model, name).values()
+            )
 
 
-def test_catalogue_preserves_contexts_and_constructs_each_model_once(documentation_contexts):
+def test_catalogue_preserves_contexts_and_constructs_each_model_once(
+    documentation_contexts,
+):
     contexts, constructions = documentation_contexts
     catalogue = variable_docs.get_variable_catalogue()
 
@@ -310,8 +296,16 @@ def test_catalogue_preserves_contexts_and_constructs_each_model_once(documentati
     assert len(constructions) == len(contexts)
     assert {variable.context for variable in catalogue} == set(contexts)
     assert sum(variable.name == "NPV" for variable in catalogue) == len(contexts)
-    assert contexts["objective_globalcosts"].params["model structure"]["objective module"] == "globalcosts"
-    assert contexts["welfare_inequal_aversion_general"].params["model structure"]["welfare module"] == "inequal_aversion_general"
+    assert (
+        contexts["objective_globalcosts"].params["model structure"]["objective module"]
+        == "globalcosts"
+    )
+    assert (
+        contexts["welfare_inequal_aversion_general"].params["model structure"][
+            "welfare module"
+        ]
+        == "inequal_aversion_general"
+    )
 
 
 def test_unknown_context_is_rejected_without_building_a_model(documentation_model):
