@@ -146,6 +146,7 @@ markdown_extensions:
 
 extra_javascript:
   - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+  - assets/table-scroll.js
 
 extra_css:
   - assets/extra.css

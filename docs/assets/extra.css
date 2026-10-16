@@ -197,12 +197,54 @@ a[href*="variables/#"]:not(:has(code))::before {
 .table_scrollable {
     overflow-y: auto;
     max-height: 300px;
-    /* padding: 15px 0 5px; */
-    padding-top: 5px;
-    -webkit-mask-image: linear-gradient(to bottom, transparent 0, black var(--top-mask-size, 0), black calc(100% - var(--bottom-mask-size, 0)), transparent 100%);
-    mask-image: linear-gradient(to bottom, transparent 0, black var(--top-mask-size, 0), black calc(100% - var(--bottom-mask-size, 0)), transparent 100%);
     --top-mask-size: 40px;
     --bottom-mask-size: 40px;
+
+    /* Use one scroll container so the header sticks to this table's viewport. */
+    .md-typeset__scrollwrap {
+        overflow: visible;
+        margin: 0;
+    }
+
+    .md-typeset__table {
+        display: block;
+        padding: 0;
+    }
+
+    thead {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        background: var(--md-default-bg-color);
+    }
+
+    /* Fade the rows below the header, keeping the header itself readable. */
+    thead::after {
+        content: "";
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        height: var(--top-mask-size);
+        background: linear-gradient(var(--md-default-bg-color), transparent);
+        pointer-events: none;
+        opacity: 0;
+    }
+
+    &.is-scrolled thead::after {
+        opacity: 1;
+    }
+
+    &::after {
+        content: "";
+        display: block;
+        position: sticky;
+        bottom: 0;
+        height: var(--bottom-mask-size);
+        margin-top: calc(-1 * var(--bottom-mask-size));
+        background: linear-gradient(transparent, var(--md-default-bg-color));
+        pointer-events: none;
+    }
 
     &.extra_small {
         max-height: 200px;
