@@ -291,12 +291,34 @@ a[href*="variables/#"]:not(:has(code))::before {
     padding: 5px 5px;
 }
 
-/* Small, standalone prototype for exploring dependency highlighting. */
+/* Standalone prototype for exploring dependency highlighting. */
 .dependency-demo {
     border: 1px solid var(--md-default-fg-color--lightest);
     border-radius: .4rem;
     padding: .8rem;
     background: var(--md-default-bg-color);
+
+    .dependency-demo-controls {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: .3rem;
+        margin-bottom: .6rem;
+        font-size: .65rem;
+
+        label { display: flex; align-items: center; gap: .3rem; max-width: 100%; }
+        select, button {
+            border: 1px solid var(--md-default-fg-color--lighter);
+            border-radius: .2rem;
+            background: var(--md-default-bg-color);
+            color: var(--md-default-fg-color);
+            padding: .25rem .4rem;
+        }
+        select { max-width: min(16rem, 65vw); }
+        button { cursor: pointer; }
+        button:hover { border-color: var(--md-accent-fg-color); }
+        output { min-width: 2rem; text-align: center; }
+    }
 
     .dependency-demo-legend {
         display: flex;
@@ -318,23 +340,34 @@ a[href*="variables/#"]:not(:has(code))::before {
         .demo-outgoing-key::before { background: #ed6a2f; }
     }
 
-    .dependency-demo-viewport { overflow-x: auto; }
-    svg { display: block; width: 100%; min-width: 540px; }
+    .dependency-demo-viewport {
+        overflow: auto;
+        height: min(65vh, 600px);
+        margin-top: .5rem;
+        border: 1px solid var(--md-default-fg-color--lightest);
+        border-radius: .2rem;
+    }
+    svg { display: block; max-width: none; }
 
     .demo-edge {
-        fill: none;
-        stroke: #999;
-        stroke-width: 2;
+        color: #999;
         opacity: .2;
+
+        path { fill: none; stroke: currentColor; stroke-width: 1.5; }
+        polygon { fill: currentColor; stroke: currentColor; }
     }
 
-    .demo-edge.incoming { stroke: #2297d5; stroke-width: 3; opacity: 1; }
-    .demo-edge.outgoing { stroke: #ed6a2f; stroke-width: 3; opacity: 1; }
+    .demo-edge.incoming { color: #2297d5; opacity: 1; }
+    .demo-edge.outgoing { color: #ed6a2f; opacity: 1; }
+    .demo-edge.incoming path, .demo-edge.outgoing path { stroke-width: 2.5; }
+
+    &.is-overview .demo-edge.normal { opacity: .5; }
+    &.is-overview .demo-node.is-muted { opacity: 1; }
 
     .demo-node {
         cursor: pointer;
 
-        rect {
+        path {
             fill: var(--md-default-bg-color);
             stroke: var(--md-default-fg-color--lighter);
             stroke-width: 2;
@@ -342,26 +375,28 @@ a[href*="variables/#"]:not(:has(code))::before {
 
         text {
             fill: var(--md-default-fg-color);
-            font-family: var(--md-code-font-family);
+            font-family: sans-serif;
             font-size: 13px;
         }
 
-        &.is-selected rect {
+        &.is-selected path {
             fill: color-mix(in srgb, var(--color-mimosa) 18%, var(--md-default-bg-color));
             stroke: var(--color-mimosa);
             stroke-width: 4;
         }
 
         &.is-selected text { font-weight: bold; }
-        &.is-incoming rect { stroke: #2297d5; }
-        &.is-outgoing rect { stroke: #ed6a2f; }
+        &.is-incoming path { stroke: #2297d5; }
+        &.is-outgoing path { stroke: #ed6a2f; }
         &.is-muted { opacity: .3; }
-        &:hover rect, &:focus-visible rect { stroke-width: 4; }
-        &:focus-visible { outline: 2px solid var(--md-accent-fg-color); outline-offset: 4px; }
+        &:hover path, &:focus-within path { stroke-width: 4; }
+        a:focus-visible { outline: 2px solid var(--md-accent-fg-color); outline-offset: 4px; }
     }
 
     .dependency-demo-status {
         margin-bottom: 0;
         font-size: .65rem;
+        max-height: 6rem;
+        overflow: auto;
     }
 }

@@ -10,10 +10,9 @@ During the ACCREU project, new damage estimates were developed for [:material-ho
 (except mortality).
 
 **Try the dependency graph demo:** highlight
-[demo_damage](../../variables.md?demo_variable=demo_damage#dependency-graph-demo),
-[demo_adaptation](../../variables.md?demo_variable=demo_adaptation#dependency-graph-demo), or
-[demo_welfare](../../variables.md?demo_variable=demo_welfare#dependency-graph-demo).
-These are invented variables for testing the interaction.
+[damage_costs](../../variables.md?demo_variable=damage_costs#dependency-graph-demo),
+[riverine_adaptation_costs_abs](../../variables.md?demo_variable=riverine_adaptation_costs_abs#dependency-graph-demo), or
+[global_welfare](../../variables.md?demo_variable=global_welfare#dependency-graph-demo).
 
 Usage:
 
