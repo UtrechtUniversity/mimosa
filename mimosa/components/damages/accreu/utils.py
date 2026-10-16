@@ -82,9 +82,7 @@ def validate_adaptation_calibration(calibration):
 def get_adaptation_options(inputs: ModelInputs):
     """Read and validate all ACCREU adaptation options once."""
 
-    adaptation_type = inputs.config_value(
-        "economics.damages.accreu.adaptation"
-    )
+    adaptation_type = inputs.config_value("economics.damages.accreu.adaptation")
     calibration_name = inputs.config_value(
         "economics.damages.accreu.adaptation_calibration"
     )
@@ -126,8 +124,14 @@ def effective_adaptation_curve(
 
 def adaptation_effectiveness_fct(adapt_costs, max_effectiveness, cost_param):
     """
-    Adaptation effectiveness function, based on the fitted function in ACCREU:
-    Avoided damages = max_effectiveness * (1 - exp(-cost_param * adapt_costs))
+    The adaptation level is calculated as a function of absolute adaptation costs
+    (in currency units) using a negative-exponential saturation curve:
+
+    $$
+    \\text{adapt. level}_{i,t,r} = \\text{max effectiveness}_{i,r} \\cdot \\left(1 - e^{-c_{i,r} \\cdot \\text{adapt. costs}_{i,t,r}}\\right)
+    $$
+
+    The parameteres $\\text{max effectiveness}_{i,r}$ and $c_{i,r}$ are calibrated to the ACCREU data for each sector $i$ and region $r$.
     """
 
     return max_effectiveness * (1 - exp(-cost_param * adapt_costs))

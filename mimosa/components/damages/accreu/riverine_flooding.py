@@ -32,7 +32,19 @@ def get_constraints(
 ):
     """
 
-    The impacts of riverine flooding are estimated using the GLOFRIS model.
+    The impacts of riverine flooding are estimated using the GLOFRIS model. The gross damages
+    are fitted with a quadratic function of temperature:
+
+    $$
+    \\text{gross damages}_{\\text{riverine},t,r} = a_r + b_r \\cdot T_t + c_r \\cdot T_t^2.
+    $$
+
+    The adaptation function is fitted with a negative-exponential saturation curve, like in
+    all three sectors. Subsequently, the residual damages are calculated as:
+
+    $$
+    \\text{damages}_{\\text{riverine},t,r} = \\text{gross damages}_{\\text{riverine},t,r} \\cdot (1 - \\text{adapt. level}_{\\text{riverine},t,r}),
+    $$
 
     <div class="grid cards" markdown>
 
