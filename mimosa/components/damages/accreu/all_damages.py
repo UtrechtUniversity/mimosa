@@ -59,6 +59,22 @@ def get_constraints(
     where $\\text{abs. damages}_{\\text{mortality}}$ is the mortality damages in absolute terms (i.e. in currency units),
     and $\\text{GDP}_{\\text{gross}}$ is the gross GDP, also in absolute terms (i.e. in currency units).
 
+    <div class="tiny_table table_scrollable extra_small" markdown>
+
+    | Variables created in this module: |
+    | --------------------------------- |
+    | var::damage_costs |
+    | var::damage_costs_abs |
+    | var::global_damage_costs |
+    | var::adaptation_costs |
+    | var::adaptation_costs_abs |
+    | var::global_adaptation_costs |
+    | var::non_market_damage_costs_abs |
+    | var::market_and_non_market_damage_costs_abs |
+    | var::market_and_non_market_damage_costs |
+
+    </div>
+
     """
 
     constraints = []

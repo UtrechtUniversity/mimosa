@@ -203,6 +203,10 @@ a[href*="variables/#"]:not(:has(code))::before {
     mask-image: linear-gradient(to bottom, transparent 0, black var(--top-mask-size, 0), black calc(100% - var(--bottom-mask-size, 0)), transparent 100%);
     --top-mask-size: 40px;
     --bottom-mask-size: 40px;
+
+    &.extra_small {
+        max-height: 200px;
+    }
 }
 
 .md-typeset .admonition.question,
