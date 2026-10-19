@@ -3,6 +3,13 @@
 These notes describe the documentation tooling. They live outside `docs/` and are
 not included in the published MkDocs site.
 
+## Parameter reference
+
+Enum options in the parameter reference include a copy button on hover or
+keyboard focus. Each button copies the complete `params[...] = value` assignment.
+The generated buttons use the theme's `data-clipboard-text` support, sharing
+the snippet copy behavior and confirmation without additional JavaScript.
+
 ## Variable catalogue
 
 [`docs/scripts/variable_docs.py`](docs/scripts/variable_docs.py) collects variable

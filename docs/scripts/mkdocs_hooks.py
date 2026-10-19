@@ -1,4 +1,5 @@
 import re
+import json
 import yaml
 import sys, os
 import pandas as pd
@@ -23,7 +24,7 @@ from mimosa.common.config.parseconfig import (
     flatten,
     load_default_yaml,
 )
-from mimosa.common.config.utils.parsers import PARSER_FACTORY
+from mimosa.common.config.utils.parsers import GeneralParser, PARSER_FACTORY
 
 
 def markdown_parse_param_reference(markdown):
@@ -182,25 +183,42 @@ def recursive_param_print(tree, mainkey, breadcrumbs, full_str, level=0):
 
 
 def _print_param(tree, mainkey, breadcrumbs, indent=""):
+    usage_target = "params" + "".join(f"[{json.dumps(key)}]" for key in breadcrumbs)
     # Print characteristics of parameter
     extra_str = f'{indent}??? parameter "{mainkey}"\n'
     extra_str += f'{indent}    <span id="{".".join(breadcrumbs)}" class="param_anchor"> </span>\n'
-    extra_str += tree.to_markdown(indent + "    ") + "\n\n"
+    if tree.type == "enum":
+        extra_str += GeneralParser.to_markdown(tree, indent + "    ")
+        extra_str += f"\n{indent}    - Allowed values:\n"
+        for value in tree.allowed_values:
+            assignment = f"{usage_target} = {_python_literal(value)}"
+            # Autorefs treats adjacent dictionary keys as Markdown link references.
+            copy_text = escape(assignment, quote=True).replace("[", "&#91;").replace("]", "&#93;")
+            extra_str += (
+                f'{indent}        - <span class="param-enum-option">{escape(str(value))}'
+                f'<button class="md-clipboard" type="button" '
+                f'title="Copy parameter assignment" aria-label="Copy assignment for {escape(str(value), quote=True)}" '
+                f'data-clipboard-text="{copy_text}"></button></span>\n'
+            )
+    else:
+        extra_str += tree.to_markdown(indent + "    ")
+    extra_str += "\n\n"
 
     # Add usage example
     extra_str += f"{indent}    Example usage: \n\n"
-    _usage_keys = [f'["{key}"]' for key in breadcrumbs]
-    _usage_default_val = tree.default
-    if isinstance(tree.default, str):
-        _usage_default_val = f'"{tree.default}"'
     extra_str += f"""
 {indent}    ```python hl_lines="2"
 {indent}    params = load_params()
-{indent}    params{''.join(_usage_keys)} = {_usage_default_val}
+{indent}    {usage_target} = {_python_literal(tree.default)}
 {indent}    model = MIMOSA(params)
 {indent}    ```
 """
     return extra_str
+
+
+def _python_literal(value):
+    """Keep strings double-quoted while preserving Python literals for other types."""
+    return json.dumps(value, ensure_ascii=False) if isinstance(value, str) else repr(value)
 
 
 def on_page_content(html, **kwargs):

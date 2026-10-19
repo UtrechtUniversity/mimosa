@@ -63,6 +63,22 @@ nav.md-nav a[target=_blank]::after {
     display: block;
 }
 
+.param-enum-option {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35em;
+}
+
+.param-enum-option > .md-clipboard {
+    opacity: 0;
+    transition: opacity 0.15s, color 0.25s;
+}
+
+.param-enum-option:hover > .md-clipboard,
+.param-enum-option:focus-within > .md-clipboard {
+    opacity: 1;
+}
+
 /* Match the theme's :target specificity and leave room for the entry title. */
 .md-typeset .variable_anchor {
     display: block;
