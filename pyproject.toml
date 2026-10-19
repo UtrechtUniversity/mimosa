@@ -40,7 +40,6 @@ docs = [
   "mkdocs-glightbox",
   "mkdocs-bibtex",
   "mike",
-  "markdown",
 ]
 
 [tool.setuptools.packages.find]
