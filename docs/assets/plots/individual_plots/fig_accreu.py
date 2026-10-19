@@ -3,6 +3,7 @@ import pandas as pd
 from plotly.subplots import make_subplots
 import plotly.express as px
 
+from mimosa.components.damages.accreu.utils import get_adaptation_calibration
 from .common import mimosa, model, COLORS, inputs, param_store
 
 
@@ -22,19 +23,42 @@ def create_all_figs():
         raw["riverine_damages"], "riverine", mode="lines+markers"
     )
     figs["riverine_adaptation_global"] = fig_adaptation_global(
-        raw["riverine_adaptation"], "riverine", groupvar="Adaptation level"
+        raw["riverine_adaptation"],
+        "riverine",
+        groupvar="Adaptation level",
+        annotations=[
+            {"x": 300, "y": 0.91, "text": "ACCREU fit"},
+            {"x": 200, "y": 0.503, "text": "Literature calibration"},
+        ],
     )
 
     ## Global labour productivity plots
     figs["labourprod_damages_global"] = fig_labourprod_damages_global(raw)
     figs["labourprod_adaptation_global"] = fig_adaptation_global(
-        raw["labourprod_adaptation"], "labourprod", maxval=2100
+        raw["labourprod_adaptation"],
+        "labourprod",
+        maxval=2100,
+        annotations=[
+            {
+                "x": 814,
+                "y": 0.177,
+                "text": "ACCREU fit and<br>literature range<br> ",
+                "ax": 30,
+                "ay": -30,
+            }
+        ],
     )
 
     ## Global slr plot
     figs["slr_damages_global"] = fig_slr_damages_global(raw)
     figs["slr_adaptation_global"] = fig_adaptation_global(
-        raw["slr_adaptation"], "slr", maxval=30
+        raw["slr_adaptation"],
+        "slr",
+        maxval=30,
+        annotations=[
+            {"x": 12.86, "y": 0.757, "text": "ACCREU fit"},
+            {"x": 8.6, "y": 0.148, "text": "Literature calibration"},
+        ],
     )
 
     ## Global mortality plot
@@ -181,7 +205,7 @@ def fig_damages_global(
     return fig
 
 
-def fig_adaptation_global(df, sector, maxval=700, groupvar="RCP"):
+def fig_adaptation_global(df, sector, maxval=700, groupvar="RCP", annotations=[]):
     selection = df[df["Region"] == "World"]
     fig = make_subplots()
     for (var, subselection), color in zip(
@@ -200,16 +224,47 @@ def fig_adaptation_global(df, sector, maxval=700, groupvar="RCP"):
         f"{sector}_adapt_eff_cost_param"
     )
     x = np.linspace(0, maxval) / 1000
-    y = a * (1 - np.exp(-b * x))
-    for dash, color in [("solid", "#FFF"), ("dot", "#000")]:
-        fig.add_scatter(
-            x=list(x * 1000),
-            y=list(y),
-            mode="lines",
-            line={"color": color, "dash": dash},
-            name="Fit",
-            showlegend=False,
+    for calib in ["literature", "literature_low", "literature_high", "accreu"]:
+        calib_values = get_adaptation_calibration(calib, sector)
+        a_total = a * calib_values.max_effectiveness_scale
+        b_total = b / calib_values.cost_multiplier
+        y = a_total * (1 - np.exp(-b_total * x))
+        if calib == "accreu":
+            styles = [
+                {"line": {"color": "#FFF", "dash": "solid"}},
+                {"line": {"color": "#000", "dash": "dot"}},
+            ]
+        elif calib == "literature":
+            styles = [{"line": {"color": "#888", "dash": "solid"}}]
+        else:
+            styles = [
+                {
+                    "line": {"color": "rgba(0,0,0,0)", "width": 0},
+                    "fillcolor": "rgba(150,150,150,.3)",
+                }
+            ]
+        for style in styles:
+            fig.add_scatter(
+                x=list(x * 1000),
+                y=list(y),
+                mode="lines",
+                name=f"Fit - {calib}",
+                fill="tonexty" if calib == "literature_high" else None,
+                showlegend=False,
+                **style,
+            )
+    for ann in annotations:
+        ann_basis = dict(
+            ax=12,
+            ay=12,
+            xanchor="left",
+            arrowhead=6,
+            arrowsize=1.7,
+            arrowcolor="#999",
+            font_color="#999",
         )
+        ann_basis.update(ann)
+        fig.add_annotation(**ann_basis)
 
     fig.update_layout(
         margin={"l": 30, "r": 10, "b": 30, "t": 5}, height=250
