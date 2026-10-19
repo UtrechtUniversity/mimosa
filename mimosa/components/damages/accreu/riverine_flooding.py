@@ -35,11 +35,9 @@ def get_constraints(
     The impacts of riverine flooding are estimated using the GLOFRIS model. The gross damages
     are fitted with a quadratic function of temperature:
 
-    $$
-    \\href{./#var__riverine_damage_costs_gross}{\\text{gross damages}_{\\text{riverine},t,r}}
-    = a_r + b_r \\cdot \\href{./#var__temperature}{T_t}
-    + c_r \\cdot \\href{./#var__temperature}{T_t}^2.
-    $$
+    :::mimosa.components.damages.accreu.riverine_flooding.gross_dmg_fct_riverine
+        options:
+            show_source: false
 
     The adaptation function is fitted with a negative-exponential saturation curve, like in
     all three sectors. Subsequently, the residual damages are calculated as:
@@ -230,6 +228,14 @@ def get_constraints(
 
 
 def gross_dmg_fct_riverine(m, t, r):
+    """
+    $$
+        \\href{./#var__riverine_damage_costs_gross}{\\text{gross damages}_{\\text{riverine},t,r}}
+        = (a_r + b_r \\cdot \\href{./#var__temperature}{T_t}
+        + c_r \\cdot \\href{./#var__temperature}{T_t}^2) - (a_r + b_r \\cdot \\href{./#var__temperature}{T_0}
+        + c_r \\cdot \\href{./#var__temperature}{T_0}^2).
+    $$
+    """
     a = m.riverine_damages_gross_constant[r]
     b = m.riverine_damages_gross_linear[r]
     c = m.riverine_damages_gross_quadr[r]

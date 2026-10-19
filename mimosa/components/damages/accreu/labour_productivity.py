@@ -38,6 +38,30 @@ def get_constraints(
     to reduced labour productivity), and cold-related expected annual benefits due to less cold days
     (especially relevant for currently cold regions).
 
+    :::mimosa.components.damages.accreu.labour_productivity.gross_dmg_fct_labourprod
+        options:
+            show_source: false
+
+    :::mimosa.components.damages.accreu.labour_productivity.benefits_dmg_fct_labourprod
+        options:
+            show_source: false
+
+    The adaptation curve, which only applies to heat-related gross damages, is fitted
+    with a negative-exponential saturation curve, like in all three sectors. This leads to
+    the residual, heat related damages:
+
+    $$
+    \\href{./#var__labourprod_damage_costs}{\\text{damages}_{\\text{labourprod},t,r}}
+    = \\href{./#var__labourprod_damage_costs_gross}{\\text{gross damages}_{\\text{labourprod},t,r}} \\cdot (1 - \\href{./#var__labourprod_adaptation_level}{\\text{adapt. level}_{\\text{labourprod},t,r}}).
+    $$
+
+    The final, net damages are calculated as the sum of the heat-related residual damages and the cold-related benefits:
+
+    $$
+    \\href{./#var__labourprod_damage_costs_net}{\\text{net damages}_{\\text{labourprod},t,r}}
+    = \\href{./#var__labourprod_damage_costs}{\\text{damages}_{\\text{labourprod},t,r}}
+    + \\href{./#var__labourprod_damage_costs_benefits}{\\text{benefits}_{\\text{labourprod},t,r}}
+    $$
 
     <div class="grid cards" markdown>
 
@@ -73,6 +97,20 @@ def get_constraints(
             ![Regional damage costs (without adaptation)](../../assets/fig/accreu/labourprod_adapt_eff.png)
 
 
+    <div class="tiny_table table_scrollable extra_small" markdown>
+
+    | Variables created in this module: |
+    | --------------------------------- |
+    | var::labourprod_damage_costs_gross |
+    | var::labourprod_damage_costs_benefits |
+    | var::labourprod_adaptation_costs_abs |
+    | var::labourprod_adaptation_costs |
+    | var::labourprod_adaptation_level |
+    | var::labourprod_damage_costs |
+    | var::labourprod_damage_costs_net |
+
+    </div>
+
     """
 
     constraints = []
@@ -91,7 +129,12 @@ def get_constraints(
     setattr(
         m,
         damage_cost_gross_var_name,
-        Var(m.t, m.regions, units=quant.unit("fraction_of_GDP")),
+        Var(
+            m.t,
+            m.regions,
+            units=quant.unit("fraction_of_GDP"),
+            doc="Gross damages from heat-related labour productivity loss (e.g. hot regions get hotter), without adaptation",
+        ),
     )
 
     m.labourprod_damages_gross_constant = Param(
@@ -111,7 +154,10 @@ def get_constraints(
     ## Benefits from less cooling demand due to higher temperatures (negative damages):
 
     m.labourprod_damage_costs_benefits = Var(
-        m.t, m.regions, units=quant.unit("fraction_of_GDP")
+        m.t,
+        m.regions,
+        units=quant.unit("fraction_of_GDP"),
+        doc="Benefits from reduced cold days for labour productivity (e.g. cold regions get less cold). No adaptation is applied to these benefits, as they are not related to heat stress.",
     )
 
     m.labourprod_damages_benefits_constant = Param(
@@ -135,16 +181,27 @@ def get_constraints(
             m.t,
             m.regions,
             units=quant.unit("currency_unit"),
+            doc="Adaptation costs for labour productivity (absolute values) (applied only to heat-related damages, not cold-related benefits)",
             bounds=lambda m, t, r: (0, 0.1 * m.baseline_GDP[t, r]),
         )
         m.labourprod_adaptation_costs = Var(
-            m.t, m.regions, units=quant.unit("fraction_of_GDP")
+            m.t,
+            m.regions,
+            units=quant.unit("fraction_of_GDP"),
+            doc="Adaptation costs for labour productivity (as a fraction of GDP) (applied only to heat-related damages, not cold-related benefits)",
         )
         m.labourprod_adaptation_level = Var(
-            m.t, m.regions, units=quant.unit("fraction_of_gross_damages"), bounds=(0, 1)
+            m.t,
+            m.regions,
+            units=quant.unit("fraction_of_gross_damages"),
+            bounds=(0, 1),
+            doc="Adaptation level for labour productivity (applied only to heat-related damages, not cold-related benefits)",
         )
         m.labourprod_damage_costs = Var(
-            m.t, m.regions, units=quant.unit("fraction_of_GDP")
+            m.t,
+            m.regions,
+            units=quant.unit("fraction_of_GDP"),
+            doc="Residual damages for labour productivity after adaptation (heat-related component only)",
         )
 
         m.labourprod_adaptation_max_effectiveness = Param(
@@ -215,7 +272,10 @@ def get_constraints(
         ## Net damages (costs + negative benefits):
 
         m.labourprod_damage_costs_net = Var(
-            m.t, m.regions, units=quant.unit("fraction_of_GDP")
+            m.t,
+            m.regions,
+            units=quant.unit("fraction_of_GDP"),
+            doc="Sum of heat-related residual damages and cold-related benefits for labour productivity (net damages)",
         )
 
         constraints.append(
@@ -230,12 +290,28 @@ def get_constraints(
 
 
 def gross_dmg_fct_labourprod(m, t, r):
+    """
+    The heat-related gross damage costs are fitted using a linear function of global temperature, shifted to 0 at the start year.
+
+    $$
+        \\href{./#var__labourprod_damage_costs_gross}{\\text{gross damages}_{\\text{labourprod},t,r}}
+        = (a_{r, \\text{heat}} + b_{r, \\text{heat}} \\cdot \\href{./#var__temperature}{T_t}) - (a_{r, \\text{heat}} + b_{r, \\text{heat}} \\cdot \\href{./#var__temperature}{T_0}).
+    $$
+    """
     a = m.labourprod_damages_gross_constant[r]
     b = m.labourprod_damages_gross_linear[r]
     return dmg_fct_linear(m, t, a, b) * m.damage_scale_factor
 
 
 def benefits_dmg_fct_labourprod(m, t, r):
+    """
+    The cold-related benefits of climate chnage are also fitted using a linear function of global temperature, and shifted to 0 at the start year.
+
+    $$
+        \\href{./#var__labourprod_damage_costs_benefits}{\\text{benefits}_{\\text{labourprod},t,r}}
+        = (a_{r, \\text{cold}} + b_{r, \\text{cold}} \\cdot \\href{./#var__temperature}{T_t}) - (a_{r, \\text{cold}} + b_{r, \\text{cold}} \\cdot \\href{./#var__temperature}{T_0}).
+    $$
+    """
     a = m.labourprod_damages_benefits_constant[r]
     b = m.labourprod_damages_benefits_linear[r]
     return dmg_fct_linear(m, t, a, b) * m.damage_scale_factor
