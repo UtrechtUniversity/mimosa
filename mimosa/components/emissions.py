@@ -109,7 +109,7 @@ def _get_emissions_constraints(
     There are two ways to calculate baseline emissions: either directly imported exogenously from
     the SSP scenarios, or calculated from the baseline carbon intensity from the SSPs. The latter
     accounts for the fact that in the absence of climate policy, baseline emissions would go down if
-    the GDP goes down, and vice versa. This can be chosen with the parameter [`use_baseline_carbon_intensity`](../parameters.md#emissions.baseline carbon intensity).
+    the GDP goes down, and vice versa. This can be chosen with the parameter [`use_baseline_carbon_intensity`](#param__emissions.baseline%20carbon%20intensity).
     If this parameter is set to true, baseline emissions are calculated as:
 
     $$
@@ -149,7 +149,7 @@ def _get_emissions_constraints(
 
     which are used to calculate the cumulative emissions. There are two ways to calculate them:
     using trapezoidal integration or by simply adding up all the years. The former is more accurate,
-    while the latter is numerically more stable. This is chosen with the parameter [`cumulative_emissions_trapz`](../parameters.md#emissions.cumulative_emissions_trapz).
+    while the latter is numerically more stable. This is chosen with the parameter [`cumulative_emissions_trapz`](#param__emissions.cumulative_emissions_trapz).
 
     === "Trapezoidal integration `default`"
 
@@ -341,11 +341,11 @@ def _get_temperature_constraints(
     showed that this performed better than the default two-box DICE climate module.
 
     $$
-    \\href{./#var__temperature}{\\text{temperature}_{t}} = T_0 + \\text{TCRE} \\cdot \\href{./#var__global_cumulative_emissions}{\\text{cumulative emissions}_{t}},
+    \\href{./#var__temperature}{\\text{temperature}_{t}} = \\href{./#param__temperature.initial}{T_0} + \\href{./#param__temperature.TCRE}{\\text{TCRE}} \\cdot \\href{./#var__global_cumulative_emissions}{\\text{cumulative emissions}_{t}},
     $$
 
-    where [$T_0$](../parameters.md#temperature.initial) is the initial temperature at the start of the run (2025 by default),
-    and the [TCRE](../parameters.md#temperature.TCRE) is the Transient Climate Response to CO<sub>2</sub> Emissions.
+    where [$T_0$](#param__temperature.initial) is the initial temperature at the start of the run (2025 by default),
+    and the [TCRE](#param__temperature.TCRE) is the Transient Climate Response to CO<sub>2</sub> Emissions.
 
     The initial temperature is set to 1.27°C in 2025 by default. Temperature is expressed as warming above
     pre-industrial levels, following the interpretation discussed by
@@ -386,13 +386,13 @@ def _get_temperature_constraints(
 
     ## Temperature target
     The usual way to specify a policy target in MIMOSA is using carbon budgets. However, it is also possible to
-    specify a temperature target. This is done by setting the parameter [`temperature_target`](../parameters.md#temperature.target).
+    specify a temperature target. This is done by setting the parameter [`temperature_target`](#param__temperature.target).
     This is an upper bound on the temperature: if the cost-optimal temperature is below this value, this constraint is not binding.
 
     If this parameter is set, the following constraint is active:
 
     $$
-    \\href{./#var__temperature}{\\text{temperature}_{t}} \\leq \\text{temperature target}
+    \\href{./#var__temperature}{\\text{temperature}_{t}} \\leq \\href{./#param__temperature.target}{\\text{temperature target}}
     $$
 
     ## Parameters defined in this module
@@ -466,21 +466,21 @@ def _get_inertia_and_budget_constraints(
     ## Carbon budget
 
     By default, the carbon budget is set to `False`, which means that MIMOSA runs in CBA mode without carbon budget.
-    If a carbon budget is defined using the parameter [`carbonbudget`](../parameters.md#emissions.carbonbudget), the following constraint is active:
+    If a carbon budget is defined using the parameter [`carbonbudget`](#param__emissions.carbonbudget), the following constraint is active:
 
     $$
     \\href{./#var__global_cumulative_emissions}{\\text{cumulative emissions}_{t}} - \\text{budget} \\leq 0,
     $$
 
-    for $t \\geq 2100$. Note that the [`carbonbudget`](../parameters.md#emissions.carbonbudget) parameter unit should be
+    for $t \\geq 2100$. Note that the [`carbonbudget`](#param__emissions.carbonbudget) parameter unit should be
     in GtCO<sub>2</sub> (or TtCO<sub>2</sub> or MtCO<sub>2</sub>).
 
     ## Inertia
 
     In MIMOSA, there is a limit on how fast emissions can be reduced. This constraint is called inertia, and represents the
     technological, social, political and economic difficulties of quickly reducing emissions. It is implemented as a hard limit
-    on the speed of emission reductions. The parameters [`inertia_global`](../parameters.md#emissions.inertia.global) and
-    [`inertia_regional`](../parameters.md#emissions.inertia.regional) are defined as percentages of baseline emissions in the
+    on the speed of emission reductions. The parameters [`inertia_global`](#param__emissions.inertia.global) and
+    [`inertia_regional`](#param__emissions.inertia.regional) are defined as percentages of baseline emissions in the
     initial year. If baseline emissions in a region are 10 GtCO<sub>2</sub>/yr in the initial year, and the global inertia is 5%,
     then the global emissions cannot be reduced by more than 0.5 GtCO<sub>2</sub>/yr throughout the whole run. This way, the parameter
     is independent of the size of the region.
@@ -498,7 +498,7 @@ def _get_inertia_and_budget_constraints(
         \\text{scaling factor} = \\left( \\sum_r \\href{./#var__baseline_emissions}{\\text{baseline emissions}_{t=0,r}}\\right)
         $$
 
-        By default, the [`inertia_global`](../parameters.md#emissions.inertia.global) is set to `False`, such that there is no global inertia
+        By default, the [`inertia_global`](#param__emissions.inertia.global) is set to `False`, such that there is no global inertia
         constraint. The only inertia constraint happens regionally by default.
 
     === "Regional inertia"
@@ -507,7 +507,7 @@ def _get_inertia_and_budget_constraints(
         \\href{./#var__regional_emissions}{\\text{regional emissions}_{t,r}} - \\href{./#var__regional_emissions}{\\text{regional emissions}_{t-1,r}} \\geq \\Delta t \\cdot \\text{inertia_regional} \\cdot \\href{./#var__baseline_emissions}{\\text{baseline emissions}_{t=0,r}}.
         $$
 
-        By default, the [`inertia_regional`](../parameters.md#emissions.inertia.regional) parameter is active, such that regional emissions cannot be reduced by more than 5% of the initial baseline emissions per year. This is
+        By default, the [`inertia_regional`](#param__emissions.inertia.regional) parameter is active, such that regional emissions cannot be reduced by more than 5% of the initial baseline emissions per year. This is
         based on maximum reduction speeds in scenarios underpinning the IPCC Special Report on Global Warming
         of 1.5°C, as analysed by [Hof et al. (2021)](https://doi.org/10.3389/fclim.2021.785577).
 
@@ -542,14 +542,14 @@ def _get_inertia_and_budget_constraints(
     \\href{./#var__regional_emissions}{\\text{regional emissions}_{t,r}} - \\href{./#var__regional_emissions}{\\text{regional emissions}_{t-1,r}} \\leq 0, \\text{if } t - 1 > 2100,
     $$
 
-    if the parameter [`non_increasing_emissions_after_2100`](../parameters.md#emissions.non increasing emissions after 2100) is set to `True`.
+    if the parameter [`non_increasing_emissions_after_2100`](#param__emissions.non%20increasing%20emissions%20after%202100) is set to `True`.
 
     When a carbon budget is imposed, it is also possible to impose a net-zero emissions constraint after the budget year (2100):
 
     $$
     \\href{./#var__global_emissions}{\\text{global emissions}_{t}} \\leq 0, \\text{if } t \\geq 2100,
     $$
-    if the parameter [`no_pos_emissions_after_budget_year`](../parameters.md#emissions.not positive after budget year) is set to `True`,
+    if the parameter [`no_pos_emissions_after_budget_year`](#param__emissions.not%20positive%20after%20budget%20year) is set to `True`,
     **and** if a carbon budget is specified. Otherwise, this constraint is ignored.
 
 

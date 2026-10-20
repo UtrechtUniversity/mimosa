@@ -50,11 +50,11 @@ def get_constraints(
 
     ## Investments and consumption
 
-    This net GDP is then split in a part of investments ($\\href{./#var__investments}{I_t}$) and a part of consumption ($\\href{./#var__consumption}{C_t}$), according to a fixed savings rate ($\\text{sr}$):
+    This net GDP is then split in a part of investments ($\\href{./#var__investments}{I_t}$) and a part of consumption ($\\href{./#var__consumption}{C_t}$), according to a fixed savings rate ($\\href{./#param__economics.GDP.savings rate}{\\text{sr}}$):
 
-    $$ \\href{./#var__investments}{I_{t,r}} = \\text{sr} \\cdot \\href{./#var__GDP_net}{\\text{GDP}_{\\text{net},t,r}}, $$
+    $$ \\href{./#var__investments}{I_{t,r}} = \\href{./#param__economics.GDP.savings rate}{\\text{sr}} \\cdot \\href{./#var__GDP_net}{\\text{GDP}_{\\text{net},t,r}}, $$
 
-    $$ \\href{./#var__consumption}{C_{t,r}} = (1 - \\text{sr}) \\cdot \\href{./#var__GDP_net}{\\text{GDP}_{\\text{net},t,r}}. $$
+    $$ \\href{./#var__consumption}{C_{t,r}} = (1 - \\href{./#param__economics.GDP.savings rate}{\\text{sr}}) \\cdot \\href{./#var__GDP_net}{\\text{GDP}_{\\text{net},t,r}}. $$
 
     ## Capital stock
 
