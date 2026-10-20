@@ -64,7 +64,7 @@ def _get_mac_constraints(
     \\text{MAC}_t(a) = \\left( \\gamma \\cdot a^{\\beta}\\right) \\cdot \\href{./#var__learning_factor}{\\text{learning factor}_t}.
     $$
 
-    The parameters $\\gamma$ ([`MAC_gamma`](../parameters.md#economics.MAC.gamma)) and $\\beta$ ([`MAC_beta`](../parameters.md#economics.MAC.beta))
+    The parameters $\\gamma$ ([`MAC_gamma`](#param__economics.MAC.gamma)) and $\\beta$ ([`MAC_beta`](#param__economics.MAC.beta))
     are calibrated using the IPCC AR6 WG3 report. The learning factor depends on learning by doing and learning over time
     (see the tab "Technological learning").
 
@@ -174,7 +174,7 @@ def _get_mac_constraints(
     $$
 
     When emission trading is allowed, some regions may even have negative mitigation costs. How negative this can become can
-    be configured with the parameter [`rel_mitigation_costs_min_level`](../parameters.md#economics.MAC.rel_mitigation_costs_min_level).
+    be configured with the parameter [`rel_mitigation_costs_min_level`](#param__economics.MAC.rel_mitigation_costs_min_level).
 
     $$
     \\href{./#var__mitigation_costs}{\\text{mitigation costs}_{t,r}} \\geq \\text{mitigation costs min level}.
@@ -344,11 +344,11 @@ def _get_learning_constraints(
     \\href{./#var__LBD_factor}{\\text{LBD factor}_t} = \\left( \\xi \\cdot \\text{cumulative mitigation}_t + 1 \\right)^{\\log_2(\\rho)},
     $$
 
-    with $\\rho$ ([`LBD_rate`](../parameters.md#economics.MAC.LBD_rate)) the progress ratio (i.e., the reduction in
+    with $\\rho$ ([`LBD_rate`](#param__economics.MAC.LBD_rate)) the progress ratio (i.e., the reduction in
     costs for doubling cumulative mitigation capacity) representing empirical studies of endogenous technological
     learning (see <https://www.frontiersin.org/articles/10.3389/fclim.2021.785577/full>).
 
-    $\\xi$ ([`LBD_scaling`](../parameters.md#economics.MAC.LBD_scaling)) is a scaling factor
+    $\\xi$ ([`LBD_scaling`](#param__economics.MAC.LBD_scaling)) is a scaling factor
     to transform the units of cumulative mitigation in relative terms (compared to baseline emissions in $t=0$).
 
     The cumulative mitigation is equal to:
@@ -367,7 +367,7 @@ def _get_learning_constraints(
     \\href{./#var__LOT_factor}{\\text{LOT factor}_t} = \\frac{1}{(1 + \\lambda)^t},
     $$
 
-    with $\\lambda$ ([`LOT_rate`](../parameters.md#economics.MAC.LOT_rate)) the learning rate. By default, the learning over time
+    with $\\lambda$ ([`LOT_rate`](#param__economics.MAC.LOT_rate)) the learning rate. By default, the learning over time
     rate is zero, so no learning over time is assumed.
 
     ## Parameters defined in this module

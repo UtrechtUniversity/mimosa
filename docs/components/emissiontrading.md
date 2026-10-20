@@ -7,7 +7,7 @@ variable_context: emissiontrade
 
 Without emission trading, the reductions and mitigation costs attributed to a region are the reductions and costs that physically occur within that region. Emission trading allows this attribution to differ, for example because reductions are cheaper elsewhere or because an [effort-sharing regime](effortsharing.md) assigns a different distribution of emission allowances.
 
-The emission trading module can be chosen using the parameter [`emissiontrade module`](../parameters.md#model structure.emissiontrade module).
+The emission trading module can be chosen using the parameter [`emissiontrade module`](#param__model%20structure.emissiontrade%20module).
 
 ## Physical and attributed reductions and costs
 

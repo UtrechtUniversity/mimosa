@@ -8,7 +8,7 @@ Effort-sharing regimes can be used to enforce the redistribution of mitigation e
 regions following pre-defined equity principles. By default, in MIMOSA, no effort-sharing regime is imposed.
 
 Besides no regime at all, there are five effort-sharing regimes implemented in MIMOSA. The regime can be
-selected using the [`effortsharing module`](../parameters.md#model structure.effortsharing module) parameter.
+selected using the [`effortsharing module`](#param__model%20structure.effortsharing%20module) parameter.
 
 === "No regime `default`"
 

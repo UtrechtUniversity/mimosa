@@ -157,6 +157,8 @@ nav.md-nav a[target=_blank]::after {
 
 a[href*="parameters/#"] code,
 a[href*="parameters/#"]:not(:has(code)),
+a[href*="param__"] code,
+a[href*="param__"]:not(:has(code)),
 a[href*="variables/#"] code,
 a[href*="variables/#"]:not(:has(code)),
 a[href^="#var__"] code,
@@ -167,7 +169,9 @@ a[href^="#var__"]:not(:has(code)) {
 }
 
 a[href*="parameters/#"] code::before,
-a[href*="parameters/#"]:not(:has(code))::before {
+a[href*="parameters/#"]:not(:has(code))::before,
+a[href*="param__"] code::before,
+a[href*="param__"]:not(:has(code))::before {
     content: "";
     height: .9rem;
     width: .9rem;
@@ -194,8 +198,10 @@ a[href^="#var__"]:not(:has(code))::before {
     mask-image: var(--md-admonition-icon--variable)
 }
 
-/* Equation links keep their mathematical spacing, without a variable icon. */
-mjx-container a[href*="#var__"] {
+/* Equation links keep their mathematical spacing, without reference icons. */
+mjx-container a[href*="#var__"],
+mjx-container a[href*="param__"],
+mjx-container a[href*="parameters/#"] {
     padding: 0;
     &::before { content: none; }
 }

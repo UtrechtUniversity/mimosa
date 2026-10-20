@@ -4,6 +4,7 @@ import yaml
 import sys, os
 import pandas as pd
 from html import escape
+from urllib.parse import quote
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../../"))
 
@@ -241,7 +242,8 @@ def on_page_content(html, **kwargs):
                     keys = param.doc.split("::")[1].split(".")
                     keys_param_format = "".join([f'["{key}"]' for key in keys])
                     doc = get_nested(parser_tree, keys).to_string()
-                    formatted_text = f"<a href='../../parameters/#{param.doc.split('::')[1]}'><code>params{keys_param_format}</code></a>: {doc}"
+                    target = quote(param.doc.split("::")[1], safe=".")
+                    formatted_text = f"<a href='#param__{target}'><code>params{keys_param_format}</code></a>: {doc}"
             html = html.replace(match, formatted_text)
 
         except AttributeError:
@@ -255,7 +257,8 @@ def on_page_content(html, **kwargs):
             keys = param_key_str.split(".")
             keys_param_format = "".join([f'["{key}"]' for key in keys])
             doc = get_nested(parser_tree, keys).to_string()
-            formatted_text = f"<a href='../../parameters/#{param_key_str}'><code>params{keys_param_format}</code></a>: {doc}"
+            target = quote(param_key_str, safe=".")
+            formatted_text = f"<a href='#param__{target}'><code>params{keys_param_format}</code></a>: {doc}"
             html = html.replace(match, formatted_text)
 
         except AttributeError:

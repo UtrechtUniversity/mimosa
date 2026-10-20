@@ -16,6 +16,14 @@ hover or keyboard focus. This includes ordinary Markdown links and generated
 reuse the rendered reference HTML, fetched and parsed once on demand, and keep
 enum assignment copy buttons. No additional model construction is needed.
 
+Use `[TCRE](#param__temperature.TCRE)` in text and
+`\href{./#param__temperature.TCRE}{\text{TCRE}}` in equations. These links work
+at any page depth. The browser resolves them to the parameter-reference URL on
+hover, keyboard focus or click, preserving native navigation and modified clicks.
+Opening a page directly with a `#param__...` fragment redirects to the reference
+entry without adding a browser-history entry. Existing links to the parameter
+reference still work. Equations need no special build-time URL rewriting.
+
 ## Variable catalogue
 
 [`docs/scripts/variable_docs.py`](docs/scripts/variable_docs.py) collects variable

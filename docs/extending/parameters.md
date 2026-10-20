@@ -43,7 +43,7 @@ The three configurable input types are described below:
 
 ## 1. Parameters from config file: non-regional parameters {id="config-params"}
 
-Parameters read from configuration have an entry in the `config_default.yaml` file (located in the folder [`mimosa/inputdata/config/`]({{config.repo_url}}/tree/master/mimosa/inputdata/config/config_default.yaml)). This defines the type of the parameter (numerical, boolean, string, etc.), the default value, and the range of possible values. For example, the following entry defines the parameter [`economics - PRTP`](../parameters.md#economics.PRTP):
+Parameters read from configuration have an entry in the `config_default.yaml` file (located in the folder [`mimosa/inputdata/config/`]({{config.repo_url}}/tree/master/mimosa/inputdata/config/config_default.yaml)). This defines the type of the parameter (numerical, boolean, string, etc.), the default value, and the range of possible values. For example, the following entry defines the parameter [`economics - PRTP`](#param__economics.PRTP):
 
 ```yaml title="mimosa/inputdata/config/config_default.yaml"
 ...
@@ -137,7 +137,7 @@ Initializing their value is done in three steps:
     -------
 
 
-2. **Register this regional parameter file** in the configuration file under the key [`regional_parameter_files`](../parameters.md#regional_parameter_files):
+2. **Register this regional parameter file** in the configuration file under the key [`regional_parameter_files`](#param__regional_parameter_files):
 
     ```yaml title="mimosa/inputdata/config/config_default.yaml"
     ...
@@ -156,9 +156,9 @@ Initializing their value is done in three steps:
     ??? info "What if my parameter values have a different regional resolution?"
 
         Give every regional parameter file a `regionstype` describing the regions in its `region`
-        column. If this differs from the model's selected [`regionstype`](../parameters.md#regionstype),
+        column. If this differs from the model's selected [`regionstype`](#param__regionstype),
         MIMOSA looks for a conversion table registered under
-        [`regionsmappings`](../parameters.md#regionsmappings):
+        [`regionsmappings`](#param__regionsmappings):
 
         ```yaml title="mimosa/inputdata/config/config_default.yaml"
         regionsmappings:
@@ -238,8 +238,8 @@ The `file` field should point to the IAMC formatted data file. The IAMC format i
 
 ???+ info "Configuration values dependent on other parameter values"
 
-    In the example above, the name of the scenario depends on the [`SSP`](../parameters.md#SSP). Every string in the configuration file can contain references
-    to other parameters, and are referred to using curly brackets `{}`. If you want to refer to a nested parameter (like [`model structure > effortsharing module`](../parameters.md#model structure.effortsharing module)), they should be joined
+    In the example above, the name of the scenario depends on the [`SSP`](#param__SSP). Every string in the configuration file can contain references
+    to other parameters, and are referred to using curly brackets `{}`. If you want to refer to a nested parameter (like [`model structure > effortsharing module`](#param__model%20structure.effortsharing%20module)), they should be joined
     with ` - `:
 
     ```yaml

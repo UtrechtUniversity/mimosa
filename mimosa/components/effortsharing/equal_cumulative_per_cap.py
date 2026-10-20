@@ -156,8 +156,8 @@ def _calc_debt(m, r, all_emissions, all_population):
 
     where you can set the following parameters:
 
-    * $\\text{start year}$ using [`params["effort sharing"]["ecpc_start_year"]`](../parameters.md#effort sharing.ecpc_start_year) (default: 1850),
-    * $\\text{discount rate}$ using [`params["effort sharing"]["ecpc_discount_rate"]`](../parameters.md#effort sharing.ecpc_discount_rate) (default: 3%/yr).
+    * $\\text{start year}$ using [`params["effort sharing"]["ecpc_start_year"]`](#param__effort%20sharing.ecpc_start_year) (default: 1850),
+    * $\\text{discount rate}$ using [`params["effort sharing"]["ecpc_discount_rate"]`](#param__effort%20sharing.ecpc_discount_rate) (default: 3%/yr).
 
     The historical debt is therefore positive for regions that emitted more than their fair share of cumulative emissions per capita, and negative for regions that emitted less than their fair share:
 

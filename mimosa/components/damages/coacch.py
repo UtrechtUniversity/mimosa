@@ -28,7 +28,7 @@ def get_constraints(
     of global mean temperature above pre-industrial), and sea-level rise damages (SLR, as function of global mean
     sea-level rise in meters):
 
-    With [combined damages](../../parameters.md#economics.damages.coacch_combined_slr_nonslr_damages),
+    With [combined damages](#param__economics.damages.coacch_combined_slr_nonslr_damages),
     the temperature-dependent curve includes SLR impacts and the separate SLR damage term is zero.
 
     $$
@@ -113,7 +113,7 @@ def get_constraints_temperature_dependent(
     * The COACCH damage functions were created as function of temperature relative to 1986-2005, which is 0.6°C above pre-industrial.
         For this reason, the temperature is shifted by 0.6°C.
     * The damages are scaled by a factor $a_{q,r}$, which depends on the quantile $q$ of the damage function. This represents the uncertainty
-        in the damage function. For median damages, this factor is $a_{0.5,r} = 1$. The quantile can be set using the [damage quantile parameter](../../parameters.md#economics.damages.quantile).
+        in the damage function. For median damages, this factor is $a_{0.5,r} = 1$. The quantile can be set using the [damage quantile parameter](#param__economics.damages.quantile).
     * Since we assume that until 2020 the climate damages are already incorporated in the baseline GDP,
         we subtract the damages of the initial time period $t=0$.
 
@@ -210,7 +210,7 @@ def get_constraints_slr(
 
     The SLR damages are calculated with the DIVA impact model (see [Impact sectors used in the damage functions](coacch.md#impact-sectors-used-in-the-damage-functions)).
     These damages are available either with optimal adaptation (and include adaptation costs), or without adaptation. This can be
-    chosen with the parameter [coacch_slr_withadapt](../../parameters.md#economics.damages.coacch_slr_withadapt). By default, the optimal
+    chosen with the parameter [coacch_slr_withadapt](#param__economics.damages.coacch_slr_withadapt). By default, the optimal
     adaptation case is used.
 
     Depending on the region, the SLR damages are modelled with different functional forms following from a best-fit regression. The
@@ -237,7 +237,7 @@ def get_constraints_slr(
 
     * Similar to temperature-dependent damages, the SLR damages are scaled by a factor $a_{q,r}$, which depends on the quantile $q$ of the damage function.
         This represents the uncertainty in the damage function. For median damages, this factor is $a_{0.5,r} = 1$. The quantile can be set using the
-        [damage quantile parameter](../../parameters.md#economics.damages.quantile).
+        [damage quantile parameter](#param__economics.damages.quantile).
     * Since we assume that until 2020 the climate damages are already incorporated in the baseline GDP,
         we subtract the damages of the initial time period $t=0$.
 

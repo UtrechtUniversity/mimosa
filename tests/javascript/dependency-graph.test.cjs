@@ -384,6 +384,12 @@ for (const prefix of ["", "/mimosa"]) {
         await new Promise(setImmediate);
         assert.deepEqual(selections.at(-1), ["coacch", "damage_costs"]);
         assert.equal(opens, 3);
+        const redirects = [];
+        context.location.replace = url => redirects.push(url);
+        context.location.hash = "#param__temperature.TCRE";
+        context.window.dispatchEvent(new Event("hashchange"));
+        assert.deepEqual(redirects, [`https://example.org${prefix}/parameters/#temperature.TCRE`]);
+        assert.equal(opens, 3);
     });
 }
 
@@ -436,7 +442,12 @@ function documentationTooltips({ waitForReference, localReference = false, local
     vm.runInContext(source, context);
     const controller = context.initializeReferenceLinkTooltips(content, "accreu_sectoral");
     function link(hash, href = `https://example.org${sitePrefix}/parameters/${hash}`) {
-        const anchor = Object.assign(element(), { hash, href });
+        const anchor = element();
+        let url = new URL(href);
+        Object.defineProperties(anchor, {
+            hash: { get: () => url.hash },
+            href: { get: () => url.href, set: value => { url = new URL(value); } },
+        });
         anchor.contains = node => node === anchor || node?.parentLink === anchor;
         return anchor;
     }
@@ -567,6 +578,34 @@ test("touch, unavailable entries and disposed page listeners do not open link ca
 });
 
 for (const sitePrefix of ["", "/mimosa"]) {
+    test(`parameter shorthand in text and late equation links resolves at ${sitePrefix || "/"}`, async () => {
+        const page = documentationTooltips({ sitePrefix });
+        const base = `https://example.org${sitePrefix}`;
+        // These stand in for a Markdown anchor and a later MathJax anchor on a deep page.
+        const initial = page.link("#mimosa.components.emissions._get_temperature_constraints--param__temperature.initial", `${base}/components/damages/accreu/#mimosa.components.emissions._get_temperature_constraints--param__temperature.initial`);
+        page.event("pointerover", initial);
+        await page.tick(250);
+        assert.equal(initial.href, `${base}/parameters/#temperature.initial`);
+        assert.equal(page.tooltip.children[0].entry, "temperature.initial");
+
+        const tcre = page.link("#param__temperature.TCRE", `${base}/components/emissions/#param__temperature.TCRE`);
+        page.context.document.activeElement = tcre;
+        page.event("focusin", tcre);
+        await page.tick(0);
+        assert.equal(tcre.href, `${base}/parameters/#temperature.TCRE`);
+        assert.equal(page.tooltip.children[0].entry, "temperature.TCRE");
+        assert.deepEqual(page.requests, [`${base}/parameters/`]);
+
+        const choice = page.link("#param__model%20structure.damage%20module", `${base}/#param__model%20structure.damage%20module`);
+        const click = Object.assign(new Event("click", { cancelable: true }), { ctrlKey: true });
+        Object.defineProperty(click, "target", { value: { closest: () => choice } });
+        page.content.dispatchEvent(click);
+        assert.equal(choice.href, `${base}/parameters/#model%20structure.damage%20module`);
+        assert.equal(click.defaultPrevented, false);
+        assert.equal(page.parsed(), 1);
+        page.controller.destroy();
+    });
+
     test(`parameter links show expanded cards and cache their reference at ${sitePrefix || "/"}`, async () => {
         const page = documentationTooltips({ sitePrefix });
         const initial = page.link("#temperature.initial");

@@ -60,9 +60,9 @@ In the dashboard, a lot of information is already shown in the various tabs. You
 
 Rerun MIMOSA with different parameters. Have a look at the [parameter reference](../../parameters.md) to see which parameters you can change. Interesting parameters could be:
 
-- [`params["economics"]["PRTP"]`](../../parameters.md#economics.PRTP): The discount rate (pure rate of time preference). Choose values between 0.01 (low end) and 0.03 (high end). The default is 0.015 (corresponding to 1.5%/year).
-- [`params["economics"]["damages"]["quantile"]`](../../parameters.md#economics.damages.quantile): The quantile of the damages distribution. Choose values between 0.05 (low end) and 0.95 (high end). The default is 0.5 (corresponding to the median).
-- [`params["temperature"]["TCRE"]`](../../parameters.md#temperature.TCRE): The transient climate response to cumulative emissions. Choose values between 0.42 (low end) and 0.82 (high end). The default is 0.62&nbsp;&deg;C/TtCO<sub>2</sub> (corresponding to the median).
+- [`params["economics"]["PRTP"]`](#param__economics.PRTP): The discount rate (pure rate of time preference). Choose values between 0.01 (low end) and 0.03 (high end). The default is 0.015 (corresponding to 1.5%/year).
+- [`params["economics"]["damages"]["quantile"]`](#param__economics.damages.quantile): The quantile of the damages distribution. Choose values between 0.05 (low end) and 0.95 (high end). The default is 0.5 (corresponding to the median).
+- [`params["temperature"]["TCRE"]`](#param__temperature.TCRE): The transient climate response to cumulative emissions. Choose values between 0.42 (low end) and 0.82 (high end). The default is 0.62&nbsp;&deg;C/TtCO<sub>2</sub> (corresponding to the median).
 
 !!! question "Question 3: sensitivity analysis"
 
@@ -87,11 +87,11 @@ In the next exercise, you will run MIMOSA with different effort sharing approach
 
         First, choose which effort sharing regime you want to use. You can choose between:
 
-        * [`"equal_mitigation_costs"`](../../parameters.md#model structure.effortsharing module)
-        * [`"equal_total_costs"`](../../parameters.md#model structure.effortsharing module)
-        * [`"per_cap_convergence"`](../../parameters.md#model structure.effortsharing module)
-        * [`"ability_to_pay"`](../../parameters.md#model structure.effortsharing module)
-        * [`"equal_cumulative_per_cap"`](../../parameters.md#model structure.effortsharing module)
+        * [`"equal_mitigation_costs"`](#param__model%20structure.effortsharing%20module)
+        * [`"equal_total_costs"`](#param__model%20structure.effortsharing%20module)
+        * [`"per_cap_convergence"`](#param__model%20structure.effortsharing%20module)
+        * [`"ability_to_pay"`](#param__model%20structure.effortsharing%20module)
+        * [`"equal_cumulative_per_cap"`](#param__model%20structure.effortsharing%20module)
 
         More information about these regimes can be found in [van den Berg et al. (2020)](https://doi.org/10.1007/s10584-019-02368-y) (specifically, [Table 1](https://link.springer.com/article/10.1007/s10584-019-02368-y/tables/1)).
 

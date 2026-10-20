@@ -8,7 +8,7 @@ icon: material/arrow-projectile-multiple
 
 MIMOSA separates the calculation of yearly welfare[^1] from the final optimisation goal. There are three ways to calculate welfare: welfare-loss-minimising, cost-minimising, and a general inequality-aversion setting that connects the first two methods. The objective can then either maximise discounted welfare or minimise discounted global costs.
 
-The welfare module can be chosen using the parameter [`welfare module`](../parameters.md#model structure.welfare module).
+The welfare module can be chosen using the parameter [`welfare module`](#param__model%20structure.welfare%20module).
 
 === "Welfare-loss-minimising `default`"
 
@@ -45,7 +45,7 @@ The welfare module can be chosen using the parameter [`welfare module`](../param
 
 ## Optimisation goal and discounting
 
-The welfare module determines how regional consumption is aggregated into `global_welfare`. The separate [`objective module`](../parameters.md#model structure.objective module) determines what MIMOSA optimises:
+The welfare module determines how regional consumption is aggregated into `global_welfare`. The separate [`objective module`](#param__model%20structure.objective%20module) determines what MIMOSA optimises:
 
 - `utility` (default) maximises discounted `global_welfare`.
 - `globalcosts` minimises discounted mitigation and damage costs.
@@ -87,7 +87,7 @@ $$
 
 and the final `NPV` is minimised. The welfare variables are still calculated in this case, but they do not determine the objective.
 
-[`PRTP`](../parameters.md#economics.PRTP) is the pure rate of time preference. A higher value gives less weight to outcomes further in the future. The factor $\Delta t$ accounts for the number of years represented by each timestep.
+[`PRTP`](#param__economics.PRTP) is the pure rate of time preference. A higher value gives less weight to outcomes further in the future. The factor $\Delta t$ accounts for the number of years represented by each timestep.
 
 The main result variables are:
 

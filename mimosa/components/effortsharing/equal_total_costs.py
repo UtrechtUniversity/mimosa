@@ -61,7 +61,7 @@ def get_constraints(
     Compared to the equal mitigation cost regime, this regime might be infeasible, especially for regions with very high damages, unless:
 
     * (a) the mitigation costs can be negative (for regions with very high damages). This can be achieved with the
-        parameter [`rel_mitigation_costs_min_level`](../parameters.md#economics.MAC.rel_mitigation_costs_min_level).
+        parameter [`rel_mitigation_costs_min_level`](#param__economics.MAC.rel_mitigation_costs_min_level).
 
     * or (b) if financial transfers are allowed between regions, that go beyond emission trading. See [Financial transfers](financialtransfers.md).
 

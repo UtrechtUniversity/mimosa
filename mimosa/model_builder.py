@@ -37,12 +37,12 @@ def create_model(
     Builds the concrete model for MIMOSA by combining all components. Some components are optional. In the
     parameters, different variants of some components can be chosen. The components are:
 
-    - [`damage module`](../parameters.md#model structure.damage module): The damage module to use
-    - [`emissiontrade module`](../parameters.md#model structure.emissiontrade module): The emission trading module to use
-    - [`financialtransfer module`](../parameters.md#model structure.financialtransfer module): The financial transfer module to use
-    - [`welfare module`](../parameters.md#model structure.welfare module): The welfare module to use
-    - [`objective module`](../parameters.md#model structure.objective module): The objective module to use
-    - [`effortsharing module`](../parameters.md#model structure.effortsharing module): The effort-sharing module to use
+    - [`damage module`](#param__model%20structure.damage%20module): The damage module to use
+    - [`emissiontrade module`](#param__model%20structure.emissiontrade%20module): The emission trading module to use
+    - [`financialtransfer module`](#param__model%20structure.financialtransfer%20module): The financial transfer module to use
+    - [`welfare module`](#param__model%20structure.welfare%20module): The welfare module to use
+    - [`objective module`](#param__model%20structure.objective%20module): The objective module to use
+    - [`effortsharing module`](#param__model%20structure.effortsharing%20module): The effort-sharing module to use
 
     """
     m = create_base_model(inputs)

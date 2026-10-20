@@ -28,7 +28,7 @@ Usage:
     model = MIMOSA(params)
     ```
 
-By default, only the damages are considered, without adaptation. Adaptation can be enabled with the parameter [ACCREU adaptation](../../parameters.md#economics.damages.accreu.adaptation) set to `sectoral`. If adaptation is enabled, the regional adaptation costs for each sector become additional control variables (either optimised by the solver, or set by the user in simulation mode). The adaptation costs are then used to reduce the damages in sector $i$ according to the adaptation level:
+By default, only the damages are considered, without adaptation. Adaptation can be enabled with the parameter [ACCREU adaptation](#param__economics.damages.accreu.adaptation) set to `sectoral`. If adaptation is enabled, the regional adaptation costs for each sector become additional control variables (either optimised by the solver, or set by the user in simulation mode). The adaptation costs are then used to reduce the damages in sector $i$ according to the adaptation level:
 
 $$
 \text{damages}_{i,t,r} = \text{gross damages}_{i,t,r} \cdot (1 - \text{adapt. level}_{i,t,r}),

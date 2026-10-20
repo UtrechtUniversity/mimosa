@@ -153,11 +153,14 @@ def test_hooks_and_macros_share_lazy_provider(documentation_model):
     )
 
     macros.define_env(env)
-    html = hooks.on_page_content("param::alpha")
+    html = hooks.on_page_content(
+        "param::alpha manualparam::alpha::economics.GDP.alpha::"
+    )
 
     assert env.variables["example_constraint"] == "Test constraint documentation"
     assert "Alpha description" in html
     assert "param::alpha" not in html
+    assert html.count("href='#param__economics.GDP.alpha'") == 2
     assert documentation_model.calls == [(documentation_model.params, False)]
 
 

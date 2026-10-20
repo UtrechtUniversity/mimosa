@@ -50,7 +50,7 @@ def get_constraints(
 
     The per capita convergence regime allocates equal per capita emission rights to each region, starting
     from a given year (called the convergence year). The convergence year can be set with the parameter
-    [`percapconv_year`](../parameters.md#effort sharing.percapconv_year) and is
+    [`percapconv_year`](#param__effort%20sharing.percapconv_year) and is
     set to 2050 by default. Before this convergence year, the allowances are interpolated
     between grandfathering (the emission distribution in the first model year) and equal per capita
     emission rights in the convergence year.

@@ -21,6 +21,15 @@ function parseDependencyLink(hash, pageContext = "coacch") {
     return { context: context === "default" ? "coacch" : context, variable: parts.at(-1) };
 }
 
+function parameterLinkUrl(hash) {
+    // Mkdocstrings prefixes fragment-only links with the documented function's ID.
+    const match = hash.match(/^#(?:.*--)?param__(.+)$/);
+    if (!match) return null;
+    const url = new URL(parameterReferenceUrl);
+    url.hash = match[1];
+    return url;
+}
+
 let variableReferencePage;
 let parameterReferencePage;
 
@@ -192,6 +201,8 @@ function initializeReferenceLinkTooltips(content, pageContext) {
         const link = event.target.closest("a[href]");
         if (!link || link.contains(event.relatedTarget)) return null;
         if (link.hash.startsWith("#var__")) return link;
+        const parameter = parameterLinkUrl(link.hash);
+        if (parameter) link.href = parameter.href;
         const url = new URL(link.href);
         return url.origin === parameterReferenceUrl.origin &&
             url.pathname === parameterReferenceUrl.pathname && url.hash.length > 1 ? link : null;
@@ -217,6 +228,10 @@ function initializeReferenceLinkTooltips(content, pageContext) {
     }, options);
     content.addEventListener("focusout", leave, options);
     content.addEventListener("click", event => {
+        const link = event.target.closest("a[href]");
+        const parameter = link && parameterLinkUrl(link.hash);
+        // Keep native navigation, including modified clicks, on the resolved URL.
+        if (parameter) link.href = parameter.href;
         if (!tooltip.contains(event.target)) hide();
     }, options);
     window.addEventListener("keydown", event => {
@@ -565,7 +580,10 @@ document$.subscribe(() => {
         openVariable(link.hash);
     });
     function openFromHash() {
-        if (content.isConnected && location.hash.startsWith("#var__")) openVariable(location.hash);
+        if (!content.isConnected) return;
+        const parameter = parameterLinkUrl(location.hash);
+        if (parameter) location.replace(parameter.href);
+        else if (location.hash.startsWith("#var__")) openVariable(location.hash);
     }
     openFromHash();
     window.addEventListener("hashchange", openFromHash);
