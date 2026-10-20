@@ -29,7 +29,13 @@ regional parameter files, grouped by category. It uses a `RegionalParamStore`
 with the default documentation configuration, so values use the same IMAGE26
 mapping and region order as the model. Each entry contains a compact table with
 regions above values; numbers use six significant figures and missing cells show
-an em dash. Regional entries have no hover-link handling yet. The store rereads
+an em dash. Link to a regional entry with
+`[coefficient](#param__regional.ACCREU.riverine_noadapt_ead_linear)` in text or
+`\href{./#param__regional.ACCREU.riverine_noadapt_ead_linear}{b_r}` in equations.
+Include the category to distinguish identically named columns, and URL-encode
+spaces, parentheses and other special characters in column names. These links
+reuse the parameter hover cards, including horizontal scrolling through values.
+Generated `param::` links also recognise regional source metadata. The store rereads
 the CSV files on each documentation rebuild without constructing another model.
 
 ## Variable catalogue

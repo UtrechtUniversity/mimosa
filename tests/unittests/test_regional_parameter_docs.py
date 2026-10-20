@@ -86,6 +86,12 @@ def test_default_reference_covers_all_registered_columns_and_26_image_regions():
         assert len(rows) == 2
         assert rows[0] == list(params["regions"])
         assert len(rows[1]) == 26
+    anchors = [anchor.get("id") for anchor in tree.findall('.//span[@class="param_anchor"]')]
+    assert len(anchors) == len(cards)
+    assert len(set(anchors)) == len(cards)
+    assert "regional.COACCH.NoSLR_b1" in anchors
+    assert "regional.ACCREU_CGE.NoSLR_b1" in anchors
+    assert "regional.COACCH.NoSLR_a (q=0.025)" in anchors
     titles = [card.findtext("summary") for card in cards]
     assert "kappa_rel_abatement_0.75_2050" in titles
     assert "NoSLR_a (q=0.025)" in titles
@@ -105,3 +111,16 @@ def test_hook_expands_regional_marker_only_when_present(monkeypatch, regional_st
     assert REGIONAL_REFERENCE_MARKER not in result
     assert table_rows(rendered_tree(result).find("details")) == [["USA", "CAN"], ["12", "3"]]
     assert calls == [True]
+
+
+def test_regional_parameter_marker_links_to_its_source(monkeypatch):
+    context = SimpleNamespace(
+        model=SimpleNamespace(factor=SimpleNamespace(doc="regional::MAC.kappa_rel_abatement_0.75_2050")),
+        parser_tree={},
+    )
+    monkeypatch.setattr(mkdocs_hooks, "get_documentation_context", lambda: context)
+    result = mkdocs_hooks.on_page_content("<p>param::factor</p>")
+    assert result == (
+        "<p><a href='#param__regional.MAC.kappa_rel_abatement_0.75_2050'>"
+        "<code>factor</code></a></p>"
+    )

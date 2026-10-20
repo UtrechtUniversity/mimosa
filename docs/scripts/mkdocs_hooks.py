@@ -253,8 +253,11 @@ def on_page_content(html, **kwargs):
             param = getattr(model, param_name)
             formatted_text = f"<code>{param_name}</code>"
             if isinstance(param.doc, str):
-                if param.doc.startswith("::"):
-                    # Ignore the regional parameters for now
+                if param.doc.startswith("regional::"):
+                    source = param.doc.split("::", 1)[1]
+                    target = quote(f"regional.{source}", safe=".")
+                    formatted_text = f"<a href='#param__{target}'><code>{param_name}</code></a>"
+                elif param.doc.startswith("::"):
                     keys = param.doc.split("::")[1].split(".")
                     keys_param_format = "".join([f'["{key}"]' for key in keys])
                     doc = get_nested(parser_tree, keys).to_string()
@@ -269,7 +272,6 @@ def on_page_content(html, **kwargs):
     for match, param_title, param_key_str in re.findall(pattern, html):
         try:
             formatted_text = f"<code>{param_title}</code>"
-            # Ignore the regional parameters for now
             keys = param_key_str.split(".")
             keys_param_format = "".join([f'["{key}"]' for key in keys])
             doc = get_nested(parser_tree, keys).to_string()

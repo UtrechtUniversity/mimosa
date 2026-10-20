@@ -32,6 +32,11 @@ def get_constraints(m: ConcreteModel, inputs: ModelInputs, monetise_mortality=Fa
     and cold-related component, varying strongly between regions. As global mean temperature increases,
     the heat-related mortality increases, while the cold-related mortality decreases.
 
+    The regional heat-related curve uses a [constant](#param__regional.ACCREU.heat_related_mortality_perc_constant)
+    and a [temperature coefficient](#param__regional.ACCREU.heat_related_mortality_perc_prod).
+    The cold-related curve has its own [constant](#param__regional.ACCREU.cold_related_mortality_perc_constant)
+    and [temperature coefficient](#param__regional.ACCREU.cold_related_mortality_perc_prod).
+
     The mortality forecasts are sourced from Bressler et al. (2021). The paper forecasts the change in
     future heat-related and cold-related mortality rates under RCP 2.6, RCP 4.5, RCP 6.0 and RCP 8.5 scenarios.
     It does so for the 2040-59 and 2080-99 periods. For this analysis, the estimates for these ranges are assigned

@@ -113,8 +113,8 @@ def _get_mac_constraints(
     $$
     \\begin{align}
     \\href{./#var__carbon_price}{\\text{carbon price}_{t,r}} &= \\text{MAC}_{\\text{regional},t,r}(\\href{./#var__relative_abatement}{a_{t,r}})\\\\
-    &= \\text{regional scaling factor}_{r} \\cdot \\text{MAC}_t(\\href{./#var__relative_abatement}{a_{t,r}})\\\\
-    &= \\text{regional scaling factor}_{r} \\cdot \\left( \\href{./#param__economics.MAC.gamma}{\\gamma} \\cdot \\href{./#var__relative_abatement}{a_{t,r}}^{\\href{./#param__economics.MAC.beta}{\\beta}}\\right) \\cdot \\href{./#var__learning_factor}{\\text{learning factor}_t}.
+    &= \\href{./#param__regional.MAC.kappa_rel_abatement_0.75_2050}{\\text{regional scaling factor}_{r}} \\cdot \\text{MAC}_t(\\href{./#var__relative_abatement}{a_{t,r}})\\\\
+    &= \\href{./#param__regional.MAC.kappa_rel_abatement_0.75_2050}{\\text{regional scaling factor}_{r}} \\cdot \\left( \\href{./#param__economics.MAC.gamma}{\\gamma} \\cdot \\href{./#var__relative_abatement}{a_{t,r}}^{\\href{./#param__economics.MAC.beta}{\\beta}}\\right) \\cdot \\href{./#var__learning_factor}{\\text{learning factor}_t}.
     \\end{align}
     $$
 
@@ -132,9 +132,10 @@ def _get_mac_constraints(
     {"file_path": "./assets/plots/MAC_kappa_rel_abatement_0.75_2050.json"}
     ```
 
-    The values of this regional scaling factor are calibrated using SSP2 MAC curves from the TIMER model (the energy
+    The values of this [regional scaling factor](#param__regional.MAC.kappa_rel_abatement_0.75_2050) are calibrated using SSP2 MAC curves from the TIMER model (the energy
     submodule of IMAGE). By comparing the carbon price per region required to reach 75% CO<sub>2</sub> reduction in 2050 compared to baseline,
-    relative to the world average, we obtain a scaling factor for the MAC.
+    relative to the world average, we obtain a scaling factor for the MAC. The links show this default calibration;
+    alternatives can be selected with [regional calibration factor](#param__economics.MAC.regional%20calibration%20factor).
 
 
     <h3 id="mitigation-costs">Mitigation costs</h3>

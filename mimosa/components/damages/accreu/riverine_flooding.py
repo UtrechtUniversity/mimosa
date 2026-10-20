@@ -231,9 +231,9 @@ def gross_dmg_fct_riverine(m, t, r):
     """
     $$
         \\href{./#var__riverine_damage_costs_gross}{\\text{gross damages}_{\\text{riverine},t,r}}
-        = (a_r + b_r \\cdot \\href{./#var__temperature}{T_t}
-        + c_r \\cdot \\href{./#var__temperature}{T_t}^2) - (a_r + b_r \\cdot \\href{./#param__temperature.initial}{T_0}
-        + c_r \\cdot \\href{./#param__temperature.initial}{T_0}^2).
+        = (\\href{./#param__regional.ACCREU.riverine_noadapt_ead_constant}{a_r} + \\href{./#param__regional.ACCREU.riverine_noadapt_ead_linear}{b_r} \\cdot \\href{./#var__temperature}{T_t}
+        + \\href{./#param__regional.ACCREU.riverine_noadapt_ead_quadr}{c_r} \\cdot \\href{./#var__temperature}{T_t}^2) - (\\href{./#param__regional.ACCREU.riverine_noadapt_ead_constant}{a_r} + \\href{./#param__regional.ACCREU.riverine_noadapt_ead_linear}{b_r} \\cdot \\href{./#param__temperature.initial}{T_0}
+        + \\href{./#param__regional.ACCREU.riverine_noadapt_ead_quadr}{c_r} \\cdot \\href{./#param__temperature.initial}{T_0}^2).
     $$
     """
     a = m.riverine_damages_gross_constant[r]

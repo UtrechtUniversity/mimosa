@@ -230,8 +230,8 @@ def gross_dmg_fct_slr(m, t, r):
     """
     $$
         \\href{./#var__slr_damage_costs_gross}{\\text{gross damages}_{\\text{SLR},t,r}}
-        = (a_r + b_r \\cdot \\href{./#var__total_SLR}{\\text{SLR}_t} {}^ {c_r})
-        - (a_r + b_r \\cdot \\href{./#var__total_SLR}{\\text{SLR}_0} {}^ {c_r})
+        = (\\href{./#param__regional.ACCREU.slr_noadapt_ead_constant}{a_r} + \\href{./#param__regional.ACCREU.slr_noadapt_ead_prod}{b_r} \\cdot \\href{./#var__total_SLR}{\\text{SLR}_t} {}^ {\\href{./#param__regional.ACCREU.slr_noadapt_ead_power}{c_r}})
+        - (\\href{./#param__regional.ACCREU.slr_noadapt_ead_constant}{a_r} + \\href{./#param__regional.ACCREU.slr_noadapt_ead_prod}{b_r} \\cdot \\href{./#var__total_SLR}{\\text{SLR}_0} {}^ {\\href{./#param__regional.ACCREU.slr_noadapt_ead_power}{c_r}})
     $$
     """
     return (

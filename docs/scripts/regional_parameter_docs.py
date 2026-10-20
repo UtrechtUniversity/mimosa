@@ -29,6 +29,7 @@ def render_regional_parameter_reference(store):
             f"### {escape(category)} {{#regional-{quote(category, safe='')}}}\n"
         )
         for name in container.data.columns:
+            target = escape(f"regional.{category}.{name}", quote=True)
             values = store.get(category, name)
             row = "| " + " | ".join(_cell(values[region]) for region in regions) + " |"
             content = (
@@ -37,6 +38,7 @@ def render_regional_parameter_reference(store):
             )
             sections.append(
                 f'??? parameter "{escape(name, quote=True)}"\n\n'
+                f'    <span id="{target}" class="param_anchor"> </span>\n\n'
                 + indent(content, "    ")
                 + "\n"
             )

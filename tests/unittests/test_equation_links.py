@@ -3,11 +3,14 @@
 import ast
 from pathlib import Path
 import re
+from urllib.parse import unquote
 
 import pytest
 import yaml
 
 from docs.scripts.variable_docs import get_variable_catalogue
+from mimosa.common.config.parseconfig import check_params
+from mimosa.common.regional_params import RegionalParamStore
 
 ROOT = Path(__file__).resolve().parents[2]
 INCLUDE = re.compile(r"^\s*:::\s*(mimosa\.[\w.]+)", re.MULTILINE)
@@ -75,3 +78,24 @@ def test_coacch_links_actual_damages_but_not_the_polynomial_definition(docstring
     )
     assert not GRAPH_LINK.search(equations[0])
     assert set(GRAPH_LINK.findall(equations[1])) == {"non_slr_damage_costs", "temperature"}
+
+
+def test_regional_links_in_text_and_equations_match_registered_columns(docstrings):
+    params, parsers = check_params({}, return_parser_tree=True)
+    store = RegionalParamStore(params, parsers)
+    available = {
+        f"{category}.{column}"
+        for category, container in store.categories.items()
+        for column in container.data.columns
+    }
+    contents = list(docstrings.values()) + [
+        path.read_text(encoding="utf-8") for path in (ROOT / "docs").rglob("*.md")
+    ]
+    checked = []
+    for content in contents:
+        for target in re.findall(r"#param__regional\.([^\s})\"]+)", content):
+            target = unquote(target)
+            assert target in available, f"Unknown regional parameter: {target}"
+            checked.append(target)
+    assert any(target.startswith("ACCREU.") for target in checked)
+    assert any("(q=0.5)" in target for target in checked)

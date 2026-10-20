@@ -105,7 +105,7 @@ def get_constraints_temperature_dependent(
     The temperature-dependent damages are modeled as a quadratic damage function $D(\\cdot)$ of global mean temperature:
 
     $$
-    D(x; b_1, b_2) = b_1 \\cdot x + b_2 \\cdot x^2.
+    D(x; \\href{./#param__regional.COACCH.NoSLR_b1}{b_1}, \\href{./#param__regional.COACCH.NoSLR_b2}{b_2}) = \\href{./#param__regional.COACCH.NoSLR_b1}{b_1} \\cdot x + \\href{./#param__regional.COACCH.NoSLR_b2}{b_2} \\cdot x^2.
     $$
 
     To calculate the damages, three transformations have to be taken from the above quadratic equation:
@@ -113,15 +113,18 @@ def get_constraints_temperature_dependent(
     * The COACCH damage functions were created as function of temperature relative to 1986-2005, which is 0.6°C above pre-industrial.
         For this reason, the temperature is shifted by 0.6°C.
     * The damages are scaled by a factor $a_{\\href{./#param__economics.damages.quantile}{q},r}$, which depends on the quantile $\\href{./#param__economics.damages.quantile}{q}$ of the damage function. This represents the uncertainty
-        in the damage function. For median damages, this factor is $a_{0.5,r} = 1$. The quantile can be set using the [damage quantile parameter](#param__economics.damages.quantile).
+        in the damage function. For median damages, this factor is $\\href{./#param__regional.COACCH.NoSLR_a%20%28q%3D0.5%29}{a_{0.5,r}} = 1$. The quantile can be set using the [damage quantile parameter](#param__economics.damages.quantile).
     * Since we assume that until 2020 the climate damages are already incorporated in the baseline GDP,
         we subtract the damages of the initial time period $t=0$.
 
     Combining these three transformations, the damages are calculated as:
 
     $$
-    \\href{./#var__non_slr_damage_costs}{\\text{damages}_{\\text{non-SLR},t,r}} = a_{\\href{./#param__economics.damages.quantile}{q},r} \\cdot \\big( D(\\href{./#var__temperature}{\\text{temperature}_t} - 0.6; b_{1,r}, b_{2,r}) -  D(\\href{./#param__temperature.initial}{T_0} - 0.6; b_{1,r}, b_{2,r}) \\big).
+    \\href{./#var__non_slr_damage_costs}{\\text{damages}_{\\text{non-SLR},t,r}} = a_{\\href{./#param__economics.damages.quantile}{q},r} \\cdot \\big( D(\\href{./#var__temperature}{\\text{temperature}_t} - 0.6; \\href{./#param__regional.COACCH.NoSLR_b1}{b_{1,r}}, \\href{./#param__regional.COACCH.NoSLR_b2}{b_{2,r}}) -  D(\\href{./#param__temperature.initial}{T_0} - 0.6; \\href{./#param__regional.COACCH.NoSLR_b1}{b_{1,r}}, \\href{./#param__regional.COACCH.NoSLR_b2}{b_{2,r}}) \\big).
     $$
+
+    The [regional functional form](#param__regional.COACCH.NoSLR_form) and the coefficients above describe
+    the separate non-SLR curve. Combined curves use their own coefficients, selected by quantile and adaptation.
 
     All the damage coefficients are region-dependent (see [Damage functions and coefficients](coacch.md#damage-functions-and-coefficients)).
 
@@ -217,17 +220,25 @@ def get_constraints_slr(
     SLR damages are either quadratic, linear, or logistic:
 
     $$
-    D_{\\text{\\{form\\}}_r}(\\text{SLR}; \\cdot) = \\begin{cases}
-    D_{\\text{quadratic}}(\\text{SLR}; b_1, b_2) = b_1 \\cdot \\text{SLR} + b_2 \\cdot \\text{SLR}^2\\\\[.2cm]
-    D_{\\text{linear}}(\\text{SLR}; b_1) = b_1 \\cdot \\text{SLR}\\\\[.2cm]
-    D_{\\text{logistic}}(\\text{SLR}; b_1, b_2, b_3) = \\frac{b_1}{1 + b_2 \\cdot e^{-b_3 \\cdot \\text{SLR}}} - \\frac{b_1}{1 + b_2}
+    D_{\\href{./#param__regional.COACCH.SLR-Ad_form}{\\text{\\{form\\}}_r}}(\\text{SLR}; \\cdot) = \\begin{cases}
+    D_{\\text{quadratic}}(\\text{SLR}; \\href{./#param__regional.COACCH.SLR-Ad_b1}{b_1}, \\href{./#param__regional.COACCH.SLR-Ad_b2}{b_2}) = \\href{./#param__regional.COACCH.SLR-Ad_b1}{b_1} \\cdot \\text{SLR} + \\href{./#param__regional.COACCH.SLR-Ad_b2}{b_2} \\cdot \\text{SLR}^2\\\\[.2cm]
+    D_{\\text{linear}}(\\text{SLR}; \\href{./#param__regional.COACCH.SLR-Ad_b1}{b_1}) = \\href{./#param__regional.COACCH.SLR-Ad_b1}{b_1} \\cdot \\text{SLR}\\\\[.2cm]
+    D_{\\text{logistic}}(\\text{SLR}; \\href{./#param__regional.COACCH.SLR-Ad_b1}{b_1}, \\href{./#param__regional.COACCH.SLR-Ad_b2}{b_2}, \\href{./#param__regional.COACCH.SLR-Ad_b3}{b_3}) = \\frac{\\href{./#param__regional.COACCH.SLR-Ad_b1}{b_1}}{1 + \\href{./#param__regional.COACCH.SLR-Ad_b2}{b_2} \\cdot e^{-\\href{./#param__regional.COACCH.SLR-Ad_b3}{b_3} \\cdot \\text{SLR}}} - \\frac{\\href{./#param__regional.COACCH.SLR-Ad_b1}{b_1}}{1 + \\href{./#param__regional.COACCH.SLR-Ad_b2}{b_2}}
     \\end{cases}
     $$
 
-    The values of $b_1$, $b_2$, and $b_3$ are region-dependent and depend on whether adaptation is included or not. These are different
-    values than the coefficients in the temperature-dependent damages. The functional form
-    depends on the regression of the underlying impact data (see [Damage functions and coefficients](coacch.md#damage-functions-and-coefficients)),
-    and are equal to:
+    The values of $\\href{./#param__regional.COACCH.SLR-Ad_b1}{b_1}$, $\\href{./#param__regional.COACCH.SLR-Ad_b2}{b_2}$, and $\\href{./#param__regional.COACCH.SLR-Ad_b3}{b_3}$ are region-dependent and depend on whether adaptation is included or not. These are different
+    values than the coefficients in the temperature-dependent damages. The functional forms
+    depend on the regression of the underlying impact data (see [Damage functions and coefficients](coacch.md#damage-functions-and-coefficients))
+    and are shown in the table below.
+
+    The coefficient links in the equations show the default, optimal-adaptation curve.
+    Without adaptation, the corresponding regional inputs are the
+    [functional form](#param__regional.COACCH.SLR-NoAd_form),
+    [$b_1$](#param__regional.COACCH.SLR-NoAd_b1),
+    [$b_2$](#param__regional.COACCH.SLR-NoAd_b2),
+    [$b_3$](#param__regional.COACCH.SLR-NoAd_b3) and
+    [median scale factor](#param__regional.COACCH.SLR-NoAd_a%20%28q%3D0.5%29).
 
     <div class="tiny_table table_first_col_header table_scrollable" markdown>
     {{ read_csv("docs/assets/data/coacch_slr_form.csv") }}
@@ -236,7 +247,7 @@ def get_constraints_slr(
     To calculate the SLR damage costs, two additional transformations have to be taken:
 
     * Similar to temperature-dependent damages, the SLR damages are scaled by a factor $a_{\\href{./#param__economics.damages.quantile}{q},r}$, which depends on the quantile $\\href{./#param__economics.damages.quantile}{q}$ of the damage function.
-        This represents the uncertainty in the damage function. For median damages, this factor is $a_{0.5,r} = 1$. The quantile can be set using the
+        This represents the uncertainty in the damage function. For median damages, this factor is $\\href{./#param__regional.COACCH.SLR-Ad_a%20%28q%3D0.5%29}{a_{0.5,r}} = 1$. The quantile can be set using the
         [damage quantile parameter](#param__economics.damages.quantile).
     * Since we assume that until 2020 the climate damages are already incorporated in the baseline GDP,
         we subtract the damages of the initial time period $t=0$.
@@ -244,7 +255,7 @@ def get_constraints_slr(
     The SLR damage costs therefore become:
 
     $$
-    \\href{./#var__slr_damage_costs}{\\text{damages}_{\\text{SLR},t,r}} = a_{\\href{./#param__economics.damages.quantile}{q},r} \\cdot \\big( D_{\\text{\\{form\\}}_r}(\\href{./#var__total_SLR}{\\text{SLR}_t}; \\cdot) - D_{\\text{\\{form\\}}_r}(\\href{./#var__total_SLR}{\\text{SLR}_0}; \\cdot) \\big).
+    \\href{./#var__slr_damage_costs}{\\text{damages}_{\\text{SLR},t,r}} = a_{\\href{./#param__economics.damages.quantile}{q},r} \\cdot \\big( D_{\\href{./#param__regional.COACCH.SLR-Ad_form}{\\text{\\{form\\}}_r}}(\\href{./#var__total_SLR}{\\text{SLR}_t}; \\cdot) - D_{\\href{./#param__regional.COACCH.SLR-Ad_form}{\\text{\\{form\\}}_r}}(\\href{./#var__total_SLR}{\\text{SLR}_0}; \\cdot) \\big).
     $$
 
     """
