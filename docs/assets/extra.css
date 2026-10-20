@@ -211,6 +211,10 @@ mjx-container a[href*="parameters/#"] {
 }
 
 /* Tiny table: less margins */
+.regional-parameter-values table {
+    white-space: nowrap;
+}
+
 .tiny_table {
 
     table th,

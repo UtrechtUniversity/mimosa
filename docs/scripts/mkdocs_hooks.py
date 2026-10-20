@@ -20,6 +20,11 @@ from docs.scripts.variable_rendering import (
     render_variable_markers,
 )
 from docs.scripts import generate_dependency_graph
+from docs.scripts.regional_parameter_docs import (
+    REGIONAL_REFERENCE_MARKER,
+    render_regional_parameter_reference,
+)
+from mimosa.common.regional_params import RegionalParamStore
 from mimosa.common.config.parseconfig import (
     get_nested,
     flatten,
@@ -110,6 +115,16 @@ def markdown_parse_parser_types(markdown):
     return markdown
 
 
+def markdown_parse_regional_param_reference(markdown):
+    if REGIONAL_REFERENCE_MARKER not in markdown:
+        return markdown
+    context = get_documentation_context()
+    store = RegionalParamStore(context.params, context.parser_tree)
+    return markdown.replace(
+        REGIONAL_REFERENCE_MARKER, render_regional_parameter_reference(store)
+    )
+
+
 def markdown_parse_region_defs(markdown):
     # Check if markdown has parameter reference
     check_str = "{regions::definitions}"
@@ -144,6 +159,7 @@ def markdown_parse_region_defs(markdown):
 def on_page_markdown(markdown, **kwargs):
 
     markdown = markdown_parse_param_reference(markdown)
+    markdown = markdown_parse_regional_param_reference(markdown)
     markdown = markdown_parse_parser_types(markdown)
     markdown = markdown_parse_region_defs(markdown)
     if REFERENCE_MARKER in markdown:

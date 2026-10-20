@@ -24,6 +24,14 @@ Opening a page directly with a `#param__...` fragment redirects to the reference
 entry without adding a browser-history entry. Existing links to the parameter
 reference still work. Equations need no special build-time URL rewriting.
 
+The `{regionalparams::reference}` marker lists every column from the registered
+regional parameter files, grouped by category. It uses a `RegionalParamStore`
+with the default documentation configuration, so values use the same IMAGE26
+mapping and region order as the model. Each entry contains a compact table with
+regions above values; numbers use six significant figures and missing cells show
+an em dash. Regional entries have no hover-link handling yet. The store rereads
+the CSV files on each documentation rebuild without constructing another model.
+
 ## Variable catalogue
 
 [`docs/scripts/variable_docs.py`](docs/scripts/variable_docs.py) collects variable
