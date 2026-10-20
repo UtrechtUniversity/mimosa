@@ -166,7 +166,7 @@ def recursive_param_print(tree, mainkey, breadcrumbs, full_str, level=0):
             title += f"{mainkey}"
             extra_str = f"""
 <div id="{mainkey}" class="param_group" markdown>
-{"#" * (level + 1)} {title} {{data-toc-label="{mainkey}"}}
+{"#" * (level + 2)} {title} {{data-toc-label="{mainkey}"}}
 <div class="param_content" markdown>
 """
         else:
@@ -193,7 +193,11 @@ def _print_param(tree, mainkey, breadcrumbs, indent=""):
         for value in tree.allowed_values:
             assignment = f"{usage_target} = {_python_literal(value)}"
             # Autorefs treats adjacent dictionary keys as Markdown link references.
-            copy_text = escape(assignment, quote=True).replace("[", "&#91;").replace("]", "&#93;")
+            copy_text = (
+                escape(assignment, quote=True)
+                .replace("[", "&#91;")
+                .replace("]", "&#93;")
+            )
             extra_str += (
                 f'{indent}        - <span class="param-enum-option">{escape(str(value))}'
                 f'<button class="md-clipboard" type="button" '
@@ -218,7 +222,9 @@ def _print_param(tree, mainkey, breadcrumbs, indent=""):
 
 def _python_literal(value):
     """Keep strings double-quoted while preserving Python literals for other types."""
-    return json.dumps(value, ensure_ascii=False) if isinstance(value, str) else repr(value)
+    return (
+        json.dumps(value, ensure_ascii=False) if isinstance(value, str) else repr(value)
+    )
 
 
 def on_page_content(html, **kwargs):
@@ -305,6 +311,9 @@ def on_files(files, config, **kwargs):
     from mkdocs.structure.files import File
 
     # Virtual files go straight to the site, avoiding watched source changes.
-    for path, content in generate_dependency_graph.get_dependency_graph_assets().items():
+    for (
+        path,
+        content,
+    ) in generate_dependency_graph.get_dependency_graph_assets().items():
         files.append(File.generated(config, path, content=content))
     return files

@@ -1,5 +1,6 @@
 // Resolve the reference page from this asset, independently of the current page.
 const dependencyGraphPage = new URL("../variables/", document.currentScript.src);
+const parameterReferenceUrl = new URL("../parameters/", document.currentScript.src);
 const dependencyGraphAssets = new URL("dependency-graphs/", document.currentScript.src);
 const dependencyGraphRequests = new Map();
 
@@ -21,6 +22,7 @@ function parseDependencyLink(hash, pageContext = "coacch") {
 }
 
 let variableReferencePage;
+let parameterReferencePage;
 
 function loadVariableReference() {
     if (!variableReferencePage) {
@@ -31,10 +33,19 @@ function loadVariableReference() {
     return variableReferencePage;
 }
 
-// Graph nodes and documentation links share the same card content and placement.
-function createVariableTooltip(container, id) {
+function loadParameterReference() {
+    if (!parameterReferencePage) {
+        parameterReferencePage = loadDependencyAsset(parameterReferenceUrl).then(html =>
+            new DOMParser().parseFromString(html, "text/html")
+        );
+    }
+    return parameterReferencePage;
+}
+
+// Graph nodes and documentation links share card placement and dismissal.
+function createReferenceTooltip(container, id) {
     const tooltip = document.createElement("div");
-    tooltip.className = "dependency-graph-tooltip md-typeset";
+    tooltip.className = "reference-tooltip md-typeset";
     tooltip.id = id;
     tooltip.setAttribute("role", "tooltip");
     tooltip.tabIndex = -1;
@@ -54,13 +65,13 @@ function createVariableTooltip(container, id) {
         activeLink = null;
     }
 
-    function show(target, link, reference, context, variable) {
+    function show(target, link, entry) {
         hide();
-        const anchor = reference.getElementById(`variable-${context}--${variable}`);
-        const entry = anchor?.closest(".admonition.variable");
         if (!entry) return;
         const card = entry.cloneNode(true);
-        card.querySelectorAll(".variable_anchor, .md-clipboard").forEach(element => element.remove());
+        // Parameter entries are collapsible on the reference page, but open in cards.
+        if (entry.tagName === "DETAILS") card.open = true;
+        card.querySelectorAll(".variable_anchor, .param_anchor, [data-clipboard-target]").forEach(element => element.remove());
         card.querySelectorAll("[id]").forEach(element => element.removeAttribute("id"));
         tooltip.replaceChildren(card);
         tooltip.hidden = false;
@@ -102,7 +113,7 @@ function createVariableTooltip(container, id) {
 
 function initializeDependencyTooltips(panel, nodes, reference, signal) {
     const id = panel.closest("dialog") ? "dependency-graph-modal-tooltip" : "dependency-graph-tooltip";
-    const tooltip = createVariableTooltip(panel, id);
+    const tooltip = createReferenceTooltip(panel, id);
     let showTimer;
 
     function hide() {
@@ -111,7 +122,8 @@ function initializeDependencyTooltips(panel, nodes, reference, signal) {
     }
     function show(node) {
         clearTimeout(showTimer);
-        tooltip.show(node, node.querySelector("a"), reference, panel.dataset.variableContext, node.dataset.variable);
+        const anchor = reference.getElementById(`variable-${panel.dataset.variableContext}--${node.dataset.variable}`);
+        tooltip.show(node, node.querySelector("a"), anchor?.closest(".admonition.variable"));
     }
     function scheduleHide() {
         clearTimeout(showTimer);
@@ -139,11 +151,12 @@ function initializeDependencyTooltips(panel, nodes, reference, signal) {
     return { hide };
 }
 
-function initializeVariableLinkTooltips(content, pageContext) {
-    const tooltip = createVariableTooltip(content, "variable-link-tooltip");
+function initializeReferenceLinkTooltips(content, pageContext) {
+    const tooltip = createReferenceTooltip(content, "reference-link-tooltip");
     const events = new AbortController();
     const options = { signal: events.signal };
     const localReference = content.querySelector("#dependency-graph-viewer") ? document : null;
+    const localParameters = content.querySelector(".param_anchor") ? document : null;
     let showTimer;
     let requestId = 0;
 
@@ -157,22 +170,34 @@ function initializeVariableLinkTooltips(content, pageContext) {
         const request = requestId;
         showTimer = setTimeout(async () => {
             try {
-                const reference = localReference || await loadVariableReference();
+                const isVariable = link.hash.startsWith("#var__");
+                const reference = isVariable
+                    ? localReference || await loadVariableReference()
+                    : localParameters || await loadParameterReference();
                 if (request !== requestId || !link.isConnected) return;
-                const { context, variable } = parseDependencyLink(link.hash, pageContext);
-                tooltip.show(link, link, reference, context, variable);
+                let entry;
+                if (isVariable) {
+                    const { context, variable } = parseDependencyLink(link.hash, pageContext);
+                    entry = reference.getElementById(`variable-${context}--${variable}`)?.closest(".admonition.variable");
+                } else {
+                    entry = reference.getElementById(decodeURIComponent(link.hash.slice(1)))?.closest("details.parameter, .admonition.parameter");
+                }
+                tooltip.show(link, link, entry);
             } catch (error) {
                 console.error(error);
             }
         }, delay);
     }
-    function variableLink(event) {
-        const link = event.target.closest('a[href*="#var__"]');
-        if (!link?.hash.startsWith("#var__") || link.contains(event.relatedTarget)) return null;
-        return link;
+    function referenceLink(event) {
+        const link = event.target.closest("a[href]");
+        if (!link || link.contains(event.relatedTarget)) return null;
+        if (link.hash.startsWith("#var__")) return link;
+        const url = new URL(link.href);
+        return url.origin === parameterReferenceUrl.origin &&
+            url.pathname === parameterReferenceUrl.pathname && url.hash.length > 1 ? link : null;
     }
     function leave(event) {
-        if (!variableLink(event)) return;
+        if (!referenceLink(event)) return;
         clearTimeout(showTimer);
         requestId++;
         if (tooltip.contains(event.relatedTarget)) tooltip.keepOpen();
@@ -180,12 +205,12 @@ function initializeVariableLinkTooltips(content, pageContext) {
     }
     // Delegation also covers equation anchors added later by MathJax.
     content.addEventListener("pointerover", event => {
-        const link = variableLink(event);
+        const link = referenceLink(event);
         if (link && event.pointerType !== "touch") schedule(link);
     }, options);
     content.addEventListener("pointerout", leave, options);
     content.addEventListener("focusin", event => {
-        const link = variableLink(event);
+        const link = referenceLink(event);
         if (link) requestAnimationFrame(() => {
             if (document.activeElement === link && content.isConnected) schedule(link, 0);
         });
@@ -479,10 +504,10 @@ async function createDependencyGraphController(panel, reference, dialog = null, 
     return { open };
 }
 
-let variableLinkTooltips;
+let referenceLinkTooltips;
 
 document$.subscribe(() => {
-    variableLinkTooltips?.destroy();
+    referenceLinkTooltips?.destroy();
     const pageContext = document.querySelector("[data-documentation-context]")?.dataset.documentationContext || "coacch";
     const panel = document.querySelector("#dependency-graph-viewer");
     if (panel) {
@@ -500,7 +525,7 @@ document$.subscribe(() => {
     // MathJax creates equation links later, so handle clicks on the page itself.
     const content = document.querySelector(".md-content");
     if (!content) return;
-    variableLinkTooltips = initializeVariableLinkTooltips(content, pageContext);
+    referenceLinkTooltips = initializeReferenceLinkTooltips(content, pageContext);
     async function openVariable(hash) {
         const { context, variable } = parseDependencyLink(hash, pageContext);
         if (!dialog) {

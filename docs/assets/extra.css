@@ -350,7 +350,7 @@ mjx-container a[href*="#var__"] {
     .dependency-graph-viewport { flex: 1; height: auto; min-height: 0; }
 }
 
-.dependency-graph-tooltip {
+.reference-tooltip {
     position: fixed;
     z-index: 10;
     width: min(30rem, calc(100vw - 3rem));
@@ -361,7 +361,7 @@ mjx-container a[href*="#var__"] {
     box-shadow: 0 .2rem .8rem rgb(0 0 0 / 25%);
     user-select: text;
 
-    .admonition { margin: 0; }
+    .admonition, details { margin: 0; }
 }
 
 /* Interactive dependency graph. */

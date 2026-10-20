@@ -10,6 +10,12 @@ keyboard focus. Each button copies the complete `params[...] = value` assignment
 The generated buttons use the theme's `data-clipboard-text` support, sharing
 the snippet copy behavior and confirmation without additional JavaScript.
 
+Links to parameter-reference anchors also show the matching parameter card on
+hover or keyboard focus. This includes ordinary Markdown links and generated
+`param::` links. Clicking still follows the link to the reference page. Cards
+reuse the rendered reference HTML, fetched and parsed once on demand, and keep
+enum assignment copy buttons. No additional model construction is needed.
+
 ## Variable catalogue
 
 [`docs/scripts/variable_docs.py`](docs/scripts/variable_docs.py) collects variable

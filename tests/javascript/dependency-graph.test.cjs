@@ -359,7 +359,7 @@ for (const prefix of ["", "/mimosa"]) {
             assert.equal(modal, dialog);
             return { open: (configuration, name) => selections.push([configuration, name]) };
         };
-        context.initializeVariableLinkTooltips = () => ({ destroy() {} });
+        context.initializeReferenceLinkTooltips = () => ({ destroy() {} });
         onPage();
 
         for (const name of ["damage_costs", "coacch::riverine_adaptation_costs_abs"]) {
@@ -387,7 +387,7 @@ for (const prefix of ["", "/mimosa"]) {
     });
 }
 
-function documentationTooltips({ waitForReference, localReference = false } = {}) {
+function documentationTooltips({ waitForReference, localReference = false, localParameters = false, sitePrefix = "/mimosa" } = {}) {
     const content = element();
     const tooltip = element();
     tooltip.offsetWidth = 300;
@@ -399,8 +399,11 @@ function documentationTooltips({ waitForReference, localReference = false } = {}
     let parsed = 0;
     const reference = { getElementById(id) {
         requestedEntries.push(id);
-        if (id.endsWith("--missing")) return null;
-        return { closest: () => ({ cloneNode: () => ({ entry: id, querySelectorAll: () => [] }) }) };
+        if (id.endsWith("--missing") || id === "missing") return null;
+        return { closest: () => ({
+            tagName: id.startsWith("variable-") ? "DIV" : "DETAILS",
+            cloneNode: () => ({ entry: id, querySelectorAll: () => [] }),
+        }) };
     } };
     const timers = new Map();
     let now = 0;
@@ -411,9 +414,9 @@ function documentationTooltips({ waitForReference, localReference = false } = {}
         document: {
             ...reference,
             activeElement: null,
-            currentScript: { src: "https://example.org/mimosa/assets/dependency-graph.js" },
+            currentScript: { src: `https://example.org${sitePrefix}/assets/dependency-graph.js` },
             createElement: () => tooltip,
-            getElementById: id => id === "variable-link-tooltip" ? tooltip : reference.getElementById(id),
+            getElementById: id => id === "reference-link-tooltip" ? tooltip : reference.getElementById(id),
         },
         window: Object.assign(new EventTarget(), { innerWidth: 800, innerHeight: 600 }),
         setTimeout(callback, delay) { timers.set(++timerId, { callback, due: now + delay }); return timerId; },
@@ -426,12 +429,14 @@ function documentationTooltips({ waitForReference, localReference = false } = {}
         },
         DOMParser: class { parseFromString() { parsed++; return reference; } },
     };
-    if (localReference) content.querySelector = () => ({});
+    content.querySelector = selector =>
+        (selector === "#dependency-graph-viewer" && localReference) ||
+        (selector === ".param_anchor" && localParameters) ? {} : null;
     vm.createContext(context);
     vm.runInContext(source, context);
-    const controller = context.initializeVariableLinkTooltips(content, "accreu_sectoral");
-    function link(hash) {
-        const anchor = Object.assign(element(), { hash });
+    const controller = context.initializeReferenceLinkTooltips(content, "accreu_sectoral");
+    function link(hash, href = `https://example.org${sitePrefix}/parameters/${hash}`) {
+        const anchor = Object.assign(element(), { hash, href });
         anchor.contains = node => node === anchor || node?.parentLink === anchor;
         return anchor;
     }
@@ -467,7 +472,7 @@ test("late equation links inherit context, respect overrides, and share cached r
     await page.tick(1);
     assert.equal(page.tooltip.hidden, false);
     assert.equal(page.tooltip.children[0].entry, "variable-accreu_sectoral--damage_costs");
-    assert.equal(equationLink.attributes["aria-describedby"], "variable-link-tooltip");
+    assert.equal(equationLink.attributes["aria-describedby"], "reference-link-tooltip");
 
     // Moving between MathJax children inside the same link must not dismiss it.
     page.event("pointerout", equationLink, { parentLink: equationLink });
@@ -559,4 +564,73 @@ test("touch, unavailable entries and disposed page listeners do not open link ca
     await page.tick(250);
     assert.deepEqual(page.requestedEntries, ["variable-accreu_sectoral--missing"]);
     assert.equal(page.tooltip.isConnected, false);
+});
+
+for (const sitePrefix of ["", "/mimosa"]) {
+    test(`parameter links show expanded cards and cache their reference at ${sitePrefix || "/"}`, async () => {
+        const page = documentationTooltips({ sitePrefix });
+        const initial = page.link("#temperature.initial");
+        page.event("pointerover", initial);
+        await page.tick(249);
+        assert.equal(page.tooltip.hidden, true);
+        assert.deepEqual(page.requests, []);
+        await page.tick(1);
+        assert.equal(page.tooltip.children[0].entry, "temperature.initial");
+        assert.equal(page.tooltip.children[0].open, true);
+        assert.equal(initial.attributes["aria-describedby"], "reference-link-tooltip");
+
+        page.event("pointerout", initial);
+        page.tooltip.dispatchEvent(new Event("pointerenter"));
+        await page.tick(200);
+        assert.equal(page.tooltip.hidden, false);
+        const tcre = page.link("#temperature.%54CRE");
+        page.context.document.activeElement = tcre;
+        page.event("focusin", tcre);
+        await page.tick(0);
+        assert.equal(page.tooltip.children[0].entry, "temperature.TCRE");
+        assert.deepEqual(page.requests, [`https://example.org${sitePrefix}/parameters/`]);
+        assert.equal(page.parsed(), 1);
+        const click = new Event("click", { cancelable: true });
+        Object.defineProperty(click, "target", { value: { closest: () => tcre } });
+        page.content.dispatchEvent(click);
+        assert.equal(click.defaultPrevented, false);
+        assert.equal(page.tooltip.hidden, true);
+        page.controller.destroy();
+    });
+}
+
+test("parameter cards ignore unrelated links and use local reference entries without a fetch", async () => {
+    const page = documentationTooltips({ localParameters: true });
+    for (const href of [
+        "https://other.example/mimosa/parameters/#temperature.TCRE",
+        "https://example.org/mimosa/components/emissions/#temperature.TCRE",
+        "https://example.org/mimosa/parameters/",
+    ]) {
+        page.event("pointerover", page.link(new URL(href).hash, href));
+        await page.tick(250);
+        assert.equal(page.tooltip.hidden, true);
+    }
+    page.event("pointerover", page.link("#missing"));
+    await page.tick(250);
+    assert.equal(page.tooltip.hidden, true);
+    page.event("pointerover", page.link("#temperature.TCRE"));
+    await page.tick(250);
+    assert.equal(page.tooltip.children[0].entry, "temperature.TCRE");
+    assert.deepEqual(page.requests, []);
+    page.controller.destroy();
+});
+
+test("leaving a parameter link cancels a pending reference request", async () => {
+    let release;
+    const waitForReference = new Promise(resolve => { release = resolve; });
+    const page = documentationTooltips({ waitForReference });
+    const link = page.link("#temperature.TCRE");
+    page.event("pointerover", link);
+    await page.tick(250);
+    page.event("pointerout", link);
+    release();
+    await page.tick(0);
+    assert.equal(page.tooltip.hidden, true);
+    assert.deepEqual(page.requestedEntries, []);
+    page.controller.destroy();
 });
