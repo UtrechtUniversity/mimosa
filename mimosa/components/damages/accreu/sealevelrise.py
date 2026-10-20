@@ -40,8 +40,18 @@ def get_constraints(
     we do not use the “optimal adaptation” scenario from DIVA, to avoid double optimisation
     in the IAMs.
 
+    The gross damages are fitted with a power function of global sea-level rise:
 
+    :::mimosa.components.damages.accreu.sealevelrise.gross_dmg_fct_slr
+        options:
+            show_source: false
 
+    The adaptation function is fitted with a negative-exponential saturation curve, like in
+    all three sectors. Subsequently, the residual damages are calculated as:
+
+    $$
+    \\href{./#var__slr_damage_costs}{\\text{damages}_{\\text{SLR},t,r}} = \\href{./#var__slr_damage_costs_gross}{\\text{gross damages}_{\\text{SLR},t,r}} \\cdot (1 - \\href{./#var__slr_adaptation_level}{\\text{adapt. level}_{\\text{SLR},t,r}}),
+    $$
 
     <div class="grid cards" markdown>
 
@@ -72,6 +82,17 @@ def get_constraints(
 
             ![Regional damage costs (without adaptation)](../../assets/fig/accreu/slr_adapt_eff.png)
 
+    <div class="tiny_table table_scrollable extra_small" markdown>
+
+    | Variables created in this module: |
+    | --------------------------------- |
+    | var::slr_damage_costs_gross |
+    | var::slr_adaptation_costs_abs |
+    | var::slr_adaptation_costs |
+    | var::slr_adaptation_level |
+    | var::slr_damage_costs |
+
+    </div>
     """
 
     constraints = []
@@ -98,20 +119,17 @@ def get_constraints(
     setattr(
         m,
         damage_cost_gross_var_name,
-        Var(m.t, m.regions, units=quant.unit("fraction_of_GDP")),
+        Var(
+            m.t,
+            m.regions,
+            units=quant.unit("fraction_of_GDP"),
+            doc="Gross damages from sea-level rise, without adaptation",
+        ),
     )
     constraints.append(
         RegionalEquation(
             getattr(m, damage_cost_gross_var_name),
-            lambda m, t, r: dmg_fct_power(
-                m,
-                t,
-                m.slr_damages_gross_constant[r],
-                m.slr_damages_gross_prod[r],
-                m.slr_damages_gross_power[r],
-                x="total_SLR",
-            )
-            * m.damage_scale_factor,
+            gross_dmg_fct_slr,
         )
     )
 
@@ -122,14 +140,27 @@ def get_constraints(
             m.regions,
             units=quant.unit("currency_unit"),
             bounds=lambda m, t, r: (0, 0.1 * m.baseline_GDP[t, r]),
+            doc="Absolute adaptation costs for sea-level rise, in currency units. Used to calculate the adaptation level",
         )
         m.slr_adaptation_costs = Var(
-            m.t, m.regions, units=quant.unit("fraction_of_GDP")
+            m.t,
+            m.regions,
+            units=quant.unit("fraction_of_GDP"),
+            doc="Adaptation costs for sea-level rise, as a fraction of GDP.",
         )
         m.slr_adaptation_level = Var(
-            m.t, m.regions, units=quant.unit("fraction_of_gross_damages"), bounds=(0, 1)
+            m.t,
+            m.regions,
+            units=quant.unit("fraction_of_gross_damages"),
+            bounds=(0, 1),
+            doc="Adaptation level for sea-level rise, as a fraction of gross damages. 0 means that no damages are avoided, while 1 means that all damages are avoided.",
         )
-        m.slr_damage_costs = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
+        m.slr_damage_costs = Var(
+            m.t,
+            m.regions,
+            units=quant.unit("fraction_of_GDP"),
+            doc="Residual damages from sea-level rise, after adaptation. If `noadaptation` is chosen, this variable represents the gross damages.",
+        )
 
         m.slr_adaptation_max_effectiveness = Param(
             m.regions,
@@ -193,3 +224,24 @@ def get_constraints(
             )
 
     return constraints
+
+
+def gross_dmg_fct_slr(m, t, r):
+    """
+    $$
+        \\href{./#var__slr_damage_costs_gross}{\\text{gross damages}_{\\text{SLR},t,r}}
+        = (a_r + b_r \\cdot \\href{./#var__total_SLR}{\\text{SLR}_t} {}^ {c_r})
+        - (a_r + b_r \\cdot \\href{./#var__total_SLR}{\\text{SLR}_0} {}^ {c_r})
+    $$
+    """
+    return (
+        dmg_fct_power(
+            m,
+            t,
+            m.slr_damages_gross_constant[r],
+            m.slr_damages_gross_prod[r],
+            m.slr_damages_gross_power[r],
+            x="total_SLR",
+        )
+        * m.damage_scale_factor
+    )

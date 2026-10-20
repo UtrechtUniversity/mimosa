@@ -54,7 +54,7 @@ def create_all_figs():
     figs["slr_adaptation_global"] = fig_adaptation_global(
         raw["slr_adaptation"],
         "slr",
-        maxval=30,
+        maxval=60,
         annotations=[
             {"x": 12.86, "y": 0.757, "text": "ACCREU fit"},
             {"x": 8.6, "y": 0.148, "text": "Literature calibration"},
