@@ -295,7 +295,7 @@ def gross_dmg_fct_labourprod(m, t, r):
 
     $$
         \\href{./#var__labourprod_damage_costs_gross}{\\text{gross damages}_{\\text{labourprod},t,r}}
-        = (a_{r, \\text{heat}} + b_{r, \\text{heat}} \\cdot \\href{./#var__temperature}{T_t}) - (a_{r, \\text{heat}} + b_{r, \\text{heat}} \\cdot \\href{./#var__temperature}{T_0}).
+        = (a_{r, \\text{heat}} + b_{r, \\text{heat}} \\cdot \\href{./#var__temperature}{T_t}) - (a_{r, \\text{heat}} + b_{r, \\text{heat}} \\cdot \\href{./#param__temperature.initial}{T_0}).
     $$
     """
     a = m.labourprod_damages_gross_constant[r]
@@ -309,7 +309,7 @@ def benefits_dmg_fct_labourprod(m, t, r):
 
     $$
         \\href{./#var__labourprod_damage_costs_benefits}{\\text{benefits}_{\\text{labourprod},t,r}}
-        = (a_{r, \\text{cold}} + b_{r, \\text{cold}} \\cdot \\href{./#var__temperature}{T_t}) - (a_{r, \\text{cold}} + b_{r, \\text{cold}} \\cdot \\href{./#var__temperature}{T_0}).
+        = (a_{r, \\text{cold}} + b_{r, \\text{cold}} \\cdot \\href{./#var__temperature}{T_t}) - (a_{r, \\text{cold}} + b_{r, \\text{cold}} \\cdot \\href{./#param__temperature.initial}{T_0}).
     $$
     """
     a = m.labourprod_damages_benefits_constant[r]

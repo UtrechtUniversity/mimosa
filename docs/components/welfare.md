@@ -63,16 +63,16 @@ With the utility objective, MIMOSA calculates:
 $$
 \href{./#var__NPV}{\text{NPV}_t} =
 \href{./#var__NPV}{\text{NPV}_{t-1}}
-+ \Delta t \cdot e^{-\text{PRTP}(\text{year}_t-\text{begin year})}
++ \Delta t \cdot e^{-\href{./#param__economics.PRTP}{\text{PRTP}}(\text{year}_t-\href{./#param__time.start}{\text{begin year}})}
 \cdot \href{./#var__global_welfare}{\text{yearly welfare}_t},
 $$
 
-This is a discrete approximation of the integral of discounted yearly welfare from the beginning year $t_0$ to the final year $T$:
+This is a discrete approximation of the integral of discounted yearly welfare from the beginning year $\href{./#param__time.start}{t_0}$ to the final year $\href{./#param__time.end}{T}$:
 
 $$
-\href{./#var__NPV}{\text{NPV}(T)} =
-\int_{t_0}^{T}
-e^{-\text{PRTP}(t-t_0)} \cdot \href{./#var__global_welfare}{\text{yearly welfare}(t)}\, dt.
+\href{./#var__NPV}{\text{NPV}}(\href{./#param__time.end}{T}) =
+\int_{\href{./#param__time.start}{t_0}}^{\href{./#param__time.end}{T}}
+e^{-\href{./#param__economics.PRTP}{\text{PRTP}}(t-\href{./#param__time.start}{t_0})} \cdot \href{./#var__global_welfare}{\text{yearly welfare}(t)}\, dt.
 $$
 
 MIMOSA maximises the final value of `NPV`. With the global-cost objective, `global_welfare` is replaced by:

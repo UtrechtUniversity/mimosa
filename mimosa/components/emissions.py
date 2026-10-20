@@ -469,7 +469,7 @@ def _get_inertia_and_budget_constraints(
     If a carbon budget is defined using the parameter [`carbonbudget`](#param__emissions.carbonbudget), the following constraint is active:
 
     $$
-    \\href{./#var__global_cumulative_emissions}{\\text{cumulative emissions}_{t}} - \\text{budget} \\leq 0,
+    \\href{./#var__global_cumulative_emissions}{\\text{cumulative emissions}_{t}} - \\href{./#param__emissions.carbonbudget}{\\text{budget}} \\leq 0,
     $$
 
     for $t \\geq 2100$. Note that the [`carbonbudget`](#param__emissions.carbonbudget) parameter unit should be
@@ -489,7 +489,7 @@ def _get_inertia_and_budget_constraints(
 
 
         $$
-        \\href{./#var__global_emissions}{\\text{global emissions}_{t}} - \\href{./#var__global_emissions}{\\text{global emissions}_{t-1}} \\geq \\Delta t \\cdot \\text{inertia_global} \\cdot \\text{scaling factor},
+        \\href{./#var__global_emissions}{\\text{global emissions}_{t}} - \\href{./#var__global_emissions}{\\text{global emissions}_{t-1}} \\geq \\Delta t \\cdot \\href{./#param__emissions.inertia.global}{\\text{inertia_global}} \\cdot \\text{scaling factor},
         $$
 
         with the scaling factor the global baseline emissions in the starting year:
@@ -504,7 +504,7 @@ def _get_inertia_and_budget_constraints(
     === "Regional inertia"
 
         $$
-        \\href{./#var__regional_emissions}{\\text{regional emissions}_{t,r}} - \\href{./#var__regional_emissions}{\\text{regional emissions}_{t-1,r}} \\geq \\Delta t \\cdot \\text{inertia_regional} \\cdot \\href{./#var__baseline_emissions}{\\text{baseline emissions}_{t=0,r}}.
+        \\href{./#var__regional_emissions}{\\text{regional emissions}_{t,r}} - \\href{./#var__regional_emissions}{\\text{regional emissions}_{t-1,r}} \\geq \\Delta t \\cdot \\href{./#param__emissions.inertia.regional}{\\text{inertia_regional}} \\cdot \\href{./#var__baseline_emissions}{\\text{baseline emissions}_{t=0,r}}.
         $$
 
         By default, the [`inertia_regional`](#param__emissions.inertia.regional) parameter is active, such that regional emissions cannot be reduced by more than 5% of the initial baseline emissions per year. This is
@@ -523,11 +523,11 @@ def _get_inertia_and_budget_constraints(
     are limited to -20 GtCO<sub>2</sub>/yr, and regional emissions to -10 GtCO<sub>2</sub>/yr:
 
     $$
-    \\href{./#var__global_emissions}{\\text{global emissions}_t} \\geq \\text{global min level},
+    \\href{./#var__global_emissions}{\\text{global emissions}_t} \\geq \\href{./#param__emissions.global%20min%20level}{\\text{global min level}},
     $$
 
     $$
-    \\href{./#var__regional_emissions}{\\text{regional emissions}_t} \\geq \\text{regional min level}.
+    \\href{./#var__regional_emissions}{\\text{regional emissions}_t} \\geq \\href{./#param__emissions.regional%20min%20level}{\\text{regional min level}}.
     $$
 
     Note that currently, the minimum regional emission level is the same for every region, but this could be easily changed if needed (see

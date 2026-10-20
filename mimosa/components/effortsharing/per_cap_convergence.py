@@ -120,16 +120,16 @@ def percapconv_share_rule(m, t, r):
 
     $$
     \\href{./#var__effortsharing_per_cap_convergence::regional_emission_allowances}{\\text{allowances}_{t, r}} = \\begin{cases}
-    x \\cdot \\text{allowances}_{\\text{GF}, t, r} + (1-x) \\cdot (\\text{allowances}_{\\text{EPC}, t, r}), & \\text{if } t < \\text{convergence year}, \\\\
-    \\text{allowances}_{\\text{EPC}, t, r}, & \\text{if } t \\geq \\text{convergence year},\\\\
-    \\text{allowances}_{\\text{GF},t,r}, & \\text{if } \\text{convergence year} = \\text{false}.
+    x \\cdot \\text{allowances}_{\\text{GF}, t, r} + (1-x) \\cdot (\\text{allowances}_{\\text{EPC}, t, r}), & \\text{if } t < \\href{./#param__effort%20sharing.percapconv_year}{\\text{convergence year}}, \\\\
+    \\text{allowances}_{\\text{EPC}, t, r}, & \\text{if } t \\geq \\href{./#param__effort%20sharing.percapconv_year}{\\text{convergence year}},\\\\
+    \\text{allowances}_{\\text{GF},t,r}, & \\text{if } \\href{./#param__effort%20sharing.percapconv_year}{\\text{convergence year}} = \\text{false}.
     \\end{cases}
     $$
 
     where $x$ is the linear interpolation factor, which is 1 in the first year and 0 in the convergence year:
 
     $$
-    x = \\frac{t - t_0}{\\text{convergence year} - t_0}.
+    x = \\frac{t - \\href{./#param__time.start}{t_0}}{\\href{./#param__effort%20sharing.percapconv_year}{\\text{convergence year}} - \\href{./#param__time.start}{t_0}}.
     $$
 
     #### Immediate per capita convergence

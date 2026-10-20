@@ -112,7 +112,7 @@ def get_constraints_temperature_dependent(
 
     * The COACCH damage functions were created as function of temperature relative to 1986-2005, which is 0.6°C above pre-industrial.
         For this reason, the temperature is shifted by 0.6°C.
-    * The damages are scaled by a factor $a_{q,r}$, which depends on the quantile $q$ of the damage function. This represents the uncertainty
+    * The damages are scaled by a factor $a_{\\href{./#param__economics.damages.quantile}{q},r}$, which depends on the quantile $\\href{./#param__economics.damages.quantile}{q}$ of the damage function. This represents the uncertainty
         in the damage function. For median damages, this factor is $a_{0.5,r} = 1$. The quantile can be set using the [damage quantile parameter](#param__economics.damages.quantile).
     * Since we assume that until 2020 the climate damages are already incorporated in the baseline GDP,
         we subtract the damages of the initial time period $t=0$.
@@ -120,7 +120,7 @@ def get_constraints_temperature_dependent(
     Combining these three transformations, the damages are calculated as:
 
     $$
-    \\href{./#var__non_slr_damage_costs}{\\text{damages}_{\\text{non-SLR},t,r}} = a_{q,r} \\cdot \\big( D(\\href{./#var__temperature}{\\text{temperature}_t} - 0.6; b_{1,r}, b_{2,r}) -  D(T_0 - 0.6; b_{1,r}, b_{2,r}) \\big).
+    \\href{./#var__non_slr_damage_costs}{\\text{damages}_{\\text{non-SLR},t,r}} = a_{\\href{./#param__economics.damages.quantile}{q},r} \\cdot \\big( D(\\href{./#var__temperature}{\\text{temperature}_t} - 0.6; b_{1,r}, b_{2,r}) -  D(\\href{./#param__temperature.initial}{T_0} - 0.6; b_{1,r}, b_{2,r}) \\big).
     $$
 
     All the damage coefficients are region-dependent (see [Damage functions and coefficients](coacch.md#damage-functions-and-coefficients)).
@@ -235,7 +235,7 @@ def get_constraints_slr(
 
     To calculate the SLR damage costs, two additional transformations have to be taken:
 
-    * Similar to temperature-dependent damages, the SLR damages are scaled by a factor $a_{q,r}$, which depends on the quantile $q$ of the damage function.
+    * Similar to temperature-dependent damages, the SLR damages are scaled by a factor $a_{\\href{./#param__economics.damages.quantile}{q},r}$, which depends on the quantile $\\href{./#param__economics.damages.quantile}{q}$ of the damage function.
         This represents the uncertainty in the damage function. For median damages, this factor is $a_{0.5,r} = 1$. The quantile can be set using the
         [damage quantile parameter](#param__economics.damages.quantile).
     * Since we assume that until 2020 the climate damages are already incorporated in the baseline GDP,
@@ -244,7 +244,7 @@ def get_constraints_slr(
     The SLR damage costs therefore become:
 
     $$
-    \\href{./#var__slr_damage_costs}{\\text{damages}_{\\text{SLR},t,r}} = a_{q,r} \\cdot \\big( D_{\\text{\\{form\\}}_r}(\\href{./#var__total_SLR}{\\text{SLR}_t}; \\cdot) - D_{\\text{\\{form\\}}_r}(\\href{./#var__total_SLR}{\\text{SLR}_0}; \\cdot) \\big).
+    \\href{./#var__slr_damage_costs}{\\text{damages}_{\\text{SLR},t,r}} = a_{\\href{./#param__economics.damages.quantile}{q},r} \\cdot \\big( D_{\\text{\\{form\\}}_r}(\\href{./#var__total_SLR}{\\text{SLR}_t}; \\cdot) - D_{\\text{\\{form\\}}_r}(\\href{./#var__total_SLR}{\\text{SLR}_0}; \\cdot) \\big).
     $$
 
     """
