@@ -39,8 +39,17 @@ def get_constraints(
         options:
             show_source: false
 
-    The adaptation function is fitted with a negative-exponential saturation curve, like in
-    all three sectors. Subsequently, the residual damages are calculated as:
+    The adaptation function is fitted with a negative-exponential saturation (NES) curve, like in
+    all three sectors, using regional [max. effectiveness](#param__regional.ACCREU.riverine_adapt_eff_max_effectiveness) and [cost coefficient](#param__regional.ACCREU.riverine_adapt_eff_cost_param):
+
+    $$
+    \\href{./#var__riverine_adaptation_level}{\\text{adapt. level}_{\\text{riverine},t,r}}
+    = \\text{NES}(\\href{./#var__riverine_adaptation_costs_abs}{\\text{adapt. costs}_{\\text{riverine},t,r}};
+    \\href{./#param__regional.ACCREU.riverine_adapt_eff_max_effectiveness}{\\text{max eff.}_{\\text{riverine},r}},
+    \\href{./#param__regional.ACCREU.riverine_adapt_eff_cost_param}{c_{\\text{riverine},r}})
+    $$
+
+    Subsequently, the residual damages are calculated as:
 
     $$
     \\href{./#var__riverine_damage_costs}{\\text{damages}_{\\text{riverine},t,r}} = \\href{./#var__riverine_damage_costs_gross}{\\text{gross damages}_{\\text{riverine},t,r}} \\cdot (1 - \\href{./#var__riverine_adaptation_level}{\\text{adapt. level}_{\\text{riverine},t,r}}),

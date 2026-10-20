@@ -46,9 +46,17 @@ def get_constraints(
         options:
             show_source: false
 
-    The adaptation curve, which only applies to heat-related gross damages, is fitted
-    with a negative-exponential saturation curve, like in all three sectors. This leads to
-    the residual, heat related damages:
+    The adaptation function, which only applies to heat-related gross damages, is fitted with a negative-exponential saturation (NES) curve, like in
+    all three sectors, using regional [max. effectiveness](#param__regional.ACCREU.labourprod_adapt_eff_max_effectiveness) and [cost coefficient](#param__regional.ACCREU.labourprod_adapt_eff_cost_param):
+
+    $$
+    \\href{./#var__labourprod_adaptation_level}{\\text{adapt. level}_{\\text{labourprod},t,r}}
+    = \\text{NES}(\\href{./#var__labourprod_adaptation_costs_abs}{\\text{adapt. costs}_{\\text{labourprod},t,r}};
+    \\href{./#param__regional.ACCREU.labourprod_adapt_eff_max_effectiveness}{\\text{max eff.}_{\\text{labourprod},r}},
+    \\href{./#param__regional.ACCREU.labourprod_adapt_eff_cost_param}{c_{\\text{labourprod},r}})
+    $$
+
+    This leads to the residual, heat related damages:
 
     $$
     \\href{./#var__labourprod_damage_costs}{\\text{damages}_{\\text{labourprod},t,r}}
@@ -305,7 +313,7 @@ def gross_dmg_fct_labourprod(m, t, r):
 
 def benefits_dmg_fct_labourprod(m, t, r):
     """
-    The cold-related benefits of climate chnage are also fitted using a linear function of global temperature, and shifted to 0 at the start year.
+    The cold-related benefits of climate change are also fitted using a linear function of global temperature, and shifted to 0 at the start year.
 
     $$
         \\href{./#var__labourprod_damage_costs_benefits}{\\text{benefits}_{\\text{labourprod},t,r}}

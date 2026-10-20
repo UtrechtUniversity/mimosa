@@ -125,25 +125,11 @@ def effective_adaptation_curve(
 def adaptation_effectiveness_fct(adapt_costs, max_effectiveness, cost_param):
     """
     The adaptation level is calculated as a function of absolute adaptation costs
-    (in currency units) using a negative-exponential saturation curve:
+    (in currency units) using a negative-exponential saturation (NES) curve:
 
     $$
-    \\text{adapt. level}_{i,t,r} = \\text{max effectiveness}_{i,r} \\cdot \\left(1 - e^{-c_{i,r} \\cdot \\text{adapt. costs}_{i,t,r}}\\right)
+    \\text{NES}(\\text{adapt. costs}_{i,t,r}; \\cdot) = \\text{max effectiveness}_{i,r} \\cdot \\left(1 - e^{-c_{i,r} \\cdot \\text{adapt. costs}_{i,t,r}}\\right)
     $$
-
-    The parameters $\\text{max effectiveness}_{i,r}$ and $c_{i,r}$ are calibrated to the ACCREU data for each sector $i$ and region $r$.
-
-    | Sector | Maximum effectiveness | Cost coefficient |
-    | --- | --- | --- |
-    | Riverine flooding | [Maximum effectiveness](#param__regional.ACCREU.riverine_adapt_eff_max_effectiveness) | [Cost coefficient](#param__regional.ACCREU.riverine_adapt_eff_cost_param) |
-    | Labour productivity | [Maximum effectiveness](#param__regional.ACCREU.labourprod_adapt_eff_max_effectiveness) | [Cost coefficient](#param__regional.ACCREU.labourprod_adapt_eff_cost_param) |
-    | Sea-level rise | [Maximum effectiveness](#param__regional.ACCREU.slr_adapt_eff_max_effectiveness) | [Cost coefficient](#param__regional.ACCREU.slr_adapt_eff_cost_param) |
-    | Combined labour and riverine | [Maximum effectiveness](#param__regional.ACCREU.combined_adapt_eff_max_effectiveness) | [Cost coefficient](#param__regional.ACCREU.combined_adapt_eff_cost_param) |
-
-    These links show the regional source coefficients. The model also applies the selected
-    [adaptation calibration](#param__economics.damages.accreu.adaptation_calibration),
-    [effectiveness scale factor](#param__economics.damages.accreu.adaptation_effectiveness_scale_factor)
-    and currency conversion.
     """
 
     return max_effectiveness * (1 - exp(-cost_param * adapt_costs))
