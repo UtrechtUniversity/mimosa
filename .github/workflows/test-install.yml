@@ -11,10 +11,16 @@ on:
 jobs:
   test_install:
     name: Test on Python ${{ matrix.python-version }}
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.runner || 'ubuntu-latest' }}
     strategy:
       matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.15"]
+        # setup-python has no Ubuntu 26.04 builds for Python 3.8 or 3.9.
+        include:
+          - python-version: "3.8"
+            runner: ubuntu-24.04
+          - python-version: "3.9"
+            runner: ubuntu-24.04
 
     steps:
       - uses: actions/checkout@v4
