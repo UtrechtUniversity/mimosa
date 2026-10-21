@@ -160,6 +160,31 @@ function initializeDependencyTooltips(panel, nodes, reference, signal) {
     return { hide };
 }
 
+function slrCoefficientAnchor(hash, content) {
+    const match = hash.match(/^#(?:.*--)?slrcoef__(.+)$/);
+    if (!match) return null;
+    const suffix = `slrcoef__${decodeURIComponent(match[1])}`;
+    return Array.from(content.querySelectorAll("[data-slr-coefficients]")).find(
+        anchor => anchor.id === suffix || anchor.id.endsWith(`--${suffix}`)
+    );
+}
+
+function slrCoefficientCard(anchor, content) {
+    const entries = Array.from(content.querySelectorAll("[data-slr-coefficients]"));
+    const rows = anchor.dataset.slrCoefficients.split(" ").map(name =>
+        entries.find(entry => entry.dataset.slrCoefficients === name).closest("tr")
+    );
+    const table = document.createElement("table");
+    table.append(rows[0].closest("table").tHead.cloneNode(true));
+    const body = document.createElement("tbody");
+    rows.forEach(row => body.append(row.cloneNode(true)));
+    table.append(body);
+    const card = document.createElement("div");
+    card.className = "slr-coefficient-card tiny_table";
+    card.append(table);
+    return card;
+}
+
 function initializeReferenceLinkTooltips(content, pageContext) {
     const tooltip = createReferenceTooltip(content, "reference-link-tooltip");
     const events = new AbortController();
@@ -179,6 +204,11 @@ function initializeReferenceLinkTooltips(content, pageContext) {
         const request = requestId;
         showTimer = setTimeout(async () => {
             try {
+                const coefficient = slrCoefficientAnchor(link.hash, content);
+                if (coefficient) {
+                    tooltip.show(link, link, slrCoefficientCard(coefficient, content));
+                    return;
+                }
                 const isVariable = link.hash.startsWith("#var__");
                 const reference = isVariable
                     ? localReference || await loadVariableReference()
@@ -201,6 +231,13 @@ function initializeReferenceLinkTooltips(content, pageContext) {
         const link = event.target.closest("a[href]");
         if (!link || link.contains(event.relatedTarget)) return null;
         if (link.hash.startsWith("#var__")) return link;
+        const coefficient = slrCoefficientAnchor(link.hash, content);
+        if (coefficient) {
+            const url = new URL(location.href);
+            url.hash = coefficient.id;
+            link.href = url.href;
+            return link;
+        }
         const parameter = parameterLinkUrl(link.hash);
         if (parameter) link.href = parameter.href;
         const url = new URL(link.href);
@@ -229,6 +266,12 @@ function initializeReferenceLinkTooltips(content, pageContext) {
     content.addEventListener("focusout", leave, options);
     content.addEventListener("click", event => {
         const link = event.target.closest("a[href]");
+        const coefficient = link && slrCoefficientAnchor(link.hash, content);
+        if (coefficient) {
+            const url = new URL(location.href);
+            url.hash = coefficient.id;
+            link.href = url.href;
+        }
         const parameter = link && parameterLinkUrl(link.hash);
         // Keep native navigation, including modified clicks, on the resolved URL.
         if (parameter) link.href = parameter.href;

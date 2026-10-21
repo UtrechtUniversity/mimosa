@@ -360,6 +360,16 @@ mjx-container a[href*="parameters/#"] {
     .dependency-graph-viewport { flex: 1; height: auto; min-height: 0; }
 }
 
+.slr-coefficient-anchor {
+    display: inline-block;
+    scroll-margin-top: 4rem;
+}
+
+.slr-coefficient-card {
+    padding: .5rem;
+    table { margin: 0 !important; }
+}
+
 .reference-tooltip {
     position: fixed;
     z-index: 10;

@@ -2,6 +2,7 @@
 
 from types import SimpleNamespace
 from xml.etree import ElementTree
+import re
 
 import pytest
 from pyomo.environ import ConcreteModel, Param, value
@@ -94,3 +95,31 @@ def test_land_water_has_one_shared_value(slr_model):
     block = rendered_block(render_slr_coefficients("land_water", slr_model))
     assert len(block.findall(".//table")) == 1
     assert rows(block.find(".//table"))[1][-1] == "0.0004"
+
+
+def test_slr_equation_links_resolve_to_local_rows_without_markdown(slr_model):
+    source = "\n".join(
+        render_slr_coefficients(section, slr_model)
+        for section in SLR_COEFFICIENT_GROUPS
+    )
+    anchors = re.findall(
+        r'<span id="slrcoef__([^"]+)"[^>]+data-slr-coefficients="([^"]+)">',
+        source,
+    )
+    assert len(anchors) == len(dict(anchors))
+    targets = set(re.findall(r"\\href\{\./#slrcoef__([^}]+)\}", sealevelrise.get_constraints.__doc__))
+    names = {
+        name for section, group in SLR_COEFFICIENT_GROUPS.items()
+        if section != "initial" for name, *_ in group
+    }
+    thermal = {name for name in names if name.startswith("slr_thermal_")}
+    assert targets == names - thermal | {"slr_thermal_sensitivity", "slr_thermal_timescale"}
+    lookup = dict(anchors)
+    for target in targets:
+        assert set(lookup[target].split()) <= names
+    assert lookup["slr_thermal_sensitivity"].split() == [
+        "slr_thermal_fast_sensitivity", "slr_thermal_slow_sensitivity",
+    ]
+    assert lookup["slr_thermal_timescale"].split() == [
+        "slr_thermal_fast_timescale", "slr_thermal_slow_timescale",
+    ]

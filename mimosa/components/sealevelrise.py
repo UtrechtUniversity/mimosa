@@ -118,14 +118,20 @@ def get_constraints(
 
     {{ slr_coefficients("initial") }}
 
+    In the equations below, $t$ indexes model time steps, $\Delta t$ is the
+    elapsed time in years, and $\href{./#var__temperature}{T_{t-1}}$ is global
+    mean warming above pre-industrial at the preceding step. A starred SLR
+    value is the long-term equilibrium contribution at a fixed temperature;
+    the actual contribution can lag behind that equilibrium.
+
     # Thermal expansion
 
     Thermal expansion is represented by a fast and a slow response box. Each
     box relaxes towards a temperature-dependent equilibrium:
 
     $$
-    S_{i,t}=\beta_i \href{./#var__temperature}{T_{t-1}}+
-    \left(S_{i,t-1}-\beta_i \href{./#var__temperature}{T_{t-1}}\right)e^{-\Delta t/\tau_i},
+    \text{SLR}_{i,t}=\href{./#slrcoef__slr_thermal_sensitivity}{\beta_i} \href{./#var__temperature}{T_{t-1}}+
+    \left(\text{SLR}_{i,t-1}-\href{./#slrcoef__slr_thermal_sensitivity}{\beta_i} \href{./#var__temperature}{T_{t-1}}\right)e^{-\Delta t/\href{./#slrcoef__slr_thermal_timescale}{\tau_i}},
     \qquad i\in\{\text{fast},\text{slow}\}.
     $$
 
@@ -150,14 +156,14 @@ def get_constraints(
     by Martínez Montero et al. (2022):
 
     $$
-    S^*_{\mathrm{GL}}(T)=P_{\mathrm{GL}}
-    \tanh\left(\frac{T}{\zeta_{\mathrm{GL}}}\right),
+    \text{SLR}^*_{\mathrm{GL}}(\href{./#var__temperature}{T_{t-1}})=\href{./#slrcoef__slr_gsic_total_ice}{P_{\mathrm{GL}}}
+    \tanh\left(\frac{\href{./#var__temperature}{T_{t-1}}}{\href{./#slrcoef__slr_gsic_temp_sensitivity}{\zeta_{\mathrm{GL}}}}\right),
     $$
 
     $$
-    \href{./#var__slr_cumgsic}{S_{\mathrm{GL},t}}=S^*_{\mathrm{GL}}(\href{./#var__temperature}{T_{t-1}})+
-    \left(\href{./#var__slr_cumgsic}{S_{\mathrm{GL},t-1}}-S^*_{\mathrm{GL}}(\href{./#var__temperature}{T_{t-1}})\right)
-    e^{-\Delta t/\tau_{\mathrm{GL}}}.
+    \href{./#var__slr_cumgsic}{\text{SLR}_{\mathrm{GL},t}}=\text{SLR}^*_{\mathrm{GL}}(\href{./#var__temperature}{T_{t-1}})+
+    \left(\href{./#var__slr_cumgsic}{\text{SLR}_{\mathrm{GL},t-1}}-\text{SLR}^*_{\mathrm{GL}}(\href{./#var__temperature}{T_{t-1}})\right)
+    e^{-\Delta t/\href{./#slrcoef__slr_gsic_timescale}{\tau_{\mathrm{GL}}}}.
     $$
 
     This replaces the previous formulation, in which all glaciers eventually
@@ -167,19 +173,51 @@ def get_constraints(
 
     # Greenland ice sheet
 
-    Greenland follows a SIMPLE-style delayed equilibrium. Its equilibrium
-    contribution is a normalised logistic function bounded by the ice sheet's
-    sea-level potential. Its response time decreases smoothly with warming:
+    The Greenland ice sheet contributes to sea-level rise as it loses ice.
+    MIMOSA uses a SIMPLE-style delayed equilibrium: the temperature at the
+    preceding step sets a long-term equilibrium contribution, and the actual
+    contribution approaches that target gradually.
+
+    The equilibrium curve uses the logistic function
 
     $$
-    S^*_{\mathrm{GIS}}(T)=P_{\mathrm{GIS}}
-    \frac{\sigma((T-T_c)/w)-\sigma(-T_c/w)}
-         {1-\sigma(-T_c/w)},
+    \sigma(x)=\frac{1}{1+e^{-x}},
     $$
 
+    a smooth transition from 0 to 1. Here $x$ is a dimensionless argument.
+    The equilibrium SLR contribution is normalised to zero at zero warming
+    and approaches the ice sheet's sea-level potential at high warming:
+
     $$
-    \tau_{\mathrm{GIS}}(T)=\tau_0e^{-\gamma T}.
+    \text{SLR}^*_{\mathrm{GIS}}(\href{./#var__temperature}{T_{t-1}})=\href{./#slrcoef__slr_gis_total_ice}{P_{\mathrm{GIS}}}
+    \frac{\sigma((\href{./#var__temperature}{T_{t-1}}-\href{./#slrcoef__slr_gis_threshold}{T_c})/\href{./#slrcoef__slr_gis_transition_width}{w})-\sigma(-\href{./#slrcoef__slr_gis_threshold}{T_c}/\href{./#slrcoef__slr_gis_transition_width}{w})}
+         {1-\sigma(-\href{./#slrcoef__slr_gis_threshold}{T_c}/\href{./#slrcoef__slr_gis_transition_width}{w})},
     $$
+
+    The response time $\tau_{\mathrm{GIS}}$, measured in years, determines
+    how quickly Greenland approaches this equilibrium. It decreases with
+    warming, so higher temperatures lead to a faster response:
+
+    $$
+    \tau_{\mathrm{GIS}}(\href{./#var__temperature}{T_{t-1}})=\href{./#slrcoef__slr_gis_base_timescale}{\tau_0}e^{-\href{./#slrcoef__slr_gis_timescale_sensitivity}{\gamma} \href{./#var__temperature}{T_{t-1}}}.
+    $$
+
+    The actual Greenland SLR contribution is updated each time step as
+
+    $$
+    \begin{aligned}
+    \href{./#var__slr_cumgis}{\text{SLR}_{\mathrm{GIS},t}}
+    &= \text{SLR}^*_{\mathrm{GIS}}(\href{./#var__temperature}{T_{t-1}}) \\
+    &\quad + \left(\href{./#var__slr_cumgis}{\text{SLR}_{\mathrm{GIS},t-1}}
+    - \text{SLR}^*_{\mathrm{GIS}}(\href{./#var__temperature}{T_{t-1}})\right)
+    e^{-\Delta t/\tau_{\mathrm{GIS}}(\href{./#var__temperature}{T_{t-1}})}.
+    \end{aligned}
+    $$
+
+    Thus, only part of the gap to equilibrium closes within a model time step.
+    For example, with a constant temperature and response time, about 63% of
+    that gap closes after one response time. The actual SLR contribution,
+    rather than the equilibrium target, is added to total sea-level rise.
 
     {{ slr_coefficients("greenland") }}
 
@@ -187,17 +225,20 @@ def get_constraints(
 
     A single lagged Antarctic subsurface-ocean temperature proxy drives the AIS
     response. A smooth threshold term represents the possibility of faster ice
-    loss at high warming while retaining differentiability for optimisation:
+    loss at high warming while retaining differentiability for optimisation.
+
+    The function $\sigma$ is the same logistic function defined in the
+    Greenland section above.
 
     $$
-    \href{./#var__slr_antarctic_ocean_temp}{T_{A,t}}=\lambda_A \href{./#var__temperature}{T_{t-1}}+
-    \left(\href{./#var__slr_antarctic_ocean_temp}{T_{A,t-1}}-\lambda_A \href{./#var__temperature}{T_{t-1}}\right)e^{-\Delta t/\tau_A},
+    \href{./#var__slr_antarctic_ocean_temp}{T_{A,t}}=\href{./#slrcoef__slr_ais_ocean_temp_scaling}{\lambda_A} \href{./#var__temperature}{T_{t-1}}+
+    \left(\href{./#var__slr_antarctic_ocean_temp}{T_{A,t-1}}-\href{./#slrcoef__slr_ais_ocean_temp_scaling}{\lambda_A} \href{./#var__temperature}{T_{t-1}}\right)e^{-\Delta t/\href{./#slrcoef__slr_ais_ocean_temp_timescale}{\tau_A}},
     $$
 
     $$
-    \href{./#var__slr_cumais}{S_{\mathrm{AIS},t}}=\href{./#var__slr_cumais}{S_{\mathrm{AIS},t-1}}+\Delta t
-    \left[r_0+r_1\href{./#var__slr_antarctic_ocean_temp}{T_{A,t}}+r_f\sigma((\href{./#var__slr_antarctic_ocean_temp}{T_{A,t}}-T_{crit})/w_A)\right]
-    \left(1-\frac{\href{./#var__slr_cumais}{S_{\mathrm{AIS},t-1}}}{P_{\mathrm{AIS}}}\right).
+    \href{./#var__slr_cumais}{\text{SLR}_{\mathrm{AIS},t}}=\href{./#var__slr_cumais}{\text{SLR}_{\mathrm{AIS},t-1}}+\Delta t
+    \left[\href{./#slrcoef__slr_ais_background_rate}{r_0}+\href{./#slrcoef__slr_ais_temp_sensitivity}{r_1}\href{./#var__slr_antarctic_ocean_temp}{T_{A,t}}+\href{./#slrcoef__slr_ais_fast_rate}{r_f}\sigma((\href{./#var__slr_antarctic_ocean_temp}{T_{A,t}}-\href{./#slrcoef__slr_ais_fast_threshold}{T_{crit}})/\href{./#slrcoef__slr_ais_fast_transition_width}{w_A})\right]
+    \left(1-\frac{\href{./#var__slr_cumais}{\text{SLR}_{\mathrm{AIS},t-1}}}{\href{./#slrcoef__slr_ais_total_ice}{P_{\mathrm{AIS}}}}\right).
     $$
 
     The scaling and delay between global surface warming and Antarctic
@@ -221,8 +262,8 @@ def get_constraints(
     is added explicitly:
 
     $$
-    \href{./#var__slr_cumlws}{S_{\mathrm{LWS},t}}=\href{./#var__slr_cumlws}{S_{\mathrm{LWS},t-1}}+\Delta t\,r_{\mathrm{LWS}},
-    \qquad r_{\mathrm{LWS}}=0.0004\ \mathrm{m\,yr^{-1}}.
+    \href{./#var__slr_cumlws}{\text{SLR}_{\mathrm{LWS},t}}=\href{./#var__slr_cumlws}{\text{SLR}_{\mathrm{LWS},t-1}}+\Delta t\,\href{./#slrcoef__slr_lws_rate}{r_{\mathrm{LWS}}},
+    \qquad \href{./#slrcoef__slr_lws_rate}{r_{\mathrm{LWS}}}=0.0004\ \mathrm{m\,yr^{-1}}.
     $$
 
     {{ slr_coefficients("land_water") }}
@@ -230,8 +271,8 @@ def get_constraints(
     # Total sea-level rise
 
     $$
-    \href{./#var__total_SLR}{S_t}=\href{./#var__slr_thermal}{S_{\mathrm{thermal},t}}+\href{./#var__slr_cumgsic}{S_{\mathrm{GL},t}}
-        +\href{./#var__slr_cumgis}{S_{\mathrm{GIS},t}}+\href{./#var__slr_cumais}{S_{\mathrm{AIS},t}}+\href{./#var__slr_cumlws}{S_{\mathrm{LWS},t}}.
+    \href{./#var__total_SLR}{\text{SLR}_t}=\href{./#var__slr_thermal}{\text{SLR}_{\mathrm{thermal},t}}+\href{./#var__slr_cumgsic}{\text{SLR}_{\mathrm{GL},t}}
+        +\href{./#var__slr_cumgis}{\text{SLR}_{\mathrm{GIS},t}}+\href{./#var__slr_cumais}{\text{SLR}_{\mathrm{AIS},t}}+\href{./#var__slr_cumlws}{\text{SLR}_{\mathrm{LWS},t}}.
     $$
 
     ## Calibration against IPCC AR6
