@@ -104,7 +104,7 @@ def var_to_row(rows, m, var, is_regional, unit):
 
 
 def add_derived_global_rows(rows, m, all_variables):
-    """
+    r"""
     Add derived regional and missing global series to the exported results.
 
     Indirect costs are attributed to damage, mitigation, and adaptation using
@@ -131,8 +131,8 @@ def add_derived_global_rows(rows, m, all_variables):
     people`, are summed directly:
 
     $$
-    \\text{global population quantity}_t =
-    \\sum_r \\text{population quantity}_{t,r}.
+    \text{global population quantity}_t =
+    \sum_r \text{population quantity}_{t,r}.
     $$
 
     Regional cost variables are aggregated when they have `fraction_of_GDP` as
@@ -142,19 +142,19 @@ def add_derived_global_rows(rows, m, all_variables):
     used as the numerator:
 
     $$
-    \\text{global costs}_t =
-    \\frac{\\sum_r \\text{absolute costs}_{t,r}}
-    {\\href{./#var__global_GDP_gross}{\\text{global GDP gross}_t}}.
+    \text{global costs}_t =
+    \frac{\sum_r \text{absolute costs}_{t,r}}
+    {\href{./#var__global_GDP_gross}{\text{global GDP gross}_t}}.
     $$
 
     Otherwise, absolute regional costs are reconstructed from the GDP-relative
     values:
 
     $$
-    \\text{global costs}_t =
-    \\frac{\\sum_r \\left(\\text{costs}_{t,r}
-    \\cdot \\href{./#var__GDP_gross}{\\text{GDP gross}_{t,r}}\\right)}
-    {\\href{./#var__global_GDP_gross}{\\text{global GDP gross}_t}}.
+    \text{global costs}_t =
+    \frac{\sum_r \left(\text{costs}_{t,r}
+    \cdot \href{./#var__GDP_gross}{\text{GDP gross}_{t,r}}\right)}
+    {\href{./#var__global_GDP_gross}{\text{global GDP gross}_t}}.
     $$
 
     Regional adaptation effectiveness variables measured as

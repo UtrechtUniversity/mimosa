@@ -30,7 +30,7 @@ from .utils import (
 def get_constraints(
     m: ConcreteModel, inputs: ModelInputs, adaptation_options: AdaptationOptions
 ):
-    """
+    r"""
 
     The impacts of riverine flooding are estimated using the GLOFRIS model. The gross damages
     are fitted with a quadratic function of temperature:
@@ -43,16 +43,16 @@ def get_constraints(
     all three sectors, using regional [max. effectiveness](#param__regional.ACCREU.riverine_adapt_eff_max_effectiveness) and [cost coefficient](#param__regional.ACCREU.riverine_adapt_eff_cost_param):
 
     $$
-    \\href{./#var__riverine_adaptation_level}{\\text{adapt. level}_{\\text{riverine},t,r}}
-    = \\text{NES}(\\href{./#var__riverine_adaptation_costs_abs}{\\text{adapt. costs}_{\\text{riverine},t,r}};
-    \\href{./#param__regional.ACCREU.riverine_adapt_eff_max_effectiveness}{\\text{max eff.}_{\\text{riverine},r}},
-    \\href{./#param__regional.ACCREU.riverine_adapt_eff_cost_param}{c_{\\text{riverine},r}})
+    \href{./#var__riverine_adaptation_level}{\text{adapt. level}_{\text{riverine},t,r}}
+    = \text{NES}(\href{./#var__riverine_adaptation_costs_abs}{\text{adapt. costs}_{\text{riverine},t,r}};
+    \href{./#param__regional.ACCREU.riverine_adapt_eff_max_effectiveness}{\text{max eff.}_{\text{riverine},r}},
+    \href{./#param__regional.ACCREU.riverine_adapt_eff_cost_param}{c_{\text{riverine},r}})
     $$
 
     Subsequently, the residual damages are calculated as:
 
     $$
-    \\href{./#var__riverine_damage_costs}{\\text{damages}_{\\text{riverine},t,r}} = \\href{./#var__riverine_damage_costs_gross}{\\text{gross damages}_{\\text{riverine},t,r}} \\cdot (1 - \\href{./#var__riverine_adaptation_level}{\\text{adapt. level}_{\\text{riverine},t,r}}),
+    \href{./#var__riverine_damage_costs}{\text{damages}_{\text{riverine},t,r}} = \href{./#var__riverine_damage_costs_gross}{\text{gross damages}_{\text{riverine},t,r}} \cdot (1 - \href{./#var__riverine_adaptation_level}{\text{adapt. level}_{\text{riverine},t,r}}),
     $$
 
     <div class="grid cards" markdown>
@@ -237,12 +237,12 @@ def get_constraints(
 
 
 def gross_dmg_fct_riverine(m, t, r):
-    """
+    r"""
     $$
-        \\href{./#var__riverine_damage_costs_gross}{\\text{gross damages}_{\\text{riverine},t,r}}
-        = (\\href{./#param__regional.ACCREU.riverine_noadapt_ead_constant}{a_r} + \\href{./#param__regional.ACCREU.riverine_noadapt_ead_linear}{b_r} \\cdot \\href{./#var__temperature}{T_t}
-        + \\href{./#param__regional.ACCREU.riverine_noadapt_ead_quadr}{c_r} \\cdot \\href{./#var__temperature}{T_t}^2) - (\\href{./#param__regional.ACCREU.riverine_noadapt_ead_constant}{a_r} + \\href{./#param__regional.ACCREU.riverine_noadapt_ead_linear}{b_r} \\cdot \\href{./#param__temperature.initial}{T_0}
-        + \\href{./#param__regional.ACCREU.riverine_noadapt_ead_quadr}{c_r} \\cdot \\href{./#param__temperature.initial}{T_0}^2).
+        \href{./#var__riverine_damage_costs_gross}{\text{gross damages}_{\text{riverine},t,r}}
+        = (\href{./#param__regional.ACCREU.riverine_noadapt_ead_constant}{a_r} + \href{./#param__regional.ACCREU.riverine_noadapt_ead_linear}{b_r} \cdot \href{./#var__temperature}{T_t}
+        + \href{./#param__regional.ACCREU.riverine_noadapt_ead_quadr}{c_r} \cdot \href{./#var__temperature}{T_t}^2) - (\href{./#param__regional.ACCREU.riverine_noadapt_ead_constant}{a_r} + \href{./#param__regional.ACCREU.riverine_noadapt_ead_linear}{b_r} \cdot \href{./#param__temperature.initial}{T_0}
+        + \href{./#param__regional.ACCREU.riverine_noadapt_ead_quadr}{c_r} \cdot \href{./#param__temperature.initial}{T_0}^2).
     $$
     """
     a = m.riverine_damages_gross_constant[r]

@@ -34,17 +34,17 @@ from .utils import get_adaptation_options
 def get_constraints(
     m: ConcreteModel, inputs: ModelInputs
 ) -> Sequence[GeneralConstraint]:
-    """
+    r"""
     The total damage costs are the sum of the sectoral damages:
 
     $$
-    \\href{./#var__damage_costs}{\\text{damages}_{t,r}} = \\href{./#var__riverine_damage_costs}{\\text{damages}_{\\text{riverine},t,r}} + \\href{./#var__labourprod_damage_costs_net}{\\text{damages}_{\\text{labour prod. (net)},t,r}} + \\href{./#var__slr_damage_costs}{\\text{damages}_{\\text{SLR},t,r}}.
+    \href{./#var__damage_costs}{\text{damages}_{t,r}} = \href{./#var__riverine_damage_costs}{\text{damages}_{\text{riverine},t,r}} + \href{./#var__labourprod_damage_costs_net}{\text{damages}_{\text{labour prod. (net)},t,r}} + \href{./#var__slr_damage_costs}{\text{damages}_{\text{SLR},t,r}}.
     $$
 
     Similarly, if adaptation is enabled, the total adaptation costs are the sum of the sectoral adaptation costs:
 
     $$
-    \\href{./#var__adaptation_costs}{\\text{adapt. costs}_{t,r}} = \\href{./#var__riverine_adaptation_costs}{\\text{adapt. costs}_{\\text{riverine},t,r}} + \\href{./#var__labourprod_adaptation_costs}{\\text{adapt. costs}_{\\text{labour prod.},t,r}} + \\href{./#var__slr_adaptation_costs}{\\text{adapt. costs}_{\\text{SLR},t,r}}.
+    \href{./#var__adaptation_costs}{\text{adapt. costs}_{t,r}} = \href{./#var__riverine_adaptation_costs}{\text{adapt. costs}_{\text{riverine},t,r}} + \href{./#var__labourprod_adaptation_costs}{\text{adapt. costs}_{\text{labour prod.},t,r}} + \href{./#var__slr_adaptation_costs}{\text{adapt. costs}_{\text{SLR},t,r}}.
     $$
 
     As mentioned above, mortality is also included in this damage representation. However, since (the monetisation of) mortality
@@ -53,11 +53,11 @@ def get_constraints(
     this is given by the variable `market_and_non_market_damage_costs`, calculated as:
 
     $$
-    \\href{./#var__market_and_non_market_damage_costs}{\\text{market and non-market damages}_{t,r}} = \\href{./#var__damage_costs}{\\text{damages}_{t,r}} + \\frac{\\href{./#var__mortality_damage_costs_abs}{\\text{abs. damages}_{\\text{mortality},t,r}}}{\\href{./#var__GDP_gross}{\\text{GDP}_{\\text{gross},t,r}}},
+    \href{./#var__market_and_non_market_damage_costs}{\text{market and non-market damages}_{t,r}} = \href{./#var__damage_costs}{\text{damages}_{t,r}} + \frac{\href{./#var__mortality_damage_costs_abs}{\text{abs. damages}_{\text{mortality},t,r}}}{\href{./#var__GDP_gross}{\text{GDP}_{\text{gross},t,r}}},
     $$
 
-    where $\\text{abs. damages}_{\\text{mortality}}$ is the mortality damages in absolute terms (i.e. in currency units),
-    and $\\text{GDP}_{\\text{gross}}$ is the gross GDP, also in absolute terms (i.e. in currency units).
+    where $\text{abs. damages}_{\text{mortality}}$ is the mortality damages in absolute terms (i.e. in currency units),
+    and $\text{GDP}_{\text{gross}}$ is the gross GDP, also in absolute terms (i.e. in currency units).
 
     <div class="tiny_table table_scrollable extra_small" markdown>
 

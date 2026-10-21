@@ -140,24 +140,24 @@ def _load_data():
 
 
 def _calc_debt(m, r, all_emissions, all_population):
-    """
+    r"""
 
     #### Step 1: historical debt calculation
 
     The historical debt is calculated as the cumulative difference between the historical
     fair share (based on equal per capita emissions) and the actual emissions, starting from
     a given start year (default: 1850) and using all historical observations available up to
-    the first model year. The debt is discounted to that first model year, denoted by $\\href{./#param__time.start}{t_0}$
-    (2025 by default). If $t_{\\mathrm{hist}}$ is the final available historical observation:
+    the first model year. The debt is discounted to that first model year, denoted by $\href{./#param__time.start}{t_0}$
+    (2025 by default). If $t_{\mathrm{hist}}$ is the final available historical observation:
 
     $$
-    \\text{debt}_{r} = \\sum_{t=\\href{./#param__effort%20sharing.ecpc_start_year}{\\text{start year}}}^{t_{\\mathrm{hist}}} \\left(\\text{emissions}_{r,t} - \\frac{\\text{population}_{r,t}}{\\text{global population}_{t}} \\cdot \\text{global emissions}_{t}\\right) \\cdot e^{-\\href{./#param__effort%20sharing.ecpc_discount_rate}{\\text{discount rate}} \\cdot (\\href{./#param__time.start}{t_0} - t)}.
+    \text{debt}_{r} = \sum_{t=\href{./#param__effort%20sharing.ecpc_start_year}{\text{start year}}}^{t_{\mathrm{hist}}} \left(\text{emissions}_{r,t} - \frac{\text{population}_{r,t}}{\text{global population}_{t}} \cdot \text{global emissions}_{t}\right) \cdot e^{-\href{./#param__effort%20sharing.ecpc_discount_rate}{\text{discount rate}} \cdot (\href{./#param__time.start}{t_0} - t)}.
     $$
 
     where you can set the following parameters:
 
-    * $\\href{./#param__effort%20sharing.ecpc_start_year}{\\text{start year}}$ using [`params["effort sharing"]["ecpc_start_year"]`](#param__effort%20sharing.ecpc_start_year) (default: 1850),
-    * $\\href{./#param__effort%20sharing.ecpc_discount_rate}{\\text{discount rate}}$ using [`params["effort sharing"]["ecpc_discount_rate"]`](#param__effort%20sharing.ecpc_discount_rate) (default: 3%/yr).
+    * $\href{./#param__effort%20sharing.ecpc_start_year}{\text{start year}}$ using [`params["effort sharing"]["ecpc_start_year"]`](#param__effort%20sharing.ecpc_start_year) (default: 1850),
+    * $\href{./#param__effort%20sharing.ecpc_discount_rate}{\text{discount rate}}$ using [`params["effort sharing"]["ecpc_discount_rate"]`](#param__effort%20sharing.ecpc_discount_rate) (default: 3%/yr).
 
     The historical debt is therefore positive for regions that emitted more than their fair share of cumulative emissions per capita, and negative for regions that emitted less than their fair share:
 

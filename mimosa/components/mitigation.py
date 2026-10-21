@@ -44,7 +44,7 @@ def get_constraints(
 def _get_mac_constraints(
     m: ConcreteModel, inputs: ModelInputs
 ) -> Sequence[GeneralConstraint]:
-    """
+    r"""
     In MIMOSA, the baseline emissions can be reduced by implementing a carbon price. This increases the price of
     carbon-intensive technologies relative to cleaner alternatives, which in turn leads to a reduction in emissions.
 
@@ -61,10 +61,10 @@ def _get_mac_constraints(
     to baseline emissions) and a time-dependent learning factor:
 
     $$
-    \\text{MAC}_t(a) = \\left( \\href{./#param__economics.MAC.gamma}{\\gamma} \\cdot a^{\\href{./#param__economics.MAC.beta}{\\beta}}\\right) \\cdot \\href{./#var__learning_factor}{\\text{learning factor}_t}.
+    \text{MAC}_t(a) = \left( \href{./#param__economics.MAC.gamma}{\gamma} \cdot a^{\href{./#param__economics.MAC.beta}{\beta}}\right) \cdot \href{./#var__learning_factor}{\text{learning factor}_t}.
     $$
 
-    The parameters $\\href{./#param__economics.MAC.gamma}{\\gamma}$ ([`MAC_gamma`](#param__economics.MAC.gamma)) and $\\href{./#param__economics.MAC.beta}{\\beta}$ ([`MAC_beta`](#param__economics.MAC.beta))
+    The parameters $\href{./#param__economics.MAC.gamma}{\gamma}$ ([`MAC_gamma`](#param__economics.MAC.gamma)) and $\href{./#param__economics.MAC.beta}{\beta}$ ([`MAC_beta`](#param__economics.MAC.beta))
     are calibrated using the IPCC AR6 WG3 report. The learning factor depends on learning by doing and learning over time
     (see the tab "Technological learning").
 
@@ -86,10 +86,10 @@ def _get_mac_constraints(
         ### Step 2: fitting a function to the data
 
         The next step is to fit a function through the cloud of points. We assume that the MAC is a power function
-        (of a certain power $\\href{./#param__economics.MAC.beta}{\\beta}$). This means that the abatement costs, being the integral of the MAC
-        (area under the MAC) follows a function of power $\\href{./#param__economics.MAC.beta}{\\beta}+1$. We obtain the best fit (highest r-squared)
-        with a power of $\\href{./#param__economics.MAC.beta}{\\beta}=3$, so a cubic MAC. We then perform an Ordinary Least Square regression of the function
-        $a \\cdot x^4$ (a power function of $\\href{./#param__economics.MAC.beta}{\\beta}+1=4$) and obtain the best fit shown as solid black line in figure 1:
+        (of a certain power $\href{./#param__economics.MAC.beta}{\beta}$). This means that the abatement costs, being the integral of the MAC
+        (area under the MAC) follows a function of power $\href{./#param__economics.MAC.beta}{\beta}+1$. We obtain the best fit (highest r-squared)
+        with a power of $\href{./#param__economics.MAC.beta}{\beta}=3$, so a cubic MAC. We then perform an Ordinary Least Square regression of the function
+        $a \cdot x^4$ (a power function of $\href{./#param__economics.MAC.beta}{\beta}+1=4$) and obtain the best fit shown as solid black line in figure 1:
 
         ![Mitigation costs as GDP loss in the AR6 database](../assets/fig/calibration_ar6_mitig_costs.jpg)
 
@@ -98,9 +98,9 @@ def _get_mac_constraints(
         ### Step 3: calibrating MIMOSA to the fitted function
 
         The final step is to calibrate the MAC used in MIMOSA to the OLS fit. In MIMOSA, this means calibrating the
-        parameter $\\href{./#param__economics.MAC.gamma}{\\gamma}$. When using
+        parameter $\href{./#param__economics.MAC.gamma}{\gamma}$. When using
 
-        $$\\href{./#param__economics.MAC.gamma}{\\gamma} = 2601 \\text{ \\$/tCO}_2,$$
+        $$\href{./#param__economics.MAC.gamma}{\gamma} = 2601 \text{ \$/tCO}_2,$$
 
         the MIMOSA costs align best with the OLS fit through the AR6 points (see the diamond points in the previous figure).
 
@@ -108,20 +108,20 @@ def _get_mac_constraints(
     ### Regional MAC curve
 
     The regional MAC curve is obtained by scaling the global MAC curve by a regional scaling factor, and links the
-    regional carbon price to the regional relative mitigation $\\href{./#var__relative_abatement}{a_{t,r}}$:
+    regional carbon price to the regional relative mitigation $\href{./#var__relative_abatement}{a_{t,r}}$:
 
     $$
-    \\begin{align}
-    \\href{./#var__carbon_price}{\\text{carbon price}_{t,r}} &= \\text{MAC}_{\\text{regional},t,r}(\\href{./#var__relative_abatement}{a_{t,r}})\\\\
-    &= \\href{./#param__regional.MAC.kappa_rel_abatement_0.75_2050}{\\text{regional scaling factor}_{r}} \\cdot \\text{MAC}_t(\\href{./#var__relative_abatement}{a_{t,r}})\\\\
-    &= \\href{./#param__regional.MAC.kappa_rel_abatement_0.75_2050}{\\text{regional scaling factor}_{r}} \\cdot \\left( \\href{./#param__economics.MAC.gamma}{\\gamma} \\cdot \\href{./#var__relative_abatement}{a_{t,r}}^{\\href{./#param__economics.MAC.beta}{\\beta}}\\right) \\cdot \\href{./#var__learning_factor}{\\text{learning factor}_t}.
-    \\end{align}
+    \begin{align}
+    \href{./#var__carbon_price}{\text{carbon price}_{t,r}} &= \text{MAC}_{\text{regional},t,r}(\href{./#var__relative_abatement}{a_{t,r}})\\
+    &= \href{./#param__regional.MAC.kappa_rel_abatement_0.75_2050}{\text{regional scaling factor}_{r}} \cdot \text{MAC}_t(\href{./#var__relative_abatement}{a_{t,r}})\\
+    &= \href{./#param__regional.MAC.kappa_rel_abatement_0.75_2050}{\text{regional scaling factor}_{r}} \cdot \left( \href{./#param__economics.MAC.gamma}{\gamma} \cdot \href{./#var__relative_abatement}{a_{t,r}}^{\href{./#param__economics.MAC.beta}{\beta}}\right) \cdot \href{./#var__learning_factor}{\text{learning factor}_t}.
+    \end{align}
     $$
 
     The initial carbon price at time $t=0$ is set to zero:
 
     $$
-    \\href{./#var__carbon_price}{\\text{carbon price}_{0,r}} = 0.
+    \href{./#var__carbon_price}{\text{carbon price}_{0,r}} = 0.
     $$
 
     :::mimosa.components.mitigation.MAC
@@ -151,10 +151,10 @@ def _get_mac_constraints(
     absolute domestic mitigation costs, is therefore calculated as:
     
     $$
-    \\begin{align}
-    \\href{./#var__domestic_mitigation_costs_abs}{\\text{domestic mitigation costs abs}_{t,r}} &= \\left(\\int_0^{\\href{./#var__relative_abatement}{a_{t,r}}} \\text{MAC}_{\\text{regional},t,r}(a)\\ da \\right) \\cdot \\href{./#var__baseline_emissions}{\\text{baseline emissions}_{t,r}}\\\\
-    &= \\text{factor}_{t,r} \\cdot \\frac{\\href{./#param__economics.MAC.gamma}{\\gamma} \\cdot \\href{./#var__relative_abatement}{a_{t,r}}^{\\href{./#param__economics.MAC.beta}{\\beta}+1}}{\\href{./#param__economics.MAC.beta}{\\beta}+1} \\cdot \\href{./#var__baseline_emissions}{\\text{baseline emissions}_{t,r}}
-    \\end{align}
+    \begin{align}
+    \href{./#var__domestic_mitigation_costs_abs}{\text{domestic mitigation costs abs}_{t,r}} &= \left(\int_0^{\href{./#var__relative_abatement}{a_{t,r}}} \text{MAC}_{\text{regional},t,r}(a)\ da \right) \cdot \href{./#var__baseline_emissions}{\text{baseline emissions}_{t,r}}\\
+    &= \text{factor}_{t,r} \cdot \frac{\href{./#param__economics.MAC.gamma}{\gamma} \cdot \href{./#var__relative_abatement}{a_{t,r}}^{\href{./#param__economics.MAC.beta}{\beta}+1}}{\href{./#param__economics.MAC.beta}{\beta}+1} \cdot \href{./#var__baseline_emissions}{\text{baseline emissions}_{t,r}}
+    \end{align}
     $$
 
     Finally, the absolute mitigation costs attributed to a region are equal to its absolute domestic
@@ -162,7 +162,7 @@ def _get_mac_constraints(
     [emission trading](emissiontrading.md) is enabled:
 
     $$
-    \\href{./#var__mitigation_costs_abs}{\\text{mitigation costs abs}_{t,r}} = \\href{./#var__domestic_mitigation_costs_abs}{\\text{domestic mitigation costs abs}_{t,r}} + \\href{./#var__emissiontrade::mitigation_cost_trading_balance}{\\text{mitigation cost trading balance}_{t,r}}.
+    \href{./#var__mitigation_costs_abs}{\text{mitigation costs abs}_{t,r}} = \href{./#var__domestic_mitigation_costs_abs}{\text{domestic mitigation costs abs}_{t,r}} + \href{./#var__emissiontrade::mitigation_cost_trading_balance}{\text{mitigation cost trading balance}_{t,r}}.
     $$
 
 
@@ -171,14 +171,14 @@ def _get_mac_constraints(
     `mitigation_costs` contains the same costs as a fraction of gross GDP:
 
     $$
-    \\href{./#var__mitigation_costs}{\\text{mitigation costs}_{t,r}} = \\frac{\\href{./#var__mitigation_costs_abs}{\\text{mitigation costs abs}_{t,r}}}{\\href{./#var__GDP_gross}{\\text{GDP}_{\\text{gross}, t,r}}}.
+    \href{./#var__mitigation_costs}{\text{mitigation costs}_{t,r}} = \frac{\href{./#var__mitigation_costs_abs}{\text{mitigation costs abs}_{t,r}}}{\href{./#var__GDP_gross}{\text{GDP}_{\text{gross}, t,r}}}.
     $$
 
     When emission trading is allowed, some regions may even have negative mitigation costs. How negative this can become can
     be configured with the parameter [`rel_mitigation_costs_min_level`](#param__economics.MAC.rel_mitigation_costs_min_level).
 
     $$
-    \\href{./#var__mitigation_costs}{\\text{mitigation costs}_{t,r}} \\geq \\href{./#param__economics.MAC.rel_mitigation_costs_min_level}{\\text{mitigation costs min level}}.
+    \href{./#var__mitigation_costs}{\text{mitigation costs}_{t,r}} \geq \href{./#param__economics.MAC.rel_mitigation_costs_min_level}{\text{mitigation costs min level}}.
     $$
 
     By default, this parameter is 0, meaning that the mitigation costs can not become negative.
@@ -329,7 +329,7 @@ def _get_mac_constraints(
 def _get_learning_constraints(
     m: ConcreteModel, inputs: ModelInputs
 ) -> Sequence[GeneralConstraint]:
-    """
+    r"""
 
     In MIMOSA, there are two ways in which the price of mitigation policy can be reduced over time:
     through learning by doing and learning over time. The learning factor is the product of these two factors.
@@ -342,20 +342,20 @@ def _get_learning_constraints(
     The learning by doing factor is defined as:
 
     $$
-    \\href{./#var__LBD_factor}{\\text{LBD factor}_t} = \\left( \\href{./#param__economics.MAC.LBD_scaling}{\\xi} \\cdot \\text{cumulative mitigation}_t + 1 \\right)^{\\log_2(\\href{./#param__economics.MAC.LBD_rate}{\\rho})},
+    \href{./#var__LBD_factor}{\text{LBD factor}_t} = \left( \href{./#param__economics.MAC.LBD_scaling}{\xi} \cdot \text{cumulative mitigation}_t + 1 \right)^{\log_2(\href{./#param__economics.MAC.LBD_rate}{\rho})},
     $$
 
-    with $\\href{./#param__economics.MAC.LBD_rate}{\\rho}$ ([`LBD_rate`](#param__economics.MAC.LBD_rate)) the progress ratio (i.e., the reduction in
+    with $\href{./#param__economics.MAC.LBD_rate}{\rho}$ ([`LBD_rate`](#param__economics.MAC.LBD_rate)) the progress ratio (i.e., the reduction in
     costs for doubling cumulative mitigation capacity) representing empirical studies of endogenous technological
     learning (see <https://www.frontiersin.org/articles/10.3389/fclim.2021.785577/full>).
 
-    $\\href{./#param__economics.MAC.LBD_scaling}{\\xi}$ ([`LBD_scaling`](#param__economics.MAC.LBD_scaling)) is a scaling factor
+    $\href{./#param__economics.MAC.LBD_scaling}{\xi}$ ([`LBD_scaling`](#param__economics.MAC.LBD_scaling)) is a scaling factor
     to transform the units of cumulative mitigation in relative terms (compared to baseline emissions in $t=0$).
 
     The cumulative mitigation is equal to:
 
     $$
-    \\text{cumulative mitigation}_t = \\text{baseline cum. emissions}_t - \\href{./#var__global_cumulative_emissions}{\\text{cum. emissions}_t}.
+    \text{cumulative mitigation}_t = \text{baseline cum. emissions}_t - \href{./#var__global_cumulative_emissions}{\text{cum. emissions}_t}.
     $$
 
 
@@ -365,10 +365,10 @@ def _get_learning_constraints(
     even if no mitigation has been done yet. The learning over time factor is defined as:
 
     $$
-    \\href{./#var__LOT_factor}{\\text{LOT factor}_t} = \\frac{1}{(1 + \\href{./#param__economics.MAC.LOT_rate}{\\lambda})^t},
+    \href{./#var__LOT_factor}{\text{LOT factor}_t} = \frac{1}{(1 + \href{./#param__economics.MAC.LOT_rate}{\lambda})^t},
     $$
 
-    with $\\href{./#param__economics.MAC.LOT_rate}{\\lambda}$ ([`LOT_rate`](#param__economics.MAC.LOT_rate)) the learning rate. By default, the learning over time
+    with $\href{./#param__economics.MAC.LOT_rate}{\lambda}$ ([`LOT_rate`](#param__economics.MAC.LOT_rate)) the learning rate. By default, the learning over time
     rate is zero, so no learning over time is assumed.
 
     ## Parameters defined in this module

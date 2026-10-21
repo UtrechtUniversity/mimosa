@@ -26,7 +26,7 @@ from mimosa.core.model_inputs import ModelInputs
 def get_constraints(
     m: ConcreteModel, inputs: ModelInputs
 ) -> Sequence[GeneralConstraint]:
-    """
+    r"""
     Usage:
     ```python hl_lines="2"
     params = load_params()
@@ -50,11 +50,11 @@ def get_constraints(
     In this effort-sharing regime, the damages are also taken into account when equalising the costs among regions:
 
     $$
-    \\href{./#var__effortsharing_equal_total_costs::mitigation_costs}{\\text{mitigation costs}_{t,r}} + \\href{./#var__effortsharing_equal_total_costs::damage_costs}{\\text{damage costs}_{t,r}}\\ (+ \\href{./#var__financialtransfer_globaldamagepool::financial_transfer}{\\text{financial transfer}_{t,r}}) = \\href{./#var__effortsharing_equal_total_costs::effort_sharing_common_level}{\\text{common level}_t},
+    \href{./#var__effortsharing_equal_total_costs::mitigation_costs}{\text{mitigation costs}_{t,r}} + \href{./#var__effortsharing_equal_total_costs::damage_costs}{\text{damage costs}_{t,r}}\ (+ \href{./#var__financialtransfer_globaldamagepool::financial_transfer}{\text{financial transfer}_{t,r}}) = \href{./#var__effortsharing_equal_total_costs::effort_sharing_common_level}{\text{common level}_t},
     $$
 
-    where the variable $\\href{./#var__effortsharing_equal_total_costs::effort_sharing_common_level}{\\text{common level}_t}$ can have arbitrary values and is purely used as a common
-    value accross all the regions[^1]. Note that the variable $\\href{./#var__effortsharing_equal_total_costs::damage_costs}{\\text{damages}_{t,r}}$ is already expressed as percentage of GDP (see [Damages](damages/index.md)).
+    where the variable $\href{./#var__effortsharing_equal_total_costs::effort_sharing_common_level}{\text{common level}_t}$ can have arbitrary values and is purely used as a common
+    value accross all the regions[^1]. Note that the variable $\href{./#var__effortsharing_equal_total_costs::damage_costs}{\text{damages}_{t,r}}$ is already expressed as percentage of GDP (see [Damages](damages/index.md)).
 
     For feasibility reasons, this constraint is only enforced until 2100.
 
@@ -71,7 +71,7 @@ def get_constraints(
         most 0.5%. See [Soft-equality constraints](../extending/variables_constraints.md#soft-equality-constraints).
 
         $$
-        0.995 \\cdot \\text{RHS} \\leq \\text{LHS} \\leq 1.005 \\cdot \\text{RHS}.
+        0.995 \cdot \text{RHS} \leq \text{LHS} \leq 1.005 \cdot \text{RHS}.
         $$
     """
 

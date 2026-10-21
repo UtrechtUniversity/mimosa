@@ -31,7 +31,7 @@ from .utils import (
 def get_constraints(
     m: ConcreteModel, inputs: ModelInputs, adaptation_options: AdaptationOptions
 ):
-    """
+    r"""
 
     The impact of climate change on labour productivity can be decomposed in two types:
     heat-related expected annual costs due to warming (e.g. hot regions get hotter, leading
@@ -50,25 +50,25 @@ def get_constraints(
     all three sectors, using regional [max. effectiveness](#param__regional.ACCREU.labourprod_adapt_eff_max_effectiveness) and [cost coefficient](#param__regional.ACCREU.labourprod_adapt_eff_cost_param):
 
     $$
-    \\href{./#var__labourprod_adaptation_level}{\\text{adapt. level}_{\\text{labourprod},t,r}}
-    = \\text{NES}(\\href{./#var__labourprod_adaptation_costs_abs}{\\text{adapt. costs}_{\\text{labourprod},t,r}};
-    \\href{./#param__regional.ACCREU.labourprod_adapt_eff_max_effectiveness}{\\text{max eff.}_{\\text{labourprod},r}},
-    \\href{./#param__regional.ACCREU.labourprod_adapt_eff_cost_param}{c_{\\text{labourprod},r}})
+    \href{./#var__labourprod_adaptation_level}{\text{adapt. level}_{\text{labourprod},t,r}}
+    = \text{NES}(\href{./#var__labourprod_adaptation_costs_abs}{\text{adapt. costs}_{\text{labourprod},t,r}};
+    \href{./#param__regional.ACCREU.labourprod_adapt_eff_max_effectiveness}{\text{max eff.}_{\text{labourprod},r}},
+    \href{./#param__regional.ACCREU.labourprod_adapt_eff_cost_param}{c_{\text{labourprod},r}})
     $$
 
     This leads to the residual, heat related damages:
 
     $$
-    \\href{./#var__labourprod_damage_costs}{\\text{damages}_{\\text{labourprod},t,r}}
-    = \\href{./#var__labourprod_damage_costs_gross}{\\text{gross damages}_{\\text{labourprod},t,r}} \\cdot (1 - \\href{./#var__labourprod_adaptation_level}{\\text{adapt. level}_{\\text{labourprod},t,r}}).
+    \href{./#var__labourprod_damage_costs}{\text{damages}_{\text{labourprod},t,r}}
+    = \href{./#var__labourprod_damage_costs_gross}{\text{gross damages}_{\text{labourprod},t,r}} \cdot (1 - \href{./#var__labourprod_adaptation_level}{\text{adapt. level}_{\text{labourprod},t,r}}).
     $$
 
     The final, net damages are calculated as the sum of the heat-related residual damages and the cold-related benefits:
 
     $$
-    \\href{./#var__labourprod_damage_costs_net}{\\text{net damages}_{\\text{labourprod},t,r}}
-    = \\href{./#var__labourprod_damage_costs}{\\text{damages}_{\\text{labourprod},t,r}}
-    + \\href{./#var__labourprod_damage_costs_benefits}{\\text{benefits}_{\\text{labourprod},t,r}}
+    \href{./#var__labourprod_damage_costs_net}{\text{net damages}_{\text{labourprod},t,r}}
+    = \href{./#var__labourprod_damage_costs}{\text{damages}_{\text{labourprod},t,r}}
+    + \href{./#var__labourprod_damage_costs_benefits}{\text{benefits}_{\text{labourprod},t,r}}
     $$
 
     <div class="grid cards" markdown>
@@ -298,12 +298,12 @@ def get_constraints(
 
 
 def gross_dmg_fct_labourprod(m, t, r):
-    """
+    r"""
     The heat-related gross damage costs are fitted using a linear function of global temperature, shifted to 0 at the start year.
 
     $$
-        \\href{./#var__labourprod_damage_costs_gross}{\\text{gross damages}_{\\text{labourprod},t,r}}
-        = (\\href{./#param__regional.ACCREU.labourprod_noadapt_ead_constant}{a_{r, \\text{heat}}} + \\href{./#param__regional.ACCREU.labourprod_noadapt_ead_linear}{b_{r, \\text{heat}}} \\cdot \\href{./#var__temperature}{T_t}) - (\\href{./#param__regional.ACCREU.labourprod_noadapt_ead_constant}{a_{r, \\text{heat}}} + \\href{./#param__regional.ACCREU.labourprod_noadapt_ead_linear}{b_{r, \\text{heat}}} \\cdot \\href{./#param__temperature.initial}{T_0}).
+        \href{./#var__labourprod_damage_costs_gross}{\text{gross damages}_{\text{labourprod},t,r}}
+        = (\href{./#param__regional.ACCREU.labourprod_noadapt_ead_constant}{a_{r, \text{heat}}} + \href{./#param__regional.ACCREU.labourprod_noadapt_ead_linear}{b_{r, \text{heat}}} \cdot \href{./#var__temperature}{T_t}) - (\href{./#param__regional.ACCREU.labourprod_noadapt_ead_constant}{a_{r, \text{heat}}} + \href{./#param__regional.ACCREU.labourprod_noadapt_ead_linear}{b_{r, \text{heat}}} \cdot \href{./#param__temperature.initial}{T_0}).
     $$
     """
     a = m.labourprod_damages_gross_constant[r]
@@ -312,12 +312,12 @@ def gross_dmg_fct_labourprod(m, t, r):
 
 
 def benefits_dmg_fct_labourprod(m, t, r):
-    """
+    r"""
     The cold-related benefits of climate change are also fitted using a linear function of global temperature, and shifted to 0 at the start year.
 
     $$
-        \\href{./#var__labourprod_damage_costs_benefits}{\\text{benefits}_{\\text{labourprod},t,r}}
-        = (\\href{./#param__regional.ACCREU.labourprod_benefit_cdd_constant}{a_{r, \\text{cold}}} + \\href{./#param__regional.ACCREU.labourprod_benefit_cdd_linear}{b_{r, \\text{cold}}} \\cdot \\href{./#var__temperature}{T_t}) - (\\href{./#param__regional.ACCREU.labourprod_benefit_cdd_constant}{a_{r, \\text{cold}}} + \\href{./#param__regional.ACCREU.labourprod_benefit_cdd_linear}{b_{r, \\text{cold}}} \\cdot \\href{./#param__temperature.initial}{T_0}).
+        \href{./#var__labourprod_damage_costs_benefits}{\text{benefits}_{\text{labourprod},t,r}}
+        = (\href{./#param__regional.ACCREU.labourprod_benefit_cdd_constant}{a_{r, \text{cold}}} + \href{./#param__regional.ACCREU.labourprod_benefit_cdd_linear}{b_{r, \text{cold}}} \cdot \href{./#var__temperature}{T_t}) - (\href{./#param__regional.ACCREU.labourprod_benefit_cdd_constant}{a_{r, \text{cold}}} + \href{./#param__regional.ACCREU.labourprod_benefit_cdd_linear}{b_{r, \text{cold}}} \cdot \href{./#param__temperature.initial}{T_0}).
     $$
     """
     a = m.labourprod_damages_benefits_constant[r]

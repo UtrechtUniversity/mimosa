@@ -123,12 +123,12 @@ def effective_adaptation_curve(
 
 
 def adaptation_effectiveness_fct(adapt_costs, max_effectiveness, cost_param):
-    """
+    r"""
     The adaptation level is calculated as a function of absolute adaptation costs
     (in currency units) using a negative-exponential saturation (NES) curve:
 
     $$
-    \\text{NES}(\\text{adapt. costs}_{i,t,r}; \\cdot) = \\text{max effectiveness}_{i,r} \\cdot \\left(1 - e^{-c_{i,r} \\cdot \\text{adapt. costs}_{i,t,r}}\\right)
+    \text{NES}(\text{adapt. costs}_{i,t,r}; \cdot) = \text{max effectiveness}_{i,r} \cdot \left(1 - e^{-c_{i,r} \cdot \text{adapt. costs}_{i,t,r}}\right)
     $$
     """
 

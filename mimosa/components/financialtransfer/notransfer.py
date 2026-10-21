@@ -13,11 +13,11 @@ from mimosa.core.model_inputs import ModelInputs
 def get_constraints(
     m: ConcreteModel, inputs: ModelInputs
 ) -> Sequence[GeneralConstraint]:
-    """
+    r"""
     Without financial transfers, this variable is always equal to zero:
 
     $$
-    \\text{financial transfer abs}_{t,r} = \\text{financial transfer}_{t,r} = 0.0
+    \text{financial transfer abs}_{t,r} = \text{financial transfer}_{t,r} = 0.0
     $$
     """
     constraints = []

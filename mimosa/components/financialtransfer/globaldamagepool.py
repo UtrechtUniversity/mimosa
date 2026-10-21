@@ -22,30 +22,30 @@ from mimosa.core.model_inputs import ModelInputs
 def get_constraints(
     m: ConcreteModel, inputs: ModelInputs
 ) -> Sequence[GeneralConstraint]:
-    """
+    r"""
     When allowing financial transfers for a global damage cost pool, a region can
     receive financial transfers up to its level of climate damages:
 
     $$
-    \\href{./#var__financialtransfer_globaldamagepool::financial_transfer_abs}{\\text{financial transfer abs}_{t,r}} \\geq - \\href{./#var__financialtransfer_globaldamagepool::damage_costs}{\\text{damage costs}_{t,r}} \\cdot \\href{./#var__financialtransfer_globaldamagepool::GDP_gross}{\\text{GDP}_{\\text{gross},t,r}}
+    \href{./#var__financialtransfer_globaldamagepool::financial_transfer_abs}{\text{financial transfer abs}_{t,r}} \geq - \href{./#var__financialtransfer_globaldamagepool::damage_costs}{\text{damage costs}_{t,r}} \cdot \href{./#var__financialtransfer_globaldamagepool::GDP_gross}{\text{GDP}_{\text{gross},t,r}}
     $$
 
     The sum of financial transfers per time period should be zero, since it is a redistribution
     of costs:
 
     $$
-    \\sum_r \\href{./#var__financialtransfer_globaldamagepool::financial_transfer_abs}{\\text{financial transfer abs}_{t,r}} = 0
+    \sum_r \href{./#var__financialtransfer_globaldamagepool::financial_transfer_abs}{\text{financial transfer abs}_{t,r}} = 0
     $$
 
     Also, in the first year, no financial transfers are allowed:
 
-    $$ \\href{./#var__financialtransfer_globaldamagepool::financial_transfer_abs}{\\text{financial transfer abs}_{0,r}} = 0. $$
+    $$ \href{./#var__financialtransfer_globaldamagepool::financial_transfer_abs}{\text{financial transfer abs}_{0,r}} = 0. $$
 
     `financial_transfer_abs` is expressed in currency units (dollars), while
     `financial_transfer` is expressed as a fraction of gross GDP:
 
     $$
-    \\href{./#var__financialtransfer_globaldamagepool::financial_transfer}{\\text{financial transfer}_{t,r}} = \\frac{\\href{./#var__financialtransfer_globaldamagepool::financial_transfer_abs}{\\text{financial transfer abs}_{t,r}}}{\\href{./#var__financialtransfer_globaldamagepool::GDP_gross}{\\text{GDP}_{\\text{gross},t,r}}}
+    \href{./#var__financialtransfer_globaldamagepool::financial_transfer}{\text{financial transfer}_{t,r}} = \frac{\href{./#var__financialtransfer_globaldamagepool::financial_transfer_abs}{\text{financial transfer abs}_{t,r}}}{\href{./#var__financialtransfer_globaldamagepool::GDP_gross}{\text{GDP}_{\text{gross},t,r}}}
     $$
 
 

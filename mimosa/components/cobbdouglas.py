@@ -23,7 +23,7 @@ from mimosa.core.model_inputs import ModelInputs
 def get_constraints(
     m: ConcreteModel, inputs: ModelInputs
 ) -> Sequence[GeneralConstraint]:
-    """
+    r"""
     # Economic module and production function
 
     ## Gross and net GDP
@@ -39,10 +39,10 @@ def get_constraints(
     subtracted from GDP must be in currency units.
 
     $$
-    \\begin{align}
-    \\href{./#var__GDP_net}{\\text{GDP}_{\\text{net},t,r}} =\\ & \\href{./#var__GDP_gross}{\\text{GDP}_{\\text{gross},t,r}} \\cdot (1 - \\href{./#var__damage_costs}{\\text{damage costs}_{t,r}}) \\\\
-    &\\ \\ \\ - \\href{./#var__mitigation_costs_abs}{\\text{mitigation costs abs}_{t,r}} - \\href{./#var__financialtransfer_globaldamagepool::financial_transfer_abs}{\\text{financial transfer abs}_{t,r}}
-    \\end{align}
+    \begin{align}
+    \href{./#var__GDP_net}{\text{GDP}_{\text{net},t,r}} =\ & \href{./#var__GDP_gross}{\text{GDP}_{\text{gross},t,r}} \cdot (1 - \href{./#var__damage_costs}{\text{damage costs}_{t,r}}) \\
+    &\ \ \ - \href{./#var__mitigation_costs_abs}{\text{mitigation costs abs}_{t,r}} - \href{./#var__financialtransfer_globaldamagepool::financial_transfer_abs}{\text{financial transfer abs}_{t,r}}
+    \end{align}
     $$
 
     The last term represents optional financial transfers to compensate regions for damage
@@ -50,17 +50,17 @@ def get_constraints(
 
     ## Investments and consumption
 
-    This net GDP is then split in a part of investments ($\\href{./#var__investments}{I_t}$) and a part of consumption ($\\href{./#var__consumption}{C_t}$), according to a fixed savings rate ($\\href{./#param__economics.GDP.savings rate}{\\text{sr}}$):
+    This net GDP is then split in a part of investments ($\href{./#var__investments}{I_t}$) and a part of consumption ($\href{./#var__consumption}{C_t}$), according to a fixed savings rate ($\href{./#param__economics.GDP.savings rate}{\text{sr}}$):
 
-    $$ \\href{./#var__investments}{I_{t,r}} = \\href{./#param__economics.GDP.savings rate}{\\text{sr}} \\cdot \\href{./#var__GDP_net}{\\text{GDP}_{\\text{net},t,r}}, $$
+    $$ \href{./#var__investments}{I_{t,r}} = \href{./#param__economics.GDP.savings rate}{\text{sr}} \cdot \href{./#var__GDP_net}{\text{GDP}_{\text{net},t,r}}, $$
 
-    $$ \\href{./#var__consumption}{C_{t,r}} = (1 - \\href{./#param__economics.GDP.savings rate}{\\text{sr}}) \\cdot \\href{./#var__GDP_net}{\\text{GDP}_{\\text{net},t,r}}. $$
+    $$ \href{./#var__consumption}{C_{t,r}} = (1 - \href{./#param__economics.GDP.savings rate}{\text{sr}}) \cdot \href{./#var__GDP_net}{\text{GDP}_{\text{net},t,r}}. $$
 
     ## Capital stock
 
-    The capital stock $\\href{./#var__capital_stock}{K_t}$ grows over time according to the investments and the depreciation of the capital stock:
+    The capital stock $\href{./#var__capital_stock}{K_t}$ grows over time according to the investments and the depreciation of the capital stock:
 
-    $$ \\href{./#var__capital_stock}{K_{t,r}} = \\href{./#var__capital_stock}{K_{t-1,r}} + \\Delta t \\cdot \\frac{\\partial \\href{./#var__capital_stock}{K_{t,r}}}{\\partial t}, $$
+    $$ \href{./#var__capital_stock}{K_{t,r}} = \href{./#var__capital_stock}{K_{t-1,r}} + \Delta t \cdot \frac{\partial \href{./#var__capital_stock}{K_{t,r}}}{\partial t}, $$
 
     with the change in capital stock calculated by:
 
@@ -69,7 +69,7 @@ def get_constraints(
     Since this only gives the change in capital stock, we need to add the initial capital stock to get the actual capital stock.
     This is calculated as a region-dependent multiple of the initial GDP:
 
-    $$ \\href{./#var__capital_stock}{K_{t=0,r}} = \\href{./#param__regional.economics.init_capital_factor}{\\text{init_capitalstock_factor}_r} \\cdot \\text{GDP}_{t=0,r}. $$
+    $$ \href{./#var__capital_stock}{K_{t=0,r}} = \href{./#param__regional.economics.init_capital_factor}{\text{init_capitalstock_factor}_r} \cdot \text{GDP}_{t=0,r}. $$
 
     The [regional initial capital stock factors](#param__regional.economics.init_capital_factor) are calibrated from capital-stock-to-GDP ratios in
     the [IMF Investment and Capital Stock Dataset](https://data.imf.org/en/Datasets/ICSD).

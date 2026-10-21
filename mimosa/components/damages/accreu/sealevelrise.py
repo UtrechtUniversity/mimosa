@@ -31,7 +31,7 @@ from .utils import (
 def get_constraints(
     m: ConcreteModel, inputs: ModelInputs, adaptation_options: AdaptationOptions
 ):
-    """
+    r"""
 
     The sea-level rise impacts are calculated using the DIVA model. Specifically,
     for this purpose, we compare the Constant Dike Height scenario (“no adaptation / CDH”)
@@ -50,16 +50,16 @@ def get_constraints(
     all three sectors, using regional [max. effectiveness](#param__regional.ACCREU.slr_adapt_eff_max_effectiveness) and [cost coefficient](#param__regional.ACCREU.slr_adapt_eff_cost_param):
 
     $$
-    \\href{./#var__slr_adaptation_level}{\\text{adapt. level}_{\\text{SLR},t,r}}
-    = \\text{NES}(\\href{./#var__slr_adaptation_costs_abs}{\\text{adapt. costs}_{\\text{SLR},t,r}};
-    \\href{./#param__regional.ACCREU.slr_adapt_eff_max_effectiveness}{\\text{max eff.}_{\\text{SLR},r}},
-    \\href{./#param__regional.ACCREU.slr_adapt_eff_cost_param}{c_{\\text{SLR},r}})
+    \href{./#var__slr_adaptation_level}{\text{adapt. level}_{\text{SLR},t,r}}
+    = \text{NES}(\href{./#var__slr_adaptation_costs_abs}{\text{adapt. costs}_{\text{SLR},t,r}};
+    \href{./#param__regional.ACCREU.slr_adapt_eff_max_effectiveness}{\text{max eff.}_{\text{SLR},r}},
+    \href{./#param__regional.ACCREU.slr_adapt_eff_cost_param}{c_{\text{SLR},r}})
     $$
 
     Subsequently, the residual damages are calculated as:
 
     $$
-    \\href{./#var__slr_damage_costs}{\\text{damages}_{\\text{SLR},t,r}} = \\href{./#var__slr_damage_costs_gross}{\\text{gross damages}_{\\text{SLR},t,r}} \\cdot (1 - \\href{./#var__slr_adaptation_level}{\\text{adapt. level}_{\\text{SLR},t,r}}),
+    \href{./#var__slr_damage_costs}{\text{damages}_{\text{SLR},t,r}} = \href{./#var__slr_damage_costs_gross}{\text{gross damages}_{\text{SLR},t,r}} \cdot (1 - \href{./#var__slr_adaptation_level}{\text{adapt. level}_{\text{SLR},t,r}}),
     $$
 
     <div class="grid cards" markdown>
@@ -236,11 +236,11 @@ def get_constraints(
 
 
 def gross_dmg_fct_slr(m, t, r):
-    """
+    r"""
     $$
-        \\href{./#var__slr_damage_costs_gross}{\\text{gross damages}_{\\text{SLR},t,r}}
-        = \\left(\\href{./#param__regional.ACCREU.slr_noadapt_ead_constant}{a_r} + \\href{./#param__regional.ACCREU.slr_noadapt_ead_prod}{b_r} \\cdot \\left(\\href{./#var__total_SLR}{\\text{SLR}_t}\\right)^{\\href{./#param__regional.ACCREU.slr_noadapt_ead_power}{c_r}}\\right)
-        - \\left(\\href{./#param__regional.ACCREU.slr_noadapt_ead_constant}{a_r} + \\href{./#param__regional.ACCREU.slr_noadapt_ead_prod}{b_r} \\cdot \\left(\\href{./#var__total_SLR}{\\text{SLR}_0}\\right)^{\\href{./#param__regional.ACCREU.slr_noadapt_ead_power}{c_r}}\\right)
+        \href{./#var__slr_damage_costs_gross}{\text{gross damages}_{\text{SLR},t,r}}
+        = \left(\href{./#param__regional.ACCREU.slr_noadapt_ead_constant}{a_r} + \href{./#param__regional.ACCREU.slr_noadapt_ead_prod}{b_r} \cdot \left(\href{./#var__total_SLR}{\text{SLR}_t}\right)^{\href{./#param__regional.ACCREU.slr_noadapt_ead_power}{c_r}}\right)
+        - \left(\href{./#param__regional.ACCREU.slr_noadapt_ead_constant}{a_r} + \href{./#param__regional.ACCREU.slr_noadapt_ead_prod}{b_r} \cdot \left(\href{./#var__total_SLR}{\text{SLR}_0}\right)^{\href{./#param__regional.ACCREU.slr_noadapt_ead_power}{c_r}}\right)
     $$
     """
     return (

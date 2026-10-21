@@ -21,7 +21,7 @@ from mimosa.core.model_inputs import ModelInputs
 def get_constraints(
     m: ConcreteModel, inputs: ModelInputs
 ) -> Sequence[GeneralConstraint]:
-    """
+    r"""
 
     <h3>Cost-minimising setting</h3>
 
@@ -39,15 +39,15 @@ def get_constraints(
 
     <h3>Equations</h3>
 
-    First, calculate the global consumption $\\href{./#var__welfare_cost_minimising::consumption}{C_{t,r}}$ and population $L_{t,r}$:
+    First, calculate the global consumption $\href{./#var__welfare_cost_minimising::consumption}{C_{t,r}}$ and population $L_{t,r}$:
 
-    $$ \\widehat{C}_{t} = \\sum_r \\href{./#var__welfare_cost_minimising::consumption}{C_{t,r}}, $$
+    $$ \widehat{C}_{t} = \sum_r \href{./#var__welfare_cost_minimising::consumption}{C_{t,r}}, $$
 
-    $$ \\widehat{L}_{t} = \\sum_r L_{t,r}. $$
+    $$ \widehat{L}_{t} = \sum_r L_{t,r}. $$
 
     These are used to calculate the global utility:
 
-    $$ \\href{./#var__welfare_cost_minimising::global_welfare}{W_t} = \\widehat{L}_t \\cdot \\text{utility}\\left( \\widehat{C}_{t}, \\widehat{L}_{t} \\right) $$
+    $$ \href{./#var__welfare_cost_minimising::global_welfare}{W_t} = \widehat{L}_t \cdot \text{utility}\left( \widehat{C}_{t}, \widehat{L}_{t} \right) $$
 
     <h3>Utility function</h3>
     :::mimosa.components.welfare.utility_fct.calc_utility
