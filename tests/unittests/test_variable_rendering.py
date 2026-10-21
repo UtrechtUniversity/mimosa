@@ -173,9 +173,13 @@ def test_reference_placeholder_expands_only_outside_code_examples(catalogue):
 @pytest.fixture
 def documentation_site(tmp_path, monkeypatch, catalogue):
     """Use real hooks, macros and mkdocstrings, without constructing MIMOSA."""
+    pytest.importorskip("markdown")
     pytest.importorskip("mkdocs")
     pytest.importorskip("mkdocstrings")
     pytest.importorskip("mkdocs_macros")
+    pytest.importorskip("pymdownx.details")
+    pytest.importorskip("pymdownx.superfences")
+    pytest.importorskip("pygraphviz")
     from mkdocs.config.config_options import Hooks
 
     # MkDocs retains hook modules between configurations; each test supplies

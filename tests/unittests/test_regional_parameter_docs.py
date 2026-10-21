@@ -4,7 +4,6 @@ import csv
 from types import SimpleNamespace
 from xml.etree import ElementTree
 
-import markdown
 import pytest
 
 from docs.scripts import mkdocs_hooks
@@ -17,6 +16,8 @@ from mimosa.common.regional_params import RegionalParamStore
 
 
 def rendered_tree(source):
+    markdown = pytest.importorskip("markdown", reason="Rendering tests require .[docs]")
+    pytest.importorskip("pymdownx.details", reason="Rendering tests require .[docs]")
     html = markdown.markdown(
         source,
         extensions=["admonition", "pymdownx.details", "md_in_html", "tables", "attr_list"],

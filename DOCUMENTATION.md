@@ -3,6 +3,11 @@
 These notes describe the documentation tooling. They live outside `docs/` and are
 not included in the published MkDocs site.
 
+Documentation rendering tests require the optional `.[docs]` dependencies. When
+these are absent, only the rendering checks are skipped; tests that inspect
+metadata or generated Markdown without rendering still run. The normal `.[test]`
+installation does not require Markdown or its documentation extensions.
+
 ## Parameter reference
 
 Enum options in the parameter reference include a copy button on hover or
@@ -37,6 +42,16 @@ spaces, parentheses and other special characters in column names. These links
 reuse the parameter hover cards, including horizontal scrolling through values.
 Generated `param::` links also recognise regional source metadata. The store rereads
 the CSV files on each documentation rebuild without constructing another model.
+
+## SLR coefficient tables
+
+The SLR page uses `{{ slr_coefficients("thermal") }}` and equivalent calls for
+the initial values, glaciers, Greenland, Antarctica and land-water storage.
+`docs/scripts/slr_coefficient_docs.py` supplies symbols, descriptions and units;
+values come from `SLR_PROJECTION_PARAMETER_SETS` and the cached documentation
+model. The tables compare all three projections and show shared constants
+separately. They are generated during the documentation build, including inside
+the component docstring, and do not construct additional models.
 
 ## Variable catalogue
 

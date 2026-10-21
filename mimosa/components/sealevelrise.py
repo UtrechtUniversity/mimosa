@@ -116,6 +116,8 @@ def get_constraints(
     params["sealevelrise"]["projection"] = "high"
     ```
 
+    {{ slr_coefficients("initial") }}
+
     # Thermal expansion
 
     Thermal expansion is represented by a fast and a slow response box. Each
@@ -140,6 +142,8 @@ def get_constraints(
     in Table 9.9 of Fox-Kemper et al. (2021); they are not the coefficients from
     either BRICK or SURFER.
 
+    {{ slr_coefficients("thermal") }}
+
     # Glaciers
 
     The glacier contribution relaxes towards the capped equilibrium proposed
@@ -159,6 +163,8 @@ def get_constraints(
     This replaces the previous formulation, in which all glaciers eventually
     melted under any sustained temperature above -1 degree C.
 
+    {{ slr_coefficients("glaciers") }}
+
     # Greenland ice sheet
 
     Greenland follows a SIMPLE-style delayed equilibrium. Its equilibrium
@@ -174,6 +180,8 @@ def get_constraints(
     $$
     \tau_{\mathrm{GIS}}(T)=\tau_0e^{-\gamma T}.
     $$
+
+    {{ slr_coefficients("greenland") }}
 
     # Antarctic ice sheet
 
@@ -203,6 +211,8 @@ def get_constraints(
     high-impact sensitivity case and not as the upper endpoint of the AR6 likely
     range.
 
+    {{ slr_coefficients("antarctica") }}
+
     # Land-water storage
 
     AR6 projects an approximately scenario-independent land-water contribution
@@ -214,6 +224,8 @@ def get_constraints(
     \href{./#var__slr_cumlws}{S_{\mathrm{LWS},t}}=\href{./#var__slr_cumlws}{S_{\mathrm{LWS},t-1}}+\Delta t\,r_{\mathrm{LWS}},
     \qquad r_{\mathrm{LWS}}=0.0004\ \mathrm{m\,yr^{-1}}.
     $$
+
+    {{ slr_coefficients("land_water") }}
 
     # Total sea-level rise
 
