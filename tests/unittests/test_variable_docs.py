@@ -143,7 +143,14 @@ def test_hooks_and_macros_share_lazy_provider(documentation_model):
     macros = importlib.reload(importlib.import_module("docs.scripts.mkdocs_macros"))
     assert documentation_model.calls == []
     handler = SimpleNamespace(update_env=lambda: None)
+    registered_macros = {}
+
+    def register_macro(function):
+        registered_macros[function.__name__] = function
+        return function
+
     env = SimpleNamespace(
+        macro=register_macro,
         variables={},
         conf={
             "plugins": {
@@ -153,11 +160,14 @@ def test_hooks_and_macros_share_lazy_provider(documentation_model):
     )
 
     macros.define_env(env)
+    coefficients = registered_macros["slr_coefficients"]("thermal")
     html = hooks.on_page_content(
         "param::alpha manualparam::alpha::economics.GDP.alpha::"
     )
 
     assert env.variables["example_constraint"] == "Test constraint documentation"
+    assert '??? parameter "Coefficients"' in coefficients
+    assert "Central (default)" in coefficients
     assert "Alpha description" in html
     assert "param::alpha" not in html
     assert html.count("href='#param__economics.GDP.alpha'") == 2
