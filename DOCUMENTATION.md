@@ -55,9 +55,9 @@ the component docstring, and do not construct additional models.
 
 SLR equation links use `\href{./#slrcoef__slr_gsic_total_ice}{P_{\mathrm{GL}}}`.
 They show the matching table header and row on hover or keyboard focus, and
-clicking opens the local coefficient table. Generic thermal symbols use
-`slr_thermal_sensitivity` or `slr_thermal_timescale` to show the fast and slow
-rows together. The cards reuse the rendered rows on the SLR page.
+clicking opens the local coefficient table. The fast and slow thermal-expansion
+equations link directly to their respective coefficient rows. The cards reuse
+the rendered rows on the SLR page.
 
 ## Variable catalogue
 

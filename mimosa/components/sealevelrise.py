@@ -130,15 +130,38 @@ def get_constraints(
     box relaxes towards a temperature-dependent equilibrium:
 
     $$
-    \text{SLR}_{i,t}=\href{./#slrcoef__slr_thermal_sensitivity}{\beta_i} \href{./#var__temperature}{T_{t-1}}+
-    \left(\text{SLR}_{i,t-1}-\href{./#slrcoef__slr_thermal_sensitivity}{\beta_i} \href{./#var__temperature}{T_{t-1}}\right)e^{-\Delta t/\href{./#slrcoef__slr_thermal_timescale}{\tau_i}},
-    \qquad i\in\{\text{fast},\text{slow}\}.
+    \begin{aligned}
+    \href{./#var__slr_thermal_fast}{\text{SLR}_{\mathrm{thermal,fast},t}}
+    &=\href{./#slrcoef__slr_thermal_fast_sensitivity}{\beta_{\mathrm{fast}}} \href{./#var__temperature}{T_{t-1}} \\
+    &\quad+\left(\href{./#var__slr_thermal_fast}{\text{SLR}_{\mathrm{thermal,fast},t-1}}-
+    \href{./#slrcoef__slr_thermal_fast_sensitivity}{\beta_{\mathrm{fast}}} \href{./#var__temperature}{T_{t-1}}\right)
+    e^{-\Delta t/\href{./#slrcoef__slr_thermal_fast_timescale}{\tau_{\mathrm{fast}}}}.
+    \end{aligned}
+    $$
+
+    $$
+    \begin{aligned}
+    \href{./#var__slr_thermal_slow}{\text{SLR}_{\mathrm{thermal,slow},t}}
+    &=\href{./#slrcoef__slr_thermal_slow_sensitivity}{\beta_{\mathrm{slow}}} \href{./#var__temperature}{T_{t-1}} \\
+    &\quad+\left(\href{./#var__slr_thermal_slow}{\text{SLR}_{\mathrm{thermal,slow},t-1}}-
+    \href{./#slrcoef__slr_thermal_slow_sensitivity}{\beta_{\mathrm{slow}}} \href{./#var__temperature}{T_{t-1}}\right)
+    e^{-\Delta t/\href{./#slrcoef__slr_thermal_slow_timescale}{\tau_{\mathrm{slow}}}}.
+    \end{aligned}
+    $$
+
+    The total thermal-expansion contribution is the sum of the fast and slow
+    contributions:
+
+    $$
+    \href{./#var__slr_thermal}{\text{SLR}_{\mathrm{thermal},t}}=
+    \href{./#var__slr_thermal_fast}{\text{SLR}_{\mathrm{thermal,fast},t}}+
+    \href{./#var__slr_thermal_slow}{\text{SLR}_{\mathrm{thermal,slow},t}}.
     $$
 
     The exact exponential update makes the response independent of the chosen
     numerical time step for a constant temperature forcing.
 
-    This two-timescale equation is a reduced-form approximation chosen for
+    This two-timescale formulation is a reduced-form approximation chosen for
     MIMOSA, rather than a direct reproduction of an ocean model. The first-order
     relaxation form follows BRICK v0.2 (Wong et al., 2017, Sect. 3.2.4,
     Eqs. 9--10). Splitting it into fast and slow boxes represents the upper- and

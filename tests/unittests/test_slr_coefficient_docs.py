@@ -112,14 +112,25 @@ def test_slr_equation_links_resolve_to_local_rows_without_markdown(slr_model):
         name for section, group in SLR_COEFFICIENT_GROUPS.items()
         if section != "initial" for name, *_ in group
     }
-    thermal = {name for name in names if name.startswith("slr_thermal_")}
-    assert targets == names - thermal | {"slr_thermal_sensitivity", "slr_thermal_timescale"}
+    assert targets == names
     lookup = dict(anchors)
     for target in targets:
-        assert set(lookup[target].split()) <= names
-    assert lookup["slr_thermal_sensitivity"].split() == [
-        "slr_thermal_fast_sensitivity", "slr_thermal_slow_sensitivity",
-    ]
-    assert lookup["slr_thermal_timescale"].split() == [
-        "slr_thermal_fast_timescale", "slr_thermal_slow_timescale",
+        assert lookup[target] == target
+
+
+def test_thermal_equations_link_each_box_to_its_own_variables_and_coefficients():
+    thermal = sealevelrise.get_constraints.__doc__.split("# Thermal expansion")[1].split("# Glaciers")[0]
+    equations = re.findall(r"\$\$(.*?)\$\$", thermal, re.DOTALL)
+    assert len(equations) == 3
+    for box, equation in zip(("fast", "slow"), equations):
+        assert set(re.findall(r"\\href\{\./#var__([^}]+)\}", equation)) == {
+            f"slr_thermal_{box}", "temperature",
+        }
+        assert set(re.findall(r"\\href\{\./#slrcoef__([^}]+)\}", equation)) == {
+            f"slr_thermal_{box}_sensitivity", f"slr_thermal_{box}_timescale",
+        }
+        assert rf"\text{{SLR}}_{{\mathrm{{thermal,{box}}},t}}" in equation
+        assert rf"\text{{SLR}}_{{\mathrm{{thermal,{box}}},t-1}}" in equation
+    assert re.findall(r"\\href\{\./#var__([^}]+)\}", equations[2]) == [
+        "slr_thermal", "slr_thermal_fast", "slr_thermal_slow",
     ]

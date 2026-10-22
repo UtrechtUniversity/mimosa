@@ -169,15 +169,12 @@ function slrCoefficientAnchor(hash, content) {
     );
 }
 
-function slrCoefficientCard(anchor, content) {
-    const entries = Array.from(content.querySelectorAll("[data-slr-coefficients]"));
-    const rows = anchor.dataset.slrCoefficients.split(" ").map(name =>
-        entries.find(entry => entry.dataset.slrCoefficients === name).closest("tr")
-    );
+function slrCoefficientCard(anchor) {
+    const row = anchor.closest("tr");
     const table = document.createElement("table");
-    table.append(rows[0].closest("table").tHead.cloneNode(true));
+    table.append(row.closest("table").tHead.cloneNode(true));
     const body = document.createElement("tbody");
-    rows.forEach(row => body.append(row.cloneNode(true)));
+    body.append(row.cloneNode(true));
     table.append(body);
     const card = document.createElement("div");
     card.className = "slr-coefficient-card tiny_table";
@@ -206,7 +203,7 @@ function initializeReferenceLinkTooltips(content, pageContext) {
             try {
                 const coefficient = slrCoefficientAnchor(link.hash, content);
                 if (coefficient) {
-                    tooltip.show(link, link, slrCoefficientCard(coefficient, content));
+                    tooltip.show(link, link, slrCoefficientCard(coefficient));
                     return;
                 }
                 const isVariable = link.hash.startsWith("#var__");

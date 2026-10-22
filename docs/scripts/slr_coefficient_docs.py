@@ -13,8 +13,8 @@ SLR_COEFFICIENT_GROUPS = {
     "initial": (
         ("slr_reference_year", r"y_{\mathrm{ref}}", "Sea-level reference year", "year"),
         ("slr_initial_year", r"y_{\mathrm{init}}", "Historical calibration year", "year"),
-        ("slr_thermal_fast_init", r"\text{SLR}_{\mathrm{fast,init}}", "Initial fast thermal-expansion contribution", "m"),
-        ("slr_thermal_slow_init", r"\text{SLR}_{\mathrm{slow,init}}", "Initial slow thermal-expansion contribution", "m"),
+        ("slr_thermal_fast_init", r"\text{SLR}_{\mathrm{thermal,fast,init}}", "Initial fast thermal-expansion contribution", "m"),
+        ("slr_thermal_slow_init", r"\text{SLR}_{\mathrm{thermal,slow,init}}", "Initial slow thermal-expansion contribution", "m"),
         ("slr_gsic_init", r"\text{SLR}_{\mathrm{GL,init}}", "Initial glacier contribution", "m"),
         ("slr_gis_init", r"\text{SLR}_{\mathrm{GIS,init}}", "Initial Greenland contribution", "m"),
         ("slr_ais_init", r"\text{SLR}_{\mathrm{AIS,init}}", "Initial Antarctic contribution", "m"),
@@ -68,15 +68,6 @@ def render_slr_coefficients(section, model):
             f'<span id="slrcoef__{name}" class="slr-coefficient-anchor" '
             f'data-slr-coefficients="{name}">${symbol}$</span>'
         )
-        # The thermal equation uses i = fast/slow, so its generic symbols
-        # should show both corresponding rows.
-        if name in ("slr_thermal_fast_sensitivity", "slr_thermal_fast_timescale"):
-            family = name.replace("_fast", "")
-            names = f'{name} {name.replace("_fast", "_slow")}'
-            anchor = (
-                f'<span id="slrcoef__{family}" class="slr-coefficient-anchor" '
-                f'data-slr-coefficients="{names}">{anchor}</span>'
-            )
         cells = [anchor, description, unit]
         key = name[len("slr_"):]
         if key in SLR_PROJECTION_PARAMETER_SETS["central"]:
