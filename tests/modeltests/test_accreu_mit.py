@@ -22,7 +22,7 @@ def test_run_successfully(script_output):
 
 def test_mitigation_without_adaptation(script_output):
     output = read_output(script_output["model"])
-    assert output.loc["relative_abatement", "2025":].max().max() > 0
+    assert output.loc["mitigation_level", "2025":].max().max() > 0
     assert output.loc["mitigation_costs_abs", "2025":].max().max() > 0
     adaptation_costs = output.loc["adaptation_costs_abs", "2025":].to_numpy()
     assert np.abs(adaptation_costs).max() == pytest.approx(0, abs=1e-9)

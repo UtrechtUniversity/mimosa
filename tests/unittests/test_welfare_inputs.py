@@ -63,7 +63,7 @@ def test_component_initializes_elasmu_from_prepared_inputs(welfare_model):
 
 
 def test_simulation_matches_its_utility_equations(welfare_model):
-    simulation = welfare_model.run_simulation(relative_abatement=0.2)
+    simulation = welfare_model.run_simulation(mitigation_level=0.2)
 
     for t in simulation.t:
         expected_welfare = 0.0

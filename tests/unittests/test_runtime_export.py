@@ -102,7 +102,7 @@ def test_simulation_stores_its_own_wall_clock_runtime(monkeypatch):
     timer_values = iter([20.0, 23.456])
     monkeypatch.setattr("mimosa.mimosa.time.perf_counter", lambda: next(timer_values))
 
-    result = model.run_simulation(relative_abatement=0)
+    result = model.run_simulation(mitigation_level=0)
 
     assert result is simulation
     assert result.runtime == pytest.approx(3.456)

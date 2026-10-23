@@ -29,8 +29,8 @@ def test_successful_simulation(script_output):
 
 def test_mitigation_is_unchanged(script_output):
     np.testing.assert_allclose(
-        script_output["sim"].relative_abatement.values,
-        script_output["sim_ada"].relative_abatement.values,
+        script_output["sim"].mitigation_level.values,
+        script_output["sim_ada"].mitigation_level.values,
         rtol=1e-9,
         atol=1e-9,
     )

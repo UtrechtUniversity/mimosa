@@ -101,7 +101,7 @@ def test_production_build_never_instantiates_an_abstract_model(monkeypatch):
     assert not hasattr(model, "model_context")
     assert model.inputs is model.preprocessor.inputs
     assert model.concrete_model.nopolicy_damage_costs.extract_values()
-    assert model.run_simulation(relative_abatement=0.2).damage_costs.values.shape == (2, 1)
+    assert model.run_simulation(mitigation_level=0.2).damage_costs.values.shape == (2, 1)
 
 
 def test_custom_constraints_are_applied_only_when_configured(monkeypatch):

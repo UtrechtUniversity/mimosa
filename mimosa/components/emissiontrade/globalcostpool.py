@@ -54,7 +54,7 @@ def get_constraints(
         [
             RegionalConstraint(
                 lambda m, t, r: m.domestic_mitigation_costs_abs[t, r]
-                == AC(m.relative_abatement[t, r], m, t, r) * m.baseline_emissions[t, r],
+                == AC(m.mitigation_level[t, r], m, t, r) * m.baseline_emissions[t, r],
                 "mitigation_costs",
             ),
             GlobalConstraint(

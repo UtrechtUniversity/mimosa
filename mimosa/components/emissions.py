@@ -59,7 +59,7 @@ def get_constraints(
 def fix_initial_abatement(m: ConcreteModel) -> None:
     """Fix initial abatement after general Pyomo preprocessing is complete."""
     for region in m.regions:
-        m.relative_abatement[0, region].fix(0)
+        m.mitigation_level[0, region].fix(0)
 
 
 def _set_baseline_emissions(m: ConcreteModel) -> None:
@@ -130,7 +130,7 @@ def _get_emissions_constraints(
     (see [Mitigation](mitigation.md)). The regional emissions are then calculated as:
 
     $$
-    \href{./#var__regional_emissions}{\text{regional emissions}_{t,r}} = (1 - \href{./#var__relative_abatement}{\text{relative abatement}_{t,r}}) \cdot \href{./#var__baseline_emissions}{\text{baseline emissions}_{t,r}}
+    \href{./#var__regional_emissions}{\text{regional emissions}_{t,r}} = (1 - \href{./#var__mitigation_level}{\text{mitigation level}_{t,r}}) \cdot \href{./#var__baseline_emissions}{\text{baseline emissions}_{t,r}}
     $$
 
     In the first period, reductions are assumed to be zero:
@@ -199,7 +199,7 @@ def _get_emissions_constraints(
         initialize=inputs.config("emissions.baseline carbon intensity")
     )
 
-    m.relative_abatement = Var(
+    m.mitigation_level = Var(
         m.t,
         m.regions,
         initialize=0,
@@ -208,16 +208,17 @@ def _get_emissions_constraints(
         # Note that limits on negative emissions can also be set with the parameters `global_min_level` and `regional_min_level`.
         bounds=(0, 2.5),
         units=quant.unit("fraction_of_baseline_emissions"),
+        doc="Fraction of baseline emissions reduced through mitigation. Zero means no mitigation, one means net-zero emissions, and values above one represent net-negative emissions.",
     )
 
-    # If set, delay mitigation until after a given year by setting a bound on relative_abatement:
+    # If set, delay mitigation until after a given year by setting a bound on mitigation_level:
     m.delay_mitigation_year = Param(
         initialize=inputs.config("emissions.delay_mitigation_until_year")
     )
     constraints.append(
         RegionalConstraint(
             lambda m, t, r: (
-                m.relative_abatement[t, r] <= 0.001
+                m.mitigation_level[t, r] <= 0.001
                 if value(m.delay_mitigation_year) is not False
                 and m.year(t) <= m.delay_mitigation_year
                 else Constraint.Skip
@@ -254,11 +255,11 @@ def _get_emissions_constraints(
                     else m.ssp_baseline_emissions[t, r]
                 ),
             ),
-            # Regional emissions from baseline and relative abatement
+            # Regional emissions from baseline and mitigation level
             RegionalEquation(
                 m.regional_emissions,
                 lambda m, t, r: (
-                    (1 - m.relative_abatement[t, r])
+                    (1 - m.mitigation_level[t, r])
                     * (
                         m.baseline_emissions[t, r]
                         if value(m.use_carbon_intensity_for_baseline)

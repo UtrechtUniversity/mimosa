@@ -108,13 +108,13 @@ def _get_mac_constraints(
     ### Regional MAC curve
 
     The regional MAC curve is obtained by scaling the global MAC curve by a regional scaling factor, and links the
-    regional carbon price to the regional relative mitigation $\href{./#var__relative_abatement}{a_{t,r}}$:
+    regional carbon price to the regional mitigation level $\href{./#var__mitigation_level}{a_{t,r}}$:
 
     $$
     \begin{align}
-    \href{./#var__carbon_price}{\text{carbon price}_{t,r}} &= \text{MAC}_{\text{regional},t,r}(\href{./#var__relative_abatement}{a_{t,r}})\\
-    &= \href{./#param__regional.MAC.kappa_rel_abatement_0.75_2050}{\text{regional scaling factor}_{r}} \cdot \text{MAC}_t(\href{./#var__relative_abatement}{a_{t,r}})\\
-    &= \href{./#param__regional.MAC.kappa_rel_abatement_0.75_2050}{\text{regional scaling factor}_{r}} \cdot \left( \href{./#param__economics.MAC.gamma}{\gamma} \cdot \href{./#var__relative_abatement}{a_{t,r}}^{\href{./#param__economics.MAC.beta}{\beta}}\right) \cdot \href{./#var__learning_factor}{\text{learning factor}_t}.
+    \href{./#var__carbon_price}{\text{carbon price}_{t,r}} &= \text{MAC}_{\text{regional},t,r}(\href{./#var__mitigation_level}{a_{t,r}})\\
+    &= \href{./#param__regional.MAC.kappa_rel_abatement_0.75_2050}{\text{regional scaling factor}_{r}} \cdot \text{MAC}_t(\href{./#var__mitigation_level}{a_{t,r}})\\
+    &= \href{./#param__regional.MAC.kappa_rel_abatement_0.75_2050}{\text{regional scaling factor}_{r}} \cdot \left( \href{./#param__economics.MAC.gamma}{\gamma} \cdot \href{./#var__mitigation_level}{a_{t,r}}^{\href{./#param__economics.MAC.beta}{\beta}}\right) \cdot \href{./#var__learning_factor}{\text{learning factor}_t}.
     \end{align}
     $$
 
@@ -146,14 +146,14 @@ def _get_mac_constraints(
     {"file_path": "./assets/plots/mac_explanation.json"}
     ```
 
-    Since the MAC is expressed in terms of relative abatement, we still need to multiply by the baseline emissions to obtain
+    Since the MAC is expressed in terms of mitigation level, we still need to multiply by the baseline emissions to obtain
     absolute mitigation costs in currency units (dollars). The area under the MAC, also called the
     absolute domestic mitigation costs, is therefore calculated as:
     
     $$
     \begin{align}
-    \href{./#var__domestic_mitigation_costs_abs}{\text{domestic mitigation costs abs}_{t,r}} &= \left(\int_0^{\href{./#var__relative_abatement}{a_{t,r}}} \text{MAC}_{\text{regional},t,r}(a)\ da \right) \cdot \href{./#var__baseline_emissions}{\text{baseline emissions}_{t,r}}\\
-    &= \text{factor}_{t,r} \cdot \frac{\href{./#param__economics.MAC.gamma}{\gamma} \cdot \href{./#var__relative_abatement}{a_{t,r}}^{\href{./#param__economics.MAC.beta}{\beta}+1}}{\href{./#param__economics.MAC.beta}{\beta}+1} \cdot \href{./#var__baseline_emissions}{\text{baseline emissions}_{t,r}}
+    \href{./#var__domestic_mitigation_costs_abs}{\text{domestic mitigation costs abs}_{t,r}} &= \left(\int_0^{\href{./#var__mitigation_level}{a_{t,r}}} \text{MAC}_{\text{regional},t,r}(a)\ da \right) \cdot \href{./#var__baseline_emissions}{\text{baseline emissions}_{t,r}}\\
+    &= \text{factor}_{t,r} \cdot \frac{\href{./#param__economics.MAC.gamma}{\gamma} \cdot \href{./#var__mitigation_level}{a_{t,r}}^{\href{./#param__economics.MAC.beta}{\beta}+1}}{\href{./#param__economics.MAC.beta}{\beta}+1} \cdot \href{./#var__baseline_emissions}{\text{baseline emissions}_{t,r}}
     \end{align}
     $$
 
@@ -196,7 +196,7 @@ def _get_mac_constraints(
 
     constraints = []
 
-    # MAC: linking the carbon price to the relative abatement
+    # MAC: linking the carbon price to the mitigation level
     m.MAC_gamma = Param(initialize=inputs.config("economics.MAC.gamma"))
     m.MAC_beta = Param(initialize=inputs.config("economics.MAC.beta"))
     calibration = inputs.config_value("economics.MAC.regional calibration factor")
@@ -221,7 +221,7 @@ def _get_mac_constraints(
             RegionalEquation(
                 m.carbon_price,
                 lambda m, t, r: (
-                    MAC(m.relative_abatement[t, r], m, t, r) if t > 0 else 0
+                    MAC(m.mitigation_level[t, r], m, t, r) if t > 0 else 0
                 ),
             ),
         ]
@@ -252,7 +252,7 @@ def _get_mac_constraints(
             # so the costs of mitigation in a region without taking into account emission trading
             RegionalEquation(
                 m.domestic_mitigation_costs_abs,
-                lambda m, t, r: AC(m.relative_abatement[t, r], m, t, r)
+                lambda m, t, r: AC(m.mitigation_level[t, r], m, t, r)
                 * m.baseline_emissions[t, r],
             ),
             # Attributed mitigation costs: domestic costs plus the trading balance

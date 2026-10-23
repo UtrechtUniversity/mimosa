@@ -22,7 +22,7 @@ def test_successful_simulation(script_output):
 
 def test_zero_mitigation_and_adaptation(script_output):
     output = read_output(script_output["model"], simulation=True)
-    for variable in ("relative_abatement", "mitigation_costs_abs", "adaptation_costs_abs"):
+    for variable in ("mitigation_level", "mitigation_costs_abs", "adaptation_costs_abs"):
         assert np.abs(output.loc[variable, "2025":].to_numpy()).max() == pytest.approx(0, abs=1e-9)
 
 

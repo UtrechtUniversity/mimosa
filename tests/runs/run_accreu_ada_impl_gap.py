@@ -10,9 +10,9 @@ def reduce_adaptation_costs(ssp, concrete_model):
         "riverine_adaptation_costs_abs",
     ]
 
-    # Keep the mitigation level (relative_abatement) the same
+    # Keep the mitigation level (mitigation_level) the same
     control_values = {
-        "relative_abatement": concrete_model.relative_abatement.extract_values()
+        "mitigation_level": concrete_model.mitigation_level.extract_values()
     }
 
     def _get_adapt_readiness(t, r):

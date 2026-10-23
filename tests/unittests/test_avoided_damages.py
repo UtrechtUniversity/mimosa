@@ -10,7 +10,7 @@ def test_policy_simulation_calculates_avoided_damages_after_baseline():
 
     model = MIMOSA(params, prerun=False)
     baseline = model.run_nopolicy_baseline()
-    policy = model.run_simulation(relative_abatement=0.5)
+    policy = model.run_simulation(mitigation_level=0.5)
 
     expected_regional = baseline.damage_costs.values - policy.damage_costs.values
     np.testing.assert_allclose(policy.avoided_damage_costs.values, expected_regional)

@@ -27,8 +27,8 @@ def test_mitigation_matches_mitigation_only_run(script_output, accreu_mit_output
     output = read_output(script_output["model"])
     mitigation_only = read_output(accreu_mit_output["model"])
     np.testing.assert_allclose(
-        output.loc["relative_abatement", "2025":],
-        mitigation_only.loc["relative_abatement", "2025":], rtol=1e-7, atol=1e-8,
+        output.loc["mitigation_level", "2025":],
+        mitigation_only.loc["mitigation_level", "2025":], rtol=1e-7, atol=1e-8,
     )
 
 
@@ -54,7 +54,7 @@ def test_workflow_matches_manual_replay(script_output, accreu_mit_output):
     manual_result = model.run_simulation(**controls)
 
     for variable in (
-        "relative_abatement", "temperature", "adaptation_costs_abs",
+        "mitigation_level", "temperature", "adaptation_costs_abs",
         "damage_costs_abs", "avoided_damage_costs",
         "global_avoided_damage_costs", "total_direct_costs_abs",
     ):

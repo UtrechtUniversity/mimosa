@@ -24,7 +24,7 @@ def test_mitigation_and_adaptation_expenditure_are_unchanged(script_output):
     sim = script_output["sim"]
     reference = script_output["sim_ada"]
     for variable in (
-        "relative_abatement",
+        "mitigation_level",
         "labourprod_adaptation_costs_abs",
         "riverine_adaptation_costs_abs",
         "slr_adaptation_costs_abs",

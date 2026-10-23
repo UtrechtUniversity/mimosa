@@ -44,7 +44,7 @@ def reduce_adaptation_costs(ssp, concrete_model):
     ]
 
     control_values = {
-        "relative_abatement": concrete_model.relative_abatement.extract_values()
+        "mitigation_level": concrete_model.mitigation_level.extract_values()
     }
 
     def _get_adapt_readiness(t, r):

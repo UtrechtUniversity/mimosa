@@ -165,7 +165,7 @@ def test_sequential_workflow_copies_params_forwards_options_and_replays(monkeypa
     monkeypatch.setattr(
         model,
         "_extract_compatible_controls",
-        lambda source: {"relative_abatement": {0: 0.5}},
+        lambda source: {"mitigation_level": {0: 0.5}},
     )
     monkeypatch.setattr(
         model,
@@ -194,10 +194,10 @@ def test_sequential_workflow_copies_params_forwards_options_and_replays(monkeypa
                 "neos_email": "user@example.com",
             },
         ),
-        ("simulate", {"relative_abatement": {0: 0.5}}),
+        ("simulate", {"mitigation_level": {0: 0.5}}),
         ("initialize", model.concrete_model, replay_result),
     ]
-    assert model.workflow_control_values == {"relative_abatement": {0: 0.5}}
+    assert model.workflow_control_values == {"mitigation_level": {0: 0.5}}
     assert model.status == "ok"
 
 
@@ -237,25 +237,25 @@ def _transfer_model(controls, times=(0, 1), regions=("A",), values=None):
 
 
 def test_control_transfer_validates_names_grids_and_indices():
-    target = _transfer_model(["relative_abatement"])
+    target = _transfer_model(["mitigation_level"])
     target.prepare_simulation = lambda: None
 
     values = target._extract_compatible_controls(
-        _transfer_model(["relative_abatement"])
+        _transfer_model(["mitigation_level"])
     )
-    assert values == {"relative_abatement": {(0, "A"): 0.1, (1, "A"): 0.2}}
+    assert values == {"mitigation_level": {(0, "A"): 0.1, (1, "A"): 0.2}}
 
     with pytest.raises(ValueError, match="source controls"):
         target._extract_compatible_controls(_transfer_model(["other_control"]))
 
     with pytest.raises(ValueError, match="t indices"):
         target._extract_compatible_controls(
-            _transfer_model(["relative_abatement"], times=(0, 2))
+            _transfer_model(["mitigation_level"], times=(0, 2))
         )
 
     with pytest.raises(ValueError, match="its indices"):
         target._extract_compatible_controls(
-            _transfer_model(["relative_abatement"], values={(0, "A"): 0.1})
+            _transfer_model(["mitigation_level"], values={(0, "A"): 0.1})
         )
 
 

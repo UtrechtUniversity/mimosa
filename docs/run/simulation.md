@@ -9,7 +9,11 @@ MIMOSA can run in two different ways:
 | Constraints and objective | Used by the solver     | Not enforced                            |
 | Typical purpose           | Find an optimal policy | Evaluate a specified policy or scenario |
 
-In the default model, the main control variable is `relative_abatement`. Components can introduce additional control variables, such as adaptation choices. Once the controls are known, simulation mode evaluates the remaining equations in dependency order without calling an optimisation solver.
+In the default model, the main control variable is `mitigation_level`. Components can introduce additional control variables, such as adaptation choices. Once the controls are known, simulation mode evaluates the remaining equations in dependency order without calling an optimisation solver.
+
+`mitigation_level` is the fraction of baseline emissions reduced: `0` means no
+mitigation, `0.5` means a 50% reduction, `1` means net-zero emissions, and values
+above `1` mean net-negative emissions.
 
 Simulation is especially useful for:
 
@@ -39,7 +43,7 @@ model = MIMOSA(load_params())
 print(model.simulator.control_variables)
 ```
 
-With the default components, this prints a list containing `relative_abatement`. When additional controls are present, they must be supplied in the same way.
+With the default components, this prints a list containing `mitigation_level`. When additional controls are present, they must be supplied in the same way.
 
 !!! warning "Controls that are not supplied are set to zero"
 
@@ -91,7 +95,7 @@ The model checks the shape and reports the available control names if an unknown
 
 Re-evaluating the controls from an optimisation is useful for checking the equation-based simulation against the optimised model or as the starting point for another scenario.
 
-Copy all controls rather than assuming that `relative_abatement` is the only one:
+Copy all controls rather than assuming that `mitigation_level` is the only one:
 
 ```python
 from mimosa import MIMOSA, load_params
