@@ -39,7 +39,7 @@ The three configurable input types are described below:
 
 1. [**Scalar parameters**](#config-params): Scalar parameters (that don't depend on region or time) are defined in the `config_default.yaml` file and can be modified at runtime by modifying the `params` dictionary. These parameters are typically used for model settings, such as the pure rate of time preference (PRTP), discount rates, etc.
 2. [**Regional parameters**](#regional-params): Regional parameters (that don't depend on time) are defined in a CSV file and initialized through `inputs.regional`. These parameters are typically used for regional coefficients for damage functions, emissions factors, etc.
-3. [**Time and region dependent data**](#time-and-region-dependent-data): These parameters depend on both time and region, such as baseline population, baseline GDP, etc. Their data comes from CSV files in IAMC format.
+3. [**Time and region dependent data**](#time-and-region-dependent-data): These parameters depend on both time and region, such as [population](#param__timeandregional.population) and [baseline GDP](#param__timeandregional.baseline_GDP). Their data comes from CSV files in IAMC format.
 
 ## 1. Parameters from config file: non-regional parameters {id="config-params"}
 
@@ -192,7 +192,7 @@ Initializing their value is done in three steps:
 
 ## 3. Time and region dependent data {id="time-and-region-dependent-data"}
 
-The third type of parameters are time and region dependent parameters. This is typically used for baseline data, such as population, GDP, etc. 
+The third type of parameters are time and region dependent parameters. This is typically used for baseline data, such as [population](#param__timeandregional.population) and [GDP](#param__timeandregional.baseline_GDP).
 
 They are defined like any other parameter, but with the `time` and `regions` dimensions. For example, the population data is defined as:
 

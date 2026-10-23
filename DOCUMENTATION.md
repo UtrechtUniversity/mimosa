@@ -62,6 +62,12 @@ There is no scenario dropdown, extra input loading or interpolation. Direct
 inputs use their `timeandregional::` metadata to show source descriptions and
 file names; derived parameters use their own declaration descriptions.
 
+Link to these entries with `#param__timeandregional.TFP` (using the model parameter
+name). Text links and equation `\href` links both open the parameter reference
+and show its card on hover or keyboard focus. Plots in hover cards use the same
+cached JSON as the reference page. Pages without Plotly load the library only
+when a plot card is first shown.
+
 MkDocs publishes the Plotly JSON as virtual files under `assets/parameter-plots/`.
 These assets are cached for a build or serve session, so live rebuilds do not
 construct another model or repeat data extraction. The existing Plotly plugin

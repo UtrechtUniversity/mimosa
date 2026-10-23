@@ -32,6 +32,37 @@ function parameterLinkUrl(hash) {
 
 let variableReferencePage;
 let parameterReferencePage;
+let referencePlotly;
+
+async function renderReferencePlots(card, reference) {
+    const plots = card.querySelectorAll(".mkdocs-plotly[data-jsonpath]");
+    if (!plots.length) return;
+    if (!window.Plotly) {
+        // Pages without plots do not load Plotly until a chart is hovered.
+        if (!referencePlotly) referencePlotly = new Promise((resolve, reject) => {
+            // Leave the page's MathJax configuration to the documentation theme.
+            window.PlotlyConfig = { ...window.PlotlyConfig, MathJaxConfig: "local" };
+            const library = reference.querySelector('script[src*="plotly"][src$=".min.js"]');
+            const script = document.createElement("script");
+            script.src = new URL(library.getAttribute("src"), parameterReferenceUrl);
+            script.onload = resolve;
+            script.onerror = reject;
+            document.head.append(script);
+        });
+        await referencePlotly;
+    }
+    const scheme = document.body.dataset.mdColorScheme === "slate" ? "slate" : "default";
+    const template = reference.getElementById(`${scheme}-template-settings`);
+    for (const plot of plots) {
+        const url = new URL(plot.dataset.jsonpath, parameterReferenceUrl);
+        const data = await loadDependencyAsset(url, "json");
+        if (!card.isConnected || card.closest("[hidden]")) return;
+        await Plotly.newPlot(plot, data.data, { ...data.layout, height: 300 }, {
+            ...data.config, responsive: false, displayModeBar: false,
+        });
+        if (template) await Plotly.relayout(plot, JSON.parse(template.textContent));
+    }
+}
 
 function loadVariableReference() {
     if (!variableReferencePage) {
@@ -70,6 +101,7 @@ function createReferenceTooltip(container, id) {
     function hide() {
         keepOpen();
         tooltip.hidden = true;
+        tooltip.querySelectorAll(".js-plotly-plot").forEach(plot => window.Plotly?.purge(plot));
         activeLink?.removeAttribute("aria-describedby");
         activeLink = null;
     }
@@ -82,6 +114,11 @@ function createReferenceTooltip(container, id) {
         if (entry.tagName === "DETAILS") card.open = true;
         card.querySelectorAll(".variable_anchor, .param_anchor, [data-clipboard-target]").forEach(element => element.remove());
         card.querySelectorAll("[id]").forEach(element => element.removeAttribute("id"));
+        card.querySelectorAll(".mkdocs-plotly").forEach(plot => {
+            plot.replaceChildren();
+            // Reserve space before positioning the tooltip and loading the plot.
+            plot.style.height = "300px";
+        });
         tooltip.replaceChildren(card);
         tooltip.hidden = false;
         activeLink = link;
@@ -103,6 +140,7 @@ function createReferenceTooltip(container, id) {
         }
         tooltip.style.left = `${Math.max(bounds.left + 8, Math.min(left, bounds.right - width - 8))}px`;
         tooltip.style.top = `${Math.max(bounds.top + 8, Math.min(top, bounds.bottom - height - 8))}px`;
+        return card;
     }
 
     function scheduleHide() {
@@ -218,7 +256,8 @@ function initializeReferenceLinkTooltips(content, pageContext) {
                 } else {
                     entry = reference.getElementById(decodeURIComponent(link.hash.slice(1)))?.closest("details.parameter, .admonition.parameter");
                 }
-                tooltip.show(link, link, entry);
+                const card = tooltip.show(link, link, entry);
+                if (card) await renderReferencePlots(card, reference);
             } catch (error) {
                 console.error(error);
             }

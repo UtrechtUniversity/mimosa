@@ -54,7 +54,7 @@ def get_constraints(
 
     In the equal cumulative per capita (ECPC) regime, emission allowances are allocated based on an equal
     per capita distribution of emissions, combining both *historical* and *future* emissions per capita.
-    The historical emission debt is then spread out over the future time steps, going linearly down to
+    The [historical emission debt](#param__timeandregional.effortsharing_ecpc_historical_debt) is then [spread out over the future time steps](#param__timeandregional.effortsharing_ecpc_annual_debt_repayment), going linearly down to
     zero in the repayment end year (default: 2050).
 
     First, a historical debt is calculated for each region: how much more, or less, emissions did a region emit
@@ -67,7 +67,7 @@ def get_constraints(
 
     The future fair share for every region (excluding the historical debt) is equal to the immediate
     per capita convergence regime: every year, a region gets allocated a share of the global emissions
-    based on their population share.
+    based on their [population share](#param__timeandregional.percapconv_share_pop).
 
     ``` plotly
     {"file_path": "./assets/plots/ecpc_allowances.json"}
@@ -151,7 +151,7 @@ def _calc_debt(m, r, all_emissions, all_population):
     (2025 by default). If $t_{\mathrm{hist}}$ is the final available historical observation:
 
     $$
-    \text{debt}_{r} = \sum_{t=\href{./#param__effort%20sharing.ecpc_start_year}{\text{start year}}}^{t_{\mathrm{hist}}} \left(\text{emissions}_{r,t} - \frac{\text{population}_{r,t}}{\text{global population}_{t}} \cdot \text{global emissions}_{t}\right) \cdot e^{-\href{./#param__effort%20sharing.ecpc_discount_rate}{\text{discount rate}} \cdot (\href{./#param__time.start}{t_0} - t)}.
+    \href{./#param__timeandregional.effortsharing_ecpc_historical_debt}{\text{debt}_{r}} = \sum_{t=\href{./#param__effort%20sharing.ecpc_start_year}{\text{start year}}}^{t_{\mathrm{hist}}} \left(\text{emissions}_{r,t} - \frac{\text{population}_{r,t}}{\text{global population}_{t}} \cdot \text{global emissions}_{t}\right) \cdot e^{-\href{./#param__effort%20sharing.ecpc_discount_rate}{\text{discount rate}} \cdot (\href{./#param__time.start}{t_0} - t)}.
     $$
 
     where you can set the following parameters:

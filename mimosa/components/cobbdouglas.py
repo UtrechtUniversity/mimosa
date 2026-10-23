@@ -69,7 +69,7 @@ def get_constraints(
     Since this only gives the change in capital stock, we need to add the initial capital stock to get the actual capital stock.
     This is calculated as a region-dependent multiple of the initial GDP:
 
-    $$ \href{./#var__capital_stock}{K_{t=0,r}} = \href{./#param__regional.economics.init_capital_factor}{\text{init_capitalstock_factor}_r} \cdot \text{GDP}_{t=0,r}. $$
+    $$ \href{./#var__capital_stock}{K_{t=0,r}} = \href{./#param__regional.economics.init_capital_factor}{\text{init_capitalstock_factor}_r} \cdot \href{./#param__timeandregional.baseline_GDP}{\text{GDP}_{t=0,r}}. $$
 
     The [regional initial capital stock factors](#param__regional.economics.init_capital_factor) are calibrated from capital-stock-to-GDP ratios in
     the [IMF Investment and Capital Stock Dataset](https://data.imf.org/en/Datasets/ICSD).

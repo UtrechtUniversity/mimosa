@@ -39,11 +39,11 @@ def get_constraints(
 
     <h3>Equations</h3>
 
-    First, calculate the global consumption $\href{./#var__welfare_cost_minimising::consumption}{C_{t,r}}$ and population $L_{t,r}$:
+    First, calculate the global consumption $\href{./#var__welfare_cost_minimising::consumption}{C_{t,r}}$ and population $\href{./#param__timeandregional.population}{L_{t,r}}$:
 
     $$ \widehat{C}_{t} = \sum_r \href{./#var__welfare_cost_minimising::consumption}{C_{t,r}}, $$
 
-    $$ \widehat{L}_{t} = \sum_r L_{t,r}. $$
+    $$ \widehat{L}_{t} = \sum_r \href{./#param__timeandregional.population}{L_{t,r}}. $$
 
     These are used to calculate the global utility:
 

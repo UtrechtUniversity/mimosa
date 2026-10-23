@@ -38,11 +38,11 @@ def get_constraints(
 
     <h3>Equations</h3>
 
-    First, calculate the regional utility using the regional consumption $\href{./#var__coacch::consumption}{C_{t,r}}$ and population $L_{t,r}$:
-    $$ \href{./#var__coacch::utility}{U_{t,r}} = \text{utility}(\href{./#var__coacch::consumption}{C_{t,r}}, L_{t,r}) $$
+    First, calculate the regional utility using the regional consumption $\href{./#var__coacch::consumption}{C_{t,r}}$ and population $\href{./#param__timeandregional.population}{L_{t,r}}$:
+    $$ \href{./#var__coacch::utility}{U_{t,r}} = \text{utility}(\href{./#var__coacch::consumption}{C_{t,r}}, \href{./#param__timeandregional.population}{L_{t,r}}) $$
 
     Second, the global welfare is calculated as the sum of the regional utility values weighted by population:
-    $$ \href{./#var__coacch::global_welfare}{W_t} = \sum_r L_{t,r} \cdot \href{./#var__coacch::utility}{U_{t,r}} $$
+    $$ \href{./#var__coacch::global_welfare}{W_t} = \sum_r \href{./#param__timeandregional.population}{L_{t,r}} \cdot \href{./#var__coacch::utility}{U_{t,r}} $$
 
     <h3>Utility function</h3>
     :::mimosa.components.welfare.utility_fct.calc_utility

@@ -132,7 +132,7 @@ def ability_to_pay_rule(m, t, r):
     \text{glob. frac. of baseline emissions}_{t} = \frac{\text{global baseline emissions}_{t} - \href{./#var__effortsharing_ability_to_pay::global_emissions}{\text{global emissions}_{t}}}{\text{global baseline emissions}_{t}}.
     $$
 
-    *Note: The per-capita GDP can be calculated in two ways: either from the baseline GDP variable or from the net GDP variable. For numerical stability, we use the baseline GDP variable, even though it would be slightly more accurate to use the net GDP variable.*
+    *Note: The per-capita GDP can be calculated in two ways: either from the [baseline GDP](#param__timeandregional.baseline_GDP) parameter or from the net GDP variable. For numerical stability, we use the [baseline GDP](#param__timeandregional.baseline_GDP) parameter, even though it would be slightly more accurate to use the net GDP variable.*
 
 
     """

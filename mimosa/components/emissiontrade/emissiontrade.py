@@ -47,7 +47,7 @@ def get_constraints(
     where the global carbon price is the population weighted average of the regional carbon prices:
 
     $$
-    \href{./#var__global_carbon_price}{\text{global carbon price}_{t}} = \frac{\sum_r \href{./#var__carbon_price}{\text{carbon price}_{t,r}} \cdot \text{population}_{t,r}}{\sum_r \text{population}_{t,r}}.
+    \href{./#var__global_carbon_price}{\text{global carbon price}_{t}} = \frac{\sum_r \href{./#var__carbon_price}{\text{carbon price}_{t,r}} \cdot \href{./#param__timeandregional.population}{\text{population}_{t,r}}}{\sum_r \href{./#param__timeandregional.population}{\text{population}_{t,r}}}.
     $$
 
     The emission reductions attributed to a region are calculated as the physical reductions in that region plus its

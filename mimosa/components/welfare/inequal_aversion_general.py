@@ -25,13 +25,13 @@ def get_constraints(
     <h3>General inequality aversion</h3>
 
     This setting makes the weight given to inequality between regions explicit. Let $\href{./#var__welfare_inequal_aversion_general::consumption}{C_{t,r}}$
-    be regional consumption, $L_{t,r}$ population, $\href{./#param__economics.inequal_aversion}{\eta}$ the inequality-aversion parameter
+    be regional consumption, $\href{./#param__timeandregional.population}{L_{t,r}}$ population, $\href{./#param__economics.inequal_aversion}{\eta}$ the inequality-aversion parameter
     (`inequal_aversion`), and $\href{./#param__economics.elasmu}{\mu}$ the elasticity of marginal utility (`elasmu`). MIMOSA first
     calculates:
 
     $$
-    \href{./#var__welfare_inequal_aversion_general::utility}{U_{t,r}} = L_{t,r}
-    \left(\frac{\href{./#var__welfare_inequal_aversion_general::consumption}{C_{t,r}}}{L_{t,r}}\right)^{1-\href{./#param__economics.inequal_aversion}{\eta}}.
+    \href{./#var__welfare_inequal_aversion_general::utility}{U_{t,r}} = \href{./#param__timeandregional.population}{L_{t,r}}
+    \left(\frac{\href{./#var__welfare_inequal_aversion_general::consumption}{C_{t,r}}}{\href{./#param__timeandregional.population}{L_{t,r}}}\right)^{1-\href{./#param__economics.inequal_aversion}{\eta}}.
     $$
 
     The regional values are then aggregated into yearly welfare:

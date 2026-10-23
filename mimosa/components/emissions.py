@@ -107,13 +107,13 @@ def _get_emissions_constraints(
     relative to baseline emissions: emissions that would occur in the absence of any climate policy.
 
     There are two ways to calculate baseline emissions: either directly imported exogenously from
-    the SSP scenarios, or calculated from the baseline carbon intensity from the SSPs. The latter
+    the [SSP scenarios](#param__timeandregional.ssp_baseline_emissions), or calculated from the [baseline carbon intensity](#param__timeandregional.baseline_carbon_intensity) from the SSPs. The latter
     accounts for the fact that in the absence of climate policy, baseline emissions would go down if
     the GDP goes down, and vice versa. This can be chosen with the parameter [`use_baseline_carbon_intensity`](#param__emissions.baseline%20carbon%20intensity).
     If this parameter is set to true, baseline emissions are calculated as:
 
     $$
-    \href{./#var__baseline_emissions}{\text{baseline emissions}_{t,r}} = \text{baseline carbon intensity}_{t,r} \cdot \href{./#var__GDP_net}{\text{GDP}_{\text{net}, t,r}}
+    \href{./#var__baseline_emissions}{\text{baseline emissions}_{t,r}} = \href{./#param__timeandregional.baseline_carbon_intensity}{\text{baseline carbon intensity}_{t,r}} \cdot \href{./#var__GDP_net}{\text{GDP}_{\text{net}, t,r}}
     $$
 
     ??? info "Baseline emissions values"

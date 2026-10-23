@@ -59,7 +59,7 @@ def get_constraints(
     Therefore, two functions are needed. First, the allowances for equal per capita emissions (EPC):
 
     $$
-    \text{allowances}_{\text{EPC}, t, r} = \frac{\text{population}_{t,r}}{\sum_{s} \text{population}_{t,s}} \cdot \href{./#var__effortsharing_per_cap_convergence::global_emissions}{\text{global emissions}_{t}},
+    \text{allowances}_{\text{EPC}, t, r} = \frac{\href{./#param__timeandregional.population}{\text{population}_{t,r}}}{\sum_{s} \href{./#param__timeandregional.population}{\text{population}_{t,s}}} \cdot \href{./#var__effortsharing_per_cap_convergence::global_emissions}{\text{global emissions}_{t}},
     $$
 
     and second the allowances for grandfathering (GF):
@@ -115,8 +115,8 @@ def get_constraints(
 
 def percapconv_share_rule(m, t, r):
     r"""
-    Finally, the allowances for each region are calculated as a linear interpolation between the two before the convergence year. After the convergence year,
-    only the equal per capita emissions are used:
+    Finally, [each region's emission share](#param__timeandregional.percapconv_share) is calculated as a linear interpolation between the two distributions before the convergence year. After the convergence year,
+    only the equal per capita shares are used. The resulting allowances are:
 
     $$
     \href{./#var__effortsharing_per_cap_convergence::regional_emission_allowances}{\text{allowances}_{t, r}} = \begin{cases}

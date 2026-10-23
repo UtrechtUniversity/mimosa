@@ -9,6 +9,7 @@ import pytest
 import yaml
 
 from docs.scripts.variable_docs import get_variable_catalogue
+from docs.scripts.time_regional_parameter_docs import get_time_regional_parameter_catalogue
 from mimosa.common.config.parseconfig import check_params
 from mimosa.common.regional_params import RegionalParamStore
 
@@ -99,3 +100,32 @@ def test_regional_links_in_text_and_equations_match_registered_columns(docstring
             checked.append(target)
     assert any(target.startswith("ACCREU.") for target in checked)
     assert any("(q=0.5)" in target for target in checked)
+
+
+def test_time_regional_links_in_text_and_equations_match_plotted_parameters(docstrings):
+    available = {entry.name for entry in get_time_regional_parameter_catalogue()}
+    contents = list(docstrings.values()) + [
+        path.read_text(encoding="utf-8") for path in (ROOT / "docs").rglob("*.md")
+    ]
+    checked = set()
+    for content in contents:
+        for target in re.findall(r"#param__timeandregional\.([\w]+)", content):
+            assert target in available, f"Unknown time-and-region parameter: {target}"
+            checked.add(target)
+    assert checked >= {
+        "TFP", "population", "baseline_GDP", "baseline_carbon_intensity",
+        "ssp_baseline_emissions", "percapconv_share", "percapconv_share_pop",
+        "effortsharing_ecpc_historical_debt", "effortsharing_ecpc_annual_debt_repayment",
+    }
+
+
+def test_cobb_douglas_links_productivity_and_population(docstrings):
+    production = docstrings["mimosa.common.economics.calc_GDP"]
+    assert r"\href{./#param__timeandregional.TFP}{\text{TFP}\_{t,r}}" in production
+    assert r"\href{./#param__timeandregional.population}{L}" in production
+
+
+def test_historical_debt_does_not_link_historical_population_to_ssp_projection(docstrings):
+    debt = docstrings["mimosa.components.effortsharing.equal_cumulative_per_cap._calc_debt"]
+    assert "#param__timeandregional.effortsharing_ecpc_historical_debt" in debt
+    assert "#param__timeandregional.population" not in debt

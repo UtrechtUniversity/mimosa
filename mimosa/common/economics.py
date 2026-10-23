@@ -40,9 +40,9 @@ def calc_dKdt(K, dk, I, dt):
 
 def calc_GDP(TFP, L, K, alpha):
     r"""
-    $$ \href{./#var__GDP_gross}{\text{GDP}_{\text{gross},t,r}} = \text{TFP}\_{t,r} \cdot L^{1-\href{./#param__economics.GDP.alpha}{\alpha}}\_{t,r} \cdot \left(\href{./#var__capital_stock}{K\_{t,r}}\right)^{\href{./#param__economics.GDP.alpha}{\alpha}}, $$
-    with $\text{TFP}$ the total factor productivity (exogenously calibrated from the baseline SSP scenarios)
-    $L$ the labor (represented by the total population), $\href{./#var__capital_stock}{K}$ the capital stock and $\href{./#param__economics.GDP.alpha}{\alpha}$ the share of capital in the production function.
+    $$ \href{./#var__GDP_gross}{\text{GDP}_{\text{gross},t,r}} = \href{./#param__timeandregional.TFP}{\text{TFP}\_{t,r}} \cdot \href{./#param__timeandregional.population}{L}^{1-\href{./#param__economics.GDP.alpha}{\alpha}}\_{t,r} \cdot \left(\href{./#var__capital_stock}{K\_{t,r}}\right)^{\href{./#param__economics.GDP.alpha}{\alpha}}, $$
+    with $\href{./#param__timeandregional.TFP}{\text{TFP}}$ the total factor productivity (exogenously calibrated from the baseline SSP scenarios)
+    $\href{./#param__timeandregional.population}{L}$ the labor (represented by the [total population](#param__timeandregional.population)), $\href{./#var__capital_stock}{K}$ the capital stock and $\href{./#param__economics.GDP.alpha}{\alpha}$ the share of capital in the production function.
 
     """
     return TFP * L ** (1 - alpha) * K**alpha
