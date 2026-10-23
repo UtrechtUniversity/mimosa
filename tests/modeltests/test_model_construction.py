@@ -1,6 +1,6 @@
 import logging
 
-from pyomo.environ import AbstractModel, Var
+from pyomo.environ import ConcreteModel, Var
 
 from mimosa import MIMOSA, load_params
 
@@ -18,7 +18,7 @@ def _replacement_warnings(records):
 
 def test_pyomo_component_replacement_warning_is_detected(caplog):
     """Ensure the CI safeguard recognises Pyomo's replacement warning."""
-    model = AbstractModel()
+    model = ConcreteModel()
     model.duplicate = Var()
 
     with caplog.at_level(logging.WARNING, logger="pyomo.core"):

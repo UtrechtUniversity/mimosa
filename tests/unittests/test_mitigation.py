@@ -5,7 +5,7 @@ from mimosa.components import mitigation
 from mimosa.common import trapezoid
 
 
-class MockAbstractModel:
+class MockModel:
     def __init__(self):
         self.t = [0, 1, 2, 3, 4, 5]
         self.regions = ["r1", "r2", "r3"]
@@ -14,7 +14,7 @@ class MockAbstractModel:
 
 @pytest.fixture
 def m():
-    model = MockAbstractModel()
+    model = MockModel()
     model.MAC_scaling_factor = {r: 1 for r in model.regions}
     model.MAC_SSP_calibration_factor = {t: 1 for t in model.t}
     model.MAC_gamma = 100

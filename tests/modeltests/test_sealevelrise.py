@@ -12,7 +12,7 @@ pytestmark = pytest.mark.simulation
 
 def run_slr_projection(projection):
     params = load_params()
-    params["model structure"]["sealevelrise options"]["projection"] = projection
+    params["sealevelrise"]["projection"] = projection
     model = MIMOSA(params, prerun=False)
     return model.run_simulation()
 
@@ -21,14 +21,14 @@ def test_default_slr_projection_is_central():
     params = load_params()
 
     assert (
-        params["model structure"]["sealevelrise options"]["projection"]
+        params["sealevelrise"]["projection"]
         == "central"
     )
 
 
 def test_invalid_slr_projection_is_rejected_by_configuration():
     params = load_params()
-    params["model structure"]["sealevelrise options"]["projection"] = "invalid"
+    params["sealevelrise"]["projection"] = "invalid"
 
     with pytest.raises(ValueError, match="not in allowed values"):
         MIMOSA(params, prerun=False)

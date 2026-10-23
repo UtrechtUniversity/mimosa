@@ -13,7 +13,7 @@ pytestmark = pytest.mark.simulation
 def model_states():
     """Create equivalent, nontrivial simulation and Pyomo model states."""
     model = MIMOSA(load_params(), prerun=False)
-    simulation_model = model.run_simulation(relative_abatement=0.2)
+    simulation_model = model.run_simulation(mitigation_level=0.2)
     model.simulator.initialize_pyomo_model(
         model.concrete_model,
         simulation_model,

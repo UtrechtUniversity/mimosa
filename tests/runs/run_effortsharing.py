@@ -12,9 +12,9 @@ for regime in [
     params["model structure"]["effortsharing module"] = regime
     params["model structure"]["emissiontrade module"] = "emissiontrade"
     params["model structure"]["welfare module"] = "cost_minimising"
+    params["economics"]["MAC"]["rel_mitigation_costs_min_level"] = -0.5  # (1)!
+
     params["emissions"]["carbonbudget"] = "700 GtCO2"
-    params["emissions"]["baseline carbon intensity"] = False  # (1)!
-    params["economics"]["MAC"]["rel_mitigation_costs_min_level"] = -0.5  # (2)!
     params["time"]["end"] = 2100
 
     model1 = MIMOSA(params)

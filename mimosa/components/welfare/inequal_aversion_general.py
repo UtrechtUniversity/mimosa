@@ -6,44 +6,45 @@ Utility and global welfare
 from typing import Sequence
 
 from mimosa.common import (
-    AbstractModel,
+    ConcreteModel,
     Param,
     Var,
     GeneralConstraint,
     RegionalEquation,
     GlobalEquation,
     soft_min,
-    ModelContext,
 )
+
+from mimosa.core.model_inputs import ModelInputs
 
 
 def get_constraints(
-    m: AbstractModel, context: ModelContext
+    m: ConcreteModel, inputs: ModelInputs
 ) -> Sequence[GeneralConstraint]:
-    """
+    r"""
     <h3>General inequality aversion</h3>
 
-    This setting makes the weight given to inequality between regions explicit. Let $C_{t,r}$
-    be regional consumption, $L_{t,r}$ population, $\\eta$ the inequality-aversion parameter
-    (`inequal_aversion`), and $\\mu$ the elasticity of marginal utility (`elasmu`). MIMOSA first
+    This setting makes the weight given to inequality between regions explicit. Let $\href{./#var__welfare_inequal_aversion_general::consumption}{C_{t,r}}$
+    be regional consumption, $\href{./#param__timeandregional.population}{L_{t,r}}$ population, $\href{./#param__economics.inequal_aversion}{\eta}$ the inequality-aversion parameter
+    (`inequal_aversion`), and $\href{./#param__economics.elasmu}{\mu}$ the elasticity of marginal utility (`elasmu`). MIMOSA first
     calculates:
 
     $$
-    U_{t,r} = L_{t,r}
-    \\left(\\frac{C_{t,r}}{L_{t,r}}\\right)^{1-\\eta}.
+    \href{./#var__welfare_inequal_aversion_general::utility}{U_{t,r}} = \href{./#param__timeandregional.population}{L_{t,r}}
+    \left(\frac{\href{./#var__welfare_inequal_aversion_general::consumption}{C_{t,r}} - \href{./#var__accreu_sectoral::non_market_damage_costs_abs}{D^{\mathrm{NM}}_{t,r}}}{\href{./#param__timeandregional.population}{L_{t,r}}}\right)^{1-\href{./#param__economics.inequal_aversion}{\eta}}.
     $$
 
     The regional values are then aggregated into yearly welfare:
 
     $$
-    W_t = \\frac{L_t}{1-\\mu}
-    \\left(\\frac{\\sum_r U_{t,r}}{L_t}\\right)^{
-    \\frac{1-\\mu}{1-\\eta}}.
+    \href{./#var__welfare_inequal_aversion_general::global_welfare}{W_t} = \frac{L_t}{1-\href{./#param__economics.elasmu}{\mu}}
+    \left(\frac{\sum_r \href{./#var__welfare_inequal_aversion_general::utility}{U_{t,r}}}{L_t}\right)^{
+    \frac{1-\href{./#param__economics.elasmu}{\mu}}{1-\href{./#param__economics.inequal_aversion}{\eta}}}.
     $$
 
-    A higher $\\eta$ gives relatively more weight to consumption changes in poorer regions.
-    Setting $\\eta=0$ gives the same policy weighting as the cost-minimising setting, while
-    setting $\\eta=\\mu$ gives the same policy weighting as the welfare-loss-minimising
+    A higher $\href{./#param__economics.inequal_aversion}{\eta}$ gives relatively more weight to consumption changes in poorer regions.
+    Setting $\href{./#param__economics.inequal_aversion}{\eta}=0$ gives the same policy weighting as the cost-minimising setting, while
+    setting $\href{./#param__economics.inequal_aversion}{\eta}=\href{./#param__economics.elasmu}{\mu}$ gives the same policy weighting as the welfare-loss-minimising
     setting. The welfare levels can differ by terms that do not depend on the policy controls.
 
     <h3>Parameters defined in this module</h3>
@@ -54,8 +55,8 @@ def get_constraints(
     constraints = []
 
     # Parameters
-    m.elasmu = Param(doc="::economics.elasmu")
-    m.inequal_aversion = Param(doc="::economics.inequal_aversion")
+    m.elasmu = Param(initialize=inputs.config("economics.elasmu"))
+    m.inequal_aversion = Param(initialize=inputs.config("economics.inequal_aversion"))
 
     m.utility = Var(m.t, m.regions, initialize=10)
     m.global_welfare = Var(m.t)
@@ -65,7 +66,9 @@ def get_constraints(
             RegionalEquation(
                 m.utility,
                 lambda m, t, r: calc_regional_utility(
-                    m.consumption[t, r], m.population[t, r], m.inequal_aversion
+                    m.consumption[t, r] - m.non_market_damage_costs_abs[t, r],
+                    m.population[t, r],
+                    m.inequal_aversion,
                 ),
             ),
             GlobalEquation(

@@ -1,8 +1,8 @@
 By default, MIMOSA uses the 26 IMAGE regions. More information about this regional definition is
 available on the [IMAGE website](https://models.pbl.nl/image/Region_classification_map).
 
-The model region definition is named by the [`regionstype`](../parameters.md#regionstype) setting,
-while [`regions`](../parameters.md#regions) contains the region codes included in a run. The
+The model region definition is named by the [`regionstype`](#param__regionstype) setting,
+while [`regions`](#param__regions) contains the region codes included in a run. The
 configuration schema also recognises `SSP5` and `World` definitions. Using a different definition
 requires matching time-dependent input data and, where necessary, a registered mapping for regional
 parameters. See [Regional parameters](../extending/parameters.md#regional-params) for details.

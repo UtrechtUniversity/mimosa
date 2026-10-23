@@ -15,7 +15,11 @@ from individual_plots import (
     fig_ar6_tcre,
     fig_mac,
     table_coacch_slr,
+    fig_accreu,
 )
+
+for name, fig in fig_accreu.create_all_figs().items():
+    fig.write_json(f"docs/assets/plots/{name}.json")
 
 figure_ecpc_debt = fig_ecpc_historical_debt.create_fig()
 figure_ecpc_debt.write_json("docs/assets/plots/ecpc_debt.json")

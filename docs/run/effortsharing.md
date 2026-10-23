@@ -8,9 +8,7 @@ regimes and solves a separate optimisation for each one:
 --8<-- "tests/runs/run_effortsharing.py"
 ```
 
-1. Using the exogenous SSP baseline emissions prevents regional baseline emissions from changing
-   with damage-induced GDP losses.
-2. A negative minimum allows regions receiving trading payments to have negative attributed
+1. A negative minimum allows regions receiving trading payments to have negative attributed
    mitigation costs.
 
 The example combines each regime with the following settings:
@@ -33,7 +31,5 @@ Five output pairs are created, named `run_<regime>.csv` and
   universal recommended value.
 - Effort-sharing rules use soft equalities, so the allocation is satisfied within its documented
   tolerance rather than as an exact numerical equality.
-- Keeping baseline emissions exogenous can improve numerical behaviour in these comparisons, but it
-  also changes the model assumption: baseline emissions no longer respond to lower GDP.
 - These examples use optimisation. See the note on the [effort-sharing component
   page](../components/effortsharing.md) for the limitation in simulation mode.

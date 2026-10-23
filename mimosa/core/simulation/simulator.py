@@ -24,7 +24,7 @@ class Simulator:
     between equations and sorts them based on their dependencies.
 
     After preparation, the `run` method can be used to perform the simulation.
-    It allows setting "free" variables, such as relative abatement, and runs the
+    It allows setting "free" variables, such as mitigation level, and runs the
     simulation based on the sorted equations.
 
     """
@@ -90,7 +90,7 @@ class Simulator:
         """
         Runs MIMOSA as simulation.
 
-        It first sets the "free" variables (relative_abatement), then runs the simulation
+        It first sets the "free" variables (mitigation_level), then runs the simulation
 
         Args:
         simulation_model (SimulationObjectModel): The simulation model to run.
@@ -161,7 +161,7 @@ class Simulator:
         sim_m = SimulationObjectModel(self.concrete_model)
 
         # Get the initial guess for the optimisation
-        # For this prerun, we assume equal relative abatement in every region
+        # For this prerun, we assume equal mitigation level in every region
         n_t = len(sim_m.t)
         n_r = len(sim_m.regions)
 
@@ -175,10 +175,10 @@ class Simulator:
 
         # Perform first step of scipy optimisation to find a good initial guess:
         def f(x, objective_only=True):
-            # Set global relative abatement (x) to regional abatement in simulation
-            relative_abatement = x.reshape((n_t, 1)).repeat(n_r, axis=1)
+            # Apply the same mitigation level (x) to every region in simulation
+            mitigation_level = x.reshape((n_t, 1)).repeat(n_r, axis=1)
             # Do simulation
-            self.run(sim_m, relative_abatement=relative_abatement)
+            self.run(sim_m, mitigation_level=mitigation_level)
             # Return the value to minimise (we try to maximise the final NPV)
             if objective_only:
                 return -sim_m.NPV[n_t - 1]

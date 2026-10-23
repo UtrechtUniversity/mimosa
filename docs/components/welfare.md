@@ -8,7 +8,13 @@ icon: material/arrow-projectile-multiple
 
 MIMOSA separates the calculation of yearly welfare[^1] from the final optimisation goal. There are three ways to calculate welfare: welfare-loss-minimising, cost-minimising, and a general inequality-aversion setting that connects the first two methods. The objective can then either maximise discounted welfare or minimise discounted global costs.
 
-The welfare module can be chosen using the parameter [`welfare module`](../parameters.md#model structure.welfare module).
+The welfare module can be chosen using the parameter [`welfare module`](#param__model%20structure.welfare%20module).
+
+In the equations below, $\href{./#var__accreu_sectoral::non_market_damage_costs_abs}{D^{\mathrm{NM}}_{t,r}}$
+denotes monetised non-market damages, such as mortality, in the same currency units as
+consumption. These damages reduce the consumption-equivalent input to welfare,
+while reported consumption $\href{./#var__consumption}{C_{t,r}}$ remains physical
+consumption. The deduction is zero when non-market damages are not included.
 
 === "Welfare-loss-minimising `default`"
 
@@ -45,7 +51,7 @@ The welfare module can be chosen using the parameter [`welfare module`](../param
 
 ## Optimisation goal and discounting
 
-The welfare module determines how regional consumption is aggregated into `global_welfare`. The separate [`objective module`](../parameters.md#model structure.objective module) determines what MIMOSA optimises:
+The welfare module determines how regional consumption is aggregated into `global_welfare`. The separate [`objective module`](#param__model%20structure.objective%20module) determines what MIMOSA optimises:
 
 - `utility` (default) maximises discounted `global_welfare`.
 - `globalcosts` minimises discounted mitigation and damage costs.
@@ -61,18 +67,18 @@ model = MIMOSA(params)
 With the utility objective, MIMOSA calculates:
 
 $$
-\text{NPV}_t =
-\text{NPV}_{t-1}
-+ \Delta t \cdot e^{-\text{PRTP}(\text{year}_t-\text{begin year})}
-\cdot \text{yearly welfare}_t,
+\href{./#var__NPV}{\text{NPV}_t} =
+\href{./#var__NPV}{\text{NPV}_{t-1}}
++ \Delta t \cdot e^{-\href{./#param__economics.PRTP}{\text{PRTP}}(\text{year}_t-\href{./#param__time.start}{\text{begin year}})}
+\cdot \href{./#var__global_welfare}{\text{yearly welfare}_t},
 $$
 
-This is a discrete approximation of the integral of discounted yearly welfare from the beginning year $t_0$ to the final year $T$:
+This is a discrete approximation of the integral of discounted yearly welfare from the beginning year $\href{./#param__time.start}{t_0}$ to the final year $\href{./#param__time.end}{T}$:
 
 $$
-\text{NPV}(T) =
-\int_{t_0}^{T}
-e^{-\text{PRTP}(t-t_0)} \cdot \text{yearly welfare}(t)\, dt.
+\href{./#var__NPV}{\text{NPV}}(\href{./#param__time.end}{T}) =
+\int_{\href{./#param__time.start}{t_0}}^{\href{./#param__time.end}{T}}
+e^{-\href{./#param__economics.PRTP}{\text{PRTP}}(t-\href{./#param__time.start}{t_0})} \cdot \href{./#var__global_welfare}{\text{yearly welfare}(t)}\, dt.
 $$
 
 MIMOSA maximises the final value of `NPV`. With the global-cost objective, `global_welfare` is replaced by:
@@ -80,14 +86,14 @@ MIMOSA maximises the final value of `NPV`. With the global-cost objective, `glob
 $$
 \text{global costs}_t =
 \sum_r \left(
-\text{mitigation costs abs}_{t,r}
-+ \text{damage costs}_{t,r} \cdot \text{GDP gross}_{t,r}
+\href{./#var__objective_globalcosts::mitigation_costs_abs}{\text{mitigation costs abs}_{t,r}}
++ \href{./#var__objective_globalcosts::damage_costs}{\text{damage costs}_{t,r}} \cdot \href{./#var__objective_globalcosts::GDP_gross}{\text{GDP gross}_{t,r}}
 \right),
 $$
 
 and the final `NPV` is minimised. The welfare variables are still calculated in this case, but they do not determine the objective.
 
-[`PRTP`](../parameters.md#economics.PRTP) is the pure rate of time preference. A higher value gives less weight to outcomes further in the future. The factor $\Delta t$ accounts for the number of years represented by each timestep.
+[`PRTP`](#param__economics.PRTP) is the pure rate of time preference. A higher value gives less weight to outcomes further in the future. The factor $\Delta t$ accounts for the number of years represented by each timestep.
 
 The main result variables are:
 

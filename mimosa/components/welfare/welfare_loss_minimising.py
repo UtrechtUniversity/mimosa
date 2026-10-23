@@ -5,21 +5,22 @@ Utility and global welfare
 
 from typing import Sequence
 from mimosa.common import (
-    AbstractModel,
+    ConcreteModel,
     Param,
     Var,
     GeneralConstraint,
     GlobalEquation,
     RegionalEquation,
-    ModelContext,
 )
 from .utility_fct import calc_utility
 
+from mimosa.core.model_inputs import ModelInputs
+
 
 def get_constraints(
-    m: AbstractModel, context: ModelContext
+    m: ConcreteModel, inputs: ModelInputs
 ) -> Sequence[GeneralConstraint]:
-    """
+    r"""
 
     <h3>Welfare-loss-minimising setting</h3>
 
@@ -37,11 +38,11 @@ def get_constraints(
 
     <h3>Equations</h3>
 
-    First, calculate the regional utility using the regional consumption $C_{t,r}$ and population $L_{t,r}$:
-    $$ U_{t,r} = \\text{utility}(C_{t,r}, L_{t,r}) $$
+    First, calculate regional utility from consumption after deducting non-market damages, and population:
+    $$ \href{./#var__coacch::utility}{U_{t,r}} = \text{utility}\left(\href{./#var__coacch::consumption}{C_{t,r}} - \href{./#var__accreu_sectoral::non_market_damage_costs_abs}{D_{t,r}^{NM}}, \href{./#param__timeandregional.population}{L_{t,r}}\right) $$
 
     Second, the global welfare is calculated as the sum of the regional utility values weighted by population:
-    $$ W_t = \\sum_r L_{t,r} \\cdot U_{t,r} $$
+    $$ \href{./#var__coacch::global_welfare}{W_t} = \sum_r \href{./#param__timeandregional.population}{L_{t,r}} \cdot \href{./#var__coacch::utility}{U_{t,r}} $$
 
     <h3>Utility function</h3>
     :::mimosa.components.welfare.utility_fct.calc_utility
@@ -54,7 +55,7 @@ def get_constraints(
     constraints = []
 
     # Parameters
-    m.elasmu = Param(doc="::economics.elasmu")
+    m.elasmu = Param(initialize=inputs.config("economics.elasmu"))
 
     m.utility = Var(m.t, m.regions, initialize=0.1)
     m.global_welfare = Var(m.t)
@@ -64,7 +65,9 @@ def get_constraints(
             RegionalEquation(
                 m.utility,
                 lambda m, t, r: calc_utility(
-                    m.consumption[t, r], m.population[t, r], m.elasmu
+                    m.consumption[t, r] - m.non_market_damage_costs_abs[t, r],
+                    m.population[t, r],
+                    m.elasmu,
                 ),
             ),
             GlobalEquation(

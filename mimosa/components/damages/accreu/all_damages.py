@@ -1,0 +1,281 @@
+"""
+Model equations and constraints:
+Damage and adaptation costs, ACCREU specification
+"""
+
+from typing import Sequence
+from mimosa.common import (
+    ConcreteModel,
+    Param,
+    Var,
+    GeneralConstraint,
+    RegionalEquation,
+    GlobalEquation,
+    value,
+    soft_max,
+    Any,
+    exp,
+    quant,
+    NonNegativeReals,
+)
+from mimosa.core.model_inputs import ModelInputs
+
+
+from . import (
+    sealevelrise,
+    riverine_flooding,
+    labour_productivity,
+    mortality,
+    combined_nslr_adaptation,
+)
+from .utils import get_adaptation_options
+
+
+def get_constraints(
+    m: ConcreteModel, inputs: ModelInputs
+) -> Sequence[GeneralConstraint]:
+    r"""
+    The total damage costs are the sum of the sectoral damages:
+
+    $$
+    \href{./#var__damage_costs}{\text{damages}_{t,r}} = \href{./#var__riverine_damage_costs}{\text{damages}_{\text{riverine},t,r}} + \href{./#var__labourprod_damage_costs_net}{\text{damages}_{\text{labour prod. (net)},t,r}} + \href{./#var__slr_damage_costs}{\text{damages}_{\text{SLR},t,r}}.
+    $$
+
+    Similarly, if adaptation is enabled, the total adaptation costs are the sum of the sectoral adaptation costs:
+
+    $$
+    \href{./#var__adaptation_costs}{\text{adapt. costs}_{t,r}} = \href{./#var__riverine_adaptation_costs}{\text{adapt. costs}_{\text{riverine},t,r}} + \href{./#var__labourprod_adaptation_costs}{\text{adapt. costs}_{\text{labour prod.},t,r}} + \href{./#var__slr_adaptation_costs}{\text{adapt. costs}_{\text{SLR},t,r}}.
+    $$
+
+    As mentioned above, mortality is also included in this damage representation. However, since (the monetisation of) mortality
+    is not represented as a direct cost to the economy, but rather a non-market impact, it is not included in the total damage costs.
+    Instead, the monetised mortality costs are reported separately. If a user is interested in the sum of market and non-market damages,
+    this is given by the variable `market_and_non_market_damage_costs`, calculated as:
+
+    $$
+    \href{./#var__market_and_non_market_damage_costs}{\text{market and non-market damages}_{t,r}} = \href{./#var__damage_costs}{\text{damages}_{t,r}} + \frac{\href{./#var__mortality_damage_costs_abs}{\text{abs. damages}_{\text{mortality},t,r}}}{\href{./#var__GDP_gross}{\text{GDP}_{\text{gross},t,r}}},
+    $$
+
+    where $\text{abs. damages}_{\text{mortality}}$ is the mortality damages in absolute terms (i.e. in currency units),
+    and $\text{GDP}_{\text{gross}}$ is the gross GDP, also in absolute terms (i.e. in currency units).
+
+    <div class="tiny_table table_scrollable extra_small" markdown>
+
+    | Variables created in this module: |
+    | --------------------------------- |
+    | var::damage_costs |
+    | var::damage_costs_abs |
+    | var::global_damage_costs |
+    | var::adaptation_costs |
+    | var::adaptation_costs_abs |
+    | var::global_adaptation_costs |
+    | var::non_market_damage_costs_abs |
+    | var::market_and_non_market_damage_costs_abs |
+    | var::market_and_non_market_damage_costs |
+
+    </div>
+
+    """
+
+    constraints = []
+    # In the config, the user can choose whether to use the separate adaptation module for ACCREU or not.
+    # This is done using the parameter params["economics"]["damages"]["accreu"]["adaptation"] = "sectoral" or "combined"
+    adaptation_options = get_adaptation_options(inputs)
+    adaptation_type = adaptation_options.adaptation_type
+    m.damage_scale_factor = Param(
+        initialize=inputs.config("economics.damages.scale factor")
+    )
+
+    if adaptation_type != "noadaptation":
+        m.adaptation_effectiveness_scale_factor = Param(
+            initialize=inputs.config(
+                "economics.damages.accreu.adaptation_effectiveness_scale_factor"
+            )
+        )
+
+    # Get constraints for sea-level rise damages
+    constraints.extend(sealevelrise.get_constraints(m, inputs, adaptation_options))
+
+    # Get constraints for riverine flooding damages
+    constraints.extend(riverine_flooding.get_constraints(m, inputs, adaptation_options))
+
+    # Get constraints for labour productivity damages
+    constraints.extend(
+        labour_productivity.get_constraints(m, inputs, adaptation_options)
+    )
+
+    if adaptation_type == "combined":
+        # Get constraints for combined adaptation costs, which combines labour productivity and riverine flooding adaptation costs
+        # Only if the user has chosen to use the combined adaptation module for ACCREU
+        constraints.extend(
+            combined_nslr_adaptation.get_constraints(m, inputs, adaptation_options)
+        )
+
+    # Get constraints for mortality
+    monetise_mortality = inputs.config_value(
+        "economics.damages.accreu.monetise_mortality"
+    )
+    constraints.extend(
+        mortality.get_constraints(m, inputs, monetise_mortality=monetise_mortality)
+    )
+
+    m.damage_costs = Var(
+        m.t,
+        m.regions,
+        units=quant.unit("fraction_of_GDP"),
+        doc="Total damages from all sectors (excluding non-market impacts like mortality), as a fraction of GDP.",
+    )
+    m.damage_costs_abs = Var(
+        m.t,
+        m.regions,
+        units=quant.unit("currency_unit"),
+        doc="Total damages from all sectors (excluding non-market impacts like mortality), in currency units.",
+    )
+    m.global_damage_costs = Var(
+        m.t,
+        units=quant.unit("fraction_of_GDP"),
+        doc="Global total damages from all sectors (excluding non-market impacts like mortality), as a fraction of global GDP.",
+    )
+    # Total damages are sum of non-SLR and SLR damages
+    constraints.extend(
+        [
+            RegionalEquation(
+                m.damage_costs,
+                (
+                    (
+                        lambda m, t, r: m.combined_labprod_riv_damage_costs[t, r]
+                        + m.slr_damage_costs[t, r]
+                    )
+                    if adaptation_type == "combined"
+                    else (
+                        lambda m, t, r: m.labourprod_damage_costs_net[t, r]
+                        + m.riverine_damage_costs[t, r]
+                        + m.slr_damage_costs[t, r]
+                    )
+                ),
+            ),
+            RegionalEquation(
+                m.damage_costs_abs,
+                lambda m, t, r: m.damage_costs[t, r] * m.GDP_gross[t, r],
+            ),
+            GlobalEquation(
+                m.global_damage_costs,
+                lambda m, t: (
+                    sum(m.damage_costs_abs[t, r] for r in m.regions)
+                    / m.global_GDP_gross[t]
+                ),
+            ),
+        ]
+    )
+
+    if adaptation_type != "noadaptation":
+        m.adaptation_costs = Var(
+            m.t,
+            m.regions,
+            units=quant.unit("fraction_of_GDP"),
+            doc="Total adaptation costs from all sectors, as a fraction of GDP.",
+        )
+        m.adaptation_costs_abs = Var(
+            m.t,
+            m.regions,
+            units=quant.unit("currency_unit"),
+            doc="Total adaptation costs from all sectors, in currency units.",
+        )
+        m.global_adaptation_costs = Var(
+            m.t,
+            units=quant.unit("fraction_of_GDP"),
+            doc="Global total adaptation costs from all sectors, as a fraction of global GDP.",
+        )
+        m.delay_adaptation_year = Param(
+            initialize=inputs.config(
+                "economics.damages.accreu.delay_adaptation_until_year"
+            )
+        )
+        constraints.extend(
+            [
+                # Adaptation costs:
+                RegionalEquation(
+                    m.adaptation_costs,
+                    (
+                        (
+                            lambda m, t, r: m.combined_labprod_riv_adaptation_costs[
+                                t, r
+                            ]
+                            + m.slr_adaptation_costs[t, r]
+                        )
+                        if adaptation_type == "combined"
+                        else (
+                            lambda m, t, r: m.labourprod_adaptation_costs[t, r]
+                            + m.riverine_adaptation_costs[t, r]
+                            + m.slr_adaptation_costs[t, r]
+                        )
+                    ),
+                ),
+                RegionalEquation(
+                    m.adaptation_costs_abs,
+                    lambda m, t, r: m.adaptation_costs[t, r] * m.GDP_gross[t, r],
+                ),
+                GlobalEquation(
+                    m.global_adaptation_costs,
+                    lambda m, t: (
+                        sum(m.adaptation_costs_abs[t, r] for r in m.regions)
+                        / m.global_GDP_gross[t]
+                    ),
+                ),
+            ]
+        )
+    else:
+        m.adaptation_costs = Param(
+            m.t, m.regions, units=quant.unit("fraction_of_GDP"), initialize=0.0
+        )
+        m.adaptation_costs_abs = Param(
+            m.t, m.regions, units=quant.unit("currency_unit"), initialize=0.0
+        )
+
+    ## Non-market damages:
+    if monetise_mortality:
+        m.non_market_damage_costs_abs = Var(
+            m.t,
+            m.regions,
+            units=quant.unit("currency_unit"),
+            doc="Total non-market damages (monetised mortality), in currency units.",
+        )
+        constraints.append(
+            RegionalEquation(
+                m.non_market_damage_costs_abs,
+                lambda m, t, r: m.mortality_damage_costs_abs[t, r],
+            )
+        )
+    else:
+        m.non_market_damage_costs_abs = Param(
+            m.t, m.regions, units=quant.unit("currency_unit"), initialize=0.0
+        )
+    m.market_and_non_market_damage_costs_abs = Var(
+        m.t,
+        m.regions,
+        units=quant.unit("currency_unit"),
+        doc="Total market and non-market damages, in currency units.",
+    )
+    m.market_and_non_market_damage_costs = Var(
+        m.t,
+        m.regions,
+        units=quant.unit("fraction_of_GDP"),
+        doc="Total market and non-market damages, as a fraction of GDP.",
+    )
+
+    constraints.extend(
+        [
+            RegionalEquation(
+                m.market_and_non_market_damage_costs_abs,
+                lambda m, t, r: m.damage_costs_abs[t, r]
+                + m.non_market_damage_costs_abs[t, r],
+            ),
+            RegionalEquation(
+                m.market_and_non_market_damage_costs,
+                lambda m, t, r: m.market_and_non_market_damage_costs_abs[t, r]
+                / m.GDP_gross[t, r],
+            ),
+        ]
+    )
+
+    return constraints

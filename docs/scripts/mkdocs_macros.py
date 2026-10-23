@@ -4,15 +4,10 @@ import sys, os
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../../"))
 
-from mimosa import MIMOSA, load_params
+from docs.scripts.variable_docs import get_documentation_context
+from docs.scripts.slr_coefficient_docs import render_slr_coefficients
 from mimosa.common import Constraint
 import mimosa.components
-
-params = load_params()
-# Constraint documentation only needs the constructed model, not a baseline simulation.
-model = MIMOSA(params, prerun=False)
-
-all_constraints = list(model.concrete_model.component_objects(Constraint))
 
 components = []
 
@@ -31,7 +26,12 @@ def recursive_traverse_components(current_component):
 
 
 def define_env(env):
-    for constraint in all_constraints:
+    @env.macro
+    def slr_coefficients(section):
+        return render_slr_coefficients(section, get_documentation_context().model)
+
+    model = get_documentation_context().model
+    for constraint in model.component_objects(Constraint):
         env.variables[constraint.name] = constraint.doc
 
     # get mkdocstrings' Python handler

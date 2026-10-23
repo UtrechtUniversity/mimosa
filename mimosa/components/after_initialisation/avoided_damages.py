@@ -5,7 +5,7 @@ Avoided damages and GDP loss compared to a no-policy baseline.
 
 from typing import Sequence
 from mimosa.common import (
-    AbstractModel,
+    ConcreteModel,
     Param,
     Var,
     GeneralConstraint,
@@ -16,7 +16,7 @@ from mimosa.common import (
 )
 
 
-def get_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
+def get_constraints(m: ConcreteModel) -> Sequence[GeneralConstraint]:
     """
     Uses the simulation results of the no-policy baseline to calculate the avoided damages
     and GDP loss compared to a no-policy baseline.

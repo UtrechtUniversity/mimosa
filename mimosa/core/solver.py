@@ -28,6 +28,7 @@ class Solver:
         halt_on_ampl_error="no",
         ipopt_maxiter=None,
         ipopt_output_file=None,
+        ipopt_executable=None,
     ):
         """
         Solves the given concrete model using the IPOPT solver.
@@ -38,6 +39,7 @@ class Solver:
             halt_on_ampl_error: If True, halts on AMPL errors.
             ipopt_maxiter: Maximum number of iterations for IPOPT.
             ipopt_output_file: File to write IPOPT output to.
+            ipopt_executable: Path to IPOPT. If None, use the default executable.
 
         Raises:
             SolverException if solver status is not "OK"
@@ -46,7 +48,7 @@ class Solver:
         _deactivate_trivial_constraints_if_required(concrete_model)
 
         # Create an IPOPT solver instance
-        opt: OptSolver = SolverFactory("ipopt")
+        opt: OptSolver = SolverFactory("ipopt", executable=ipopt_executable)
         opt.options["halt_on_ampl_error"] = halt_on_ampl_error
         if ipopt_maxiter is not None:
             opt.options["max_iter"] = ipopt_maxiter
@@ -132,9 +134,7 @@ def _deactivate_trivial_constraints_if_required(model):
             active_equalities += 1
         relevant_variables.update(
             variable
-            for variable in identify_variables(
-                constraint.body, include_fixed=False
-            )
+            for variable in identify_variables(constraint.body, include_fixed=False)
             if not variable.fixed
         )
 
@@ -146,6 +146,4 @@ def _deactivate_trivial_constraints_if_required(model):
         )
 
     if len(relevant_variables) < active_equalities:
-        TransformationFactory("contrib.deactivate_trivial_constraints").apply_to(
-            model
-        )
+        TransformationFactory("contrib.deactivate_trivial_constraints").apply_to(model)

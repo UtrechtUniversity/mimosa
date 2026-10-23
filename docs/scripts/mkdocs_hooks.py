@@ -1,24 +1,42 @@
 import re
+import json
 import yaml
 import sys, os
 import pandas as pd
+from html import escape
+from urllib.parse import quote
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../../"))
 
-from mimosa import MIMOSA
+from docs.scripts.variable_docs import (
+    DOCUMENTATION_CONFIGS,
+    clear_documentation_cache,
+    get_documentation_context,
+    get_variable_catalogue,
+)
+from docs.scripts.variable_rendering import (
+    REFERENCE_MARKER,
+    expand_variable_reference,
+    render_variable_markers,
+)
+from docs.scripts import generate_dependency_graph
+from docs.scripts.regional_parameter_docs import (
+    REGIONAL_REFERENCE_MARKER,
+    render_regional_parameter_reference,
+)
+from docs.scripts.time_regional_parameter_docs import (
+    TIME_REGIONAL_REFERENCE_MARKER,
+    clear_time_regional_parameter_cache,
+    get_time_regional_parameter_assets,
+    render_time_regional_parameter_reference,
+)
+from mimosa.common.regional_params import RegionalParamStore
 from mimosa.common.config.parseconfig import (
     get_nested,
-    check_params,
     flatten,
     load_default_yaml,
 )
-from mimosa.common.config.utils.parsers import PARSER_FACTORY
-
-# Get the default parameters and the parser tree
-params, parser_tree = check_params({}, return_parser_tree=True)
-
-# Create the model only to inspect its parameters; no baseline simulation is needed.
-model = MIMOSA(params, prerun=False).concrete_model
+from mimosa.common.config.utils.parsers import GeneralParser, PARSER_FACTORY
 
 
 def markdown_parse_param_reference(markdown):
@@ -30,6 +48,7 @@ def markdown_parse_param_reference(markdown):
         return markdown
 
     # Build the parameter reference
+    parser_tree = get_documentation_context().parser_tree
     reference_markdown = recursive_param_print(parser_tree, "", [], "")
 
     # Replace the reference in the markdown
@@ -49,7 +68,7 @@ def markdown_parse_parser_types(markdown):
 
 """
 
-    flattened_parser_tree = flatten(parser_tree)
+    flattened_parser_tree = flatten(get_documentation_context().parser_tree)
     default_yaml = load_default_yaml()
 
     for parser_type, parser in PARSER_FACTORY.parsers.items():
@@ -102,6 +121,25 @@ def markdown_parse_parser_types(markdown):
     return markdown
 
 
+def markdown_parse_regional_param_reference(markdown):
+    if REGIONAL_REFERENCE_MARKER not in markdown:
+        return markdown
+    context = get_documentation_context()
+    store = RegionalParamStore(context.params, context.parser_tree)
+    return markdown.replace(
+        REGIONAL_REFERENCE_MARKER, render_regional_parameter_reference(store)
+    )
+
+
+def markdown_parse_time_regional_param_reference(markdown):
+    if TIME_REGIONAL_REFERENCE_MARKER not in markdown:
+        return markdown
+    return markdown.replace(
+        TIME_REGIONAL_REFERENCE_MARKER,
+        render_time_regional_parameter_reference(),
+    )
+
+
 def markdown_parse_region_defs(markdown):
     # Check if markdown has parameter reference
     check_str = "{regions::definitions}"
@@ -136,8 +174,12 @@ def markdown_parse_region_defs(markdown):
 def on_page_markdown(markdown, **kwargs):
 
     markdown = markdown_parse_param_reference(markdown)
+    markdown = markdown_parse_regional_param_reference(markdown)
+    markdown = markdown_parse_time_regional_param_reference(markdown)
     markdown = markdown_parse_parser_types(markdown)
     markdown = markdown_parse_region_defs(markdown)
+    if REFERENCE_MARKER in markdown:
+        markdown = expand_variable_reference(markdown, get_variable_catalogue())
 
     return markdown
 
@@ -157,7 +199,7 @@ def recursive_param_print(tree, mainkey, breadcrumbs, full_str, level=0):
             title += f"{mainkey}"
             extra_str = f"""
 <div id="{mainkey}" class="param_group" markdown>
-{"#" * (level + 1)} {title} {{data-toc-label="{mainkey}"}}
+{"#" * (level + 2)} {title} {{data-toc-label="{mainkey}"}}
 <div class="param_content" markdown>
 """
         else:
@@ -174,40 +216,70 @@ def recursive_param_print(tree, mainkey, breadcrumbs, full_str, level=0):
 
 
 def _print_param(tree, mainkey, breadcrumbs, indent=""):
+    usage_target = "params" + "".join(f"[{json.dumps(key)}]" for key in breadcrumbs)
     # Print characteristics of parameter
     extra_str = f'{indent}??? parameter "{mainkey}"\n'
     extra_str += f'{indent}    <span id="{".".join(breadcrumbs)}" class="param_anchor"> </span>\n'
-    extra_str += tree.to_markdown(indent + "    ") + "\n\n"
+    if tree.type == "enum":
+        extra_str += GeneralParser.to_markdown(tree, indent + "    ")
+        extra_str += f"\n{indent}    - Allowed values:\n"
+        for value in tree.allowed_values:
+            assignment = f"{usage_target} = {_python_literal(value)}"
+            # Autorefs treats adjacent dictionary keys as Markdown link references.
+            copy_text = (
+                escape(assignment, quote=True)
+                .replace("[", "&#91;")
+                .replace("]", "&#93;")
+            )
+            extra_str += (
+                f'{indent}        - <span class="param-enum-option">{escape(str(value))}'
+                f'<button class="md-clipboard" type="button" '
+                f'title="Copy parameter assignment" aria-label="Copy assignment for {escape(str(value), quote=True)}" '
+                f'data-clipboard-text="{copy_text}"></button></span>\n'
+            )
+    else:
+        extra_str += tree.to_markdown(indent + "    ")
+    extra_str += "\n\n"
 
     # Add usage example
     extra_str += f"{indent}    Example usage: \n\n"
-    _usage_keys = [f'["{key}"]' for key in breadcrumbs]
-    _usage_default_val = tree.default
-    if isinstance(tree.default, str):
-        _usage_default_val = f'"{tree.default}"'
     extra_str += f"""
 {indent}    ```python hl_lines="2"
 {indent}    params = load_params()
-{indent}    params{''.join(_usage_keys)} = {_usage_default_val}
+{indent}    {usage_target} = {_python_literal(tree.default)}
 {indent}    model = MIMOSA(params)
 {indent}    ```
 """
     return extra_str
 
 
+def _python_literal(value):
+    """Keep strings double-quoted while preserving Python literals for other types."""
+    return (
+        json.dumps(value, ensure_ascii=False) if isinstance(value, str) else repr(value)
+    )
+
+
 def on_page_content(html, **kwargs):
+    context = get_documentation_context()
+    model, parser_tree = context.model, context.parser_tree
     pattern = re.compile(r"(param::([a-zA-Z0-9_]+))")
     for match, param_name in re.findall(pattern, html):
         try:
             param = getattr(model, param_name)
             formatted_text = f"<code>{param_name}</code>"
-            if isinstance(param.doc, str):
-                if param.doc.startswith("::"):
-                    # Ignore the regional parameters for now
-                    keys = param.doc.split("::")[1].split(".")
+            source_key = getattr(param, "source_key", None)
+            if isinstance(source_key, str):
+                if source_key.startswith("regional::"):
+                    source = source_key.split("::", 1)[1]
+                    target = quote(f"regional.{source}", safe=".")
+                    formatted_text = f"<a href='#param__{target}'><code>{param_name}</code></a>"
+                elif source_key.startswith("::"):
+                    keys = source_key.split("::")[1].split(".")
                     keys_param_format = "".join([f'["{key}"]' for key in keys])
-                    doc = get_nested(parser_tree, keys).to_string()
-                    formatted_text = f"<a href='../../parameters/#{param.doc.split('::')[1]}'><code>params{keys_param_format}</code></a>: {doc}"
+                    doc = param.doc or get_nested(parser_tree, keys).to_string()
+                    target = quote(source_key.split("::")[1], safe=".")
+                    formatted_text = f"<a href='#param__{target}'><code>params{keys_param_format}</code></a>: {doc}"
             html = html.replace(match, formatted_text)
 
         except AttributeError:
@@ -217,13 +289,73 @@ def on_page_content(html, **kwargs):
     for match, param_title, param_key_str in re.findall(pattern, html):
         try:
             formatted_text = f"<code>{param_title}</code>"
-            # Ignore the regional parameters for now
             keys = param_key_str.split(".")
             keys_param_format = "".join([f'["{key}"]' for key in keys])
             doc = get_nested(parser_tree, keys).to_string()
-            formatted_text = f"<a href='../../parameters/#{param_key_str}'><code>params{keys_param_format}</code></a>: {doc}"
+            target = quote(param_key_str, safe=".")
+            formatted_text = f"<a href='#param__{target}'><code>params{keys_param_format}</code></a>: {doc}"
             html = html.replace(match, formatted_text)
 
         except AttributeError:
             pass
+    if "var::" in html or "varref::" in html:
+        page = kwargs["page"]
+        reference = kwargs["files"].get_file_from_path("variables.md")
+        if reference is None:
+            raise ValueError(
+                f"{page.file.src_uri}: Variable reference page variables.md is missing"
+            )
+        html = render_variable_markers(
+            html,
+            get_variable_catalogue(),
+            page.meta.get("variable_context"),
+            page.file.src_uri,
+            page.url,
+            reference.url,
+        )
+    if "page" in kwargs:
+        page = kwargs["page"]
+        graph_context = page.meta.get("variable_context") or "coacch"
+        if graph_context == "default":
+            graph_context = "coacch"
+        if graph_context not in DOCUMENTATION_CONFIGS:
+            raise ValueError(
+                f"{page.file.src_uri}: Unknown variable context {graph_context!r}"
+            )
+        html += f'<span hidden data-documentation-context="{escape(graph_context, quote=True)}"></span>'
     return html
+
+
+def on_startup(**kwargs):
+    # Start each build command or serve session with fresh model metadata.
+    generate_dependency_graph.get_dependency_graph_assets.cache_clear()
+    clear_time_regional_parameter_cache()
+    clear_documentation_cache()
+
+
+def on_shutdown(**kwargs):
+    generate_dependency_graph.get_dependency_graph_assets.cache_clear()
+    clear_time_regional_parameter_cache()
+    clear_documentation_cache()
+
+
+import time
+
+
+def on_pre_build(**kwargs):
+    # Reuse the catalogue across live rebuilds within the same serve session.
+    get_variable_catalogue()
+
+
+def on_files(files, config, **kwargs):
+    from mkdocs.structure.files import File
+
+    # Virtual files go straight to the site, avoiding watched source changes.
+    for (
+        path,
+        content,
+    ) in generate_dependency_graph.get_dependency_graph_assets().items():
+        files.append(File.generated(config, path, content=content))
+    for path, content in get_time_regional_parameter_assets().items():
+        files.append(File.generated(config, path, content=content))
+    return files

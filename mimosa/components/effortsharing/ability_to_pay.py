@@ -5,7 +5,7 @@ Effort sharing
 
 from typing import Sequence
 from mimosa.common import (
-    AbstractModel,
+    ConcreteModel,
     Var,
     Param,
     GeneralConstraint,
@@ -18,18 +18,32 @@ from mimosa.common import (
     quant,
     value,
     soft_min,
-    ModelContext,
 )
+
+from mimosa.core.model_inputs import ModelInputs
 
 
 def get_constraints(
-    m: AbstractModel, context: ModelContext
+    m: ConcreteModel, inputs: ModelInputs
 ) -> Sequence[GeneralConstraint]:
-    """
+    r"""
     Usage:
     ```python hl_lines="2"
     params = load_params()
     params["model structure"]["effortsharing module"] = "ability_to_pay"
+
+    # Effort-sharing regimes require emission trading to be feasible:
+    params["model structure"]["emissiontrade module"] = "emissiontrade"
+
+    # Cost-minimisation is typically used, to allocate real mitigation effort to regions with the lowest costs:
+    params["model structure"]["welfare module"] = "cost_minimising"
+
+    # Often, the effort sharing regimes require financial transfers larger than the mitigation costs:
+    params["economics"]["MAC"]["rel_mitigation_costs_min_level"] = -0.5
+
+    # Optionally set a carbon budget:
+    params["emissions"]["carbonbudget"] = "700 GtCO2"
+
     model = MIMOSA(params)
     ```
 
@@ -46,7 +60,7 @@ def get_constraints(
     The reduction factors from step 1 do not fully add up to the global emissions. There is typically a gap of a few percent. To correct this, a global correction factor is applied to the reductions:
 
     $$
-    \\text{correction factor}_{t} = \\frac{\\text{global baseline emissions}_{t} - \\text{global emissions}_{t}}{\\sum_{r} \\text{reductions}_{\\text{AP}; t,r}}.
+    \href{./#var__effortsharing_ability_to_pay::effortsharing_AP_inv_correction_factor}{\text{correction factor}_{t}} = \frac{\text{global baseline emissions}_{t} - \href{./#var__effortsharing_ability_to_pay::global_emissions}{\text{global emissions}_{t}}}{\sum_{r} \href{./#var__effortsharing_ability_to_pay::effortsharing_AP_reductions_before_correction}{\text{reductions}_{\text{AP}; t,r}}}.
     $$
 
     #### Step 3: Final allowances calculation
@@ -54,7 +68,7 @@ def get_constraints(
     Finally, the allowances are calculated by subtracting the reductions from the baseline emissions, multiplied by the correction factor:
 
     $$
-    \\text{allowances}_{\\text{AP}; t,r} = \\text{baseline emissions}_{t,r} - \\text{reductions}_{\\text{AP}; t,r} \\cdot \\text{correction factor}_{t}.
+    \href{./#var__effortsharing_ability_to_pay::effortsharing_AP_allowances}{\text{allowances}_{\text{AP}; t,r}} = \href{./#var__effortsharing_ability_to_pay::baseline_emissions}{\text{baseline emissions}_{t,r}} - \href{./#var__effortsharing_ability_to_pay::effortsharing_AP_reductions_before_correction}{\text{reductions}_{\text{AP}; t,r}} \cdot \href{./#var__effortsharing_ability_to_pay::effortsharing_AP_inv_correction_factor}{\text{correction factor}_{t}}.
     $$
 
 
@@ -105,20 +119,20 @@ def get_constraints(
 
 
 def ability_to_pay_rule(m, t, r):
-    """
+    r"""
     #### Step 1: Reductions before correction factor
 
     $$
-    \\text{reductions}_{\\text{AP}; t,r} = \\sqrt[3]{\\frac{\\text{per cap. GDP}_{t,r}}{\\text{global per cap. GDP}_{t}}} \\cdot \\text{glob. fract. of baseline emissions}_{t} \\cdot \\text{baseline emissions}_{t,r},
+    \href{./#var__effortsharing_ability_to_pay::effortsharing_AP_reductions_before_correction}{\text{reductions}_{\text{AP}; t,r}} = \sqrt[3]{\frac{\text{per cap. GDP}_{t,r}}{\text{global per cap. GDP}_{t}}} \cdot \text{glob. fract. of baseline emissions}_{t} \cdot \href{./#var__effortsharing_ability_to_pay::baseline_emissions}{\text{baseline emissions}_{t,r}},
     $$
 
     with
 
     $$
-    \\text{glob. frac. of baseline emissions}_{t} = \\frac{\\text{global baseline emissions}_{t} - \\text{global emissions}_{t}}{\\text{global baseline emissions}_{t}}.
+    \text{glob. frac. of baseline emissions}_{t} = \frac{\text{global baseline emissions}_{t} - \href{./#var__effortsharing_ability_to_pay::global_emissions}{\text{global emissions}_{t}}}{\text{global baseline emissions}_{t}}.
     $$
 
-    *Note: The per-capita GDP can be calculated in two ways: either from the baseline GDP variable or from the net GDP variable. For numerical stability, we use the baseline GDP variable, even though it would be slightly more accurate to use the net GDP variable.*
+    *Note: The per-capita GDP can be calculated in two ways: either from the [baseline GDP](#param__timeandregional.baseline_GDP) parameter or from the net GDP variable. For numerical stability, we use the [baseline GDP](#param__timeandregional.baseline_GDP) parameter, even though it would be slightly more accurate to use the net GDP variable.*
 
 
     """
