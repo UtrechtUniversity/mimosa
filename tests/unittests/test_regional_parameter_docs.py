@@ -116,7 +116,9 @@ def test_hook_expands_regional_marker_only_when_present(monkeypatch, regional_st
 
 def test_regional_parameter_marker_links_to_its_source(monkeypatch):
     context = SimpleNamespace(
-        model=SimpleNamespace(factor=SimpleNamespace(doc="regional::MAC.kappa_rel_abatement_0.75_2050")),
+        model=SimpleNamespace(factor=SimpleNamespace(
+            source_key="regional::MAC.kappa_rel_abatement_0.75_2050", doc="A description",
+        )),
         parser_tree={},
     )
     monkeypatch.setattr(mkdocs_hooks, "get_documentation_context", lambda: context)

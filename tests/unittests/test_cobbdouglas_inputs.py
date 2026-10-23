@@ -75,11 +75,11 @@ def check_capital_and_tfp(model):
 def test_economic_component_initializes_inputs_without_abstract_loader(economic_model):
     model = build_component(economic_model.inputs)
     check_capital_and_tfp(model)
-    assert model.init_capitalstock_factor.doc == "regional::economics.init_capital_factor"
-    assert model.alpha.doc == "::economics.GDP.alpha"
-    assert model.dk.doc == "::economics.GDP.depreciation of capital"
-    assert model.sr.doc == "::economics.GDP.savings rate"
-    assert model.ignore_damages.doc == "::economics.damages.ignore damages"
+    assert model.init_capitalstock_factor.source_key == "regional::economics.init_capital_factor"
+    assert model.alpha.source_key == "::economics.GDP.alpha"
+    assert model.dk.source_key == "::economics.GDP.depreciation of capital"
+    assert model.sr.source_key == "::economics.GDP.savings rate"
+    assert model.ignore_damages.source_key == "::economics.damages.ignore damages"
 
 
 def test_abstract_pipeline_keeps_overrides_initialization_and_tfp(economic_model):

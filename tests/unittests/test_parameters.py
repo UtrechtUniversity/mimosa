@@ -61,12 +61,13 @@ def test_plain_initialization_and_defaults_retain_pyomo_behavior(constructor):
         "timeandregional::population",
     ],
 )
-def test_sourced_initialization_preserves_documentation_key(source_key):
+def test_sourced_initialization_preserves_source_key_and_leaves_doc_free(source_key):
     model = ConcreteModel()
     model.coefficient = Param(initialize=SourcedValue(3.0, source_key))
 
     assert value(model.coefficient) == 3.0
-    assert model.coefficient.doc == source_key
+    assert model.coefficient.source_key == source_key
+    assert model.coefficient.doc is None
     assert isinstance(model.coefficient, NativeParam)
     assert PyomoParam is NativeParam
 
@@ -133,8 +134,8 @@ def test_sourced_data_remains_deferred_and_overridable_in_abstract_model():
         {None: {"factor": {None: 4.0}, "input": {0: 5.0, 1: 7.0}}}
     )
     assert instance.derived.extract_values() == {0: 20.0, 1: 28.0}
-    assert instance.factor.doc == "::example.factor"
-    assert instance.input.doc == "timeandregional::input"
+    assert instance.factor.source_key == "::example.factor"
+    assert instance.input.source_key == "timeandregional::input"
     assert len(list(instance.component_objects(PyomoParam))) == 3
 
 
@@ -186,15 +187,48 @@ def test_sourced_false_and_none_are_forwarded_without_coercion(initial_value):
             value(model.optional)
     else:
         assert model.optional.extract_values() == {None: initial_value}
-    assert model.optional.doc == "::example.optional"
+    assert model.optional.source_key == "::example.optional"
 
 
 @pytest.mark.parametrize("explicit_doc", ["A description", "::example.other", None])
-def test_explicit_doc_conflicts_with_sourced_metadata(explicit_doc):
-    with pytest.raises(ValueError, match="omit the explicit doc argument"):
+def test_explicit_doc_is_independent_of_sourced_metadata(explicit_doc):
+    model = ConcreteModel()
+    model.coefficient = Param(
+        initialize=SourcedValue(3.0, "::example.value"), doc=explicit_doc,
+    )
+
+    assert value(model.coefficient) == 3.0
+    assert model.coefficient.doc == explicit_doc
+    assert model.coefficient.source_key == "::example.value"
+
+
+def test_explicit_source_key_labels_plain_values_and_survives_cloning():
+    model = ConcreteModel()
+    model.t = Set(initialize=[0, 1])
+    model.coefficient = Param(
+        model.t, initialize={0: 3.0, 1: 5.0},
+        source_key="::example.value", doc="A description",
+    )
+    clone = model.clone()
+
+    assert isinstance(clone.coefficient, NativeParam)
+    assert clone.coefficient.source_key == "::example.value"
+    assert clone.coefficient.doc == "A description"
+    assert clone.coefficient.extract_values() == {0: 3.0, 1: 5.0}
+
+
+def test_conflicting_source_keys_are_rejected():
+    with pytest.raises(ValueError, match="source_key conflicts"):
         Param(
-            initialize=SourcedValue(3.0, "::example.value"), doc=explicit_doc
+            initialize=SourcedValue(3.0, "::example.value"),
+            source_key="::example.other",
         )
+
+    matching = Param(
+        initialize=SourcedValue(3.0, "::example.value"),
+        source_key="::example.value",
+    )
+    assert matching.source_key == "::example.value"
 
 
 def test_sourced_value_metadata_is_frozen():

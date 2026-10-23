@@ -27,6 +27,7 @@ class TimeRegionalParameter:
 
     name: str
     description: Optional[str]
+    source_key: Optional[str]
     unit: str
     years: Tuple[float, ...]
     regions: Tuple[str, ...]
@@ -36,8 +37,8 @@ class TimeRegionalParameter:
     @property
     def source_name(self):
         prefix = "timeandregional::"
-        if self.description and self.description.startswith(prefix):
-            return self.description[len(prefix):]
+        if self.source_key and self.source_key.startswith(prefix):
+            return self.source_key[len(prefix):]
         return None
 
 
@@ -81,6 +82,7 @@ def collect_time_regional_parameters(model):
         entries.append(TimeRegionalParameter(
             name=parameter.name,
             description=parameter.doc,
+            source_key=getattr(parameter, "source_key", None),
             unit=get_unit(parameter),
             years=years,
             regions=regions,
@@ -175,7 +177,7 @@ def render_time_regional_parameter_reference():
             if entry.source_name:
                 params = parse_param_values(deepcopy(context.params))
                 source = params["input"]["variables"][entry.source_name]
-                description = context.parser_tree["input"]["variables"][entry.source_name].descr
+                description = description or context.parser_tree["input"]["variables"][entry.source_name].descr
                 details.extend([
                     f"- Source: {escape(source['model'])}, {escape(source['variable'])}",
                     f"- Data file: `{escape(source['file'])}`",

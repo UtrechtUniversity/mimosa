@@ -42,6 +42,9 @@ spaces, parentheses and other special characters in column names. These links
 reuse the parameter hover cards, including horizontal scrolling through values.
 Generated `param::` links also recognise regional source metadata. The store rereads
 the CSV files on each documentation rebuild without constructing another model.
+Source keys come from the parameter's `source_key` attribute; `doc` is reserved
+for descriptions. `mimosa.common.Param` obtains the key automatically from a
+sourced initializer, or accepts it explicitly for ordinary values.
 
 ## Time- and region-dependent parameter plots
 
@@ -60,7 +63,8 @@ Missing values within retained series appear as gaps.
 All plots use the SSP2 values already initialized on the documentation models.
 There is no scenario dropdown, extra input loading or interpolation. Direct
 inputs use their `timeandregional::` metadata to show source descriptions and
-file names; derived parameters use their own declaration descriptions.
+file names. An explicit `doc` takes precedence over the input's configuration
+description; derived parameters use their own declaration descriptions.
 
 Link to these entries with `#param__timeandregional.TFP` (using the model parameter
 name). Text links and equation `\href` links both open the parameter reference

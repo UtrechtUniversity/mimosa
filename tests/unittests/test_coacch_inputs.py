@@ -54,7 +54,7 @@ def check_selected_parameters(m, store, combined, adaptation, quantile):
     prefix = "Ad" if adaptation else "NoAd"
     assert tuple(m.regions) == ("USA", "CAN")
     assert value(m.damage_scale_factor) == 1.25
-    assert m.damage_scale_factor.doc == "::economics.damages.scale factor"
+    assert m.damage_scale_factor.source_key == "::economics.damages.scale factor"
     for name in ("damage_noslr_form", "damage_noslr_b3", "damage_slr_form",
                  "damage_slr_b2", "damage_slr_b3"):
         assert getattr(m, name).domain is Any
@@ -70,7 +70,7 @@ def check_selected_parameters(m, store, combined, adaptation, quantile):
         for suffix in ("b1", "b2"):
             parameter = getattr(m, "damage_noslr_" + suffix)
             source = f"combined_{suffix}_{prefix}-q{quantile}"
-            assert parameter.doc == "regional::COACCH." + source
+            assert parameter.source_key == "regional::COACCH." + source
             for region in m.regions:
                 assert value(parameter[region]) == store.getregional("COACCH", source, region)
         for name in ("damage_noslr_form", "damage_noslr_b3", "damage_noslr_a",
@@ -84,7 +84,7 @@ def check_selected_parameters(m, store, combined, adaptation, quantile):
                 source = f"{source_prefix}_{suffix}"
                 if suffix == "a":
                     source += f" (q={quantile})"
-                assert parameter.doc == "regional::COACCH." + source
+                assert parameter.source_key == "regional::COACCH." + source
                 for region in m.regions:
                     expected = store.getregional("COACCH", source, region)
                     if isinstance(expected, float) and isnan(expected):

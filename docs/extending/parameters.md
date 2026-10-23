@@ -32,8 +32,9 @@ m.population = Param(
 
 Every component receives prepared `inputs`; you do not need to create it yourself.
 For configuration lookup, use the full path as one string, such as `"economics.PRTP"`.
-The input methods also supply the source metadata used by the documentation, so no separate
-`doc` argument is needed. Regional and time-dependent values are matched to `m.regions` and `m.t`.
+The input methods also supply the documentation's source metadata in `source_key`.
+You can add an optional `doc` argument for a description, alongside any initializer.
+Regional and time-dependent values are matched to `m.regions` and `m.t`.
 
 The three configurable input types are described below:
 
@@ -262,15 +263,24 @@ The `file` field should point to the IAMC formatted data file. The IAMC format i
     m.alpha = Param(
         initialize=SourcedValue(0.3, "::economics.GDP.alpha"),
     )
-    # m.alpha is a Pyomo parameter; m.alpha.doc is "::economics.GDP.alpha".
+    # m.alpha is a Pyomo parameter; m.alpha.source_key is "::economics.GDP.alpha".
     ```
 
-    `SourcedValue` does not load or convert data. It carries values and a documentation key using the
+    `SourcedValue` does not load or convert data. It carries values and a source key using the
     existing `::config.path`, `regional::category.name` or `timeandregional::variable` conventions.
-    Omit `doc` when using a sourced initializer: supplying both raises `ValueError`.
-    The concrete builder uses explicit initialization. `doc` is documentation metadata and does not
-    load or override values. A doc-only declaration such as `Param(doc="::economics.PRTP")` does
-    not initialize the parameter; use `initialize=inputs.config("economics.PRTP")` instead.
+    The factory stores that key in `source_key` and passes `doc` unchanged to Pyomo.
+    For time-and-region parameter cards, an explicit `doc` takes precedence over the input's
+    configuration description. Without one, the existing description is used.
+
+    Ordinary initializers can also be labelled explicitly:
+
+    ```python
+    m.alpha = Param(initialize=0.3, source_key="::economics.GDP.alpha")
+    ```
+
+    `source_key` is a MIMOSA-only argument consumed by the factory, not forwarded to Pyomo.
+    Supplying a key that conflicts with a sourced initializer raises `ValueError`.
+    Neither `source_key` nor `doc` loads or overrides values; always supply initialization separately.
 
     ### Explicit input lookup
 
@@ -345,7 +355,7 @@ The `file` field should point to the IAMC formatted data file. The IAMC format i
     ```
 
     Its `param::elasmu` documentation marker continues to work because the factory preserves the source
-    key in `doc`. The Cobb–Douglas component now also uses explicit lookup for its capital-stock
+    key in `source_key`. The Cobb–Douglas component now also uses explicit lookup for its capital-stock
     coefficient, production parameters and damage-ignore flag. For example:
 
     ```python

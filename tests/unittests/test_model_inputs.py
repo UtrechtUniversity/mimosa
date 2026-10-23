@@ -132,7 +132,7 @@ def test_regional_string_data_retains_values_and_native_any_domain(inputs):
 
     assert all(isinstance(form, str) for form in source.values.values())
     assert model.damage_form.extract_values() == source.values
-    assert model.damage_form.doc == "regional::COACCH.NoSLR_form"
+    assert model.damage_form.source_key == "regional::COACCH.NoSLR_form"
 
 
 @pytest.mark.parametrize("name", ["population", "GDP", "emissions"])
@@ -184,16 +184,16 @@ def test_lookup_values_construct_native_pyomo_parameters_and_derived_values(inpu
     population = inputs.time_regional("population").values
 
     assert value(model.alpha) == 0.3
-    assert model.alpha.doc == "::economics.GDP.alpha"
+    assert model.alpha.source_key == "::economics.GDP.alpha"
     assert model.capital_factor["CAN"] == 4.0
     for t in inputs.t:
         assert value(model.global_population[t]) == pytest.approx(
             sum(population[t, r] for r in inputs.regions)
         )
-    assert model.population.doc == "timeandregional::population"
+    assert model.population.source_key == "timeandregional::population"
     assert model.population.index_set().dimen == 2
     assert model.mac_factor.extract_values() == calibration.values
-    assert model.mac_factor.doc == calibration.documentation_key
+    assert model.mac_factor.source_key == calibration.documentation_key
 
 
 def test_lookup_matches_current_model_initialization(inputs):

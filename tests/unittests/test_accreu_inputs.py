@@ -111,10 +111,10 @@ def base_model(inputs):
 
 def check_regional_sources(m, inputs):
     for parameter in m.component_objects(PyomoParam):
-        assert not callable(parameter.doc)
-        if not str(parameter.doc).startswith("regional::ACCREU"):
+        assert not callable(parameter.source_key)
+        if not str(parameter.source_key).startswith("regional::ACCREU"):
             continue
-        category, source = parameter.doc.split("::")[1].split(".", 1)
+        category, source = parameter.source_key.split("::")[1].split(".", 1)
         for region in m.regions:
             assert value(parameter[region]) == pytest.approx(
                 inputs.regional_store.getregional(category, source, region)
@@ -137,7 +137,7 @@ def test_native_accreu_parameters_options_bounds_and_equations(
     assert value(m.damage_scale_factor) == 1.25
     assert value(m.mortality_svl_rel_gdp_per_cap) == 150
     assert (
-        m.mortality_svl_rel_gdp_per_cap.doc
+        m.mortality_svl_rel_gdp_per_cap.source_key
         == "::economics.damages.accreu.mortality_svl_rel_gdp_cap"
     )
     check_regional_sources(m, inputs)
@@ -229,8 +229,8 @@ def test_native_cge_preserves_quantile_format_and_regional_overrides(quantile):
     equations = cge_damages.get_constraints(m, inputs)
     rhs = {eq.lhs: eq for eq in equations if hasattr(eq, "lhs")}
     check_regional_sources(m, inputs)
-    assert m.damage_noslr_a.doc == f"regional::ACCREU_CGE.NoSLR_a{quantile:.2f}"
-    assert m.damage_slr_a.doc == f"regional::ACCREU_CGE.slr_a{quantile:.2f}"
+    assert m.damage_noslr_a.source_key == f"regional::ACCREU_CGE.NoSLR_a{quantile:.2f}"
+    assert m.damage_slr_a.source_key == f"regional::ACCREU_CGE.slr_a{quantile:.2f}"
     x0, x = 1.2 - 0.85, 2.0 - 0.85
     expected = 1.25 * 3 * (x - x0 + 2 * (x**2 - x0**2)) / 100
     assert value(rhs["non_slr_damage_costs"](m, 1, "USA")) == pytest.approx(expected)

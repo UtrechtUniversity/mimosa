@@ -23,7 +23,7 @@ def test_objectives_initialize_prtp_and_preserve_discounting(
     for t in m.t:
         m.NPV[t].set_value(10 * t)
     assert value(m.PRTP) == 0.02
-    assert m.PRTP.doc == "::economics.PRTP"
+    assert m.PRTP.source_key == "::economics.PRTP"
     assert value(m.objective) == 30
     if component is utility:
         assert m.objective.sense == maximize

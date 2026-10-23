@@ -87,7 +87,8 @@ def documentation_model(monkeypatch):
     variable_docs.clear_documentation_cache()
     model = ConcreteModel()
     model.variable = Var(doc="Test variable", units=units.m)
-    model.alpha = Param(initialize=0.3, doc="::economics.GDP.alpha")
+    model.alpha = Param(initialize=0.3)
+    model.alpha.source_key = "::economics.GDP.alpha"
     model.example_constraint = Constraint(
         expr=model.variable >= 0, doc="Test constraint documentation"
     )

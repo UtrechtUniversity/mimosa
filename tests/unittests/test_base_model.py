@@ -45,8 +45,8 @@ def test_create_base_model_defines_shared_sets_and_inputs(settings, years):
     assert [model.year(t) for t in model.t] == years
     assert value(model.tf) == len(years) - 1
     assert [value(model.period_length[t]) for t in model.t] == [0] + [b - a for a, b in zip(years, years[1:])]
-    assert model.beginyear.doc == "::time.start"
-    assert model.population.doc == "timeandregional::population"
+    assert model.beginyear.source_key == "::time.start"
+    assert model.population.source_key == "timeandregional::population"
     assert str(model.population.get_units()) == str(quant.unit("billion people"))
     for t in model.t:
         assert value(model.global_population[t]) == pytest.approx(sum(value(model.population[t, r]) for r in model.regions))

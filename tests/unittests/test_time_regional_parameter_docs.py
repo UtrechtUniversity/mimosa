@@ -9,6 +9,7 @@ from pyomo.environ import ConcreteModel, Param, Set, Var, units, value
 
 from docs.scripts import mkdocs_hooks, time_regional_parameter_docs as plots
 from docs.scripts.variable_docs import get_documentation_context
+from mimosa.common import Param as MimosaParam, SourcedValue
 from mimosa.common.pyomo_utils import get_unit
 
 
@@ -104,7 +105,7 @@ def test_zero_substitute_does_not_hide_a_nonzero_variant_in_another_context(monk
     assert entry.values == ((11, 12, 13), (21, 22, 23))
 
 
-@pytest.mark.parametrize("difference", ["values", "description", "unit"])
+@pytest.mark.parametrize("difference", ["values", "description", "source_key", "unit"])
 def test_catalogue_merges_identical_entries_but_preserves_variants(monkeypatch, difference):
     first = example_model()
     second = example_model()
@@ -112,6 +113,8 @@ def test_catalogue_merges_identical_entries_but_preserves_variants(monkeypatch, 
         second.new_parameter = Param(second.t, second.regions, initialize=99)
     elif difference == "description":
         second.new_parameter.doc = "Another definition."
+    elif difference == "source_key":
+        second.new_parameter.source_key = "timeandregional::another_input"
     else:
         second.new_parameter = Param(
             second.t, second.regions,
@@ -221,6 +224,38 @@ def test_reference_hook_is_lazy_and_omits_zero_and_uninitialized_parameters(monk
     assert "Available when:" in debt
     assert "params['model structure']['effortsharing module'] = 'equal_cumulative_per_cap'" in debt
     assert "effortsharing_equal_cumulative_per_cap" not in debt
+
+
+@pytest.mark.parametrize("description", [None, "A custom input description."])
+def test_reference_uses_doc_without_losing_source_metadata(monkeypatch, description):
+    default = get_documentation_context()
+    model = example_model()
+    model.population = MimosaParam(
+        model.t, model.regions,
+        initialize=SourcedValue(
+            {(t, r): 1.0 for t in model.t for r in model.regions},
+            "timeandregional::population",
+        ),
+        doc=description,
+    )
+    context = SimpleNamespace(
+        model=model, params=default.params, parser_tree=default.parser_tree,
+    )
+    monkeypatch.setattr(plots.variable_docs, "DOCUMENTATION_CONFIGS", {"coacch": {}})
+    monkeypatch.setattr(plots.variable_docs, "get_documentation_context", lambda name: context)
+
+    result = plots.render_time_regional_parameter_reference()
+    population = next(
+        entry for entry in plots.get_time_regional_parameter_catalogue()
+        if entry.name == "population"
+    )
+    assert population.description == description
+    assert population.source_key == "timeandregional::population"
+    assert population.source_name == "population"
+    fallback = default.parser_tree["input"]["variables"]["population"].descr
+    assert (description or fallback) in result
+    assert "Source: IMAGE 3.4, Population" in result
+    assert '"file_path": "assets/parameter-plots/population.json"' in result
 
 
 def test_variants_have_distinct_assets_but_one_card_and_anchor(monkeypatch):

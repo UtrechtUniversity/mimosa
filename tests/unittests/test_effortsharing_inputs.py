@@ -16,7 +16,7 @@ def test_convergence_uses_configured_year_for_derived_shares(
     m = policy_model(inputs)
     per_cap_convergence.get_constraints(m, inputs)
     assert value(m.percapconv_year) == year
-    assert m.percapconv_year.doc == "::effort sharing.percapconv_year"
+    assert m.percapconv_year.source_key == "::effort sharing.percapconv_year"
     for t in m.t:
         weight = 1 if year == 2025 else min((m.year(t) - 2025) / (year - 2025), 1)
         for region, initial_share in (("USA", 0.8), ("CAN", 0.2)):
@@ -41,7 +41,7 @@ def test_ecpc_nondefault_inputs_preserve_debt_and_discrete_repayment(
     assert value(m.effortsharing_ecpc_repayment_endyear) == end_year
     for name, path in (("discount_rate", "ecpc_discount_rate"), ("start_year", "ecpc_start_year"),
                        ("repayment_endyear", "ecpc_repayment_endyear")):
-        assert getattr(m, "effortsharing_ecpc_" + name).doc == "::effort sharing." + path
+        assert getattr(m, "effortsharing_ecpc_" + name).source_key == "::effort sharing." + path
     for region in m.regions:
         fair_share = population[region].to_numpy() / population.sum(axis=1).to_numpy() * emissions.sum(axis=1).to_numpy()
         debt = float(np.sum((emissions[region].to_numpy() - fair_share) * np.exp(-0.05 * (2025 - np.array(years)))))

@@ -34,7 +34,7 @@ def test_pipeline_supplies_inputs_using_existing_config_and_stores(welfare_model
     assert inputs.data_store is preprocessor._data_store
     assert inputs.regional_store is preprocessor._regional_param_store
     assert value(welfare_model.concrete_model.elasmu) == 1.4
-    assert welfare_model.concrete_model.elasmu.doc == "::economics.elasmu"
+    assert welfare_model.concrete_model.elasmu.source_key == "::economics.elasmu"
 
 
 def test_component_initializes_elasmu_from_prepared_inputs(welfare_model):
@@ -48,7 +48,7 @@ def test_component_initializes_elasmu_from_prepared_inputs(welfare_model):
     equations = welfare_loss_minimising.get_constraints(model, welfare_model.inputs)
 
     assert value(model.elasmu) == 1.4
-    assert model.elasmu.doc == "::economics.elasmu"
+    assert model.elasmu.source_key == "::economics.elasmu"
     assert [equation.name for equation in equations] == ["utility", "global_welfare"]
     regional_utility = value(equations[0](model, 1, "CAN"))
     assert regional_utility == pytest.approx(calc_utility(6.0, 2.0, 1.4))
@@ -85,12 +85,12 @@ def test_welfare_variants_use_configured_parameters_and_utility(
     m = policy_model(inputs)
     equations = component.get_constraints(m, inputs)
     assert value(m.elasmu) == 1.4
-    assert m.elasmu.doc == "::economics.elasmu"
+    assert m.elasmu.source_key == "::economics.elasmu"
     if component is cost_minimising:
         expected = 4 * (value(soft_min(18 / 4)) ** (1 - 1.4) - 1) / (1 - 1.4)
     else:
         assert value(m.inequal_aversion) == 0.2
-        assert m.inequal_aversion.doc == "::economics.inequal_aversion"
+        assert m.inequal_aversion.source_key == "::economics.inequal_aversion"
         total = 0
         for region in m.regions:
             pop = value(m.population[0, region])

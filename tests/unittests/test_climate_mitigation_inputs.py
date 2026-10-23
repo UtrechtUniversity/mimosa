@@ -71,8 +71,8 @@ def test_emissions_initializes_quantities_flags_and_temperature_directly(inputs)
     assert value(m.TCRE) == pytest.approx(0.00075)
     assert value(m.budget) is False
     assert value(m.temperature_target) is False
-    assert m.emissions_pulse_amount.doc == "::emissions.pulse.amount"
-    assert m.T0.doc == "::temperature.initial"
+    assert m.emissions_pulse_amount.source_key == "::emissions.pulse.amount"
+    assert m.T0.source_key == "::temperature.initial"
     assert all(value(m.temperature[t]) == 2.0 for t in m.t)
 
 
@@ -83,8 +83,8 @@ def test_mitigation_owns_calibration_and_learning_inputs(inputs):
     mitigation.get_constraints(m, inputs)
 
     assert m.MAC_scaling_factor["CAN"] == 0.7
-    assert m.MAC_scaling_factor.doc == "regional::MAC.kappa_rel_abatement_0.4_2030"
-    assert m.MAC_SSP_calibration_factor.doc == "::economics.MAC.SSP_calibration_factor.SSP1"
+    assert m.MAC_scaling_factor.source_key == "regional::MAC.kappa_rel_abatement_0.4_2030"
+    assert m.MAC_SSP_calibration_factor.source_key == "::economics.MAC.SSP_calibration_factor.SSP1"
     assert m.MAC_SSP_calibration_factor.extract_values() == pytest.approx(
         inputs.time_config("economics.MAC.SSP_calibration_factor.SSP1").values
     )
