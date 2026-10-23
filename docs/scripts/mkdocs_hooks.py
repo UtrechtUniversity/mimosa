@@ -24,6 +24,11 @@ from docs.scripts.regional_parameter_docs import (
     REGIONAL_REFERENCE_MARKER,
     render_regional_parameter_reference,
 )
+from docs.scripts.time_regional_parameter_docs import (
+    TIME_REGIONAL_REFERENCE_MARKER,
+    get_time_regional_parameter_assets,
+    render_time_regional_parameter_reference,
+)
 from mimosa.common.regional_params import RegionalParamStore
 from mimosa.common.config.parseconfig import (
     get_nested,
@@ -125,6 +130,15 @@ def markdown_parse_regional_param_reference(markdown):
     )
 
 
+def markdown_parse_time_regional_param_reference(markdown):
+    if TIME_REGIONAL_REFERENCE_MARKER not in markdown:
+        return markdown
+    return markdown.replace(
+        TIME_REGIONAL_REFERENCE_MARKER,
+        render_time_regional_parameter_reference(get_documentation_context()),
+    )
+
+
 def markdown_parse_region_defs(markdown):
     # Check if markdown has parameter reference
     check_str = "{regions::definitions}"
@@ -160,6 +174,7 @@ def on_page_markdown(markdown, **kwargs):
 
     markdown = markdown_parse_param_reference(markdown)
     markdown = markdown_parse_regional_param_reference(markdown)
+    markdown = markdown_parse_time_regional_param_reference(markdown)
     markdown = markdown_parse_parser_types(markdown)
     markdown = markdown_parse_region_defs(markdown)
     if REFERENCE_MARKER in markdown:
@@ -312,11 +327,13 @@ def on_page_content(html, **kwargs):
 def on_startup(**kwargs):
     # Start each build command or serve session with fresh model metadata.
     generate_dependency_graph.get_dependency_graph_assets.cache_clear()
+    get_time_regional_parameter_assets.cache_clear()
     clear_documentation_cache()
 
 
 def on_shutdown(**kwargs):
     generate_dependency_graph.get_dependency_graph_assets.cache_clear()
+    get_time_regional_parameter_assets.cache_clear()
     clear_documentation_cache()
 
 
@@ -336,5 +353,7 @@ def on_files(files, config, **kwargs):
         path,
         content,
     ) in generate_dependency_graph.get_dependency_graph_assets().items():
+        files.append(File.generated(config, path, content=content))
+    for path, content in get_time_regional_parameter_assets().items():
         files.append(File.generated(config, path, content=content))
     return files

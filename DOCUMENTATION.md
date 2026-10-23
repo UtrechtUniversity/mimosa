@@ -43,6 +43,20 @@ reuse the parameter hover cards, including horizontal scrolling through values.
 Generated `param::` links also recognise regional source metadata. The store rereads
 the CSV files on each documentation rebuild without constructing another model.
 
+## Time- and region-dependent parameter plots
+
+`{timeandregionalparams::reference}` adds population, baseline GDP and baseline
+CO₂ emissions to the parameter reference. `docs/scripts/time_regional_parameter_docs.py`
+reads their initialized values and units from the shared default documentation
+model, keeping its time grid but restricting displayed years to 2025–2100.
+Each plot shows all IMAGE regions and identifies the selected scenario and source.
+
+MkDocs publishes the Plotly JSON as virtual files under `assets/parameter-plots/`.
+These assets are cached for a build or serve session, so live rebuilds do not
+construct another model or repeat data extraction. The existing Plotly plugin
+loads them in the browser, and `plotly-resize.js` sizes plots when their collapsed
+parameter cards open. No simulation or IPOPT run is needed.
+
 ## SLR coefficient tables
 
 The SLR page uses `{{ slr_coefficients("thermal") }}` and equivalent calls for
