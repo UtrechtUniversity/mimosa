@@ -1,6 +1,6 @@
 """Summarise availability using public configuration keys and values."""
 
-from itertools import combinations
+from itertools import combinations, product
 
 from mimosa.common.config.parseconfig import get_nested
 
@@ -16,6 +16,29 @@ DAMAGE_OPTIONS = {
         "economics.damages.coacch_combined_slr_nonslr_damages",
     ),
 }
+
+
+def render_availability_examples(available_contexts, context_params):
+    """Show the public parameter assignments needed for these contexts."""
+    blocks = []
+    for requirements in availability_requirements(available_contexts, context_params):
+        paths, value_choices = zip(*requirements)
+        for values in product(*value_choices):
+            assignments = []
+            for path, value in zip(paths, values):
+                keys = "".join(f"[{key!r}]" for key in path.split("."))
+                assignments.append(f"params{keys} = {value!r}")
+            highlight_lines = " ".join(
+                str(line) for line in range(2, len(assignments) + 2)
+            )
+            blocks.append("\n".join([
+                f'```python hl_lines="{highlight_lines}"',
+                "params = load_params()",
+                *assignments,
+                "model = MIMOSA(params)",
+                "```",
+            ]))
+    return "\n\nor\n\n".join(blocks)
 
 
 def availability_requirements(available_contexts, context_params):

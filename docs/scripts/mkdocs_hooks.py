@@ -26,6 +26,7 @@ from docs.scripts.regional_parameter_docs import (
 )
 from docs.scripts.time_regional_parameter_docs import (
     TIME_REGIONAL_REFERENCE_MARKER,
+    clear_time_regional_parameter_cache,
     get_time_regional_parameter_assets,
     render_time_regional_parameter_reference,
 )
@@ -135,7 +136,7 @@ def markdown_parse_time_regional_param_reference(markdown):
         return markdown
     return markdown.replace(
         TIME_REGIONAL_REFERENCE_MARKER,
-        render_time_regional_parameter_reference(get_documentation_context()),
+        render_time_regional_parameter_reference(),
     )
 
 
@@ -327,13 +328,13 @@ def on_page_content(html, **kwargs):
 def on_startup(**kwargs):
     # Start each build command or serve session with fresh model metadata.
     generate_dependency_graph.get_dependency_graph_assets.cache_clear()
-    get_time_regional_parameter_assets.cache_clear()
+    clear_time_regional_parameter_cache()
     clear_documentation_cache()
 
 
 def on_shutdown(**kwargs):
     generate_dependency_graph.get_dependency_graph_assets.cache_clear()
-    get_time_regional_parameter_assets.cache_clear()
+    clear_time_regional_parameter_cache()
     clear_documentation_cache()
 
 

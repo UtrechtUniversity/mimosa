@@ -45,17 +45,28 @@ the CSV files on each documentation rebuild without constructing another model.
 
 ## Time- and region-dependent parameter plots
 
-`{timeandregionalparams::reference}` adds population, baseline GDP and baseline
-CO₂ emissions to the parameter reference. `docs/scripts/time_regional_parameter_docs.py`
-reads their initialized values and units from the shared default documentation
-model, keeping its time grid but restricting displayed years to 2025–2100.
-Each plot shows all IMAGE regions and identifies the selected scenario and source.
+`{timeandregionalparams::reference}` discovers public Pyomo `Param` declarations
+indexed by `t` and `regions` across all cached documentation models. No manual
+parameter list is needed. `docs/scripts/time_regional_parameter_docs.py` snapshots
+their units, descriptions and initialized values on each model's time grid,
+restricting displayed years to 2025–2100. Identical entries share one plot;
+different values or declaration metadata remain separate variants within the
+parameter's card. Configuration-specific entries show public parameter assignments
+using the same availability rules as variable descriptions. Entries with no
+nonzero initialized values in 2025–2100 are omitted, including zero substitutes
+for variables in other configurations and wholly uninitialized parameters.
+Missing values within retained series appear as gaps.
+
+All plots use the SSP2 values already initialized on the documentation models.
+There is no scenario dropdown, extra input loading or interpolation. Direct
+inputs use their `timeandregional::` metadata to show source descriptions and
+file names; derived parameters use their own declaration descriptions.
 
 MkDocs publishes the Plotly JSON as virtual files under `assets/parameter-plots/`.
 These assets are cached for a build or serve session, so live rebuilds do not
 construct another model or repeat data extraction. The existing Plotly plugin
 loads them in the browser, and `plotly-resize.js` sizes plots when their collapsed
-parameter cards open. No simulation or IPOPT run is needed.
+parameter cards open. No extra concrete model, simulation or IPOPT run is needed.
 
 ## SLR coefficient tables
 

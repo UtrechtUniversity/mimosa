@@ -3,11 +3,10 @@
 import re
 from html import escape
 from html.parser import HTMLParser
-from itertools import product
 from textwrap import indent
 from urllib.parse import quote
 
-from docs.scripts.variable_availability import availability_requirements
+from docs.scripts.variable_availability import render_availability_examples
 from docs.scripts.variable_docs import get_documentation_context
 from docs.scripts.variable_references import (
     group_variables,
@@ -69,31 +68,11 @@ def render_variable_reference(catalogue, context_params=None):
         if variable.requires_baseline:
             content.append("- Requires a no-policy baseline.")
         if available_contexts[variable.name] != all_contexts:
-            alternatives = availability_requirements(
+            examples = render_availability_examples(
                 available_contexts[variable.name], context_params
             )
-            blocks = []
-            for requirements in alternatives:
-                paths, value_choices = zip(*requirements)
-                for values in product(*value_choices):
-                    assignments = []
-                    for path, value in zip(paths, values):
-                        keys = "".join(f"[{key!r}]" for key in path.split("."))
-                        assignments.append(f"params{keys} = {value!r}")
-                    highlight_lines = " ".join(
-                        str(line) for line in range(2, len(assignments) + 2)
-                    )
-                    blocks.append(
-                        "\n".join([
-                            f'```python hl_lines="{highlight_lines}"',
-                            "params = load_params()",
-                            *assignments,
-                            "model = MIMOSA(params)",
-                            "```",
-                        ])
-                    )
             content.append("\nAvailable when:\n")
-            content.append("\n\nor\n\n".join(blocks))
+            content.append(examples)
         title = f'!!! variable "{escape(variable.name)}"\n\n'
         entries.append(title + indent("\n".join(content), "    "))
     return "\n\n".join(entries) + "\n"
