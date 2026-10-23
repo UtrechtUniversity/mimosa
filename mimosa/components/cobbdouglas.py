@@ -56,6 +56,9 @@ def get_constraints(
 
     $$ \href{./#var__consumption}{C_{t,r}} = (1 - \href{./#param__economics.GDP.savings rate}{\text{sr}}) \cdot \href{./#var__GDP_net}{\text{GDP}_{\text{net},t,r}}. $$
 
+    Consumption is physical consumption. Monetised non-market damages, such as mortality,
+    are deducted separately in the welfare calculation.
+
     ## Capital stock
 
     The capital stock $\href{./#var__capital_stock}{K_t}$ grows over time according to the investments and the depreciation of the capital stock:
@@ -197,8 +200,7 @@ def get_constraints(
             ),
             RegionalEquation(
                 m.consumption,
-                lambda m, t, r: (1 - m.sr) * m.GDP_net[t, r]
-                - m.non_market_damage_costs_abs[t, r],
+                lambda m, t, r: (1 - m.sr) * m.GDP_net[t, r],
             ),
         ]
     )

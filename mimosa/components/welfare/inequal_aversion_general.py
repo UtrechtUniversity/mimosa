@@ -31,7 +31,7 @@ def get_constraints(
 
     $$
     \href{./#var__welfare_inequal_aversion_general::utility}{U_{t,r}} = \href{./#param__timeandregional.population}{L_{t,r}}
-    \left(\frac{\href{./#var__welfare_inequal_aversion_general::consumption}{C_{t,r}}}{\href{./#param__timeandregional.population}{L_{t,r}}}\right)^{1-\href{./#param__economics.inequal_aversion}{\eta}}.
+    \left(\frac{\href{./#var__welfare_inequal_aversion_general::consumption}{C_{t,r}} - \href{./#var__accreu_sectoral::non_market_damage_costs_abs}{D^{\mathrm{NM}}_{t,r}}}{\href{./#param__timeandregional.population}{L_{t,r}}}\right)^{1-\href{./#param__economics.inequal_aversion}{\eta}}.
     $$
 
     The regional values are then aggregated into yearly welfare:
@@ -66,7 +66,9 @@ def get_constraints(
             RegionalEquation(
                 m.utility,
                 lambda m, t, r: calc_regional_utility(
-                    m.consumption[t, r], m.population[t, r], m.inequal_aversion
+                    m.consumption[t, r] - m.non_market_damage_costs_abs[t, r],
+                    m.population[t, r],
+                    m.inequal_aversion,
                 ),
             ),
             GlobalEquation(

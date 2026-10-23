@@ -39,9 +39,9 @@ def get_constraints(
 
     <h3>Equations</h3>
 
-    First, calculate the global consumption $\href{./#var__welfare_cost_minimising::consumption}{C_{t,r}}$ and population $\href{./#param__timeandregional.population}{L_{t,r}}$:
+    First, aggregate consumption after deducting non-market damages, and population:
 
-    $$ \widehat{C}_{t} = \sum_r \href{./#var__welfare_cost_minimising::consumption}{C_{t,r}}, $$
+    $$ \widehat{C}_{t} = \sum_r \left(\href{./#var__welfare_cost_minimising::consumption}{C_{t,r}} - \href{./#var__accreu_sectoral::non_market_damage_costs_abs}{D^{\mathrm{NM}}_{t,r}}\right), $$
 
     $$ \widehat{L}_{t} = \sum_r \href{./#param__timeandregional.population}{L_{t,r}}. $$
 
@@ -68,13 +68,20 @@ def get_constraints(
     constraints.extend(
         [
             RegionalEquation(
-                m.utility, lambda m, t, r: m.consumption[t, r] / m.population[t, r]
+                m.utility,
+                lambda m, t, r: (
+                    m.consumption[t, r] - m.non_market_damage_costs_abs[t, r]
+                )
+                / m.population[t, r],
             ),
             GlobalEquation(
                 m.global_welfare,
                 lambda m, t: m.global_population[t]
                 * calc_utility(
-                    sum(m.consumption[t, r] for r in m.regions),
+                    sum(
+                        m.consumption[t, r] - m.non_market_damage_costs_abs[t, r]
+                        for r in m.regions
+                    ),
                     sum(m.population[t, r] for r in m.regions),
                     m.elasmu,
                 ),

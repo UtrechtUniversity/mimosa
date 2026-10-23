@@ -38,8 +38,8 @@ def get_constraints(
 
     <h3>Equations</h3>
 
-    First, calculate the regional utility using the regional consumption $\href{./#var__coacch::consumption}{C_{t,r}}$ and population $\href{./#param__timeandregional.population}{L_{t,r}}$:
-    $$ \href{./#var__coacch::utility}{U_{t,r}} = \text{utility}(\href{./#var__coacch::consumption}{C_{t,r}}, \href{./#param__timeandregional.population}{L_{t,r}}) $$
+    First, calculate regional utility from consumption after deducting non-market damages, and population:
+    $$ \href{./#var__coacch::utility}{U_{t,r}} = \text{utility}\left(\href{./#var__coacch::consumption}{C_{t,r}} - \href{./#var__accreu_sectoral::non_market_damage_costs_abs}{D_{t,r}^{NM}}, \href{./#param__timeandregional.population}{L_{t,r}}\right) $$
 
     Second, the global welfare is calculated as the sum of the regional utility values weighted by population:
     $$ \href{./#var__coacch::global_welfare}{W_t} = \sum_r \href{./#param__timeandregional.population}{L_{t,r}} \cdot \href{./#var__coacch::utility}{U_{t,r}} $$
@@ -65,7 +65,9 @@ def get_constraints(
             RegionalEquation(
                 m.utility,
                 lambda m, t, r: calc_utility(
-                    m.consumption[t, r], m.population[t, r], m.elasmu
+                    m.consumption[t, r] - m.non_market_damage_costs_abs[t, r],
+                    m.population[t, r],
+                    m.elasmu,
                 ),
             ),
             GlobalEquation(

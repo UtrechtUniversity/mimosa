@@ -47,6 +47,7 @@ def _make_policy_model(inputs):
         m.t, initialize=lambda m, t: sum(m.population[t, r] for r in m.regions)
     )
     m.consumption = Var(m.t, m.regions, initialize=lambda m, t, r: 12 if r == "USA" else 6)
+    m.non_market_damage_costs_abs = Param(m.t, m.regions, initialize=0, mutable=True)
     m.ssp_baseline_emissions = Param(
         m.t, m.regions, initialize=lambda m, t, r: 8 if r == "USA" else 2
     )

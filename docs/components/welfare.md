@@ -10,6 +10,12 @@ MIMOSA separates the calculation of yearly welfare[^1] from the final optimisati
 
 The welfare module can be chosen using the parameter [`welfare module`](#param__model%20structure.welfare%20module).
 
+In the equations below, $\href{./#var__accreu_sectoral::non_market_damage_costs_abs}{D^{\mathrm{NM}}_{t,r}}$
+denotes monetised non-market damages, such as mortality, in the same currency units as
+consumption. These damages reduce the consumption-equivalent input to welfare,
+while reported consumption $\href{./#var__consumption}{C_{t,r}}$ remains physical
+consumption. The deduction is zero when non-market damages are not included.
+
 === "Welfare-loss-minimising `default`"
 
     Usage:

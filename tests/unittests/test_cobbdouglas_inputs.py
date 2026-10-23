@@ -103,3 +103,18 @@ def test_economic_simulation_uses_configured_production_and_savings(economic_mod
             assert simulation.investments[t, region] == pytest.approx(
                 0.25 * simulation.GDP_net[t, region]
             )
+
+
+def test_consumption_excludes_non_market_damages(economic_model):
+    model = economic_model.concrete_model.clone()
+    consumption = next(
+        equation for equation in economic_model.simulator.equations
+        if equation.lhs == "consumption"
+    )
+    for t in model.t:
+        for region in model.regions:
+            expected = (1 - value(model.sr)) * value(model.GDP_net[t, region])
+            model.non_market_damage_costs_abs[t, region] = 0
+            assert value(consumption(model, t, region)) == pytest.approx(expected)
+            model.non_market_damage_costs_abs[t, region] = 2.0
+            assert value(consumption(model, t, region)) == pytest.approx(expected)

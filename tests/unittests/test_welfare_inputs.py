@@ -44,6 +44,7 @@ def test_component_initializes_elasmu_from_prepared_inputs(welfare_model):
     model.year = welfare_model.inputs.year
     model.population = Param(model.t, model.regions, initialize=2.0)
     model.consumption = Var(model.t, model.regions, initialize=6.0)
+    model.non_market_damage_costs_abs = Param(model.t, model.regions, initialize=0)
 
     equations = welfare_loss_minimising.get_constraints(model, welfare_model.inputs)
 
@@ -68,7 +69,7 @@ def test_simulation_matches_its_utility_equations(welfare_model):
         expected_welfare = 0.0
         for region in simulation.regions:
             utility = calc_utility(
-                simulation.consumption[t, region],
+                simulation.consumption[t, region] - simulation.non_market_damage_costs_abs[t, region],
                 simulation.population[t, region],
                 1.4,
             )
@@ -101,3 +102,48 @@ def test_welfare_variants_use_configured_parameters_and_utility(
             total += regional
         expected = 4 * value(soft_min(total / 4)) ** ((1 - 1.4) / (1 - 0.2)) / (1 - 1.4)
     assert value(equations[1](m, 0)) == pytest.approx(expected)
+
+
+@pytest.mark.parametrize("component", [
+    welfare_loss_minimising, cost_minimising, inequal_aversion_general,
+])
+@pytest.mark.parametrize("damage_level", [0, 1, -0.5, 15])
+def test_moving_non_market_damages_preserves_welfare(
+    component, damage_level, policy_inputs, policy_model,
+):
+    inputs = policy_inputs()
+    model = policy_model(inputs)
+    for t in model.t:
+        for region in model.regions:
+            model.non_market_damage_costs_abs[t, region] = (
+                damage_level * (t + 1) * (1 if region == "USA" else 2)
+            )
+
+    # The old consumption variable already contained the deduction. With no
+    # further welfare deduction, it must give the same utility and welfare.
+    previous = model.clone()
+    for t in model.t:
+        for region in model.regions:
+            previous.consumption[t, region] = value(
+                model.consumption[t, region] - model.non_market_damage_costs_abs[t, region]
+            )
+            previous.non_market_damage_costs_abs[t, region] = 0
+    equations = component.get_constraints(model, inputs)
+    component.get_constraints(previous, inputs)
+
+    # Check native Pyomo expressions and the objects used during simulation,
+    # including zero damages, benefits and negative welfare-adjusted consumption.
+    for current, old in [
+        (model, previous),
+        (SimulationObjectModel(model), SimulationObjectModel(previous)),
+    ]:
+        for t in model.t:
+            for region in model.regions:
+                utility = value(equations[0](current, t, region))
+                old_utility = value(equations[0](old, t, region))
+                assert utility == pytest.approx(old_utility)
+                current.utility[t, region] = utility
+                old.utility[t, region] = old_utility
+            assert value(equations[1](current, t)) == pytest.approx(
+                value(equations[1](old, t))
+            )
