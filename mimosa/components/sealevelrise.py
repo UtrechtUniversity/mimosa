@@ -369,9 +369,24 @@ def get_constraints(
     m.slr_initial_year = Param(initialize=2025)
 
     # Thermal expansion: fast upper-ocean and slow deep-ocean response boxes.
-    m.slr_thermal_fast = Var(m.t, within=NonNegativeReals, units=quant.unit("m"))
-    m.slr_thermal_slow = Var(m.t, within=NonNegativeReals, units=quant.unit("m"))
-    m.slr_thermal = Var(m.t, within=NonNegativeReals, units=quant.unit("m"))
+    m.slr_thermal_fast = Var(
+        m.t,
+        within=NonNegativeReals,
+        units=quant.unit("m"),
+        doc="Global mean sea-level rise from the fast thermal-expansion response of the upper ocean, relative to 1900.",
+    )
+    m.slr_thermal_slow = Var(
+        m.t,
+        within=NonNegativeReals,
+        units=quant.unit("m"),
+        doc="Global mean sea-level rise from the slow thermal-expansion response of the deep ocean, relative to 1900.",
+    )
+    m.slr_thermal = Var(
+        m.t,
+        within=NonNegativeReals,
+        units=quant.unit("m"),
+        doc="Total global mean sea-level rise from ocean thermal expansion, relative to 1900. Sum of the fast and slow contributions.",
+    )
     m.slr_thermal_fast_init = Param(initialize=0.045)
     m.slr_thermal_slow_init = Param(initialize=0.025)
     m.slr_thermal_fast_sensitivity = Param(
@@ -388,7 +403,12 @@ def get_constraints(
     )
 
     # Glaciers. The 0.32 m potential follows the AR6 parametric extrapolation.
-    m.slr_cumgsic = Var(m.t, within=NonNegativeReals, units=quant.unit("m"))
+    m.slr_cumgsic = Var(
+        m.t,
+        within=NonNegativeReals,
+        units=quant.unit("m"),
+        doc="Global mean sea-level rise from the loss of glaciers and ice caps outside the Greenland and Antarctic ice sheets, relative to 1900.",
+    )
     m.slr_gsic_init = Param(initialize=0.090)
     m.slr_gsic_total_ice = Param(initialize=0.32)
     m.slr_gsic_temp_sensitivity = Param(
@@ -398,7 +418,12 @@ def get_constraints(
 
     # Greenland. The potential is the sea-level equivalent of the full ice
     # sheet; the remaining parameters govern equilibrium and response speed.
-    m.slr_cumgis = Var(m.t, within=NonNegativeReals, units=quant.unit("m"))
+    m.slr_cumgis = Var(
+        m.t,
+        within=NonNegativeReals,
+        units=quant.unit("m"),
+        doc="Global mean sea-level rise from Greenland ice-sheet loss, relative to 1900. Gradually approaches a temperature-dependent equilibrium contribution.",
+    )
     m.slr_gis_init = Param(initialize=0.045)
     m.slr_gis_total_ice = Param(initialize=7.3)
     m.slr_gis_threshold = Param(initialize=slr_params["gis_threshold"])
@@ -415,7 +440,9 @@ def get_constraints(
     # Antarctica. The proxy temperature is in degrees C above pre-industrial;
     # rates are metres of sea-level equivalent per year.
     m.slr_antarctic_ocean_temp = Var(
-        m.t, units=quant.unit("degC_above_PI")
+        m.t,
+        units=quant.unit("degC_above_PI"),
+        doc="Antarctic subsurface-ocean temperature proxy above pre-industrial levels. Responds with a delay to global warming and drives Antarctic ice-sheet loss.",
     )
     m.slr_ais_ocean_temp_init = Param(initialize=0.30)
     m.slr_ais_ocean_temp_scaling = Param(
@@ -424,7 +451,12 @@ def get_constraints(
     m.slr_ais_ocean_temp_timescale = Param(
         initialize=slr_params["ais_ocean_temp_timescale"]
     )
-    m.slr_cumais = Var(m.t, within=NonNegativeReals, units=quant.unit("m"))
+    m.slr_cumais = Var(
+        m.t,
+        within=NonNegativeReals,
+        units=quant.unit("m"),
+        doc="Global mean sea-level rise from Antarctic ice-sheet loss, relative to 1900. Includes background loss, an ocean-temperature response, and a possible faster response at high warming.",
+    )
     m.slr_ais_init = Param(initialize=0.025)
     # Effective vulnerable Antarctic stock, rather than the full AIS potential.
     m.slr_ais_total_ice = Param(initialize=5.0)
@@ -444,10 +476,20 @@ def get_constraints(
 
     # Future land-water-storage anomaly. Its historical contribution is
     # implicit in the common 2025 initial total, avoiding double counting.
-    m.slr_cumlws = Var(m.t, within=NonNegativeReals, units=quant.unit("m"))
+    m.slr_cumlws = Var(
+        m.t,
+        within=NonNegativeReals,
+        units=quant.unit("m"),
+        doc="Additional global mean sea-level rise from changes in land-water storage after the model start. Starts at zero and increases at a constant annual rate; historical land-water contributions are already included in the initial total sea level.",
+    )
     m.slr_lws_rate = Param(initialize=0.0004)
 
-    m.total_SLR = Var(m.t, within=NonNegativeReals, units=quant.unit("m"))
+    m.total_SLR = Var(
+        m.t,
+        within=NonNegativeReals,
+        units=quant.unit("m"),
+        doc="Total global mean sea-level rise relative to 1900. Sum of thermal expansion, glacier and ice-sheet loss, and future changes in land-water storage.",
+    )
 
     constraints = [
         GlobalEquation(
