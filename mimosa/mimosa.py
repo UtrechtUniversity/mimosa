@@ -214,7 +214,8 @@ class MIMOSA:
             verbose: Print IPOPT output during a local solve.
             use_neos: Submit the model to NEOS instead of using local IPOPT.
             **kwargs: Solver-specific options. Local IPOPT accepts
-                `halt_on_ampl_error`, `ipopt_maxiter` and `ipopt_output_file`.
+                `halt_on_ampl_error`, `ipopt_maxiter`, `ipopt_output_file` and
+                `ipopt_executable` (an optional path to a specific IPOPT build).
                 NEOS requires `neos_email` and optionally accepts `solver_name`.
 
         Raises:
