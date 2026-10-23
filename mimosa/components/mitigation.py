@@ -215,6 +215,7 @@ def _get_mac_constraints(
         m.regions,
         bounds=lambda m: (0, 2 * m.MAC_gamma),
         units=quant.unit("currency_unit/emissions_unit"),
+        doc="Regional carbon price required to achieve the mitigation level on the marginal abatement cost curve, accounting for regional and SSP calibration and technological learning. Set to zero at the initial timestep.",
     )
     constraints.extend(
         [
@@ -235,14 +236,21 @@ def _get_mac_constraints(
         m.regions,
         initialize=0,
         units=quant.unit("currency_unit"),
+        doc="Regional mitigation costs in currency units, equal to domestic mitigation costs plus the mitigation-cost trading balance.",
     )
     m.domestic_mitigation_costs_abs = Var(
         m.t,
         m.regions,
         initialize=0,
         units=quant.unit("currency_unit"),
+        doc="Cost of emission reductions physically carried out in a region, calculated as the area under its marginal abatement cost curve times baseline emissions.",
     )
-    m.mitigation_costs = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
+    m.mitigation_costs = Var(
+        m.t,
+        m.regions,
+        units=quant.unit("fraction_of_GDP"),
+        doc="Mitigation costs attributed to a region, including any mitigation-cost trading balance, divided by its gross GDP.",
+    )
     m.mitigation_costs_min_level = Param(
         initialize=inputs.config("economics.MAC.rel_mitigation_costs_min_level")
     )
@@ -276,7 +284,11 @@ def _get_mac_constraints(
     )
 
     # Keep track of relative global costs
-    m.global_mitigation_costs = Var(m.t, units=quant.unit("fraction_of_GDP"))
+    m.global_mitigation_costs = Var(
+        m.t,
+        units=quant.unit("fraction_of_GDP"),
+        doc="Global mitigation costs as a fraction of global gross GDP, calculated from the sum of regional mitigation costs.",
+    )
     constraints.extend(
         [
             GlobalEquation(
@@ -293,10 +305,14 @@ def _get_mac_constraints(
     # and average cost per unit emission reduction
 
     m.global_emission_reduction_per_cost_unit = Var(
-        m.t, units=quant.unit("emissionsrate_unit / currency_unit")
+        m.t,
+        units=quant.unit("emissionsrate_unit / currency_unit"),
+        doc="Average global CO2 emission reduction per unit of mitigation spending, calculated as total regional emission reductions divided by total mitigation costs. Set to zero at the initial timestep.",
     )
     m.global_cost_per_emission_reduction_unit = Var(
-        m.t, units=quant.unit("currency_unit / emissionsrate_unit")
+        m.t,
+        units=quant.unit("currency_unit / emissionsrate_unit"),
+        doc="Average global mitigation cost per unit of CO2 emission reduction, calculated as total mitigation costs divided by total regional emission reductions. Set to zero at the initial timestep.",
     )
     constraints.extend(
         [
@@ -385,7 +401,10 @@ def _get_learning_constraints(
     m.LBD_rate = Param(initialize=inputs.config("economics.MAC.LBD_rate"))
     m.log_LBD_rate = Param(initialize=log(m.LBD_rate) / log(2))
     m.LBD_scaling = Param(initialize=inputs.config("economics.MAC.LBD_scaling"))
-    m.LBD_factor = Var(m.t)  # , bounds=(0,1), initialize=1)
+    m.LBD_factor = Var(
+        m.t,
+        doc="Multiplier on marginal abatement costs from learning by doing, based on cumulative emissions avoided relative to the SSP baseline through the preceding timestep. Starts at one; lower values mean cheaper mitigation.",
+    )  # , bounds=(0,1), initialize=1)
     constraints.append(
         GlobalEquation(
             m.LBD_factor,
@@ -409,8 +428,14 @@ def _get_learning_constraints(
 
     # Learning over time and total learning factor
     m.LOT_rate = Param(initialize=inputs.config("economics.MAC.LOT_rate"))
-    m.LOT_factor = Var(m.t)
-    m.learning_factor = Var(m.t)
+    m.LOT_factor = Var(
+        m.t,
+        doc="Multiplier on marginal abatement costs from exogenous technological progress, independent of mitigation undertaken. Starts at one; a positive learning rate reduces it at each model timestep.",
+    )
+    m.learning_factor = Var(
+        m.t,
+        doc="Combined technological-learning multiplier on marginal abatement costs, calculated as the product of the learning-by-doing and learning-over-time factors. Lower values mean cheaper mitigation.",
+    )
     constraints.extend(
         [
             GlobalEquation(
