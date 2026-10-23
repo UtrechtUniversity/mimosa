@@ -188,12 +188,18 @@ def _get_emissions_constraints(
 
     constraints = []
 
-    m.regional_emissions = Var(m.t, m.regions, units=quant.unit("emissionsrate_unit"))
+    m.regional_emissions = Var(
+        m.t,
+        m.regions,
+        units=quant.unit("emissionsrate_unit"),
+        doc="Regional net CO2 emissions after mitigation, calculated as baseline emissions times one minus the mitigation level. Negative values represent net CO2 removal.",
+    )
     m.baseline_emissions = Var(
         m.t,
         m.regions,
         initialize=lambda m, t, r: m.ssp_baseline_emissions[t, r],
         units=quant.unit("emissionsrate_unit"),
+        doc="Regional baseline CO2 emissions (emissions before applying mitigation). Taken from the selected SSP or calculated from baseline carbon intensity and model GDP.",
     )
     m.use_carbon_intensity_for_baseline = Param(
         initialize=inputs.config("emissions.baseline carbon intensity")
@@ -227,10 +233,21 @@ def _get_emissions_constraints(
     )
 
     m.regional_emission_reductions = Var(
-        m.t, m.regions, units=quant.unit("emissionsrate_unit")
+        m.t,
+        m.regions,
+        units=quant.unit("emissionsrate_unit"),
+        doc="Regional reduction in CO2 emissions relative to the baseline, calculated as baseline emissions minus actual net emissions. Can exceed baseline emissions when net emissions are negative.",
     )
-    m.global_cumulative_emissions = Var(m.t, units=quant.unit("emissions_unit"))
-    m.global_emissions = Var(m.t, units=quant.unit("emissionsrate_unit"))
+    m.global_cumulative_emissions = Var(
+        m.t,
+        units=quant.unit("emissions_unit"),
+        doc="Cumulative global net CO2 emissions since the model start, including any exogenous emissions pulse. Calculated using trapezoidal integration or timestep-weighted summation, depending on configuration.",
+    )
+    m.global_emissions = Var(
+        m.t,
+        units=quant.unit("emissionsrate_unit"),
+        doc="Global net CO2 emissions, calculated as the sum of regional net emissions. Negative values represent net CO2 removal.",
+    )
 
     m.global_cumulative_emissions_trapz = Param(
         initialize=inputs.config("emissions.cumulative_emissions_trapz")
@@ -304,7 +321,11 @@ def _get_emissions_constraints(
         ]
     )
 
-    m.global_relative_cumulative_emissions = Var(m.t, initialize=1)
+    m.global_relative_cumulative_emissions = Var(
+        m.t,
+        initialize=1,
+        doc="Cumulative global CO2 emissions divided by cumulative SSP baseline emissions since the model start. Set to one at the initial timestep.",
+    )
     constraints.extend(
         [
             GlobalEquation(
@@ -409,7 +430,10 @@ def _get_temperature_constraints(
         initialize=inputs.config("temperature.initial"),
     )
     m.temperature = Var(
-        m.t, initialize=lambda m, t: m.T0, units=quant.unit("degC_above_PI")
+        m.t,
+        initialize=lambda m, t: m.T0,
+        units=quant.unit("degC_above_PI"),
+        doc="Global mean warming above pre-industrial levels. Calculated as initial warming plus the temperature response to cumulative CO2 emissions, determined by the TCRE.",
     )
     m.TCRE = Param(initialize=inputs.config("temperature.TCRE"))
     m.temperature_target = Param(initialize=inputs.config("temperature.target"))
