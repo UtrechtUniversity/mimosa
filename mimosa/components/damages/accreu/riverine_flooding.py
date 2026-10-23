@@ -253,18 +253,3 @@ def gross_dmg_fct_riverine(m, t, r):
         return a + b * x + c * x**2
 
     return (fct(m.temperature[t]) - fct(m.temperature[0])) * m.damage_scale_factor
-
-
-# def gross_dmg_fct_riverine(m, t, r):
-
-#     a = m.riverine_damages_gross_constant[r]
-#     b = m.riverine_damages_gross_time_div_100_linear[r]
-#     c = m.riverine_damages_gross_time_div_100_squared[r]
-#     d = m.riverine_damages_gross_temp_squared[r]
-
-#     def fct(time, temp):
-#         return a + b * (time / 100) + c * (time / 100) ** 2 + d * temp**2
-
-#     return fct(m.year(t) - 2020, m.temperature[t]) - fct(
-#         m.year(0) - 2020, m.temperature[0]
-#     )

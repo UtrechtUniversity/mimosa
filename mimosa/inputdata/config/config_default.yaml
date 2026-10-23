@@ -356,7 +356,7 @@ economics:
         type: bool
         default: True
 
-      mortality_svl_rel_gdp_cap:
+      mortality_vsl_rel_gdp_cap:
         descr: >-
           If the monetise_mortality option is enabled, use this value for
           the Statistical Value of Life (SVL), expressed as multiple of GDP per capita.

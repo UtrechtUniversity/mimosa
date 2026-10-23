@@ -14,7 +14,7 @@ def test_option_defaults_and_module_selectors_are_preserved():
     assert accreu["adaptation_determination"] == "analytical_optimum"
     assert accreu["adaptation_calibration"] == "accreu"
     assert accreu["monetise_mortality"] is True
-    assert accreu["mortality_svl_rel_gdp_cap"] == 117.59
+    assert accreu["mortality_vsl_rel_gdp_cap"] == 117.59
     assert params["sealevelrise"]["projection"] == "central"
     assert set(params["model structure"]) == {
         "damage module",

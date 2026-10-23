@@ -27,7 +27,7 @@ def prepare_inputs(adaptation, determination, mortality, cge_quantile=None):
                     "adaptation_determination": determination,
                     "adaptation_calibration": "literature_high",
                     "monetise_mortality": mortality,
-                    "mortality_svl_rel_gdp_cap": 150,
+                    "mortality_vsl_rel_gdp_cap": 150,
                     "adaptation_effectiveness_scale_factor": 0.5,
                     "delay_adaptation_until_year": 2035,
                 },
@@ -135,10 +135,10 @@ def test_native_accreu_parameters_options_bounds_and_equations(
     assert tuple(m.regions) == ("USA", "CAN")
     assert [m.year(t) for t in m.t] == [2025, 2030, 2040]
     assert value(m.damage_scale_factor) == 1.25
-    assert value(m.mortality_svl_rel_gdp_per_cap) == 150
+    assert value(m.mortality_vsl_rel_gdp_per_cap) == 150
     assert (
-        m.mortality_svl_rel_gdp_per_cap.source_key
-        == "::economics.damages.accreu.mortality_svl_rel_gdp_cap"
+        m.mortality_vsl_rel_gdp_per_cap.source_key
+        == "::economics.damages.accreu.mortality_vsl_rel_gdp_cap"
     )
     check_regional_sources(m, inputs)
 
@@ -202,13 +202,13 @@ def test_native_accreu_parameters_options_bounds_and_equations(
     cold = population * -0.0005 * (2.0 - 1.2)
     assert value(rhs["mortality_heat_related"](m, 1, "USA")) == pytest.approx(heat)
     assert value(rhs["mortality_cold_related"](m, 1, "USA")) == pytest.approx(cold)
-    assert hasattr(m, "mortality_svl") == mortality
+    assert hasattr(m, "mortality_vsl") == mortality
     if mortality:
         m.mortality_heat_related[1, "USA"].set_value(heat)
         m.mortality_cold_related[1, "USA"].set_value(cold)
         vsl = 150 * value(m.GDP_gross[1, "USA"]) / population
-        assert value(rhs["mortality_svl"](m, 1, "USA")) == pytest.approx(vsl)
-        m.mortality_svl[1, "USA"].set_value(vsl)
+        assert value(rhs["mortality_vsl"](m, 1, "USA")) == pytest.approx(vsl)
+        m.mortality_vsl[1, "USA"].set_value(vsl)
         assert value(rhs["mortality_damage_costs_abs"](m, 1, "USA")) == pytest.approx(
             vsl * (heat + cold)
         )
