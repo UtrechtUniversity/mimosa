@@ -86,6 +86,22 @@ def save_output(
         with open(f"{path}.params.json", "w") as fh:
             json.dump(params_with_version, fh)
 
+    # 4. If used in Google Colab, download the created file to the browser, if possible:
+    try:
+        from IPython import get_ipython
+
+        shell = get_ipython()
+    except ImportError:
+        shell = None
+
+    if shell is not None and type(shell).__module__.startswith("google.colab"):
+        try:
+            from google.colab import files
+
+            files.download(path)
+        except ImportError:
+            pass
+
 
 def var_to_row(rows, m, var, is_regional, unit):
     # If var is a list, second element is the name
