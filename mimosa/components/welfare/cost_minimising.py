@@ -62,8 +62,16 @@ def get_constraints(
     # Parameters
     m.elasmu = Param(initialize=inputs.config("economics.elasmu"))
 
-    m.utility = Var(m.t, m.regions, initialize=10)
-    m.global_welfare = Var(m.t)
+    m.utility = Var(
+        m.t,
+        m.regions,
+        initialize=10,
+        doc="Regional consumption per person after deducting monetised non-market damages, reported as the utility variable in the cost-minimising setting.",
+    )
+    m.global_welfare = Var(
+        m.t,
+        doc="Undiscounted global welfare, calculated by applying the utility function to global per-capita consumption after non-market damages and multiplying by global population.",
+    )
 
     constraints.extend(
         [

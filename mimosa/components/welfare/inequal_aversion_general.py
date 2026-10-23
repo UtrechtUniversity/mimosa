@@ -58,8 +58,16 @@ def get_constraints(
     m.elasmu = Param(initialize=inputs.config("economics.elasmu"))
     m.inequal_aversion = Param(initialize=inputs.config("economics.inequal_aversion"))
 
-    m.utility = Var(m.t, m.regions, initialize=10)
-    m.global_welfare = Var(m.t)
+    m.utility = Var(
+        m.t,
+        m.regions,
+        initialize=10,
+        doc="Regional welfare contribution, equal to population times welfare-adjusted consumption per person raised to one minus inequality aversion. Welfare-adjusted consumption deducts monetised non-market damages.",
+    )
+    m.global_welfare = Var(
+        m.t,
+        doc="Undiscounted global welfare, calculated by aggregating regional welfare contributions with the configured inequality aversion and elasticity of marginal utility.",
+    )
 
     constraints.extend(
         [
