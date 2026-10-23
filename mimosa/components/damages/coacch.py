@@ -48,8 +48,18 @@ def get_constraints(
 
     """
     constraints = []
-    m.damage_costs = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
-    m.damage_costs_abs = Var(m.t, m.regions, units=quant.unit("currency_unit"))
+    m.damage_costs = Var(
+        m.t,
+        m.regions,
+        units=quant.unit("fraction_of_GDP"),
+        doc="Total regional COACCH damage costs as a fraction of gross GDP, relative to the model start. Sum of the temperature-dependent and separate sea-level-rise damage terms.",
+    )
+    m.damage_costs_abs = Var(
+        m.t,
+        m.regions,
+        units=quant.unit("currency_unit"),
+        doc="Total regional COACCH damage costs in currency units, calculated as the damage fraction times gross GDP.",
+    )
     m.damage_scale_factor = Param(
         initialize=inputs.config("economics.damages.scale factor")
     )
@@ -59,6 +69,7 @@ def get_constraints(
     m.global_damage_costs = Var(
         m.t,
         units=quant.unit("fraction_of_GDP"),
+        doc="Global COACCH damage costs as a fraction of global gross GDP, calculated from the sum of regional damage costs in currency units.",
     )
     m.adaptation_costs = Param(
         m.t, m.regions, units=quant.unit("fraction_of_GDP"), initialize=0.0
@@ -147,7 +158,12 @@ def get_constraints_temperature_dependent(
     )
 
     # Damages not related to SLR (dependent on temperature)
-    m.non_slr_damage_costs = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
+    m.non_slr_damage_costs = Var(
+        m.t,
+        m.regions,
+        units=quant.unit("fraction_of_GDP"),
+        doc="Temperature-dependent regional damages as a fraction of gross GDP, relative to the model start. Includes sea-level-rise impacts when combined damage curves are selected.",
+    )
 
     # Combined curves are quadratic and already incorporate the chosen quantile.
     m.damage_noslr_form = Param(
@@ -272,7 +288,11 @@ def get_constraints_slr(
 
     # SLR damages
     m.slr_damage_costs = Var(
-        m.t, m.regions, bounds=(-0.5, 0.7), units=quant.unit("fraction_of_GDP")
+        m.t,
+        m.regions,
+        bounds=(-0.5, 0.7),
+        units=quant.unit("fraction_of_GDP"),
+        doc="Regional sea-level-rise damages as a fraction of gross GDP, relative to initial sea level. Includes adaptation costs when optimal-adaptation curves are selected; zero when combined damage curves are used.",
     )
 
     # Combined curves already include SLR; keep the separate SLR parameters at zero.
