@@ -101,6 +101,7 @@ def get_constraints(
         m.regions,
         initialize=lambda m, t, r: m.init_capitalstock_factor[r] * m.baseline_GDP[t, r],
         units=quant.unit("currency_unit"),
+        doc="Regional stock of productive capital. Increases through investment and decreases through depreciation; used in the Cobb-Douglas production function.",
     )
 
     # Parameters
@@ -113,25 +114,39 @@ def get_constraints(
         m.regions,
         initialize=lambda m, t, r: m.baseline_GDP[0, r],
         units=quant.unit("currency_unit"),
+        doc="Regional gross GDP from the Cobb-Douglas production function, before deducting damages, adaptation costs, mitigation costs, and financial transfers.",
     )
     m.global_GDP_gross = Var(
         m.t,
         initialize=lambda m, t: sum(m.baseline_GDP[t, r] for r in m.regions),
         units=quant.unit("currency_unit"),
+        doc="Global gross GDP, calculated as the sum of regional gross GDP.",
     )
     m.GDP_net = Var(
         m.t,
         m.regions,
         units=quant.unit("currency_unit"),
         initialize=lambda m, t, r: m.baseline_GDP[0, r],
+        doc="Regional net GDP available for investment and consumption after mitigation costs, financial transfers, and any included damage and adaptation costs.",
     )
     m.global_GDP_net = Var(
         m.t,
         initialize=lambda m, t: sum(m.baseline_GDP[t, r] for r in m.regions),
         units=quant.unit("currency_unit"),
+        doc="Global net GDP, calculated as the sum of regional net GDP.",
     )
-    m.investments = Var(m.t, m.regions, units=quant.unit("currency_unit"))
-    m.consumption = Var(m.t, m.regions, units=quant.unit("currency_unit"))
+    m.investments = Var(
+        m.t,
+        m.regions,
+        units=quant.unit("currency_unit"),
+        doc="Regional investment in productive capital, calculated as the fixed savings rate times net GDP.",
+    )
+    m.consumption = Var(
+        m.t,
+        m.regions,
+        units=quant.unit("currency_unit"),
+        doc="Regional physical consumption, equal to net GDP minus investment.",
+    )
 
     m.ignore_damages = Param(
         initialize=inputs.config("economics.damages.ignore damages")
@@ -207,20 +222,38 @@ def get_constraints(
 
     # GDP loss: takes into account indirect effects of reduced GDP growth due to damages and mitigation costs
     m.GDP_loss = Var(
-        m.t, m.regions, units=quant.unit("fraction_of_baseline_GDP"), initialize=0
+        m.t,
+        m.regions,
+        units=quant.unit("fraction_of_baseline_GDP"),
+        initialize=0,
+        doc="Regional GDP loss relative to the baseline, calculated as baseline GDP minus net GDP, divided by baseline GDP. Includes direct costs and indirect effects on economic growth.",
     )
     m.global_GDP_loss = Var(
-        m.t, units=quant.unit("fraction_of_baseline_GDP"), initialize=0
+        m.t,
+        units=quant.unit("fraction_of_baseline_GDP"),
+        initialize=0,
+        doc="Global GDP loss relative to the baseline, calculated as global baseline GDP minus global net GDP, divided by global baseline GDP.",
     )
 
     m.total_direct_costs_abs = Var(
-        m.t, m.regions, units=quant.unit("currency_unit"), initialize=0
+        m.t,
+        m.regions,
+        units=quant.unit("currency_unit"),
+        initialize=0,
+        doc="Total regional direct costs in currency units: the sum of mitigation costs, damage costs, and adaptation costs.",
     )
     m.indirect_costs = Var(
-        m.t, m.regions, units=quant.unit("fraction_of_baseline_GDP"), initialize=0
+        m.t,
+        m.regions,
+        units=quant.unit("fraction_of_baseline_GDP"),
+        initialize=0,
+        doc="Regional GDP loss beyond direct costs, expressed as a fraction of baseline GDP. Includes effects of reduced capital accumulation.",
     )
     m.global_indirect_costs = Var(
-        m.t, units=quant.unit("fraction_of_baseline_GDP"), initialize=0
+        m.t,
+        units=quant.unit("fraction_of_baseline_GDP"),
+        initialize=0,
+        doc="Global GDP loss beyond direct costs, calculated as global GDP loss minus total direct costs divided by global baseline GDP.",
     )
 
     constraints.extend(
