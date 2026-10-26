@@ -14,6 +14,77 @@ You will learn how to:
 - include the new sector in total damages, so it affects GDP;
 - make the damage coefficient configurable and compare different assumptions.
 
+## Ideas for your own extension
+
+The equipment-damage example below shows the basic steps. For your own project,
+you could apply them to one of these questions. Some ideas start with changing
+existing assumptions; others require a new variable or equation. Choose one small
+change and compare its results with the original model.
+
+<div class="grid cards" markdown>
+
+-   #### :material-wind-turbine: Mitigation and fairness
+
+    ---
+
+    - **Who pays?** Compare fairness rules or propose a different way to share
+      mitigation costs between regions.
+    - **Act now or later?** Explore delayed mitigation or pathways that temporarily
+      exceed a temperature target before returning below it (overshoot).
+    - **Reduce demand?** Represent lower energy or material demand and its effect
+      on emissions and mitigation costs.
+
+    **How it works now:** [Mitigation costs and learning](../components/mitigation.md),
+    [effort-sharing](../components/effortsharing.md),
+    [emission trading](../components/emissiontrading.md) and
+    [emissions and temperature limits](../components/emissions.md).
+
+-   #### :material-home-flood: Impacts and adaptation
+
+    ---
+
+    - **A new impact sector?** Add a simple damage relationship for a sector such
+      as infrastructure or ecosystem services, or explore biodiversity loss.
+    - **Who is affected?** Explore how the same warming causes different damages
+      across regions, or how impacts are shared between population groups.
+    - **Thresholds and protection?** Explore damages that rise sharply beyond a
+      warming threshold, or add a measure that reduces a sector's damages.
+
+    **How it works now:** [COACCH damage functions](../components/damages/coacch.md),
+    [ACCREU sectors and adaptation](../components/damages/accreu.md) and
+    [welfare and inequality](../components/welfare.md).
+
+-   #### :material-waves-arrow-up: Climate and sea-level rise
+
+    ---
+
+    - **Different warming responses?** Explore how strongly temperature responds
+      to cumulative emissions, or propose an alternative relationship.
+    - **Long-lasting consequences?** Investigate how sea-level rise continues
+      after temperature stabilises.
+    - **Climate tipping points?** Add a simplified feedback that starts above a
+      temperature threshold, such as extra emissions or faster ice loss.
+
+    **How it works now:** [Emissions and temperature](../components/emissions.md)
+    and [sea-level-rise contributions](../components/sealevelrise.md).
+
+-   #### :fontawesome-regular-money-bill-1: Economy and development pathways
+
+    ---
+
+    - **A different future?** Compare Shared Socioeconomic Pathways (SSPs), or
+      supply your own population, GDP or baseline emissions assumptions.
+    - **Lower growth or degrowth?** Explore alternative economic trajectories
+      and their consequences for emissions, consumption and welfare.
+    - **A different economy?** Change how investment, productivity or production
+      affects GDP, starting with one relationship in the economic module.
+
+    **How it works now:** [GDP, investment and consumption](../components/economics.md),
+    [welfare](../components/welfare.md) and
+    [time- and region-dependent input data](../extending/parameters.md#time-and-region-dependent-data).
+
+</div>
+
 ## Where to work
 
 Your course branch already contains `mimosa/components/new_component.py`, with the
