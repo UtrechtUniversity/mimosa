@@ -8,12 +8,12 @@ Let's create a new variable that calculates the regional carbon intensity (emiss
 You can add this variable to any of the components in the folder `mimosa/components`, but the most logical place is probably
 the file [`mimosa/components/cobbdouglas.py`]({{config.repo_url}}/blob/master/mimosa/components/cobbdouglas.py), which contains
 all GDP-related variables and equations. Each component has a function `get_constraints(...)`, which is called from the main
-`abstract_model.py` file.
+`model_builder.py` file.
 
 Inside the function `get_constraints()`, create the new variable `m.carbon_intensity`:
 
 ```python title="mimosa/components/cobbdouglas.py" hl_lines="5"
-def get_constraints(m, context):
+def get_constraints(m, inputs):
     # ... existing code ...
 
     # New variable
@@ -58,7 +58,7 @@ These equations are implemented in MIMOSA as Equations: either `GlobalEquation` 
 `RegionalEquation` (for time- and region-dependent equations). In our example, the carbon intensity equation
 
 $$
-\text{carbon intensity}_{t,r} = \frac{\text{regional emissions}_{t,r}}{\text{GDP}_{t,r}}
+\text{carbon intensity}_{t,r} = \frac{\href{./#var__regional_emissions}{\text{regional emissions}_{t,r}}}{\href{./#var__GDP_net}{\text{GDP}_{t,r}}}
 $$
 
 would be implemented as a `RegionalEquation`:
@@ -156,7 +156,7 @@ Next, MIMOSA needs to receive the equation from the component. Every component u
 returns MIMOSA equations. Add the new equation to the returned list:
 
 ```python hl_lines="5 6 7 8 9 10 11"
-def get_constraints(m, context):
+def get_constraints(m, inputs):
     equations = []
     # ... existing code ...
 

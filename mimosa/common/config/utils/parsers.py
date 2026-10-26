@@ -43,15 +43,13 @@ class GeneralParser(ABC):
         self.can_be_false = node.get("can_be_false", False)
 
     def error(self, error_message):
-        raise ValueError(
-            f"""
+        raise ValueError(f"""
             {error_message}
             Type: {self.type}
             Description: {self.descr}
             Default value: {self.default}
             Can be false: {self.can_be_false}
-        """
-        )
+        """)
 
     @abstractmethod
     def parse(self, value):
@@ -71,6 +69,7 @@ class GeneralParser(ABC):
         return False
 
     def to_markdown(self, indent):
+        can_be_false_str = f"{indent}- Can be false: yes" if self.can_be_false else ""
         return f"""
 {indent}{self.descr}
 
@@ -78,7 +77,7 @@ class GeneralParser(ABC):
 
 {indent}- Default: {self.default}
 
-{indent}- Can be false: {self.can_be_false}
+{can_be_false_str}
 
         """
 
@@ -285,7 +284,9 @@ class QuantityParser(GeneralParser):
             UndefinedUnitError,
         ):
             self.error(f"Cannot parse quantity `{value}` to unit `{self.unit}`")
-        return value  # Returns the string, unit will be really converted when instantiating the model
+        return (
+            value  # Keep the quantity string; input lookup converts it to model units.
+        )
 
     def to_string(self):
         return f"{super().to_string()} Unit: {self.unit}."

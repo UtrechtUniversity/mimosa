@@ -1,0 +1,255 @@
+from typing import Sequence
+from mimosa.common import (
+    ConcreteModel,
+    Param,
+    Var,
+    GeneralConstraint,
+    RegionalConstraint,
+    RegionalEquation,
+    value,
+    soft_max,
+    soft_min,
+    Any,
+    exp,
+    log,
+    quant,
+    NonNegativeReals,
+)
+
+from mimosa.core.model_inputs import ModelInputs
+
+from .utils import (
+    AdaptationOptions,
+    adaptation_effectiveness_fct,
+    effective_adaptation_curve,
+    optimal_adaptation_costs_fct,
+    get_delayed_adaptation_constraint,
+)
+
+
+def get_constraints(
+    m: ConcreteModel, inputs: ModelInputs, adaptation_options: AdaptationOptions
+):
+    r"""
+
+    The impacts of riverine flooding are estimated using the GLOFRIS model. The gross damages
+    are fitted with a quadratic function of temperature:
+
+    :::mimosa.components.damages.accreu.riverine_flooding.gross_dmg_fct_riverine
+        options:
+            show_source: false
+
+    The adaptation function is fitted with a negative-exponential saturation (NES) curve, like in
+    all three sectors, using regional [max. effectiveness](#param__regional.ACCREU.riverine_adapt_eff_max_effectiveness) and [cost coefficient](#param__regional.ACCREU.riverine_adapt_eff_cost_param):
+
+    $$
+    \href{./#var__riverine_adaptation_level}{\text{adapt. level}_{\text{riverine},t,r}}
+    = \text{NES}(\href{./#var__riverine_adaptation_costs_abs}{\text{adapt. costs}_{\text{riverine},t,r}};
+    \href{./#param__regional.ACCREU.riverine_adapt_eff_max_effectiveness}{\text{max eff.}_{\text{riverine},r}},
+    \href{./#param__regional.ACCREU.riverine_adapt_eff_cost_param}{c_{\text{riverine},r}})
+    $$
+
+    Subsequently, the residual damages are calculated as:
+
+    $$
+    \href{./#var__riverine_damage_costs}{\text{damages}_{\text{riverine},t,r}} = \href{./#var__riverine_damage_costs_gross}{\text{gross damages}_{\text{riverine},t,r}} \cdot (1 - \href{./#var__riverine_adaptation_level}{\text{adapt. level}_{\text{riverine},t,r}}),
+    $$
+
+    <div class="grid cards" markdown>
+
+    -   <h5 class="no-nav">Global damages (without adaptation)</h5>
+
+        ---
+
+        ``` plotly
+        {"file_path": "./assets/plots/riverine_damages_global.json"}
+        ```
+
+    -   <h5 class="no-nav">Global adaptation costs</h5>
+
+        ---
+
+        ``` plotly
+        {"file_path": "./assets/plots/riverine_adaptation_global.json"}
+        ```
+    </div>
+
+    ??? regional-fct "Regional damage and adaptation functions"
+
+        === "Damages (without adaptation)"
+
+            ![Regional damage costs (without adaptation)](../../assets/fig/accreu/riverine_noadapt_ead.png)
+
+        === "Adaptation costs"
+
+            ![Regional damage costs (without adaptation)](../../assets/fig/accreu/riverine_adapt_eff.png)
+
+    <div class="tiny_table table_scrollable extra_small" markdown>
+
+    | Variables created in this module: |
+    | --------------------------------- |
+    | var::riverine_damage_costs_gross |
+    | var::riverine_adaptation_costs_abs |
+    | var::riverine_adaptation_costs |
+    | var::riverine_adaptation_level |
+    | var::riverine_damage_costs |
+
+    </div>
+
+    """
+
+    constraints = []
+
+    adaptation_type = adaptation_options.adaptation_type
+    adaptation_calibration = adaptation_options.calibrations["riverine"]
+
+    ## Gross damages:
+
+    # m.riverine_damage_costs_gross_abs = Var(
+    #     m.t, m.regions, units=quant.unit("currency_unit")
+    # )
+
+    m.riverine_damages_gross_constant = Param(
+        m.regions, initialize=inputs.regional("ACCREU", "riverine_noadapt_ead_constant")
+    )
+    m.riverine_damages_gross_linear = Param(
+        m.regions, initialize=inputs.regional("ACCREU", "riverine_noadapt_ead_linear")
+    )
+    m.riverine_damages_gross_quadr = Param(
+        m.regions, initialize=inputs.regional("ACCREU", "riverine_noadapt_ead_quadr")
+    )
+
+    damage_cost_gross_var_name = (
+        "riverine_damage_costs"
+        if adaptation_type == "noadaptation"
+        else "riverine_damage_costs_gross"
+    )
+    setattr(
+        m,
+        damage_cost_gross_var_name,
+        Var(
+            m.t,
+            m.regions,
+            units=quant.unit("fraction_of_GDP"),
+            doc="Gross damages from riverine flooding, without adaptation.",
+        ),
+    )
+
+    constraints.append(
+        RegionalEquation(getattr(m, damage_cost_gross_var_name), gross_dmg_fct_riverine)
+    )
+
+    ## Adaptation:
+
+    if adaptation_type == "sectoral":
+        m.riverine_adaptation_costs_abs = Var(
+            m.t,
+            m.regions,
+            units=quant.unit("currency_unit"),
+            bounds=lambda m, t, r: (0, 0.1 * m.baseline_GDP[t, r]),
+            doc="Absolute adaptation costs for riverine flooding, in currency units. Used to calculate the adaptation level.",
+        )
+        m.riverine_adaptation_costs = Var(
+            m.t,
+            m.regions,
+            units=quant.unit("fraction_of_GDP"),
+            doc="Adaptation costs for riverine flooding, as a fraction of GDP.",
+        )
+        m.riverine_adaptation_level = Var(
+            m.t,
+            m.regions,
+            units=quant.unit("fraction_of_gross_damages"),
+            bounds=(0, 1),
+            doc="Adaptation level for riverine flooding, as a fraction of gross damages. 0 means that no damages are avoided, while 1 means that all damages are avoided.",
+        )
+        m.riverine_damage_costs = Var(
+            m.t,
+            m.regions,
+            units=quant.unit("fraction_of_GDP"),
+            doc="Residual damages from riverine flooding, after adaptation. If `noadaptation` is chosen, this variable represents the gross damages.",
+        )
+
+        m.riverine_adaptation_max_effectiveness = Param(
+            m.regions,
+            initialize=inputs.regional(
+                "ACCREU", "riverine_adapt_eff_max_effectiveness"
+            ),
+        )
+        m.riverine_adaptation_cost_param = Param(
+            m.regions,
+            initialize=inputs.regional("ACCREU", "riverine_adapt_eff_cost_param"),
+        )
+        constraints.append(
+            get_delayed_adaptation_constraint("riverine_adaptation_costs")
+        )
+        constraints.extend(
+            [
+                # Adaptation effectiveness function
+                RegionalEquation(
+                    m.riverine_adaptation_level,
+                    lambda m, t, r: adaptation_effectiveness_fct(
+                        m.riverine_adaptation_costs_abs[t, r],
+                        *effective_adaptation_curve(
+                            m,
+                            r,
+                            m.riverine_adaptation_max_effectiveness[r],
+                            m.riverine_adaptation_cost_param[r],
+                            adaptation_calibration,
+                        ),
+                    ),
+                ),
+                # Adaptation costs as a fraction of GDP
+                RegionalEquation(
+                    m.riverine_adaptation_costs,
+                    lambda m, t, r: m.riverine_adaptation_costs_abs[t, r]
+                    / m.GDP_gross[t, r],
+                ),
+                # Residual damages after adaptation
+                RegionalEquation(
+                    m.riverine_damage_costs,
+                    lambda m, t, r: m.riverine_damage_costs_gross[t, r]
+                    * (1 - m.riverine_adaptation_level[t, r]),
+                ),
+            ]
+        )
+
+        if adaptation_options.uses_analytical_adaptation:
+            constraints.append(
+                # Calculate analytically the optimal level of adaptation
+                RegionalEquation(
+                    m.riverine_adaptation_costs_abs,
+                    lambda m, t, r: optimal_adaptation_costs_fct(
+                        m,
+                        t,
+                        m.riverine_damage_costs_gross[t, r] * m.GDP_gross[t, r],
+                        *effective_adaptation_curve(
+                            m,
+                            r,
+                            m.riverine_adaptation_max_effectiveness[r],
+                            m.riverine_adaptation_cost_param[r],
+                            adaptation_calibration,
+                        ),
+                    ),
+                )
+            )
+
+    return constraints
+
+
+def gross_dmg_fct_riverine(m, t, r):
+    r"""
+    $$
+        \href{./#var__riverine_damage_costs_gross}{\text{gross damages}_{\text{riverine},t,r}}
+        = (\href{./#param__regional.ACCREU.riverine_noadapt_ead_constant}{a_r} + \href{./#param__regional.ACCREU.riverine_noadapt_ead_linear}{b_r} \cdot \href{./#var__temperature}{T_t}
+        + \href{./#param__regional.ACCREU.riverine_noadapt_ead_quadr}{c_r} \cdot \href{./#var__temperature}{T_t}^2) - (\href{./#param__regional.ACCREU.riverine_noadapt_ead_constant}{a_r} + \href{./#param__regional.ACCREU.riverine_noadapt_ead_linear}{b_r} \cdot \href{./#param__temperature.initial}{T_0}
+        + \href{./#param__regional.ACCREU.riverine_noadapt_ead_quadr}{c_r} \cdot \href{./#param__temperature.initial}{T_0}^2).
+    $$
+    """
+    a = m.riverine_damages_gross_constant[r]
+    b = m.riverine_damages_gross_linear[r]
+    c = m.riverine_damages_gross_quadr[r]
+
+    def fct(x):
+        return a + b * x + c * x**2
+
+    return (fct(m.temperature[t]) - fct(m.temperature[0])) * m.damage_scale_factor

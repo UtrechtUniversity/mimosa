@@ -3,6 +3,11 @@
 Release notes describe important changes to MIMOSA, including changes that may require updates to
 existing run scripts or model extensions.
 
+## In development
+
+- [MIMOSA 2.0.0](2.0.0.md) — ACCREU damages and adaptation, direct concrete-model
+  construction and updated parameter initialization for model extensions.
+
 ## Latest release
 
 - [MIMOSA 1.4.0](1.4.0.md) — variable model-period lengths, derived global cost output, runtime

@@ -41,7 +41,7 @@ def create_slr_model(projection):
     """Construct MIMOSA with one coherent SLR response parameter set."""
 
     params = load_params()
-    params["model structure"]["sealevelrise options"]["projection"] = projection
+    params["sealevelrise"]["projection"] = projection
     return MIMOSA(params, prerun=False).concrete_model
 
 

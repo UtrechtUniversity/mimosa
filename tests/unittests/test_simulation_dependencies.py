@@ -337,6 +337,7 @@ def test_prepare_and_run_minimal_simulation_model():
     assert simulator.is_prepared is True
     result = simulator.run(control=np.array([1.0, 2.0, 3.0]))
 
+    assert result.control.extract_values() == {0: 1.0, 1: 2.0, 2: 3.0}
     np.testing.assert_allclose(result.flow.values, [2.0, 4.0, 6.0])
     np.testing.assert_allclose(result.stock.values, [0.0, 4.0, 10.0])
     np.testing.assert_allclose(result.standalone.values, [4.0, 9.0, 16.0])

@@ -20,7 +20,7 @@ from pyomo.environ import (
     SolverStatus,
     SolverManagerFactory,
     Objective,
-    Param,
+    Param as PyomoParam,
     Var,
     log,
     sqrt,
@@ -33,6 +33,8 @@ from pyomo.environ import (
     units as u,
 )
 from pyomo.opt.base.solvers import OptSolver
+
+from .parameters import Param, SourcedValue
 
 # Pyomo utils
 from .pyomo_utils import (
@@ -67,7 +69,6 @@ from .units import quant
 
 from ..export import save_output, save_output_pyomo
 
-from ..core.helpers import ModelContext, ComponentConfig
 
 # # Datastore
 # from .data import DataStore

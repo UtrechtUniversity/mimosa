@@ -5,7 +5,7 @@ Effort sharing
 
 from typing import Sequence
 from mimosa.common import (
-    AbstractModel,
+    ConcreteModel,
     Var,
     Param,
     GeneralConstraint,
@@ -18,31 +18,39 @@ from mimosa.common import (
     quant,
     value,
     soft_min,
-    ModelContext,
 )
+
+from mimosa.core.model_inputs import ModelInputs
 
 
 def get_constraints(
-    m: AbstractModel, context: ModelContext
+    m: ConcreteModel, inputs: ModelInputs
 ) -> Sequence[GeneralConstraint]:
-    """
+    r"""
     Usage:
-    ```python hl_lines="2-9"
+    ```python hl_lines="2-3"
     params = load_params()
     params["model structure"]["effortsharing module"] = "per_cap_convergence"
     params["effort sharing"]["percapconv_year"] = 2050
 
-    # Per-capita convergence needs emission trading to avoid infeasibility
+    # Effort-sharing regimes require emission trading to be feasible:
     params["model structure"]["emissiontrade module"] = "emissiontrade"
-    # And financial transfers higher than just emission trading need to be enabled
-    # (therefore allowing for negative mitigation costs)
+
+    # Cost-minimisation is typically used, to allocate real mitigation effort to regions with the lowest costs:
+    params["model structure"]["welfare module"] = "cost_minimising"
+
+    # Often, the effort sharing regimes require financial transfers larger than the mitigation costs:
     params["economics"]["MAC"]["rel_mitigation_costs_min_level"] = -0.5
+
+    # Optionally set a carbon budget:
+    params["emissions"]["carbonbudget"] = "700 GtCO2"
+
     model = MIMOSA(params)
     ```
 
     The per capita convergence regime allocates equal per capita emission rights to each region, starting
     from a given year (called the convergence year). The convergence year can be set with the parameter
-    [`percapconv_year`](../parameters.md#effort sharing.percapconv_year) and is
+    [`percapconv_year`](#param__effort%20sharing.percapconv_year) and is
     set to 2050 by default. Before this convergence year, the allowances are interpolated
     between grandfathering (the emission distribution in the first model year) and equal per capita
     emission rights in the convergence year.
@@ -51,13 +59,13 @@ def get_constraints(
     Therefore, two functions are needed. First, the allowances for equal per capita emissions (EPC):
 
     $$
-    \\text{allowances}_{\\text{EPC}, t, r} = \\frac{\\text{population}_{t,r}}{\\sum_{s} \\text{population}_{t,s}} \\cdot \\text{global emissions}_{t},
+    \text{allowances}_{\text{EPC}, t, r} = \frac{\href{./#param__timeandregional.population}{\text{population}_{t,r}}}{\sum_{s} \href{./#param__timeandregional.population}{\text{population}_{t,s}}} \cdot \href{./#var__effortsharing_per_cap_convergence::global_emissions}{\text{global emissions}_{t}},
     $$
 
     and second the allowances for grandfathering (GF):
 
     $$
-    \\text{allowances}_{\\text{GF}, t, r} = \\frac{\\text{baseline emissions}_{0,r}}{\\sum_{s} \\text{baseline emissions}_{0,s}} \\cdot \\text{global emissions}_{t},
+    \text{allowances}_{\text{GF}, t, r} = \frac{\href{./#var__effortsharing_per_cap_convergence::baseline_emissions}{\text{baseline emissions}_{0,r}}}{\sum_{s} \href{./#var__effortsharing_per_cap_convergence::baseline_emissions}{\text{baseline emissions}_{0,s}}} \cdot \href{./#var__effortsharing_per_cap_convergence::global_emissions}{\text{global emissions}_{t}},
     $$
 
     :::mimosa.components.effortsharing.per_cap_convergence.percapconv_share_rule
@@ -68,7 +76,7 @@ def get_constraints(
     reductions within that region because reductions can be traded:
 
     $$
-    \\text{allowances}_{t,r} = \\text{baseline emissions}_{t,r} - \\text{attributed emission reductions}_{t,r}
+    \href{./#var__effortsharing_per_cap_convergence::regional_emission_allowances}{\text{allowances}_{t,r}} = \href{./#var__effortsharing_per_cap_convergence::baseline_emissions}{\text{baseline emissions}_{t,r}} - \href{./#var__effortsharing_per_cap_convergence::attributed_emission_reductions}{\text{attributed emission reductions}_{t,r}}
     $$
 
 
@@ -82,7 +90,9 @@ def get_constraints(
         initialize=lambda m, r: m.ssp_baseline_emissions[0, r]
         / sum(m.ssp_baseline_emissions[0, s] for s in m.regions),
     )
-    m.percapconv_year = Param(initialize=2050, doc="::effort sharing.percapconv_year")
+    m.percapconv_year = Param(
+        initialize=inputs.config("effort sharing.percapconv_year")
+    )
     m.percapconv_share_pop = Param(
         m.t,
         m.regions,
@@ -104,22 +114,22 @@ def get_constraints(
 
 
 def percapconv_share_rule(m, t, r):
-    """
-    Finally, the allowances for each region are calculated as a linear interpolation between the two before the convergence year. After the convergence year,
-    only the equal per capita emissions are used:
+    r"""
+    Finally, [each region's emission share](#param__timeandregional.percapconv_share) is calculated as a linear interpolation between the two distributions before the convergence year. After the convergence year,
+    only the equal per capita shares are used. The resulting allowances are:
 
     $$
-    \\text{allowances}_{t, r} = \\begin{cases}
-    x \\cdot \\text{allowances}_{\\text{GF}, t, r} + (1-x) \\cdot (\\text{allowances}_{\\text{EPC}, t, r}), & \\text{if } t < \\text{convergence year}, \\\\
-    \\text{allowances}_{\\text{EPC}, t, r}, & \\text{if } t \\geq \\text{convergence year},\\\\
-    \\text{allowances}_{\\text{GF},t,r}, & \\text{if } \\text{convergence year} = \\text{false}.
-    \\end{cases}
+    \href{./#var__effortsharing_per_cap_convergence::regional_emission_allowances}{\text{allowances}_{t, r}} = \begin{cases}
+    x \cdot \text{allowances}_{\text{GF}, t, r} + (1-x) \cdot (\text{allowances}_{\text{EPC}, t, r}), & \text{if } t < \href{./#param__effort%20sharing.percapconv_year}{\text{convergence year}}, \\
+    \text{allowances}_{\text{EPC}, t, r}, & \text{if } t \geq \href{./#param__effort%20sharing.percapconv_year}{\text{convergence year}},\\
+    \text{allowances}_{\text{GF},t,r}, & \text{if } \href{./#param__effort%20sharing.percapconv_year}{\text{convergence year}} = \text{false}.
+    \end{cases}
     $$
 
     where $x$ is the linear interpolation factor, which is 1 in the first year and 0 in the convergence year:
 
     $$
-    x = \\frac{t - t_0}{\\text{convergence year} - t_0}.
+    x = \frac{t - \href{./#param__time.start}{t_0}}{\href{./#param__effort%20sharing.percapconv_year}{\text{convergence year}} - \href{./#param__time.start}{t_0}}.
     $$
 
     #### Immediate per capita convergence

@@ -5,16 +5,19 @@ Damage and adaptation costs
 
 from typing import Sequence
 from mimosa.common import (
-    AbstractModel,
+    ConcreteModel,
     Var,
     GeneralConstraint,
     RegionalEquation,
-    ModelContext,
+    Param,
+    quant,
 )
+
+from mimosa.core.model_inputs import ModelInputs
 
 
 def get_constraints(
-    m: AbstractModel, context: ModelContext
+    m: ConcreteModel, inputs: ModelInputs
 ) -> Sequence[GeneralConstraint]:
     """Damage and adaptation costs equations and constraints
     (no-damage specification)
@@ -32,7 +35,19 @@ def get_constraints(
     """
     constraints = []
 
-    m.damage_costs = Var(m.t, m.regions, initialize=0.0)
+    m.damage_costs = Var(m.t, m.regions, initialize=0.0)  # Shouldn't this be a param?
+    m.damage_costs_abs = Param(
+        m.t, m.regions, units=quant.unit("currency_unit"), initialize=0.0
+    )
+    m.adaptation_costs = Param(
+        m.t, m.regions, units=quant.unit("fraction_of_GDP"), initialize=0.0
+    )
+    m.adaptation_costs_abs = Param(
+        m.t, m.regions, units=quant.unit("currency_unit"), initialize=0.0
+    )
+    m.non_market_damage_costs_abs = Param(
+        m.t, m.regions, initialize=0.0, units=quant.unit("currency_unit")
+    )
     constraints.extend([RegionalEquation(m.damage_costs, lambda m, t, r: 0.0)])
 
     return constraints

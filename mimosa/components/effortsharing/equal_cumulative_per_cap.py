@@ -9,7 +9,7 @@ import numpy as np
 
 from typing import Sequence
 from mimosa.common import (
-    AbstractModel,
+    ConcreteModel,
     Var,
     Param,
     GeneralConstraint,
@@ -23,24 +23,38 @@ from mimosa.common import (
     quant,
     value,
     soft_min,
-    ModelContext,
 )
+
+from mimosa.core.model_inputs import ModelInputs
 
 
 def get_constraints(
-    m: AbstractModel, context: ModelContext
+    m: ConcreteModel, inputs: ModelInputs
 ) -> Sequence[GeneralConstraint]:
     """
     Usage:
     ```python hl_lines="2"
     params = load_params()
     params["model structure"]["effortsharing module"] = "equal_cumulative_per_cap"
+
+    # Effort-sharing regimes require emission trading to be feasible:
+    params["model structure"]["emissiontrade module"] = "emissiontrade"
+
+    # Cost-minimisation is typically used, to allocate real mitigation effort to regions with the lowest costs:
+    params["model structure"]["welfare module"] = "cost_minimising"
+
+    # Often, the effort sharing regimes require financial transfers larger than the mitigation costs:
+    params["economics"]["MAC"]["rel_mitigation_costs_min_level"] = -0.5
+
+    # Optionally set a carbon budget:
+    params["emissions"]["carbonbudget"] = "700 GtCO2"
+
     model = MIMOSA(params)
     ```
 
     In the equal cumulative per capita (ECPC) regime, emission allowances are allocated based on an equal
     per capita distribution of emissions, combining both *historical* and *future* emissions per capita.
-    The historical emission debt is then spread out over the future time steps, going linearly down to
+    The [historical emission debt](#param__timeandregional.effortsharing_ecpc_historical_debt) is then [spread out over the future time steps](#param__timeandregional.effortsharing_ecpc_annual_debt_repayment), going linearly down to
     zero in the repayment end year (default: 2050).
 
     First, a historical debt is calculated for each region: how much more, or less, emissions did a region emit
@@ -53,7 +67,7 @@ def get_constraints(
 
     The future fair share for every region (excluding the historical debt) is equal to the immediate
     per capita convergence regime: every year, a region gets allocated a share of the global emissions
-    based on their population share.
+    based on their [population share](#param__timeandregional.percapconv_share_pop).
 
     ``` plotly
     {"file_path": "./assets/plots/ecpc_allowances.json"}
@@ -64,9 +78,11 @@ def get_constraints(
 
     historical_emissions, historical_population = _load_data()
     m.effortsharing_ecpc_discount_rate = Param(
-        doc="::effort sharing.ecpc_discount_rate"
+        initialize=inputs.config("effort sharing.ecpc_discount_rate")
     )
-    m.effortsharing_ecpc_start_year = Param(doc="::effort sharing.ecpc_start_year")
+    m.effortsharing_ecpc_start_year = Param(
+        initialize=inputs.config("effort sharing.ecpc_start_year")
+    )
     m.effortsharing_ecpc_historical_debt = Param(
         m.t,  # Constant over time
         m.regions,
@@ -83,7 +99,7 @@ def get_constraints(
     )
 
     m.effortsharing_ecpc_repayment_endyear = Param(
-        doc="::effort sharing.ecpc_repayment_endyear"
+        initialize=inputs.config("effort sharing.ecpc_repayment_endyear")
     )
 
     m.effortsharing_ecpc_annual_debt_repayment = Param(
@@ -124,24 +140,24 @@ def _load_data():
 
 
 def _calc_debt(m, r, all_emissions, all_population):
-    """
+    r"""
 
     #### Step 1: historical debt calculation
 
     The historical debt is calculated as the cumulative difference between the historical
     fair share (based on equal per capita emissions) and the actual emissions, starting from
     a given start year (default: 1850) and using all historical observations available up to
-    the first model year. The debt is discounted to that first model year, denoted by $t_0$
-    (2025 by default). If $t_{\\mathrm{hist}}$ is the final available historical observation:
+    the first model year. The debt is discounted to that first model year, denoted by $\href{./#param__time.start}{t_0}$
+    (2025 by default). If $t_{\mathrm{hist}}$ is the final available historical observation:
 
     $$
-    \\text{debt}_{r} = \\sum_{t=\\text{start year}}^{t_{\\mathrm{hist}}} \\left(\\text{emissions}_{r,t} - \\frac{\\text{population}_{r,t}}{\\text{global population}_{t}} \\cdot \\text{global emissions}_{t}\\right) \\cdot e^{-\\text{discount rate} \\cdot (t_0 - t)}.
+    \href{./#param__timeandregional.effortsharing_ecpc_historical_debt}{\text{debt}_{r}} = \sum_{t=\href{./#param__effort%20sharing.ecpc_start_year}{\text{start year}}}^{t_{\mathrm{hist}}} \left(\text{emissions}_{r,t} - \frac{\text{population}_{r,t}}{\text{global population}_{t}} \cdot \text{global emissions}_{t}\right) \cdot e^{-\href{./#param__effort%20sharing.ecpc_discount_rate}{\text{discount rate}} \cdot (\href{./#param__time.start}{t_0} - t)}.
     $$
 
     where you can set the following parameters:
 
-    * $\\text{start year}$ using [`params["effort sharing"]["ecpc_start_year"]`](../parameters.md#effort sharing.ecpc_start_year) (default: 1850),
-    * $\\text{discount rate}$ using [`params["effort sharing"]["ecpc_discount_rate"]`](../parameters.md#effort sharing.ecpc_discount_rate) (default: 3%/yr).
+    * $\href{./#param__effort%20sharing.ecpc_start_year}{\text{start year}}$ using [`params["effort sharing"]["ecpc_start_year"]`](#param__effort%20sharing.ecpc_start_year) (default: 1850),
+    * $\href{./#param__effort%20sharing.ecpc_discount_rate}{\text{discount rate}}$ using [`params["effort sharing"]["ecpc_discount_rate"]`](#param__effort%20sharing.ecpc_discount_rate) (default: 3%/yr).
 
     The historical debt is therefore positive for regions that emitted more than their fair share of cumulative emissions per capita, and negative for regions that emitted less than their fair share:
 

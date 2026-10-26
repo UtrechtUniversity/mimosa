@@ -5,7 +5,7 @@ Objective function
 
 from typing import Sequence, Tuple
 from mimosa.common import (
-    AbstractModel,
+    ConcreteModel,
     Param,
     Var,
     GeneralConstraint,
@@ -13,12 +13,13 @@ from mimosa.common import (
     Objective,
     exp,
     maximize,
-    ModelContext,
 )
+
+from mimosa.core.model_inputs import ModelInputs
 
 
 def get_constraints(
-    m: AbstractModel, context: ModelContext
+    m: ConcreteModel, inputs: ModelInputs
 ) -> Tuple[Objective, Sequence[GeneralConstraint]]:
     """Equations and constraints for the objective of the optimisation
     (utility specification)
@@ -37,8 +38,11 @@ def get_constraints(
     """
     constraints = []
 
-    m.NPV = Var(m.t)
-    m.PRTP = Param(doc="::economics.PRTP")
+    m.NPV = Var(
+        m.t,
+        doc="Sum of discounted global welfare (Net Present Value of global welfare), discounted with the pure rate of time preference.",
+    )
+    m.PRTP = Param(initialize=inputs.config("economics.PRTP"))
     constraints.extend(
         [
             GlobalEquation(

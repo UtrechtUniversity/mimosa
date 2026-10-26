@@ -6,27 +6,28 @@ Type: no trade
 
 from typing import Sequence
 from mimosa.common import (
-    AbstractModel,
+    ConcreteModel,
     GeneralConstraint,
     Param,
     quant,
     RegionalEquation,
     Var,
-    ModelContext,
 )
+
+from mimosa.core.model_inputs import ModelInputs
 
 
 def get_constraints(
-    m: AbstractModel, context: ModelContext
+    m: ConcreteModel, inputs: ModelInputs
 ) -> Sequence[GeneralConstraint]:
-    """
+    r"""
     Without emission trading, both trading balances are always zero:
 
     $$
-    \\begin{align}
-    \\text{emission reduction trading balance}_{t,r} &= 0,\\\\
-    \\text{mitigation cost trading balance}_{t,r} &= 0.
-    \\end{align}
+    \begin{align}
+    \text{emission reduction trading balance}_{t,r} &= 0,\\
+    \text{mitigation cost trading balance}_{t,r} &= 0.
+    \end{align}
     $$
 
     Therefore, the reductions attributed to a region are the physical reductions within that region, and
@@ -37,7 +38,7 @@ def get_constraints(
     Without trade, regional emission allowances are simply equal to regional emissions:
 
     $$
-    \\text{regional emission allowances}_{t,r} = \\text{regional emissions}_{t,r}.
+    \href{./#var__coacch::regional_emission_allowances}{\text{regional emission allowances}_{t,r}} = \href{./#var__coacch::regional_emissions}{\text{regional emissions}_{t,r}}.
     $$
     """
     constraints = []  # No constraints here
@@ -49,7 +50,10 @@ def get_constraints(
         m.t, m.regions, units=quant.unit("currency_unit"), initialize=0
     )
     m.regional_emission_allowances = Var(
-        m.t, m.regions, units=quant.unit("emissionsrate_unit")
+        m.t,
+        m.regions,
+        units=quant.unit("emissionsrate_unit"),
+        doc="Regional emission allowances without trading, equal to the region's physical net CO2 emissions.",
     )
 
     constraints.append(

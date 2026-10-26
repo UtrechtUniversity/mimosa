@@ -15,8 +15,7 @@ from .utils import UnitValues, extrapolate
 
 
 class DataStore:
-    """The DataStore object is used when instantiating a concrete model from the
-    abstract mimosa. It provides values for time and region dependent data:
+    """Prepare time- and region-dependent data for model input lookup.
 
     This data is read from a data file in IIASA format, and automatically transformed
     to the right units as specified in the config file.
