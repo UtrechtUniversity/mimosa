@@ -50,6 +50,7 @@ nav:
   - Model code: "https://github.com/UtrechtUniversity/mimosa"
   - Workshops:
       - Summer school PRISMA 2025: workshops/summerschool_prisma_2025/main.md
+      - Guided exercise STSI: workshops/guided_exercise.md
 
 repo_url: https://github.com/UtrechtUniversity/mimosa
 site_url: https://utrechtuniversity.github.io/mimosa/
