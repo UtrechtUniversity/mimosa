@@ -5,8 +5,8 @@ existing run scripts or model extensions.
 
 ## In development
 
-- [MIMOSA 1.5.0](1.5.0.md) — parameter construction with input-source metadata and
-  native Pyomo components; model construction still uses the abstract pipeline.
+- [MIMOSA 2.0.0](2.0.0.md) — ACCREU damages and adaptation, direct concrete-model
+  construction and updated parameter initialization for model extensions.
 
 ## Latest release
 
