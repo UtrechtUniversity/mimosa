@@ -87,7 +87,7 @@ Inside `get_constraints`, add the following code to define a new variable:
 | `Var(m.t, m.regions, ...)` | Store a value for every timestep and region |
 | `doc=...`                  | A short description of the variable         |
 
-See [Variables](variables_constraints.md#1-variables) for more ways to define variables.
+See [Variables](../extending/variables_constraints.md#1-variables) for more ways to define variables.
 
 ## 2. Add the damage equation
 
@@ -114,7 +114,7 @@ after the colon.”** MIMOSA applies it to every timestep and region for you.
 - The first argument, `m.equipment_damage_costs`, names the result being calculated
   and is written without `[t, r]`.
 
-See [Equations](variables_constraints.md#2-equations) for more detail on
+See [Equations](../extending/variables_constraints.md#2-equations) for more detail on
 `RegionalEquation` and the `lambda` notation.
 
 Save `new_component.py` before continuing.
@@ -224,7 +224,7 @@ Only add the new parameter entry.
 coefficient. We interpret the number as the damage fraction per additional degree
 of warming. The default remains `0.002`.
 
-See [Adding parameters from configuration](parameters.md#config-params) for more
+See [Adding parameters from configuration](../extending/parameters.md#config-params) for more
 detail on defining a new configuration entry.
 
 In `new_component.py`, add this declaration **above `constraints = [...]`**, alongside
@@ -287,7 +287,7 @@ As a second check, set the coefficient to `0` in the parameter line and rerun. I
 the new CSV, `equipment_damage_costs` should be zero in every year.
 
 For more ways to supply parameter values, including regional data, see
-[Adding parameters and data](parameters.md).
+[Adding parameters and data](../extending/parameters.md).
 
 ??? info "Check your completed component"
 

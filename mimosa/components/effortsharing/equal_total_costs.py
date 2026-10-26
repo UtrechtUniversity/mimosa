@@ -75,7 +75,11 @@ def get_constraints(
         $$
     """
 
-    m.effort_sharing_common_level = Var(m.t, units=quant.unit("fraction_of_GDP"))
+    m.effort_sharing_common_level = Var(
+        m.t,
+        units=quant.unit("fraction_of_GDP"),
+        doc="Common total-cost share of gross GDP targeted across regions through 2100, including mitigation, damages, adaptation and financial transfers. Regional totals are constrained to remain approximately equal to this value.",
+    )
 
     return [
         # Total costs: mitigation + damage costs should be equal among regions as % GDP

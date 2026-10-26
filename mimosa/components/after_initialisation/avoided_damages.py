@@ -29,8 +29,17 @@ def get_constraints(m: ConcreteModel) -> Sequence[GeneralConstraint]:
         mutable=True,
         units=quant.unit("fraction_of_GDP"),
     )
-    m.avoided_damage_costs = Var(m.t, m.regions, units=quant.unit("fraction_of_GDP"))
-    m.global_avoided_damage_costs = Var(m.t, units=quant.unit("fraction_of_GDP"))
+    m.avoided_damage_costs = Var(
+        m.t,
+        m.regions,
+        units=quant.unit("fraction_of_GDP"),
+        doc="Avoided damages, calculated as the difference between the damage costs in a no-policy baseline run and the damage costs in this run.",
+    )
+    m.global_avoided_damage_costs = Var(
+        m.t,
+        units=quant.unit("fraction_of_GDP"),
+        doc="Global aggregation of avoided damages",
+    )
 
     constraints.extend(
         [

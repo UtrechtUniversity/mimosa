@@ -68,7 +68,11 @@ def get_constraints(
 
     """
 
-    m.effort_sharing_common_level = Var(m.t, units=quant.unit("fraction_of_GDP"))
+    m.effort_sharing_common_level = Var(
+        m.t,
+        units=quant.unit("fraction_of_GDP"),
+        doc="Common mitigation-cost share of gross GDP targeted across regions. Each region's attributed mitigation-cost share is constrained to remain approximately equal to this value.",
+    )
 
     return [
         RegionalSoftEqualityConstraint(

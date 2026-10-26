@@ -38,7 +38,10 @@ def get_constraints(
     """
     constraints = []
 
-    m.NPV = Var(m.t)
+    m.NPV = Var(
+        m.t,
+        doc="Sum of discounted global welfare (Net Present Value of global welfare), discounted with the pure rate of time preference.",
+    )
     m.PRTP = Param(initialize=inputs.config("economics.PRTP"))
     constraints.extend(
         [

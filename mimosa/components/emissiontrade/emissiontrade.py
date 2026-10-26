@@ -66,7 +66,10 @@ def get_constraints(
     """
     constraints = []
 
-    m.global_carbon_price = Var(m.t)
+    m.global_carbon_price = Var(
+        m.t,
+        doc="Population-weighted average of regional carbon prices, used to value emission trades.",
+    )
 
     # Emissions are traded at the global carbon price
     constraints.extend(
@@ -85,16 +88,28 @@ def get_constraints(
     ## Extra reporting variables:
 
     m.attributed_emission_reductions = Var(
-        m.t, m.regions, units=quant.unit("emissionsrate_unit")
+        m.t,
+        m.regions,
+        units=quant.unit("emissionsrate_unit"),
+        doc="Emission reductions attributed to a region after trading, equal to its physical emission reductions plus its emission-reduction trading balance.",
     )
     m.regional_emission_allowances = Var(
-        m.t, m.regions, units=quant.unit("emissionsrate_unit")
+        m.t,
+        m.regions,
+        units=quant.unit("emissionsrate_unit"),
+        doc="Regional emission allowances, equal to baseline emissions minus the emission reductions attributed to the region after trading.",
     )
     m.emission_reduction_trading_balance = Var(
-        m.t, m.regions, units=quant.unit("emissionsrate_unit")
+        m.t,
+        m.regions,
+        units=quant.unit("emissionsrate_unit"),
+        doc="Difference between attributed and physical emission reductions due to trading. Positive values increase the reductions attributed to the region; negative values decrease them.",
     )
     m.mitigation_cost_trading_balance = Var(
-        m.t, m.regions, units=quant.unit("currency_unit")
+        m.t,
+        m.regions,
+        units=quant.unit("currency_unit"),
+        doc="Net payment for emission trading, added to domestic mitigation costs. Positive values are payments and negative values are revenues; the balances sum to zero across regions.",
     )
     constraints.extend(
         [

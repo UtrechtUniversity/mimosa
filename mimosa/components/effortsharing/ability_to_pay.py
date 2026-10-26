@@ -74,9 +74,20 @@ def get_constraints(
 
     """
 
-    m.effortsharing_AP_reductions_before_correction = Var(m.t, m.regions)
-    m.effortsharing_AP_inv_correction_factor = Var(m.t)
-    m.effortsharing_AP_allowances = Var(m.t, m.regions)
+    m.effortsharing_AP_reductions_before_correction = Var(
+        m.t,
+        m.regions,
+        doc="Provisional regional emission reductions under the ability-to-pay rule, before global correction. The global reduction fraction is scaled by the cube root of the region's baseline GDP per capita relative to the global average, then applied to its baseline emissions.",
+    )
+    m.effortsharing_AP_inv_correction_factor = Var(
+        m.t,
+        doc="Global multiplier applied to provisional ability-to-pay reductions so their sum matches the global emission reduction from baseline. Set to one at the initial time step.",
+    )
+    m.effortsharing_AP_allowances = Var(
+        m.t,
+        m.regions,
+        doc="Regional emission allowances prescribed by the ability-to-pay rule, equal to baseline emissions minus the globally corrected regional reduction. These are the targets for the region's emission allowances after trading.",
+    )
 
     return [
         RegionalEquation(

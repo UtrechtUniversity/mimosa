@@ -50,7 +50,10 @@ def get_constraints(
         m.t, m.regions, units=quant.unit("currency_unit"), initialize=0
     )
     m.regional_emission_allowances = Var(
-        m.t, m.regions, units=quant.unit("emissionsrate_unit")
+        m.t,
+        m.regions,
+        units=quant.unit("emissionsrate_unit"),
+        doc="Regional emission allowances without trading, equal to the region's physical net CO2 emissions.",
     )
 
     constraints.append(
