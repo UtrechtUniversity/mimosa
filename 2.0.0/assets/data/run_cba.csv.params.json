@@ -1,0 +1,135 @@
+{
+    "time": {
+        "start": 2020,
+        "end": 2150,
+        "dt": 5.0
+    },
+    "SSP": "SSP2",
+    "economics": {
+        "PRTP": 0.015,
+        "elasmu": 1.001,
+        "inequal_aversion": 0.5,
+        "GDP": {
+            "alpha": 0.3,
+            "depreciation of capital": 0.05,
+            "savings rate": 0.21
+        },
+        "MAC": {
+            "beta": 3.0,
+            "rho": 0.82,
+            "gamma": "2601 USD2005/tCO2",
+            "regional calibration factor": "kappa_rel_abatement_0.75_2050",
+            "rel_mitigation_costs_min_level": 0.0
+        },
+        "emission trade": {
+            "min rel payment level": false,
+            "max rel payment level": false
+        },
+        "damages": {
+            "percentage reversible": 1.0,
+            "scale factor": 1.0,
+            "ignore damages": false,
+            "quantile": 0.5,
+            "coacch_slr_withadapt": true,
+            "coacch_combined_slr_nonslr_damages": false
+        },
+        "adaptation": {
+            "curr_level": 0.0,
+            "fixed": false
+        }
+    },
+    "emissions": {
+        "carbonbudget": false,
+        "global min level": "-20 GtCO2/yr",
+        "regional min level": "-10 GtCO2/yr",
+        "not positive after budget year": true,
+        "non increasing emissions after 2100": true,
+        "baseline carbon intensity": true,
+        "inertia": {
+            "global": false,
+            "regional": -0.05
+        },
+        "cumulative_emissions_trapz": true
+    },
+    "burden sharing": {
+        "regime": "noregime",
+        "percapconv_year": 2050.0
+    },
+    "temperature": {
+        "initial": "1.16 delta_degC",
+        "TCRE": "0.62 delta_degC/(TtCO2)",
+        "target": false
+    },
+    "model": {
+        "damage module": "COACCH",
+        "emissiontrade module": "notrade",
+        "financialtransfer module": "notransfer",
+        "welfare module": "welfare_loss_minimising",
+        "objective module": "utility"
+    },
+    "regionstype": "IMAGE26",
+    "regions": {
+        "CAN": {},
+        "USA": {},
+        "MEX": {},
+        "RCAM": {},
+        "BRA": {},
+        "RSAM": {},
+        "NAF": {},
+        "WAF": {},
+        "EAF": {},
+        "SAF": {},
+        "WEU": {},
+        "CEU": {},
+        "TUR": {},
+        "UKR": {},
+        "STAN": {},
+        "RUS": {},
+        "ME": {},
+        "INDIA": {},
+        "KOR": {},
+        "CHN": {},
+        "SEAS": {},
+        "INDO": {},
+        "JAP": {},
+        "OCE": {},
+        "RSAS": {},
+        "RSAF": {}
+    },
+    "input": {
+        "db_filename": "inputdata/data/data_IMAGE_SSP.csv",
+        "baselines": {
+            "SSP1": {
+                "scenario": "SSP1-Ref-SPA0-V17",
+                "model": "IMAGE"
+            },
+            "SSP2": {
+                "scenario": "SSP2-Ref-SPA0-V17",
+                "model": "IMAGE"
+            },
+            "SSP3": {
+                "scenario": "SSP3-Ref-SPA0-V17",
+                "model": "IMAGE"
+            },
+            "SSP4": {
+                "scenario": "SSP4-Ref-SPA0-V17",
+                "model": "IMAGE"
+            },
+            "SSP5": {
+                "scenario": "SSP5-Ref-SPA0-V17",
+                "model": "IMAGE"
+            }
+        },
+        "variables": {
+            "GDP": "GDP|PPP",
+            "emissions": "Emissions|CO2",
+            "population": "Population"
+        }
+    },
+    "simulation": {
+        "simulationmode": false,
+        "constraint_variables": {},
+        "deactivated_constraints": [],
+        "custom_mapping": {}
+    }
+}
