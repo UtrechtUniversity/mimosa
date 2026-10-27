@@ -13,25 +13,25 @@ For this exercise, you will do two runs of MIMOSA: a no-policy baseline run, and
 
     Create a new Python file, and using the code below, run both a no-policy baseline run and a cost-benefit analysis (CBA) run.
 
-    === "Run 1: No-policy baseline run"
+    === "Run 1: No-policy run"
 
-        This code will do a baseline run. Since there is nothing to optimise, the code will do a *simulation*, and not an *optimisation* run.
+        This code will do a no-policy baseline run. Since there is nothing to optimise, the code will do a *simulation*, and not an *optimisation* run.
 
         ```python
-        --8<-- "docs/workshops/summerschool_prisma_2025/run_baseline.py"
+        --8<-- "docs/workshops/stsi/runs/run_nopolicy.py"
         ```
 
     === "Run 2: Cost-benefit run"
 
-        Now that you have run a no-policy baseline run, you can run MIMOSA in optimisation mode. This will allow you to find the optimal temperature and benefit-cost ratio for the given parameters.
+        Now that you have run a no-policy run, you can run MIMOSA in optimisation mode. This will allow you to find the cost-optimal temperature and benefit-cost ratio for the given parameters.
 
         ```python
-        --8<-- "docs/workshops/summerschool_prisma_2025/run_cba.py"
+        --8<-- "docs/workshops/stsi/runs/run_cba.py"
         ```
 
 #### Step 2: Analyse the results
 
-The code will produce a CSV file with the results of the run. The file is saved in the `output` folder. You can either open the CSV file (e.g. `output/run_baseline_nopolicy.csv`) in Excel/Python, or you can use the MIMOSA Dashboard. Open the [MIMOSA Dashboard](https://dashboard-mimosa.onrender.com/) and drag and drop the CSV file into the dashboard. This will allow you to visualise the results of the simulation. You can also drag and drop multiple files to compare the results of different runs: try dropping both `run_baseline_nopolicy.csv` and `run_cba.csv` to compare the results of the no-policy baseline run and the CBA run.
+The code will produce a CSV file with the results of the run. The file is saved in the `output` folder. You can either open the CSV file (e.g. `output/run_nopolicy.csv`) in Excel/Python, or you can use the MIMOSA Dashboard. Open the [MIMOSA Dashboard](https://dashboard-mimosa.onrender.com/) and drag and drop the CSV file into the dashboard. This will allow you to visualise the results of the simulation. You can also drag and drop multiple files to compare the results of different runs: try dropping both `run_nopolicy.csv` and `run_cba.csv` to compare the results of the no-policy baseline run and the CBA run.
 
 In the dashboard, a lot of information is already shown in the various tabs. You can also go to the tab "All variables" to show any variable present in the output file.
 
@@ -53,13 +53,13 @@ In the dashboard, a lot of information is already shown in the various tabs. You
 
 Rerun MIMOSA with different parameters. Have a look at the [parameter reference](../../parameters.md) to see which parameters you can change. Interesting parameters could be:
 
-- [`params["economics"]["PRTP"]`](#param__economics.PRTP): The discount rate (pure rate of time preference). Choose values between 0.01 (low end) and 0.03 (high end). The default is 0.015 (corresponding to 1.5%/year).
-- [`params["economics"]["damages"]["quantile"]`](#param__economics.damages.quantile): The quantile of the damages distribution. Choose values between 0.05 (low end) and 0.95 (high end). The default is 0.5 (corresponding to the median).
-- [`params["temperature"]["TCRE"]`](#param__temperature.TCRE): The transient climate response to cumulative emissions. Choose values between 0.42 (low end) and 0.82 (high end). The default is 0.62&nbsp;&deg;C/TtCO<sub>2</sub> (corresponding to the median).
+- [`params["economics"]["PRTP"]`](#param__economics.PRTP): The discount rate (pure rate of time preference). Choose values between 0.00 (low end) and 0.03 (high end). The default is 0.015 (corresponding to 1.5%/year).
+- [`params["economics"]["damages"]["scale factor"]`](#param__economics.damages.scale%20factor): Scale the damages up or down to see the effect of higher or lower damages. This multiplies all market damages (riverine flooding, labour productivity, sea-level rise). The default is 1.0.
+- [`params["temperature"]["TCRE"]`](#param__temperature.TCRE): The transient climate response to cumulative emissions. Choose values between 0.42&nbsp;&deg;C/TtCO<sub>2</sub> (low end) and 0.82&nbsp;&deg;C/TtCO<sub>2</sub> (high end). The default is 0.62&nbsp;&deg;C/TtCO<sub>2</sub> (corresponding to the median).
 
 !!! question "Question 3: sensitivity analysis"
 
-    * What is the new cost-optimal temperature target? What is the influence of the discount rate, the damage quantile, or the TCRE on the cost-optimal temperature target?
+    * What is the new cost-optimal temperature target? What is the influence of the discount rate, the damage scale factor, or the TCRE on the cost-optimal temperature target?
     * If you have time, how is the global or regional benefit-cost ratio affected?
 
 ## Exercise 3: effort sharing and equity
