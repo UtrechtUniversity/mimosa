@@ -48,6 +48,9 @@ def get_constraints(
     m.non_market_damage_costs_abs = Param(
         m.t, m.regions, initialize=0.0, units=quant.unit("currency_unit")
     )
+    m.market_and_non_market_damage_costs = Param(
+        m.t, m.regions, intialize=0.0, units=quant.unit("fraction_of_GDP")
+    )
     constraints.extend([RegionalEquation(m.damage_costs, lambda m, t, r: 0.0)])
 
     return constraints
