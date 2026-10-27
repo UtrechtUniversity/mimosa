@@ -57,6 +57,8 @@ def test_workflow_matches_manual_replay(script_output, accreu_mit_output):
         "mitigation_level", "temperature", "adaptation_costs_abs",
         "damage_costs_abs", "avoided_damage_costs",
         "global_avoided_damage_costs", "total_direct_costs_abs",
+        "avoided_market_and_non_market_damage_costs",
+        "global_avoided_market_and_non_market_damage_costs",
     ):
         actual = list(getattr(model.concrete_model, variable).extract_values().values())
         expected = list(getattr(manual_result, variable).extract_values().values())
