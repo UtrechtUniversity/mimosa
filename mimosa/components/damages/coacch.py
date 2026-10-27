@@ -63,9 +63,6 @@ def get_constraints(
     m.damage_scale_factor = Param(
         initialize=inputs.config("economics.damages.scale factor")
     )
-    m.non_market_damage_costs_abs = Param(
-        m.t, m.regions, initialize=0.0, units=quant.unit("currency_unit")
-    )
     m.global_damage_costs = Var(
         m.t,
         units=quant.unit("fraction_of_GDP"),
@@ -103,6 +100,24 @@ def get_constraints(
 
     # Get constraints for sea-level rise damages
     constraints.extend(get_constraints_slr(m, inputs))
+
+    # Add market and non market damages:
+    m.non_market_damage_costs_abs = Param(
+        m.t, m.regions, initialize=0.0, units=quant.unit("currency_unit")
+    )
+    m.market_and_non_market_damage_costs = Var(
+        m.t,
+        m.regions,
+        units=quant.unit("fraction_of_GDP"),
+        doc="Total market and non-market damages, as a fraction of GDP.",
+    )
+    constraints.append(
+        RegionalEquation(
+            m.market_and_non_market_damage_costs,
+            lambda m, t, r: m.damage_costs[t, r]
+            + m.non_market_damage_costs_abs[t, r] / m.GDP_gross[t, r],
+        )
+    )
 
     return constraints
 

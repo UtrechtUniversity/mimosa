@@ -295,9 +295,15 @@ def test_baseline_dependent_variables_are_declared_without_evaluating_them(
             for variable in context.variables
             if variable.requires_baseline
         }
-        assert set(baseline) == {"avoided_damage_costs", "global_avoided_damage_costs"}
-        assert baseline["avoided_damage_costs"].dimensions == ("t", "regions")
-        assert baseline["global_avoided_damage_costs"].dimensions == ("t",)
+        assert set(baseline) == {
+            "avoided_damage_costs", "global_avoided_damage_costs",
+            "avoided_market_and_non_market_damage_costs",
+            "global_avoided_market_and_non_market_damage_costs",
+        }
+        for name in baseline:
+            assert baseline[name].dimensions == (
+                ("t",) if name.startswith("global_") else ("t", "regions")
+            )
         assert not hasattr(context.model, "constraint_avoided_damage_costs")
         for name in baseline:
             assert all(
