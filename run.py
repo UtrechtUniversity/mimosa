@@ -9,7 +9,7 @@ params["time"]["periods"] = {2050: 10, 2100: 20}
 params["emissions"]["non increasing emissions after 2100"] = False
 
 
-for i in range(0, 20):
+for i in range(0, 5):
 
     # values are from Deutloff et al. (2025)
     # and can be accessed in the file "Code/Read Data/Constants_new.py" from Deutloff's published code
@@ -21,8 +21,6 @@ for i in range(0, 20):
 
     params["model structure"]["tippingpoints options"]["include ALL"] = True
 
-
-
     params["tippingpoints"]["AMAZ"]["threshold"] = AMAZ_tipping_temp[0]
     params["tippingpoints"]["AMOC"]["threshold"] = AMOC_tipping_temp[0]
     params["tippingpoints"]["AWSI"]["threshold"] = AWSI_tipping_temp[0]
@@ -30,16 +28,17 @@ for i in range(0, 20):
     params["tippingpoints"]["PFAT"]["threshold"] = PFAT_tipping_temp[0]
 
     model1 = MIMOSA(params)
-    model1.simulator.plot_dependency_graph()
-    exit()
-    baseline = model1.run_nopolicy_baseline()
-    model1.save_simulation(baseline, "nopolicy_with_tipping_23_09_2026" + str(i))
+    #model1.simulator.plot_dependency_graph()
+    #exit()
+    #baseline = model1.run_nopolicy_baseline()
+    #model1.save_simulation(baseline, "run_tippedstate_28_10_2026_" + str(i))
     model1.solve()
-    #model1.save("nopolicy_run_23_09_2026_" + str(i))
+    model1.save("run_tippedstate_28_10_2026_" + str(i))
 
 
 
 """
+
 # for single runs
 
 AMAZ_tipping_temp = random.lognormal(mean=1.25, sigma=0.33, size=1)
@@ -50,15 +49,22 @@ PFAT_tipping_temp = random.lognormal(mean=0.41, sigma=0.25, size=1)
 
 params["model structure"]["tippingpoints options"]["include ALL"] = True
 
-params["tippingpoints"]["AMAZ"]["threshold"] = AMAZ_tipping_temp[0]
-params["tippingpoints"]["AMOC"]["threshold"] = AMOC_tipping_temp[0]
-params["tippingpoints"]["AWSI"]["threshold"] = AWSI_tipping_temp[0]
-params["tippingpoints"]["LABC"]["threshold"] = LABC_tipping_temp[0]
-params["tippingpoints"]["PFAT"]["threshold"] = PFAT_tipping_temp[0]
+#params["tippingpoints"]["AMAZ"]["threshold"] = AMAZ_tipping_temp[0]
+#params["tippingpoints"]["AMOC"]["threshold"] = AMOC_tipping_temp[0]
+#params["tippingpoints"]["AWSI"]["threshold"] = AWSI_tipping_temp[0]
+#params["tippingpoints"]["LABC"]["threshold"] = LABC_tipping_temp[0]
+#params["tippingpoints"]["PFAT"]["threshold"] = PFAT_tipping_temp[0]
+
+params["tippingpoints"]["AMAZ"]["threshold"] = 4.33734817243143
+params["tippingpoints"]["AMOC"]["threshold"] = 1.6137123151197685
+params["tippingpoints"]["AWSI"]["threshold"] = 5.392562268906814
+params["tippingpoints"]["LABC"]["threshold"] = 3.112742512824636
+params["tippingpoints"]["PFAT"]["threshold"] = 1.0877148053957744
 
 model1 = MIMOSA(params)
-baseline = model1.run_nopolicy_baseline()
-model1.save_simulation(baseline, "baseline_nopolicy_with_tipping_23_09_2026")
-#model1.solve()
-#model1.save("run_no_tipping_points_23_09_2026")
+#baseline = model1.run_nopolicy_baseline()
+#model1.save_simulation(baseline, "run_NP_28_09_2026_19")
+model1.solve()
+model1.save("tipped_state_variable_26_10_2026")
+
 """
