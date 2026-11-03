@@ -34,12 +34,12 @@ change and compare its results with the original model.
     - **Reduce demand?** Represent lower energy or material demand and its effect
       on emissions and mitigation costs.
 
-    **How it works now:** [Mitigation costs and learning](../components/mitigation.md),
-    [effort-sharing](../components/effortsharing.md),
-    [emission trading](../components/emissiontrading.md) and
-    [emissions and temperature limits](../components/emissions.md).
+    **How it works now:** [Mitigation costs and learning](../../components/mitigation.md),
+    [effort-sharing](../../components/effortsharing.md),
+    [emission trading](../../components/emissiontrading.md) and
+    [emissions and temperature limits](../../components/emissions.md).
 
--   #### :material-home-flood: Impacts and adaptation
+-   #### :material-home-flood: Impacts and adaptation 
 
     ---
 
@@ -50,9 +50,9 @@ change and compare its results with the original model.
     - **Thresholds and protection?** Explore damages that rise sharply beyond a
       warming threshold, or add a measure that reduces a sector's damages.
 
-    **How it works now:** [COACCH damage functions](../components/damages/coacch.md),
-    [ACCREU sectors and adaptation](../components/damages/accreu.md) and
-    [welfare and inequality](../components/welfare.md).
+    **How it works now:** [COACCH damage functions](../../components/damages/coacch.md),
+    [ACCREU sectors and adaptation](../../components/damages/accreu.md) and
+    [welfare and inequality](../../components/welfare.md).
 
 -   #### :material-waves-arrow-up: Climate and sea-level rise
 
@@ -65,8 +65,8 @@ change and compare its results with the original model.
     - **Climate tipping points?** Add a simplified feedback that starts above a
       temperature threshold, such as extra emissions or faster ice loss.
 
-    **How it works now:** [Emissions and temperature](../components/emissions.md)
-    and [sea-level-rise contributions](../components/sealevelrise.md).
+    **How it works now:** [Emissions and temperature](../../components/emissions.md)
+    and [sea-level-rise contributions](../../components/sealevelrise.md).
 
 -   #### :fontawesome-regular-money-bill-1: Economy and development pathways
 
@@ -79,9 +79,9 @@ change and compare its results with the original model.
     - **A different economy?** Change how investment, productivity or production
       affects GDP, starting with one relationship in the economic module.
 
-    **How it works now:** [GDP, investment and consumption](../components/economics.md),
-    [welfare](../components/welfare.md) and
-    [time- and region-dependent input data](../extending/parameters.md#time-and-region-dependent-data).
+    **How it works now:** [GDP, investment and consumption](../../components/economics.md),
+    [welfare](../../components/welfare.md) and
+    [time- and region-dependent input data](../../extending/parameters.md#time-and-region-dependent-data).
 
 </div>
 
@@ -158,7 +158,7 @@ Inside `get_constraints`, add the following code to define a new variable:
 | `Var(m.t, m.regions, ...)` | Store a value for every timestep and region |
 | `doc=...`                  | A short description of the variable         |
 
-See [Variables](../extending/variables_constraints.md#1-variables) for more ways to define variables.
+See [Variables](../../extending/variables_constraints.md#1-variables) for more ways to define variables.
 
 ## 2. Add the damage equation
 
@@ -185,7 +185,7 @@ after the colon.”** MIMOSA applies it to every timestep and region for you.
 - The first argument, `m.equipment_damage_costs`, names the result being calculated
   and is written without `[t, r]`.
 
-See [Equations](../extending/variables_constraints.md#2-equations) for more detail on
+See [Equations](../../extending/variables_constraints.md#2-equations) for more detail on
 `RegionalEquation` and the `lambda` notation.
 
 Save `new_component.py` before continuing.
@@ -224,9 +224,9 @@ columns contain the results. Your new variable is included automatically. Look f
 
 | Variable                 | Region   | What to check                                                                                              |
 | ------------------------ | -------- | ---------------------------------------------------------------------------------------------------------- |
-| `equipment_damage_costs` | `USA`    | Extra damages are zero in 2025 and positive in 2050. Values are fractions of GDP, so `0.002` means `0.2%`. |
+| `equipment_damage_costs` | `WEU`    | Extra damages are zero in 2025 and positive in 2050. Values are fractions of GDP, so `0.002` means `0.2%`. |
 | `temperature`            | `Global` | The temperature values in 2025 and 2050 show how much additional warming has occurred.                     |
-| `GDP_net`                | `USA`    | Write down the value in the 2050 column to compare after the next step.                                    |
+| `GDP_net`                | `WEU`    | Write down the value in the 2050 column to compare after the next step.                                    |
 
 To check your equation using the CSV, subtract the 2025 temperature from the 2050
 temperature and multiply by `0.002`. This should match the equipment damage
@@ -295,7 +295,7 @@ Only add the new parameter entry.
 coefficient. We interpret the number as the damage fraction per additional degree
 of warming. The default remains `0.002`.
 
-See [Adding parameters from configuration](../extending/parameters.md#config-params) for more
+See [Adding parameters from configuration](../../extending/parameters.md#config-params) for more
 detail on defining a new configuration entry.
 
 In `new_component.py`, add this declaration **above `constraints = [...]`**, alongside
@@ -358,7 +358,7 @@ As a second check, set the coefficient to `0` in the parameter line and rerun. I
 the new CSV, `equipment_damage_costs` should be zero in every year.
 
 For more ways to supply parameter values, including regional data, see
-[Adding parameters and data](../extending/parameters.md).
+[Adding parameters and data](../../extending/parameters.md).
 
 ??? info "Check your completed component"
 
