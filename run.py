@@ -8,7 +8,7 @@ params["time"]["end"] = 2300
 params["time"]["periods"] = {2050: 10, 2100: 20}
 params["emissions"]["non increasing emissions after 2100"] = False
 
-
+"""
 for i in range(0, 5):
 
     # values are from Deutloff et al. (2025)
@@ -35,9 +35,9 @@ for i in range(0, 5):
     model1.solve()
     model1.save("run_tippedstate_28_10_2026_" + str(i))
 
-
-
 """
+
+
 
 # for single runs
 
@@ -55,16 +55,15 @@ params["model structure"]["tippingpoints options"]["include ALL"] = True
 #params["tippingpoints"]["LABC"]["threshold"] = LABC_tipping_temp[0]
 #params["tippingpoints"]["PFAT"]["threshold"] = PFAT_tipping_temp[0]
 
-params["tippingpoints"]["AMAZ"]["threshold"] = 4.33734817243143
-params["tippingpoints"]["AMOC"]["threshold"] = 1.6137123151197685
-params["tippingpoints"]["AWSI"]["threshold"] = 5.392562268906814
-params["tippingpoints"]["LABC"]["threshold"] = 3.112742512824636
-params["tippingpoints"]["PFAT"]["threshold"] = 1.0877148053957744
+params["tippingpoints"]["AMAZ"]["threshold"] = 3.0
+params["tippingpoints"]["AMOC"]["threshold"] = 1.6
+params["tippingpoints"]["AWSI"]["threshold"] = 5.0
+params["tippingpoints"]["LABC"]["threshold"] = 1.8
+params["tippingpoints"]["PFAT"]["threshold"] = 1.08
 
 model1 = MIMOSA(params)
 #baseline = model1.run_nopolicy_baseline()
 #model1.save_simulation(baseline, "run_NP_28_09_2026_19")
 model1.solve()
-model1.save("tipped_state_variable_26_10_2026")
+model1.save("new_emissions_test")
 
-"""

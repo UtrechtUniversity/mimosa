@@ -257,7 +257,8 @@ def _get_emissions_constraints(m: AbstractModel) -> Sequence[GeneralConstraint]:
             # Global emissions (sum from regional emissions)
             GlobalEquation(
                 m.global_emissions,
-                lambda m, t: sum(m.regional_emissions[t, r] for r in m.regions),
+                lambda m, t: (sum(m.regional_emissions[t, r] for r in m.regions) + m.total_tipping_anomaly_emis[t]
+                )
             ),
             # Cumulative emissions
             GlobalEquation(
@@ -386,7 +387,7 @@ def _get_temperature_constraints(m: AbstractModel) -> Sequence[GeneralConstraint
             GlobalEquation(
                 m.temperature,
                 lambda m, t: (
-                    m.T0 + (m.TCRE * m.global_cumulative_emissions[t]) + m.total_tipping_anomaly[t] if t > 0 else m.T0
+                    m.T0 + (m.TCRE * m.global_cumulative_emissions[t]) + m.total_tipping_anomaly_temp[t] if t > 0 else m.T0
                 ),
             ),
             GlobalConstraint(
