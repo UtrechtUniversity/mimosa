@@ -4,7 +4,7 @@ variable_context: accreu_sectoral
 
 For the first part of this assignment, you will do several MIMOSA runs to investigate the economic impacts of climate change, and how these are affected by different policy choices. You will also investigate the effect of different effort sharing approaches on the distribution of mitigation costs across regions. 
 
-**What to hand in:** a short report with your answers to the questions on this page (marked with a :octicons-question-16: icon). You have to do exercise 1, and choose between exercise 2 and 3. Exercise 2 focuses on adaptation and climate impacts, while exercise 3 focuses on equity and how to distribute mitigation effort.
+**What to hand in:** a short report with your answers to the questions on this page (marked with a :octicons-question-16: icon). You have to do exercise 1, and choose between exercise 2A and 2B. Exercise 2A focuses on adaptation and climate impacts, while exercise 2B focuses on equity and how to distribute mitigation effort.
 
 ## Exercise 1: cost-benefit analysis: optimal temperature and benefit-cost ratio
 
@@ -32,6 +32,10 @@ For this exercise, you will do two runs of MIMOSA: a no-policy run, and a cost-b
         --8<-- "docs/workshops/stsi/runs/run_cba.py"
         ```
 
+    !!! note
+
+        Note that by default, MIMOSA runs until the year 2150. However, for the purpose of these exercises, we will only look at the results until 2100. The reason MIMOSA runs until 2150 is to avoid end-of-horizon effects in the optimisation.
+
 #### Step 2: Analyse the results
 
 The code will produce a CSV file with the results of the run. The file is saved in the `output` folder. You can either open the CSV file (e.g. `output/run_nopolicy.csv`) in Excel/Python, or you can use the MIMOSA Dashboard. Open the [MIMOSA Dashboard](https://dashboard-mimosa.onrender.com/) and drag and drop the CSV file into the dashboard. This will allow you to visualise the results of the simulation. You can also drag and drop multiple files to compare the results of different runs: try dropping both `run_nopolicy.csv` and `run_cba.csv` to compare the results of the no-policy run and the CBA run.
@@ -42,33 +46,33 @@ In the dashboard, a lot of information is already shown in the various tabs. You
 
     Investigate the following policy-relevant questions:
 
-    * What is the cost-optimal temperature target? And how high does temperature rise without any policy?
-    * How big are the *global* economic damages in 2050 and 2100 in the baseline run, and in the CBA run? *Hint: look at varref::accreu_sectoral::global_damage_costs and varref::accreu_sectoral::global_avoided_damage_costs.*
-    * How big are the *global* mitigation costs (varref::accreu_sectoral::global_mitigation_costs) in 2050 and 2100 in the CBA run? And how does this compare to the avoided damages? Calculate the benefit-cost ratio (BCR) for 2050 and 2100.
-    * How does the global mortality change in the two runs? And how does the global BCR change if you include the monetised value of mortality in the damages? *Hint: find the variable that combines the (avoided) economic damages and the monetised value of mortality.*
+    * **Q1a:** What is the cost-optimal temperature in 2100? And how high does temperature rise in 2100 without any policy?
+    * **Q1b:** How big are the *global* economic damages in 2050 and 2100 in the baseline run, and in the CBA run? *Hint: look at varref::accreu_sectoral::global_damage_costs and varref::accreu_sectoral::global_avoided_damage_costs.*
+    * **Q1c:** How big are the *global* mitigation costs (varref::accreu_sectoral::global_mitigation_costs) in 2050 and 2100 in the CBA run? And how does this compare to the avoided damages? Calculate the benefit-cost ratio (BCR) for 2050 and 2100. What does this say about the distribution of costs and benefits over time?
+    * **Q1d:** How does the global mortality in 2050 and 2100 change in the two runs? And how does the global BCR change if you include the monetised value of mortality in the damages? *Hint: find the variable that combines the (avoided) economic damages and the monetised value of mortality.*
 
 !!! question "Question 2: regional differences"
 
     Choose two regions: one from the Global North, one from the Global South (see the [regions documentation](../../components/regions.md) for the full list of regions).
 
-    * For both regions, compare the damage costs, avoided damages, and mitigation costs in 2050 and 2100. What are the benefit-cost ratios for these two regions?
+    * **Q2a:** For both regions, compare the damage costs, avoided damages, and mitigation costs in 2050 and 2100. What are the benefit-cost ratios for these two regions?
 
 #### Step 3: Tweak parameters:
 
 Rerun MIMOSA with different parameters. Have a look at the [parameter reference](../../parameters.md) to see which parameters you can change. Interesting parameters could be:
 
 - [`params["economics"]["PRTP"]`](#param__economics.PRTP): The discount rate (pure rate of time preference). Choose values between 0.00 (low end) and 0.03 (high end). The default is 0.015 (corresponding to 1.5%/year).
-- [`params["economics"]["damages"]["scale factor"]`](#param__economics.damages.scale%20factor): Scale the damages up or down to see the effect of higher or lower damages. This multiplies all market damages (riverine flooding, labour productivity, sea-level rise). The default is 1.0.
+- [`params["economics"]["damages"]["scale factor"]`](#param__economics.damages.scale%20factor): Scale the damages up or down to see the effect of higher or lower damages. This multiplies all market damages (riverine flooding, labour productivity, sea-level rise). The default is 1.0. Example sensitivity values could be 0.5 (half the damages) or 2.0 (double the damages).
 - [`params["temperature"]["TCRE"]`](#param__temperature.TCRE): The transient climate response to cumulative emissions. Choose values between 0.42&nbsp;&deg;C/TtCO<sub>2</sub> (low end) and 0.82&nbsp;&deg;C/TtCO<sub>2</sub> (high end). The default is 0.62&nbsp;&deg;C/TtCO<sub>2</sub> (corresponding to the median).
 
 !!! question "Question 3: sensitivity analysis"
 
-    * Choose one of the parameters above, or another parameter of your choice, and rerun MIMOSA with two values of that parameter, different than the default. Briefly explain what this parameter means and why you choose this parameter.
-    * What is the new cost-optimal temperature target? 
-    * Make a small causal loop diagram to explain why the change in parameter leads to a different optimal temperature target. *Hint: what does your parameter affect, and how does that affect the optimal temperature target?*
+    * **Q3a:** Choose one of the parameters above, or another parameter of your choice, and rerun MIMOSA with two values of that parameter, different than the default. Briefly explain what this parameter means and why you choose this parameter. What normative judgement does this parameter reflect?
+    * **Q3b:** What is the new cost-optimal temperature target? 
+    * **Q3c:** Make a small causal loop diagram to explain why the change in parameter leads to a different optimal temperature target. *Hint: what does your parameter affect, and how does that affect the optimal temperature target?* If you choose the TCRE as parameter, also include the cumulative emissions until 2100 in your reflection.
 
 
-## Exercise 2: impact sectors and adaptation
+## Exercise 2A: impact sectors and adaptation
 
 In the first exercise, you analysed the interplay between climate impacts and mitigation. In this exercise, you will further decompose the sources of climate impacts, and analyse the effect of adaptation.
 
@@ -78,7 +82,7 @@ In the first exercise, you analysed the interplay between climate impacts and mi
 
     For this question, use the no-policy run you did in the first exercise.
 
-    * For the two regions you chose in the previous exercise, compare the damage costs in 2050 and 2100 for the three impact sectors (riverine flooding, labour productivity, and sea-level rise). Which sector is most important for each region? How does this compare to the global picture?
+    * **Q4a:** For the two regions you chose in the previous exercise, compare the damage costs in 2050 and 2100 for the three impact sectors (riverine flooding, labour productivity, and sea-level rise). Which sector is most important for each region? How does this compare to the global picture?
 
 #### Step 2: Including adaptation
 
@@ -108,12 +112,12 @@ In the first exercise, you analysed the interplay between climate impacts and mi
 
 !!! question "Question 5: effect of adaptation"
 
-    * In the adaptation-only scenario, how much lower are the *global* damage costs in 2100 compared to the no-policy run? How much are the *global* adaptation costs? What is the benefit-cost ratio for adaptation?
-    * Is the effect of adaptation similar across the three impact sectors (riverine flooding, labour productivity, and sea-level rise)? Which sector benefits most from adaptation? Do you think this is realistic? Why or why not?
-    * The mitigation and adaptation scenario is the most optimistic scenario. How much lower are the *global* damage costs in 2100 compared to the no-policy run? How do the adaptation costs compare to the mitigation costs?
-    * Here, you used the joint approach to mitigation and adaptation. This means that first mitigation is optimised, then adaptation is optimised given the mitigation pathway. How do you think the cost-optimal temperature in 2100 would change if you had used a joint approach, where mitigation and adaptation are optimised simultaneously, and why?
+    * **Q5a:** In the adaptation-only scenario, how much lower are the *global* damage costs in 2100 compared to the no-policy run? How much are the *global* adaptation costs? What is the benefit-cost ratio for adaptation?
+    * **Q5b:** Is the effect of adaptation similar across the three impact sectors (riverine flooding, labour productivity, and sea-level rise)? Which sector benefits most from adaptation? Do you think this is realistic? Why or why not?
+    * **Q5c:** In the "mitigation and adaptation" scenario, how much lower are the *global* damage costs in 2100 compared to the no-policy run. How do the adaptation costs compare to the mitigation costs? 
+    * **Q5d:** The mitigation and adaptation are optimised simultaneously in that scenario. How does the optimal end-of-century temperature compare to the mitigation-only scenario from exercise 1? Why is it the same/different?
 
-## Exercise 3: effort sharing and equity
+## Exercise 2B: effort sharing and equity
 
 In the next exercise, you will run MIMOSA with different effort sharing approaches. Contrary to the previous exercise, you will not do a CBA run, but a fixed carbon budget. We will choose a carbon budget of 700 GtCO<sub>2</sub>, and run MIMOSA with different effort sharing approaches.
 
@@ -133,7 +137,7 @@ In the next exercise, you will run MIMOSA with different effort sharing approach
         * [`"ability_to_pay"`](../../components/effortsharing.md#ability-to-pay)
         * [`"equal_cumulative_per_cap"`](../../components/effortsharing.md#equal-cumulative-per-capita-emissions)
 
-        More information about these regimes can be found in [van den Berg et al. (2020)](https://doi.org/10.1007/s10584-019-02368-y) (specifically, [Table 1](https://link.springer.com/article/10.1007/s10584-019-02368-y/tables/1)).
+        More information about these regimes can be found at the [Effort sharing](../../components/effortsharing.md) page in the documentation, or in [van den Berg et al. (2020)](https://doi.org/10.1007/s10584-019-02368-y) (specifically, [Table 1](https://link.springer.com/article/10.1007/s10584-019-02368-y/tables/1)).
 
         Then, run the following code where you change the variable `regime`.
 
@@ -155,13 +159,16 @@ In the next exercise, you will run MIMOSA with different effort sharing approach
 
 !!! question "Question 4: Attributed mitigation costs and equity"
 
-    * For the two chosen regions in exercise 1, compare the [mitigation costs](#var__mitigation_costs) in 2050 and 2100. How do these costs compare to the global mitigation costs?
-    * And how do they compare to the "CBA" run?
+    * **Q4a:** Briefly describe the chosen effort sharing regime in your own words, and describe which equity aspects it takes into account, and which ones not.
+    * **Q4b:** For the two chosen regions in exercise 1, compare the [mitigation costs](#var__mitigation_costs) in 2050 and 2100. How do these costs compare to the global mitigation costs?
+    * **Q4c:** And how do they compare to the cost-benefit run from exercise 1?
 
 #### Step 3: Effect on sovereignty
 
 !!! question "Question 5: Sovereignty and trading of emission reductions"
 
-    When emission trading is enabled, each region's attributed `mitigation_costs_abs` consist of its `domestic_mitigation_costs_abs` plus its `mitigation_cost_trading_balance`. A positive balance means that attributed costs and reductions exceed those occurring physically within the region; a negative balance means that they are lower.
+    When emission trading is enabled, each region's attributed [`mitigation_costs_abs`](#var__emissiontrade::mitigation_costs_abs) consist of its [`domestic_mitigation_costs_abs`](#var__emissiontrade::domestic_mitigation_costs_abs) plus its [`mitigation_cost_trading_balance`](#var__emissiontrade::mitigation_cost_trading_balance). A positive balance means that attributed costs and emission reductions exceed those occurring physically within the region: they need to pay for reductions in other regions; a negative balance means that they are lower: they receive money from other regions to finance their own mitigation effort.
 
-    The sum of `mitigation_cost_trading_balance` across regions is always zero. However, to get a sense of how large the financial flows are each year, you can sum all positive values (or all negative values) of this variable. Do this for 2050 and 2100. How large are the financial flows? How do they compare to global GDP in those years?
+    The sum of [`mitigation_cost_trading_balance`](#var__emissiontrade::mitigation_cost_trading_balance) across regions is always zero. However, to get a sense of how large the financial flows are each year, you can sum all positive values (or all negative values) of this variable.
+    
+    **Q5a:** How large are the global financial flows in 2050 and in 2100? How do they compare to global GDP in those years? Put this in the context of the 100 billion dollar pledge in the Paris Agreement. How realistic do you think your chosen effort sharing regime is?

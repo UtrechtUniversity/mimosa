@@ -10,7 +10,6 @@ params["model structure"]["emissiontrade module"] = "emissiontrade"
 params["model structure"]["welfare module"] = "cost_minimising"
 params["emissions"]["carbonbudget"] = "700 GtCO2"
 params["economics"]["MAC"]["rel_mitigation_costs_min_level"] = -0.5
-params["time"]["end"] = 2100
 
 model_effortsharing = MIMOSA(params)
 model_effortsharing.solve()
