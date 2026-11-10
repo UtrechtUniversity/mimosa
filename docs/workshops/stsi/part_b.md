@@ -1,3 +1,7 @@
+---
+variable_context: accreu_sectoral
+---
+
 # Part B: extending MIMOSA
 
 For the second part of the assigment, you will extend MIMOSA. Choose a topic you find
@@ -253,7 +257,7 @@ Replace **only that equation** with the version below, which subtracts your new
 sector's benefit from the total damages. Keep the other equations and the
 surrounding list in place:
 
-```python hl_lines="6"
+```python hl_lines="7"
             RegionalEquation(
                 m.damage_costs,
                 lambda m, t, r: (
