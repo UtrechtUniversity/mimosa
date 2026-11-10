@@ -21,6 +21,11 @@
     margin: 2px 0;
 }
 
+/* Make admonition font-size larger */
+.md-typeset .admonition, .md-typeset details {
+    font-size: 0.75rem;
+}
+
 nav.md-nav a[target=_blank]::after {
     background-color: gray;
     -webkit-mask-image: var(--md-external-link-icon);

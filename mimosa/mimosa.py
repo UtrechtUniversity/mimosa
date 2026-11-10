@@ -118,9 +118,7 @@ class MIMOSA:
         # Set the best guess as initial values for the concrete model
         self.simulator.initialize_pyomo_model(self.concrete_model, sim_m_best_guess)
 
-    def run_simulation(
-        self, **control_variables_kwargs: Any
-    ) -> SimulationObjectModel:
+    def run_simulation(self, **control_variables_kwargs: Any) -> SimulationObjectModel:
         """
         Evaluate the model equations for supplied control variables.
 
@@ -157,9 +155,11 @@ class MIMOSA:
         Run and store the no-policy reference used for avoided damages.
 
         Mitigation and adaptation are both disabled. The resulting damage costs
-        are stored in the Pyomo model as `nopolicy_damage_costs` for subsequent
-        policy runs. An ACCREU model with analytical adaptation uses a temporary
-        no-adaptation model for this reference.
+        are stored as `nopolicy_damage_costs` (market damages) and
+        `nopolicy_market_and_non_market_damage_costs` (including monetised
+        non-market damages), both as fractions of baseline gross GDP, for
+        subsequent policy runs. An ACCREU model with analytical adaptation uses
+        a temporary no-adaptation model for this reference.
 
         Returns:
             SimulationObjectModel: No-policy simulation results.
@@ -180,6 +180,9 @@ class MIMOSA:
 
         m.nopolicy_damage_costs.store_values(
             nopolicy_baseline.damage_costs.get_all_indexed()
+        )
+        m.nopolicy_market_and_non_market_damage_costs.store_values(
+            nopolicy_baseline.market_and_non_market_damage_costs.get_all_indexed()
         )
 
         # Avoided damages are added only after the baseline is available. Include
@@ -341,9 +344,7 @@ class MIMOSA:
 
         control_values = {}
         for name in sorted(target_controls):
-            source_values = getattr(
-                source_model.concrete_model, name
-            ).extract_values()
+            source_values = getattr(source_model.concrete_model, name).extract_values()
             target_keys = set(getattr(self.concrete_model, name).extract_values())
             if set(source_values) != target_keys:
                 raise ValueError(

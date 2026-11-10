@@ -22,7 +22,6 @@ from mimosa.common import (
     quant,
 )
 
-
 # Coherent deterministic response sets. Historical initial conditions and ice
 # potentials are deliberately shared: these sets describe uncertainty in future
 # physical response, rather than uncertainty in observed present-day sea level.
@@ -411,9 +410,7 @@ def get_constraints(
     )
     m.slr_gsic_init = Param(initialize=0.090)
     m.slr_gsic_total_ice = Param(initialize=0.32)
-    m.slr_gsic_temp_sensitivity = Param(
-        initialize=slr_params["gsic_temp_sensitivity"]
-    )
+    m.slr_gsic_temp_sensitivity = Param(initialize=slr_params["gsic_temp_sensitivity"])
     m.slr_gsic_timescale = Param(initialize=slr_params["gsic_timescale"])
 
     # Greenland. The potential is the sea-level equivalent of the full ice
@@ -427,12 +424,8 @@ def get_constraints(
     m.slr_gis_init = Param(initialize=0.045)
     m.slr_gis_total_ice = Param(initialize=7.3)
     m.slr_gis_threshold = Param(initialize=slr_params["gis_threshold"])
-    m.slr_gis_transition_width = Param(
-        initialize=slr_params["gis_transition_width"]
-    )
-    m.slr_gis_base_timescale = Param(
-        initialize=slr_params["gis_base_timescale"]
-    )
+    m.slr_gis_transition_width = Param(initialize=slr_params["gis_transition_width"])
+    m.slr_gis_base_timescale = Param(initialize=slr_params["gis_base_timescale"])
     m.slr_gis_timescale_sensitivity = Param(
         initialize=slr_params["gis_timescale_sensitivity"]
     )
@@ -460,16 +453,10 @@ def get_constraints(
     m.slr_ais_init = Param(initialize=0.025)
     # Effective vulnerable Antarctic stock, rather than the full AIS potential.
     m.slr_ais_total_ice = Param(initialize=5.0)
-    m.slr_ais_background_rate = Param(
-        initialize=slr_params["ais_background_rate"]
-    )
-    m.slr_ais_temp_sensitivity = Param(
-        initialize=slr_params["ais_temp_sensitivity"]
-    )
+    m.slr_ais_background_rate = Param(initialize=slr_params["ais_background_rate"])
+    m.slr_ais_temp_sensitivity = Param(initialize=slr_params["ais_temp_sensitivity"])
     m.slr_ais_fast_rate = Param(initialize=slr_params["ais_fast_rate"])
-    m.slr_ais_fast_threshold = Param(
-        initialize=slr_params["ais_fast_threshold"]
-    )
+    m.slr_ais_fast_threshold = Param(initialize=slr_params["ais_fast_threshold"])
     m.slr_ais_fast_transition_width = Param(
         initialize=slr_params["ais_fast_transition_width"]
     )
@@ -489,6 +476,11 @@ def get_constraints(
         within=NonNegativeReals,
         units=quant.unit("m"),
         doc="Total global mean sea-level rise relative to 1900. Sum of thermal expansion, glacier and ice-sheet loss, and future changes in land-water storage.",
+        initialize=lambda m, t: m.slr_thermal_fast_init
+        + m.slr_thermal_slow_init
+        + m.slr_gsic_init
+        + m.slr_gis_init
+        + m.slr_ais_init,
     )
 
     constraints = [
@@ -581,8 +573,7 @@ def get_constraints(
         GlobalEquation(
             m.slr_cumlws,
             lambda m, t: (
-                m.slr_cumlws[t - 1]
-                + m.period_length[t] * m.slr_lws_rate
+                m.slr_cumlws[t - 1] + m.period_length[t] * m.slr_lws_rate
                 if t > 0
                 else 0.0
             ),
@@ -639,9 +630,7 @@ def slr_thermal_expansion(
 def slr_gsic_equilibrium(temperature, m: ConcreteModel):
     """Temperature-dependent equilibrium glacier contribution."""
 
-    return m.slr_gsic_total_ice * tanh(
-        temperature / m.slr_gsic_temp_sensitivity
-    )
+    return m.slr_gsic_total_ice * tanh(temperature / m.slr_gsic_temp_sensitivity)
 
 
 def slr_gsic(cumgsic, temperature, m: ConcreteModel, period_length):
@@ -686,9 +675,7 @@ def slr_gis(cumgis, temperature, m: ConcreteModel, period_length):
     return relax_to_equilibrium(cumgis, equilibrium, timescale, period_length)
 
 
-def slr_antarctic_ocean_temperature(
-    ocean_temperature, temperature, m, period_length
-):
+def slr_antarctic_ocean_temperature(ocean_temperature, temperature, m, period_length):
     """Update the lagged Antarctic subsurface-ocean temperature proxy."""
 
     equilibrium = m.slr_ais_ocean_temp_scaling * temperature
@@ -704,8 +691,7 @@ def slr_ais_rate(ocean_temperature, m: ConcreteModel):
     """Antarctic contribution rate in metres of sea level per year."""
 
     fast_fraction = logistic(
-        (ocean_temperature - m.slr_ais_fast_threshold)
-        / m.slr_ais_fast_transition_width
+        (ocean_temperature - m.slr_ais_fast_threshold) / m.slr_ais_fast_transition_width
     )
     return (
         m.slr_ais_background_rate
@@ -719,8 +705,5 @@ def slr_ais(cumais, ocean_temperature, m: ConcreteModel, period_length):
 
     remaining_fraction = 1 - cumais / m.slr_ais_total_ice
     return (
-        cumais
-        + period_length
-        * slr_ais_rate(ocean_temperature, m)
-        * remaining_fraction
+        cumais + period_length * slr_ais_rate(ocean_temperature, m) * remaining_fraction
     )
