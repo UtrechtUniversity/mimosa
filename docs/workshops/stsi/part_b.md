@@ -1,25 +1,16 @@
-# Guided exercise: add a new impact sector
+# Part B: extending MIMOSA
 
-In this exercise, you will add a fictional impact sector: **heat-related damage to
-outdoor equipment**. Imagine that hotter conditions increase the cost of repairing
-and replacing equipment. We will represent these extra costs with a simple relation
-between temperature and economic damages.
-
-The sector and its coefficient are invented for this exercise. The purpose is to
-practise adding a model relationship, rather than reproduce an existing impact study.
-
-You will learn how to:
-
-- add a variable and an equation to a prepared component;
-- include the new sector in total damages, so it affects GDP;
-- make the damage coefficient configurable and compare different assumptions.
+For the second part of the assigment, you will extend MIMOSA. Choose a topic you find
+interesting, and that is missing in MIMOSA, or that you want to change/improve in the
+current version of MIMOSA. Here are some ideas to get you started. You can also come
+up with your own idea.
 
 ## Ideas for your own extension
 
-The equipment-damage example below shows the basic steps. For your own project,
-you could apply them to one of these questions. Some ideas start with changing
-existing assumptions; others require a new variable or equation. Choose one small
-change and compare its results with the original model.
+The ideas below are grouped in four categories: mitigation and fairness, impacts and
+adaptation, climate and sea-level rise, and economy and development pathways. Each
+category contains a few example questions you could explore. You can also propose your
+own idea, as long as it is not already included in MIMOSA.
 
 <div class="grid cards" markdown>
 
@@ -50,16 +41,16 @@ change and compare its results with the original model.
     - **Thresholds and protection?** Explore damages that rise sharply beyond a
       warming threshold, or add a measure that reduces a sector's damages.
 
-    **How it works now:** [COACCH damage functions](../../components/damages/coacch.md),
-    [ACCREU sectors and adaptation](../../components/damages/accreu.md) and
-    [welfare and inequality](../../components/welfare.md).
+    **How it works now:** [ACCREU sectors and adaptation](../../components/damages/accreu.md)
+    and [welfare and inequality](../../components/welfare.md).
 
 -   #### :material-waves-arrow-up: Climate and sea-level rise
 
     ---
 
-    - **Different warming responses?** Explore how strongly temperature responds
-      to cumulative emissions, or propose an alternative relationship.
+    - **Different warming responses?** The current climate modules is simply a linear
+      reponse of temperature to cumulative emissions. Explore different alternative
+      approaches, for example by adding methane emissions besides CO2.
     - **Long-lasting consequences?** Investigate how sea-level rise continues
       after temperature stabilises.
     - **Climate tipping points?** Add a simplified feedback that starts above a
@@ -79,11 +70,27 @@ change and compare its results with the original model.
     - **A different economy?** Change how investment, productivity or production
       affects GDP, starting with one relationship in the economic module.
 
-    **How it works now:** [GDP, investment and consumption](../../components/economics.md),
-    [welfare](../../components/welfare.md) and
-    [time- and region-dependent input data](../../extending/parameters.md#time-and-region-dependent-data).
+    **How it works now:** [GDP, investment and consumption](../../components/economics.md)
+    and [welfare](../../components/welfare.md).
 
 </div>
+
+## Steps for this assignment
+
+1. Choose a topic from the topics above
+2. In the MIMOSA causal loop diagram you made last week, identify where your new component
+    fits in the model. Which variables will you add, how do they depend on existing variables,
+    and which existing variables will depend on your new variable?
+3. Using a small literature review, define a simple relationship for your new variable.
+    Make an overview of which data you need, where to get it, and how to include it in MIMOSA.
+4. Implement your new component in MIMOSA, following the steps in the guided exercise.
+5. Report your findings in a short report, including your causal loop diagram, the literature
+    review, and the results of your new component. 
+
+# Guided practice exercise: adding a new damage sector
+
+For this exercise, you will add a new impact sector to MIMOSA. Specifically, you will model
+the economic benefits of increased ice-cream sales in a warming climate. The exercise will guide you through the steps to add a new variable, define its relationship to existing variables, and include it in the total damages deducted from GDP. You will also make the damage coefficient configurable, so you can explore different assumptions.
 
 ## Where to work
 
@@ -98,7 +105,8 @@ mimosa/
 ├── components/
 │   ├── new_component.py        # Add the new sector here
 │   └── damages/
-│       └── coacch.py           # Include it in total damages
+│       └── accreu/
+            └── all_damages.py  # Include it in total damages
 └── inputdata/
     └── config/
         └── config_default.yaml # Define the new parameter here
@@ -107,7 +115,7 @@ run_extension.py                # Create this script to run the exercise
 
 All paths start from MIMOSA's main directory: the folder containing the `mimosa`
 folder and `pyproject.toml`.
-This exercise uses the COACCH damage module and assumes your editable copy of MIMOSA
+This exercise uses the ACCREU damage module and assumes your editable copy of MIMOSA
 is ready to run.
 
 Inside `get_constraints`, `m` is the model. A **variable** holds a model result, a
