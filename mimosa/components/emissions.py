@@ -241,7 +241,7 @@ def _get_emissions_constraints(
     m.global_cumulative_emissions = Var(
         m.t,
         units=quant.unit("emissions_unit"),
-        doc="Cumulative global net CO2 emissions since the model start, including any exogenous emissions pulse. Calculated using trapezoidal integration or timestep-weighted summation, depending on configuration.",
+        doc="Cumulative global net CO2 emissions since the model start, including optionally any exogenous emissions pulse.",
     )
     m.global_emissions = Var(
         m.t,
