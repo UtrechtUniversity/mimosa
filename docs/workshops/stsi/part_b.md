@@ -24,8 +24,8 @@ own idea, as long as it is not already included in MIMOSA.
 
     - **Who pays?** Compare fairness rules or propose a different way to share
       mitigation costs between regions.
-    - **Act now or later?** Explore delayed mitigation or pathways that temporarily
-      exceed a temperature target before returning below it (overshoot).
+    - **Lifestyle changes?** Explore ways to include lifestyle changes in the model, such as
+      changes in diet.
     - **Reduce demand?** Represent lower energy or material demand and its effect
       on emissions and mitigation costs.
 
@@ -41,9 +41,9 @@ own idea, as long as it is not already included in MIMOSA.
     - **A new impact sector?** Add a simple damage relationship for a sector such
       as infrastructure or ecosystem services, or explore biodiversity loss.
     - **Who is affected?** Explore how the same warming causes different damages
-      across regions, or how impacts are shared between population groups.
+      within regions, or how impacts are distributed across different groups.
     - **Thresholds and protection?** Explore damages that rise sharply beyond a
-      warming threshold, or add a measure that reduces a sector's damages.
+      warming threshold, or add/change assumptions on adaptation measures.
 
     **How it works now:** [ACCREU sectors and adaptation](../../components/damages/accreu.md)
     and [welfare and inequality](../../components/welfare.md).
@@ -55,8 +55,6 @@ own idea, as long as it is not already included in MIMOSA.
     - **Different warming responses?** The current climate modules is simply a linear
       reponse of temperature to cumulative emissions. Explore different alternative
       approaches, for example by adding methane emissions besides CO2.
-    - **Long-lasting consequences?** Investigate how sea-level rise continues
-      after temperature stabilises.
     - **Climate tipping points?** Add a simplified feedback that starts above a
       temperature threshold, such as extra emissions or faster ice loss.
 
@@ -72,7 +70,7 @@ own idea, as long as it is not already included in MIMOSA.
     - **Lower growth or degrowth?** Explore alternative economic trajectories
       and their consequences for emissions, consumption and welfare.
     - **A different economy?** Change how investment, productivity or production
-      affects GDP, starting with one relationship in the economic module.
+      affects GDP, and investigate changes to the production function.
 
     **How it works now:** [GDP, investment and consumption](../../components/economics.md)
     and [welfare](../../components/welfare.md).
