@@ -87,7 +87,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#installing-mimosa" class="md-skip">
+        <a href="#local-installation" class="md-skip">
           Skip to content
         </a>
       
@@ -1956,10 +1956,21 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
       
         <li class="md-nav__item">
-  <a href="#installing-mimosa" class="md-nav__link">
+  <a href="#local-installation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Installing MIMOSA
+        Local installation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#google-colab-installation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Google Colab installation
       
     </span>
   </a>
@@ -2071,10 +2082,21 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
       
         <li class="md-nav__item">
-  <a href="#installing-mimosa" class="md-nav__link">
+  <a href="#local-installation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Installing MIMOSA
+        Local installation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#google-colab-installation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Google Colab installation
       
     </span>
   </a>
@@ -2103,7 +2125,24 @@
 
   <h1>Setting up MIMOSA</h1>
 
-<h2 id="installing-mimosa">Installing MIMOSA</h2>
+<h2 id="local-installation">Local installation</h2>
+<p>The preferred setup is to download and install MIMOSA on your local machine. To do this, download the following zip file with the MIMOSA code and extract it to a folder of your choice:</p>
+<p><a class="md-button" href="https://github.com/UtrechtUniversity/mimosa/archive/refs/heads/stsi.zip">Download MIMOSA</a></p>
+<p>Then, open an Anaconda Prompt (Windows) or terminal (Mac/Linux) and run the following commands:</p>
+<p>Navigate to the folder where you extracted MIMOSA:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a href="#__codelineno-0-1" id="__codelineno-0-1" name="__codelineno-0-1"></a><span class="nb">cd</span><span class="w"> </span>path/to/mimosa-stsi
+</span></code></pre></div>
+<p>Then activate the STSI conda environment:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a href="#__codelineno-1-1" id="__codelineno-1-1" name="__codelineno-1-1"></a>conda<span class="w"> </span>activate<span class="w"> </span>STSI
+</span></code></pre></div>
+<p>Install MIMOSA in editable mode so you can make changes to the code and run them without reinstalling:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a href="#__codelineno-2-1" id="__codelineno-2-1" name="__codelineno-2-1"></a>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
+</span></code></pre></div>
+<p>Finally, install IPOPT, which is required to run the model:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a href="#__codelineno-3-1" id="__codelineno-3-1" name="__codelineno-3-1"></a>conda<span class="w"> </span>install<span class="w"> </span>-c<span class="w"> </span>conda-forge<span class="w"> </span>ipopt
+</span></code></pre></div>
+<h2 id="google-colab-installation">Google Colab installation</h2>
+<p>If the above instructions don't work, you can run MIMOSA in Google Colab. This is a cloud-based Python environment that runs in your browser and does not require any installation. It is slower than running MIMOSA locally, requires a Google account, but it is easier to set up.</p>
 <p>Save the following Google Colab notebook to your Google Drive and open it in Colab. It will install MIMOSA and its dependencies, and set up a working directory for the exercises.</p>
 <p><a href="https://colab.research.google.com/drive/1DzkT0ECMVzHMK6B48whb_17PX7EbSsx-?usp=sharing">https://colab.research.google.com/drive/1DzkT0ECMVzHMK6B48whb_17PX7EbSsx-?usp=sharing</a></p><span hidden="" data-documentation-context="coacch"></span>
 
