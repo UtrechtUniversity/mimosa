@@ -784,17 +784,71 @@
   </span>
 </a>
 </li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="../../workshops/guided_exercise/">
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" id="__nav_11_2" type="checkbox">
+<div class="md-nav__link md-nav__container">
+<a class="md-nav__link" href="../../workshops/stsi/">
 <span class="md-ellipsis">
     
   
-    Guided exercise STSI
+    STSI
   
 
     
   </span>
 </a>
+<label class="md-nav__link" for="__nav_11_2" id="__nav_11_2_label" tabindex="0">
+<span class="md-nav__icon md-icon"></span>
+</label>
+</div>
+<nav aria-expanded="false" aria-labelledby="__nav_11_2_label" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="__nav_11_2">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    STSI
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../workshops/stsi/setup/">
+<span class="md-ellipsis">
+    
+  
+    Setting up MIMOSA
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../workshops/stsi/part_a/">
+<span class="md-ellipsis">
+    
+  
+    Part A: running MIMOSA
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../workshops/stsi/part_b/">
+<span class="md-ellipsis">
+    
+  
+    Part B: extending MIMOSA
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
 </li>
 </ul>
 </nav>
@@ -817,11 +871,6 @@
 <h1>Region definitions</h1>
 <p>By default, MIMOSA uses the 26 IMAGE regions. More information about this regional definition is
 available on the <a href="https://models.pbl.nl/image/Region_classification_map">IMAGE website</a>.</p>
-<p>The model region definition is named by the <a href="#param__regionstype"><code>regionstype</code></a> setting,
-while <a href="#param__regions"><code>regions</code></a> contains the region codes included in a run. The
-configuration schema also recognises <code>SSP5</code> and <code>World</code> definitions. Using a different definition
-requires matching time-dependent input data and, where necessary, a registered mapping for regional
-parameters. See <a href="../../extending/parameters/#regional-params">Regional parameters</a> for details.</p>
 <p>The map and table below describe the default IMAGE26 regions. Hover over the map to see a region's
 name:</p>
 <div class="mkdocs-plotly" data-jsonpath="../../assets/plots/image_regions.json"></div>
