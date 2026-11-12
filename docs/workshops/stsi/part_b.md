@@ -28,6 +28,12 @@ own idea, as long as it is not already included in MIMOSA.
       changes in diet.
     - **Reduce demand?** Represent lower energy or material demand and its effect
       on emissions and mitigation costs.
+    - **More recycled steel?** Estimate how using more scrap to make the same
+      amount of steel changes baseline CO₂ emissions.
+    - **Enough materials for clean power?** Add a cost penalty when the material
+      needed for new wind or solar capacity exceeds an assumed supply.
+    - **How much mitigation at home?** Require regions to make a minimum share
+      of their credited emissions cuts domestically and compare how much they trade.
 
     **How it works now:** [Mitigation costs and learning](../../components/mitigation.md),
     [effort-sharing](../../components/effortsharing.md),
@@ -44,6 +50,10 @@ own idea, as long as it is not already included in MIMOSA.
       within regions, or how impacts are distributed across different groups.
     - **Thresholds and protection?** Explore damages that rise sharply beyond a
       warming threshold, or add/change assumptions on adaptation measures.
+    - **Where does water become scarce?** Compare regional water withdrawals
+      with available freshwater under different warming pathways.
+    - **Who gets loss and damage funding?** Compare how a fixed fund is split
+      if regions are paid by total damages or by damages as a share of GDP.
 
     **How it works now:** [ACCREU sectors and adaptation](../../components/damages/accreu.md)
     and [welfare and inequality](../../components/welfare.md).
@@ -57,6 +67,8 @@ own idea, as long as it is not already included in MIMOSA.
       approaches, for example by adding methane emissions besides CO2.
     - **Climate tipping points?** Add a simplified feedback that starts above a
       temperature threshold, such as extra emissions or faster ice loss.
+    - **Can coastal wetlands move inland?** Estimate how much wetland remains
+      as seas rise under different assumptions about available land.
 
     **How it works now:** [Emissions and temperature](../../components/emissions.md)
     and [sea-level-rise contributions](../../components/sealevelrise.md).
@@ -71,6 +83,10 @@ own idea, as long as it is not already included in MIMOSA.
       and their consequences for emissions, consumption and welfare.
     - **A different economy?** Change how investment, productivity or production
       affects GDP, and investigate changes to the production function.
+    - **Whose consumption drives emissions?** For one traded product, compare
+      assigning its production emissions to the regions that make it or use it.
+    - **Who can meet basic needs?** Split regional consumption between two
+      income groups and compare their shortfalls against a basic-needs threshold.
 
     **How it works now:** [GDP, investment and consumption](../../components/economics.md)
     and [welfare](../../components/welfare.md).
